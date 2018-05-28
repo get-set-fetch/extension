@@ -1,0 +1,20 @@
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "browsers": ["last 2 Chrome versions", "last 2 Firefox versions"]
+      },
+      "include": ["transform-async-to-generator"],
+      "useBuiltIns": true,
+      "debug": false
+    }]
+  ],
+  "plugins": [
+    ["module-resolver", {
+      "root": ["./"],
+      "alias": {
+        "storage": "./src/background/storage"
+      }
+    }]
+  ]
+}
