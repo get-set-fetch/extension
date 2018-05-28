@@ -1,0 +1,25 @@
+{
+
+    "manifest_version": 2,
+    "name": "Get Set Fetch",
+    "version": "1.0",
+  
+    "description": "Get Set Fetch Browser Extension",
+  
+    "icons": {
+      "32": "icons/gsf_32x32.png"
+    },
+
+    "background": {
+        "scripts": ["index.js"]
+      },
+
+    "browser_action": {
+        "default_icon": "icons/gsf_32x32.png",
+        "default_title": "Get Set Fetch",
+        "default_popup": "popup.html"
+      },
+
+    "permissions": ["contextMenus"]
+
+  }
