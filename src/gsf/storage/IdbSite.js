@@ -50,7 +50,6 @@ class IdbSite extends BaseSite {
   }
 
   getResourceToCrawl(crawlFrequency) {
-    // besides siteId, should also be crawlDelay, retry delays in order to create a more advanved resource where query
     return IdbResource.getResourceToCrawl(this.id, crawlFrequency);
   }
 
@@ -74,7 +73,6 @@ class IdbSite extends BaseSite {
       };
 
       reqAddSite.onerror = (err) => {
-        console.log(err);
         reject(new Error(`could not add site: ${this.url} - ${err}`));
       };
     });
@@ -89,8 +87,8 @@ class IdbSite extends BaseSite {
       const reqReadSite = tx.objectStore('Sites').get(this.id);
       reqReadSite.onsuccess = (e) => {
         const latestSite = e.target.result;
-        const resourceFilterOpts = this.opts.resourceFilter;
-        const bloomFilter = BloomFilter.create(resourceFilterOpts.maxEntries, resourceFilterOpts.probability, latestSite.resourceFilter);
+        const { maxEntries, probability } = this.opts.resourceFilter.resourceFilterOpts;
+        const bloomFilter = BloomFilter.create(maxEntries, probability, latestSite.resourceFilter);
 
         // create new resources
         const resources = [];
