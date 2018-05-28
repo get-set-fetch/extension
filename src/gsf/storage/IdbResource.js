@@ -1,5 +1,4 @@
-import { Storage } from 'get-set-fetch';
-const { BaseResource } = Storage;
+import { BaseResource } from 'get-set-fetch';
 
 /* eslint-disable class-methods-use-this */
 class IdbResource extends BaseResource {

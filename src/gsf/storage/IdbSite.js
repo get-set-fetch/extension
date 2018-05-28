@@ -1,7 +1,5 @@
-import { Storage, BloomFilter, PluginManager } from 'get-set-fetch';
+import { BaseSite, BloomFilter, PluginManager } from 'get-set-fetch';
 import IdbResource from './IdbResource';
-
-const { BaseSite } = Storage;
 
 /* eslint-disable class-methods-use-this */
 class IdbSite extends BaseSite {
@@ -87,7 +85,7 @@ class IdbSite extends BaseSite {
       const reqReadSite = tx.objectStore('Sites').get(this.id);
       reqReadSite.onsuccess = (e) => {
         const latestSite = e.target.result;
-        const { maxEntries, probability } = this.opts.resourceFilter.resourceFilterOpts;
+        const { maxEntries, probability } = this.opts.resourceFilter;
         const bloomFilter = BloomFilter.create(maxEntries, probability, latestSite.resourceFilter);
 
         // create new resources

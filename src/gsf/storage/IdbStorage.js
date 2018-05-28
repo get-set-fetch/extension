@@ -1,8 +1,7 @@
-import { Storage } from 'get-set-fetch';
+import { BaseEntity } from 'get-set-fetch';
 import IdbSite from './IdbSite';
 import IdbResource from './IdbResource';
 
-const { BaseEntity } = Storage;
 class IdbStorage {
   static init() {
     return new Promise((resolve, reject) => {
