@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
+    "get-set-fetch": "^0.3.6",
     "indexeddbshim": "^3.6.2"
   }
 }
