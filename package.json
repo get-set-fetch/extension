@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha test --recursive",
     "build:dev": "webpack --config webpack.config.js --mode development --display-modules",
-    "build:dev:watch": "webpack --config webpack.config.js --mode development --watch --info-verbosity verbose",
+    "build:dev:watch": "webpack --config webpack.config.js --mode development --watch",
     "build:prod": "webpack --config webpack.config.js --mode production"
   },
   "keywords": [
