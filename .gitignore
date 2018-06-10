@@ -1,3 +1,6 @@
+# generated resources
+dist/
+
 # Logs
 logs
 *.log
