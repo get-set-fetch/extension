@@ -2,12 +2,14 @@ const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 /* eslint-disable no-param-reassign */
 module.exports = {
   entry: {
-    index: './src/gsf/index.js',
-    popup: './src/popup/js/popup.js',
+    'gsf/gsf': './src/gsf/gsf.js',
+    'popup/popup': './src/popup/js/popup.js',
+    'admin/admin': './src/admin/js/index.js',
   },
   output: {
     filename: '[name].js',
@@ -15,11 +17,24 @@ module.exports = {
   },
   target: 'web',
   devtool: 'source-map',
+  watchOptions: {
+    aggregateTimeout: 1000,
+    poll: 1000,
+  },
+
   plugins: [
     new HtmlWebpackPlugin({
-      chunks: ['popup'],
-      filename: 'popup.html',
+      chunks: ['popup/popup'],
+      filename: 'popup/popup.html',
       template: 'src/popup/html/popup.html',
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['admin/admin'],
+      filename: 'admin/admin.html',
+      template: 'src/admin/html/admin.html',
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
     }),
     new CopyWebpackPlugin([
       { from: 'src/manifest.json', to: './' },
@@ -47,10 +62,11 @@ module.exports = {
       }),
     ),
   ],
+
   module: {
     rules: [
       {
-        test: /\.js/,
+        test: /\.js|.jsx/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
@@ -60,7 +76,19 @@ module.exports = {
         test: /KnexStorage|MongoStorage/,
         use: 'null-loader',
       },
+      {
+        test: /\.scss$/,
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'sass-loader',
+        ],
+      },
     ],
+  },
+
+  resolve: {
+    extensions: ['.js', '.jsx'],
   },
 
 };
