@@ -38,6 +38,28 @@ class IdbSite extends BaseSite {
     });
   }
 
+  static getAll(nameOrId) {
+    return new Promise((resolve, reject) => {
+      const rTx = IdbSite.rTx();
+      const readReq = rTx.getAll();
+
+      readReq.onsuccess = (e) => {
+        const { result } = e.target;
+        if (!result) {
+          resolve(null);
+        }
+        else {
+          for (let i = 0; i < result.length; i += 1) {
+            Object.assign(result[i], this.parseResult(result[i]));
+            result[i] = Object.assign(new IdbSite(null, null, null, false), result[i]);
+          }
+          resolve(result);
+        }
+      };
+      readReq.onerror = () => reject(new Error(`could not read site: ${nameOrId}`));
+    });
+  }
+
   static delAll() {
     return new Promise((resolve, reject) => {
       const rwTx = IdbSite.rwTx();
