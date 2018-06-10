@@ -1,24 +1,37 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
+import Table from '../../components/Table';
 import GsfClient from '../../components/GsfClient';
 
 export default class ProjectList extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+
     this.state = {
-      sites: null,
+      header: [
+        {
+          label: 'name',
+          prop: 'name',
+          render: site => (<td><NavLink to={`/site/${site.id}`} className="nav-link">{site.name}</NavLink></td>),
+        },
+        { label: 'url', prop: 'url' },
+      ],
+      data: [],
+      currentSite: {},
     };
   }
+
   async componentDidMount() {
-    console.log('did mount');
-    const sites = await GsfClient.fetch({ method: 'GET', resource: 'sites' });
-    console.log(sites);
-    this.setState({ sites });
-    console.log(sites);
+    const data = await GsfClient.fetch('GET', 'site');
+    this.setState({ data });
+    console.log(data);
   }
+
   // eslint-disable-next-line class-methods-use-this
   render() {
-    return (
-      <p>Project List</p>
-    );
+    return [
+      <p>Project List</p>,
+      <Table header={this.state.header} data={this.state.data} />,
+    ];
   }
 }
