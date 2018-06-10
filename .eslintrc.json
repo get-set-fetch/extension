@@ -1,12 +1,16 @@
 {
-  "extends": "airbnb-base",
+  "extends": [
+    "airbnb-base",
+    "plugin:react/recommended"
+  ],
   "env": {
     "browser": true,
     "mocha": true
   },
   "globals": {
     "assert": true,
-    "browser": true
+    "browser": true,
+    "chrome": true
   },  
   "parserOptions": {
     "ecmaFeatures": {
