@@ -1,9 +1,12 @@
 import IdbStorage from './storage/IdbStorage';
 
+/* eslint-disable no-case-declarations */
 export default class GsfProvider {
   static async init() {
     // init extension storage
-    const { Site } = await IdbStorage.init();
+    const { Site, Resource } = await IdbStorage.init();
+    GsfProvider.Site = Site;
+    GsfProvider.Resource = Resource;
 
     /*
     // create some sites
@@ -19,6 +22,7 @@ export default class GsfProvider {
         case 'site':
           GsfProvider.siteHandler(Site, request, sender, sendResponse);
           break;
+        case 'resource':
         default:
       }
 
@@ -31,6 +35,10 @@ export default class GsfProvider {
     switch (request.method) {
       case 'GET':
         sitePromise = request.body && request.body.nameOrId ? await Site.get(request.body.nameOrId) : Site.getAll();
+        break;
+      case 'POST':
+        const site = new GsfProvider.Site(request.body.title, request.body.url);
+        sitePromise = site.save();
         break;
       default:
     }
