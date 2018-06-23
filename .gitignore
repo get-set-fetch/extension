@@ -1,5 +1,6 @@
 # generated resources
 dist/
+keys/
 
 # Logs
 logs

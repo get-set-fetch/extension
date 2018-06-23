@@ -24,6 +24,7 @@
       "admin/*"
     ],
 
-    "permissions": ["contextMenus"]
+    "permissions": ["contextMenus", "tabs", "<all_urls>"],
 
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA19t+tu4xk/P7cNzl74zH5KCF+PehpqviDTk+eddLmPU436arcnWxGNIdK6wFNm9YXv0luBqQbD+mm/cnFflm++jDtX+sDcNqjuOlYl8rWgMhaa3ZXLgfiFjq5nIHkgk8qtaDiciXJzSDKVJnCfslFdqP/taatw+TPQsUi93ar5sRvyM0okR7nfoecJY5zXwqNa4O0rMS/v3Fh9udYQlIuDJ88iPOex9WUwG5/MkWOcZqh9YnwGM95kKOmEoIBbKphhCBxLqCcANKdXuI/h8Zl2NH2KcIJZ9VlYTDzJPfacrz9BG/nKiDoHzFxQKthhw+AV04MmHMW14eHCfH0yPkpQIDAQAB"
   }
