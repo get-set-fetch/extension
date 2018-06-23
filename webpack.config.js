@@ -4,24 +4,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-/* eslint-disable no-param-reassign */
-module.exports = {
-  entry: {
-    'gsf/gsf': './src/gsf/gsf.js',
-    'popup/popup': './src/popup/js/popup.js',
-    'admin/admin': './src/admin/js/index.js',
-  },
-  output: {
-    filename: '[name].js',
-    path: path.resolve(__dirname, 'dist'),
-  },
-  target: 'web',
-  devtool: 'source-map',
-  watchOptions: {
-    aggregateTimeout: 1000,
-    poll: 1000,
-  },
-
+const defaultConf = {
   plugins: [
     new HtmlWebpackPlugin({
       chunks: ['popup/popup'],
@@ -90,3 +73,53 @@ module.exports = {
   },
 
 };
+module.exports = [
+  // extension files
+  {
+    entry: {
+      'gsf/gsf': './src/gsf/gsf.js',
+      'popup/popup': './src/popup/js/popup.js',
+      'admin/admin': './src/admin/js/index.js',
+    },
+    output: {
+      filename: '[name].js',
+      path: path.resolve(__dirname, 'dist'),
+      publicPath: '/',
+    },
+    target: 'web',
+    devtool: 'source-map',
+    watchOptions: {
+      aggregateTimeout: 1000,
+      poll: 1000,
+    },
+
+    plugins: defaultConf.plugins,
+    module: defaultConf.module,
+    resolve: defaultConf.resolve,
+    externals: defaultConf.externals,
+  },
+
+  // tabs.executeScript files
+  {
+    entry: {
+      ExtractUrlPlugin: 'get-set-fetch/lib/plugins/process/ExtractUrlPlugin.js',
+    },
+    output: {
+      filename: '[name].js',
+      path: path.resolve(__dirname, 'dist', 'gsf', 'execute'),
+      library: '[name]',
+      libraryTarget: 'var',
+    },
+    target: 'web',
+    devtool: 'source-map',
+    watchOptions: {
+      aggregateTimeout: 1000,
+      poll: 1000,
+    },
+
+    plugins: [],
+    module: defaultConf.module,
+    resolve: defaultConf.resolve,
+    externals: defaultConf.externals,
+  },
+];

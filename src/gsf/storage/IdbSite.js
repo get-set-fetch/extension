@@ -1,5 +1,7 @@
 import { BaseSite, BloomFilter, PluginManager } from 'get-set-fetch';
 import IdbResource from './IdbResource';
+import ExtensionPluginManager from '../plugins/ExtensionPluginManager';
+
 
 /* eslint-disable class-methods-use-this */
 class IdbSite extends BaseSite {
@@ -67,6 +69,14 @@ class IdbSite extends BaseSite {
       req.onsuccess = () => resolve();
       req.onerror = () => reject(new Error('could not clear Sites'));
     });
+  }
+
+  constructor(name, url, opts, createDefaultPlugins = true) {
+    super(name, url, opts, createDefaultPlugins);
+
+    if (createDefaultPlugins) {
+      this.plugins = ExtensionPluginManager.DEFAULT_PLUGINS;
+    }
   }
 
   getResourceToCrawl(crawlFrequency) {
