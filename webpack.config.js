@@ -40,8 +40,9 @@ module.exports = {
       { from: 'src/manifest.json', to: './' },
       { from: 'src/popup/resources/icons', to: './icons' },
     ]),
+
     new webpack.NormalModuleReplacementPlugin(
-      /NodeFetchPlugin|ChromeFetchPlugin|JsDomPlugin|ExtractUrlPlugin|RobotsFilterPlugin|PersistResourcePlugin|UrlUtils|Logger/,
+      /NodeFetchPlugin|ChromeFetchPlugin|JsDomPlugin|PersistResourcePlugin|Logger/,
       ((resource) => {
         // only attempt to modify resources coming from get-set-fetch/lib
         if (resource.context.match(/get-set-fetch.lib/) === null) {
@@ -52,9 +53,6 @@ module.exports = {
         switch (filename) {
           case 'Logger':
             resource.request = path.resolve(__dirname, 'src', 'gsf', 'logger', 'Logger.js');
-            break;
-          case 'UrlUtils':
-            resource.request = path.resolve(__dirname, 'src', 'gsf', 'utils', 'UrlUtils.js');
             break;
           default:
             resource.request = path.resolve(__dirname, 'src', 'gsf', 'plugins', 'MockPlugin.js');

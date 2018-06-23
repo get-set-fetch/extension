@@ -50,7 +50,7 @@
   "dependencies": {
     "babel-polyfill": "^6.26.0",
     "bootstrap": "^4.1.1",
-    "get-set-fetch": "^0.3.6",
+    "get-set-fetch": "^0.3.7",
     "indexeddbshim": "^3.6.2",
     "react": "^16.4.0",
     "react-dom": "^16.4.0",
