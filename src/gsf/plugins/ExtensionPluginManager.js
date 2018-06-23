@@ -11,8 +11,7 @@ class ExtensionPluginManager extends PluginManager {
       new SelectResourcePlugin(), // select: resource to crawl
       new ExtensionFetchPlugin(), // fetch: open resource in new tab
       new ExtensionExtractUrlPlugin(), // process: extract internal urls for further crawling
-      // new ExtractUrlPlugin(), // process: extract internal urls for further crawling
-      new UpdateResourcePlugin(), // save: update current resource with the fetched content
+      new UpdateResourcePlugin(), // save: update current resource with the processed content
       new InsertResourcePlugin(), // save: insert newly founded resources after parsing the current resource content
     ];
   }
