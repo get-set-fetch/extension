@@ -30,6 +30,7 @@ export default class ProjectList extends React.Component {
   // eslint-disable-next-line class-methods-use-this
   render() {
     return [
+      <NavLink to="/project" className="nav-link">Create new project</NavLink>,
       <p>Project List</p>,
       <Table header={this.state.header} data={this.state.data} />,
     ];

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 import Header from './layout/Header';
 import Page from './layout/Page';
 import ProjectList from './pages/projects/ProjectList';
+import ProjectDetail from './pages/projects/ProjectDetail';
 import LogList from './pages/logs/LogList';
 import Help from './pages/help/Help';
 
@@ -14,6 +15,7 @@ export default class Admin extends React.Component {
         <div>
           <Header/>
           <Page>
+            <Route path="/project" component={ProjectDetail} />
             <Route path="/projects" component={ProjectList} />
             <Route path="/logs" component={LogList} />
             <Route path="/help" component={Help} />
