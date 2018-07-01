@@ -1,14 +1,8 @@
-const path = require('path');
 const puppeteer = require('puppeteer');
 const queryString = require('query-string');
 const { assert } = require('chai');
 
-const extension = {
-  id: 'cpbaclenlbncmmagcfdlblmmppgmcjfg',
-  path: path.resolve(__dirname, '..', '..', '..', 'dist'),
-};
-
-describe('Test Admin, ', () => {
+describe('Test Extension Admin Area, ', () => {
   let browser = null;
   let page = null;
 
@@ -18,7 +12,7 @@ describe('Test Admin, ', () => {
   };
 
   before(async () => {
-    // launch chrome
+    // launch chromium
     browser = await puppeteer.launch({
       headless: false,
       args: [
@@ -31,7 +25,12 @@ describe('Test Admin, ', () => {
     page = await browser.newPage();
   });
 
-  it('Create New Site', async () => {
+  after(async () => {
+    // close chromium
+    await browser.close();
+  });
+
+  it('Test Create New Site', async () => {
     // construct extension url
     const actualSite = {
       name: 'siteA',

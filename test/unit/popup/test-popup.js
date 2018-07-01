@@ -1,13 +1,7 @@
-const path = require('path');
 const puppeteer = require('puppeteer');
 const { assert } = require('chai');
 
-const extension = {
-  id: 'cpbaclenlbncmmagcfdlblmmppgmcjfg',
-  path: path.resolve(__dirname, '..', '..', '..', 'dist'),
-};
-
-describe('Test Popup, ', () => {
+describe('Test Extension Popup, ', () => {
   let browser = null;
   let page = null;
 
@@ -17,7 +11,7 @@ describe('Test Popup, ', () => {
   };
 
   before(async () => {
-    // launch chrome
+    // launch chromium
     browser = await puppeteer.launch({
       headless: false,
       args: [
@@ -30,7 +24,12 @@ describe('Test Popup, ', () => {
     page = await browser.newPage();
   });
 
-  it('Test Default Popup', async () => {
+  after(async () => {
+    // close chromium
+    await browser.close();
+  });
+
+  it('Test Admin Links', async () => {
     // open extension popup
     await page.goto(`chrome-extension://${extension.id}/popup/popup.html`, gotoOpts);
 
@@ -52,7 +51,7 @@ describe('Test Popup, ', () => {
 
     // check if links are rendered correctly
     const expectedLinks = [
-      { text: 'New Project', href: `chrome-extension://${extension.id}/admin/admin.html?path=%2Fproject` },
+      { text: 'New Project', href: `chrome-extension://${extension.id}/popup/popup.html#` },
       { text: 'Admin Area', href: `chrome-extension://${extension.id}/admin/admin.html` },
     ];
     assert.sameDeepMembers(detectedlinks, expectedLinks);
