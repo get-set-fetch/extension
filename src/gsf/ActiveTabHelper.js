@@ -1,8 +1,8 @@
 export default class ActiveTabHelper {
-  static executeScript(details) {
+  static executeScript(tabId, details) {
     return new Promise((resolve) => {
       chrome.tabs.executeScript(
-        null,
+        tabId,
         details,
         (result) => {
           if (result) {
@@ -25,13 +25,31 @@ export default class ActiveTabHelper {
     });
   }
 
+  static create(createProperties) {
+    return new Promise((resolve) => {
+      chrome.tabs.create(
+        createProperties || {},
+        (tab) => {
+          resolve(tab);
+        },
+      );
+    });
+  }
+
   static update(tabId, updateProperties) {
     return new Promise((resolve) => {
       chrome.tabs.update(
         tabId,
-        updateProperties,
+        updateProperties || {},
         (tab) => {
-          resolve(tab);
+          // wait for the tab update to be completed, executeScript may throw errors otherwise
+          const updateHandler = (updatedTabId, changeInfo) => {
+            if (tabId === updatedTabId && changeInfo.status === 'complete') {
+              chrome.tabs.onUpdated.removeListener(updateHandler);
+              resolve(tab);
+            }
+          };
+          chrome.tabs.onUpdated.addListener(updateHandler);
         },
       );
     });
