@@ -1,6 +1,7 @@
-import { BaseSite, BloomFilter, PluginManager } from 'get-set-fetch';
+import { BaseSite, BloomFilter } from 'get-set-fetch';
 import IdbResource from './IdbResource';
 import ExtensionPluginManager from '../plugins/ExtensionPluginManager';
+import ExtensionExtractUrlPlugin from '../plugins/process/ExtensionExtractUrlPlugin';
 
 
 /* eslint-disable class-methods-use-this */
@@ -17,7 +18,7 @@ class IdbSite extends BaseSite {
 
   static parseResult(result) {
     return {
-      plugins: PluginManager.instantiate(JSON.parse(result.plugins)),
+      plugins: ExtensionPluginManager.instantiate(JSON.parse(result.plugins)),
     };
   }
 
@@ -77,6 +78,10 @@ class IdbSite extends BaseSite {
     if (createDefaultPlugins) {
       this.plugins = ExtensionPluginManager.DEFAULT_PLUGINS;
     }
+  }
+
+  addMaxDepthPlugin(maxDepth) {
+    this.addPlugins([new ExtensionExtractUrlPlugin({ maxDepth })]);
   }
 
   getResourceToCrawl(crawlFrequency) {
@@ -141,6 +146,7 @@ class IdbSite extends BaseSite {
             }
             // update bloomFilter, can only be done updating the entire site
             else {
+              latestSite.resourceFilter = bloomFilter.bitset;
               const reqUpdateSite = tx.objectStore('Sites').put(latestSite);
               reqUpdateSite.onsuccess = () => resolve();
               reqUpdateSite.onerror = () => reject(new Error(`could not update site: ${this.url}`));
@@ -148,6 +154,10 @@ class IdbSite extends BaseSite {
           };
 
           successHandler();
+        }
+        // otherwise nothing to do
+        else {
+          resolve();
         }
       };
 
@@ -176,7 +186,7 @@ class IdbSite extends BaseSite {
 
   // IndexedDB can't do partial update, define all site properties to be stored
   get props() {
-    return ['id', 'name', 'url', 'opts', 'robotsTxt', 'plugins'];
+    return ['id', 'name', 'url', 'opts', 'robotsTxt', 'plugins', 'resourceFilter'];
   }
 
   serialize() {

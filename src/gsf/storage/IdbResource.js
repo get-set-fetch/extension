@@ -110,6 +110,7 @@ class IdbResource extends BaseResource {
     return new Promise((resolve, reject) => {
       const rwTx = IdbResource.rwTx();
       this.crawledAt = new Date();
+      this.crawlInProgress = false;
       const reqUpdateResource = rwTx.put(this.serialize());
       reqUpdateResource.onsuccess = () => resolve();
       reqUpdateResource.onerror = () => reject(new Error(`could not update resource: ${this.url}`));

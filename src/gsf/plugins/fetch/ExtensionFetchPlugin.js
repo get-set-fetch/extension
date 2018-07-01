@@ -1,6 +1,8 @@
 import BasePlugin from 'get-set-fetch/lib/plugins/base/BasePlugin';
 import ActiveTabHelper from '../../ActiveTabHelper';
 
+const URL = require('url-parse');
+
 class ExtensionFetchPlugin extends BasePlugin {
   // eslint-disable-next-line class-methods-use-this
   getPhase() {
@@ -18,7 +20,7 @@ class ExtensionFetchPlugin extends BasePlugin {
     let activeTab = await ActiveTabHelper.getCurrent();
     activeTab = await ActiveTabHelper.update(activeTab.id, { url: resource.url });
 
-    const contentType = await ActiveTabHelper.executeScript({ code: 'document.contentType' });
+    const contentType = await ActiveTabHelper.executeScript(activeTab.id, { code: 'document.contentType' });
     return { activeTab, contentType };
   }
 }
