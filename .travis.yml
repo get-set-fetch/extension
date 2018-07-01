@@ -9,9 +9,3 @@ script:
 after_script:
   - npm run test:report
   - npm run clean
-addons:
-  chrome: stable
-  apt:
-    packages:
-      # This is required to run new chrome on old trusty
-      - libnss3
