@@ -17,6 +17,7 @@ describe('Test Extension Popup, ', () => {
       args: [
         `--disable-extensions-except=${extension.path}`,
         `--load-extension=${extension.path}`,
+        '--no-sandbox',
       ],
     });
 
