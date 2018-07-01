@@ -3,8 +3,8 @@ import React from 'react';
 export default class Table extends React.Component {
   render() {
     return (
-      <table className="table table-hover">
-        <thead>
+      <table className="table table-hover table-fixed">
+        <thead className="blue-grey lighten-4">
           <tr>
             {
               this.props.header.map(hr => <th>{hr.label}</th>)
@@ -13,6 +13,7 @@ export default class Table extends React.Component {
         </thead>
         <tbody>
           {
+            this.props.data &&
             this.props.data.map &&
             this.props.data.map(row => (
               <tr>
