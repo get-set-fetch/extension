@@ -18,6 +18,7 @@ describe('Test Extension Admin Area, ', () => {
       args: [
         `--disable-extensions-except=${extension.path}`,
         `--load-extension=${extension.path}`,
+        '--no-sandbox',
       ],
     });
 
