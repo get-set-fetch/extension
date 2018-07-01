@@ -1,32 +1,26 @@
-function crawl() {
-  chrome.runtime.sendMessage('crawl');
+import queryString from 'query-string';
+import ActiveTabHelper from '../../gsf/ActiveTabHelper';
+
+const extensionId = 'cpbaclenlbncmmagcfdlblmmppgmcjfg';
+
+function handleNewProject() {
+  document.getElementById('newproject').onclick = async (evt) => {
+    evt.preventDefault();
+
+    const activeTab = await ActiveTabHelper.getCurrent();
+    const name = await ActiveTabHelper.executeScript(activeTab.id, { code: 'document.title' });
+    const url = await ActiveTabHelper.executeScript(activeTab.id, { code: 'window.location.toString()' });
+
+    const queryParams = queryString.stringify({
+      redirectPath: '/project',
+      name,
+      url,
+    });
+
+    const adminUrl = `chrome-extension://${extensionId}/admin/admin.html?${queryParams}`;
+    chrome.tabs.create({ url: adminUrl });
+  };
 }
 
-function addCrawlLink(container) {
-  const crawlLink = document.createElement('a');
-  const crawlText = document.createTextNode('Create new project');
-  crawlLink.appendChild(crawlText);
-  crawlLink.id = 'newproject';
-  crawlLink.href = '#';
-  container.appendChild(crawlLink);
-  container.appendChild(document.createElement('br'));
-}
-
-function addAdminLink(container) {
-  const adminLink = document.createElement('a');
-  const linkText = document.createTextNode('Admin Area');
-  adminLink.appendChild(linkText);
-  adminLink.id = 'admin';
-  adminLink.title = 'Admin Area';
-  adminLink.href = chrome.runtime.getURL('admin/admin.html');
-  adminLink.target = '_blank';
-  container.appendChild(adminLink);
-}
-
-addCrawlLink(document.body);
-addAdminLink(document.body);
-
-document.getElementById('crawlLink').onclick = (evt) => {
-  crawl();
-};
+handleNewProject();
 
