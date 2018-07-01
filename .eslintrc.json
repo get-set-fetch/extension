@@ -5,12 +5,15 @@
   ],
   "env": {
     "browser": true,
-    "mocha": true
+    "mocha": true    
   },
   "globals": {
     "assert": true,
     "browser": true,
-    "chrome": true
+    "chrome": true,
+    "extension": true,
+    "gsfRequire": true,
+    "GsfClient": true
   },  
   "parserOptions": {
     "ecmaFeatures": {

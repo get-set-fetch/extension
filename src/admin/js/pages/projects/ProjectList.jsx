@@ -27,7 +27,11 @@ export default class ProjectList extends React.Component {
         { label: 'Status', prop: 'status' },
         {
           label: 'Actions',
-          render: site => (<td><input type="button" className="btn-secondary" value="Crawl" onClick={ProjectList.crawlSite.bind(this, site)}/></td>),
+          render: site => (
+            <td>
+              <input type="button" className="btn-secondary" value="Crawl" onClick={ProjectList.crawlSite.bind(this, site)}/>
+            </td>
+          ),
         },
       ],
       data: [],
