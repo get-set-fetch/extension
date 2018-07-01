@@ -2,4 +2,4 @@
 --require babel-core/register
 --require test/utils/init.js
 --require test/utils/shims.js
---timeout 5000
+--timeout 15000
