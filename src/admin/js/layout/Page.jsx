@@ -5,7 +5,7 @@ export default class Header extends React.Component {
     return (
       <div className="container-fluid">
       <div className="row">
-        <main role="main" className="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+        <main role="main" className="col pt-3 px-4">
           {this.props.children}
         </main>
       </div>

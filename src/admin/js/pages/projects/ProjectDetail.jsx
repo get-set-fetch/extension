@@ -1,14 +1,42 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { setIn } from 'immutable';
-import { NavLink } from 'react-router-dom';
+import queryString from 'query-string';
 import GsfClient from '../../components/GsfClient';
 
 export default class ProjectDetail extends React.Component {
+  static get propTypes() {
+    return {
+      history: PropTypes.shape({
+        push: PropTypes.func,
+      }),
+      location: PropTypes.shape({
+        search: PropTypes.string,
+      }),
+    };
+  }
+
+  static get defaultProps() {
+    return {
+      history: {
+        push: () => {},
+      },
+      location: {
+        search: '',
+      },
+    };
+  }
+
   constructor(props) {
     super(props);
 
+    const queryParams = queryString.parse(props.location.search);
+
     this.state = {
-      site: {},
+      site: {
+        name: queryParams.name,
+        url: queryParams.url,
+      },
     };
 
     this.changeHandler = this.changeHandler.bind(this);
@@ -17,38 +45,44 @@ export default class ProjectDetail extends React.Component {
 
   changeHandler(evt) {
     const val = evt.target.value;
-    const key = evt.target.id;
-    this.setState({ site: setIn(this.state.site, [key], val) });
+    const path = evt.target.id.split('.');
+    this.setState({ site: setIn(this.state.site, path, val) });
   }
 
-  async submitHandler() {
+  async submitHandler(evt) {
+    evt.preventDefault();
+
     try {
       await GsfClient.fetch('POST', 'site', this.state.site);
+      this.props.history.push('/projects');
     }
     catch (err) {
       console.log('error saving site');
     }
-
-    return false;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   render() {
     return (
     <form onSubmit={this.submitHandler}>
       <div className="form-group row">
           <label htmlFor="name" className="col-sm-2 col-form-label">Site Name</label>
           <div className="col-sm-10">
-            <input id="name" type="text" className="form-control" onChange={this.changeHandler.bind(this)}/>
+            <input
+              id="name" type="text" className="form-control"
+              value={this.state.site.name}
+              onChange={this.changeHandler.bind(this)}/>
           </div>
         </div>
       <div className="form-group row">
         <label htmlFor="url" className="col-sm-2 col-form-label">Site URL</label>
         <div className="col-sm-10">
-          <input id="url" type="text" className="form-control" onChange={this.changeHandler.bind(this)}/>
+          <input
+            id="url" type="text" className="form-control"
+            value={this.state.site.url}
+            onChange={this.changeHandler.bind(this)}/>
         </div>
       </div>
-      <button type="submit" className="btn btn-primary">Create project</button>
+      <button id="save" type="submit" className="btn btn-primary">Save</button>
     </form>
     );
   }
