@@ -1,108 +1,126 @@
-import NodeFetchPlugin from 'get-set-fetch/lib/plugins/fetch/NodeFetchPlugin';
 import TestUtils from 'get-set-fetch/test/utils/TestUtils';
+import BrowserHelper from 'test/utils/BrowserHelper';
 
+const fs = require('fs');
 const path = require('path');
-const URL = require('url-parse');
-const puppeteer = require('puppeteer');
 
-const extension = {
-  id: 'cpbaclenlbncmmagcfdlblmmppgmcjfg',
-  path: path.resolve(__dirname, '..', '..', 'dist'),
-};
-
-/*
-discover all site pages
-for each one extract document.title as resource.content
-export them as csv
-*/
-describe('Test Extract Document Titles, ', () => {
+/* eslint-disable no-shadow */
+describe('Site Crawl', () => {
   let browser = null;
-  let page = null;
-  let nockScopes = null;
+
+  const targetDir = './test/tmp';
 
   const gotoOpts = {
     timeout: 10 * 1000,
     waitUntil: 'load',
   };
 
-  async function launchAndInterceptChrome(siteUrl) {
-    browser = await puppeteer.launch({
-      headless: false,
-      args: [
-        `--disable-extensions-except=${extension.path}`,
-        `--load-extension=${extension.path}`,
-        '--no-sandbox',
-      ],
-    });
-
-    // add new page and intercept request
-    page = await browser.newPage();
-    await page.setRequestInterception(true);
-    page.on('request', async (request) => {
-      if (request.url().indexOf(siteUrl) === -1) {
-        request.continue();
-        return;
-      }
-
-      // add urlObj props to http|https request options
-      const urlObj = new URL(request.url());
-      const reqOpts = {
-        protocol: urlObj.protocol,
-        host: urlObj.host,
-        port: urlObj.port,
-        path: urlObj.pathname,
-      };
-
-      reqOpts.headers = request.headers();
-      const lib = reqOpts.protocol === 'https:' ? require('https') : require('http');
-      lib.get(reqOpts, async (response) => {
-        const contentType = response.headers['Content-Type'] || response.headers['content-type'];
-        let body = null;
-
-        if (/(text|html)/.test(contentType)) {
-          body = await NodeFetchPlugin.readUtf8Stream(response);
-        }
-        else {
-          body = await NodeFetchPlugin.readBufferStream(response);
-        }
-
-        request.respond({
-          status: response.statusCode,
-          headers: response.headers,
-          body,
-        });
-      });
-    });
-  }
-
-  const siteUrl = 'http://www.site1.com';
-  const mainPageUrl = `${siteUrl}/index.html`;
+  const actualSite = {
+    name: 'siteA',
+    url: 'http://www.sitea.com/index.html',
+    opts: {
+      userPlugins: ['ExtractTitle'],
+    },
+  };
 
   before(async () => {
-    // configure nock to serve fs files
-    nockScopes = TestUtils.fs2http(
-      path.join('test', 'integration', 'test-crawl-site-extract-html-headers'),
-      siteUrl,
+    browser = await BrowserHelper.launchAndStubRequests(
+      actualSite.url,
+      path.join('test', 'integration', actualSite.name),
     );
+  });
 
-    // configure, launch, intercept chrome requests
-    await launchAndInterceptChrome(siteUrl);
-
-    // create new site
+  beforeEach(async () => {
+    // cleanup fs
+    TestUtils.emptyDir(targetDir);
   });
 
   after(async () => {
-    TestUtils.stopPersisting(nockScopes);
-
-    // close chromium
-    await browser.close();
+    // await browser.close();
   });
 
-  it('Test Single Page Crawl Project', async () => {
-    // open site main page
-    await page.goto(mainPageUrl, gotoOpts);
+  async function waitForCrawlComplete(adminPage, siteId, resolve = null) {
+    // if no promise defined return one
+    if (!resolve) {
+      return new Promise((resolve) => {
+        waitForCrawlComplete(adminPage, siteId, resolve);
+      });
+    }
 
-    // trigger new project
-    // await page.click('a#newproject');
+    const notCrawledResources = await adminPage.evaluate(
+      siteId => GsfClient.fetch('GET', `resources/${siteId}/notcrawled`),
+      siteId,
+    );
+
+    // crawl complete, there are no more resources to be crawled
+    if (notCrawledResources.length === 0) {
+      resolve();
+    }
+    // crawl in progress, check again later
+    else {
+      setTimeout(waitForCrawlComplete, 2000, adminPage, siteId, resolve);
+    }
+
+    return null;
+  }
+
+
+  it('Test Crawl Site', async () => {
+    // open site list, the default admin page
+    const adminPage = await browser.newPage();
+    await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html`, gotoOpts);
+
+    // create site to crawl
+    await adminPage.evaluate(site => GsfClient.fetch('POST', 'site', site), actualSite);
+    const sites = await adminPage.evaluate(() => GsfClient.fetch('GET', 'sites'));
+    assert.strictEqual(1, sites.length);
+    const loadedSite = sites[0];
+
+    // reload site list
+    const crawlInputId = `input#crawl-${loadedSite.id}[type=button]`;
+    await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html`, gotoOpts);
+    await adminPage.waitFor(crawlInputId);
+
+    // start crawling site
+    await adminPage.click(crawlInputId);
+
+    // wait for all resources to be crawled (resource.crawledAt is updated for all resources)
+    await waitForCrawlComplete(adminPage, loadedSite.id);
+
+    // retrievel crawled resources
+    const crawledResources = await adminPage.evaluate(
+      siteId => GsfClient.fetch('GET', `resources/${siteId}/crawled`),
+      loadedSite.id,
+    );
+    assert.strictEqual(3, crawledResources.length);
+
+    // check each resource
+    const titles = {
+      'http://www.sitea.com/index.html': 'siteA',
+      'http://www.sitea.com/pageA.html': 'pageA',
+      'http://www.sitea.com/pageB.html': 'pageB',
+    };
+    for (let i = 0; i < crawledResources.length; i += 1) {
+      const crawledResource = crawledResources[i];
+      assert.strictEqual('text/html', crawledResource.contentType);
+      assert.strictEqual(titles[crawledResource.url], crawledResource.info.title);
+    }
+
+    // start a CDPSession in order to change download behavior via Chrome Devtools Protocol
+    const client = await adminPage.target().createCDPSession();
+    await client.send('Page.setDownloadBehavior', { behavior: 'allow', downloadPath: path.resolve(targetDir) });
+
+    // download csv
+    await adminPage.click(`a#csv-${loadedSite.id}`);
+
+    // wait a bit for file to be generated and saved
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // check file content
+    const expectedHeader = 'title';
+    const expectedBody = Object.values(titles).join('\n');
+    const expectedCsv = `${expectedHeader}\n${expectedBody}`;
+    const generatedCsv = fs.readFileSync(path.resolve('./', 'test', 'tmp', `${loadedSite.name}.txt`), 'utf8');
+    assert.strictEqual(expectedCsv, generatedCsv);
   });
 });
