@@ -52,7 +52,7 @@ describe('Test Extension Popup, ', () => {
 
     // check if links are rendered correctly
     const expectedLinks = [
-      { text: 'New Project', href: `chrome-extension://${extension.id}/popup/popup.html#` },
+      { text: 'New Site', href: `chrome-extension://${extension.id}/popup/popup.html#` },
       { text: 'Admin Area', href: `chrome-extension://${extension.id}/admin/admin.html` },
     ];
     assert.sameDeepMembers(detectedlinks, expectedLinks);
