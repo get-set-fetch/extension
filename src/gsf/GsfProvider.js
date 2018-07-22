@@ -47,8 +47,8 @@ export default class GsfProvider {
             const getSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);
             reqPromise = this.Site.get(getSiteId);
             break;
-          // site/:siteName
-          case /^site\/.+$/.test(request.resource):
+          // site/:siteName , don't allow "/" so that we can differentiate /crawl verb as another switch option
+          case /^site\/[^/]+$/.test(request.resource):
             const getSiteName = /^site\/(.+)$/.exec(request.resource)[1];
             reqPromise = this.Site.get(getSiteName);
             break;
@@ -73,7 +73,7 @@ export default class GsfProvider {
         switch (true) {
           // site
           case /^site$/.test(request.resource):
-            const site = Object.assign(new this.Site(), request.body);
+            const site = new this.Site(request.body.name, request.body.url, request.body.opts, request.body.createDefaultPlugins);
             reqPromise = site.id ? site.update() : site.save();
             break;
           default:
@@ -163,7 +163,7 @@ export default class GsfProvider {
         switch (true) {
           // plugin
           case /^plugin$/.test(request.resource):
-            const plugin = Object.assign(new this.UserPlugin(), request.body);
+            const plugin = new this.UserPlugin(request.body.name, request.body.code);
             reqPromise = plugin.id ? plugin.update() : plugin.save();
             break;
           default:

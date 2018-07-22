@@ -98,7 +98,8 @@ class IdbSite extends BaseSite {
   }
 
   constructor(name, url, opts, createDefaultPlugins = true) {
-    super(name, url, opts, createDefaultPlugins);
+    super(name, url, opts, false);
+
     if (createDefaultPlugins) {
       this.plugins = ExtensionPluginManager.DEFAULT_PLUGINS;
     }
