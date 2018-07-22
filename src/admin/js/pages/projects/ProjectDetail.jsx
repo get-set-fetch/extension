@@ -7,22 +7,34 @@ import GsfClient from '../../components/GsfClient';
 export default class ProjectDetail extends React.Component {
   static get propTypes() {
     return {
+      siteId: PropTypes.string,
       history: PropTypes.shape({
         push: PropTypes.func,
       }),
       location: PropTypes.shape({
         search: PropTypes.string,
       }),
+      match: PropTypes.shape({
+        params: PropTypes.shape({
+          pluginId: PropTypes.string,
+        }),
+      }),
     };
   }
 
   static get defaultProps() {
     return {
+      siteId: '',
       history: {
         push: () => {},
       },
       location: {
         search: '',
+      },
+      match: {
+        params: {
+          pluginId: null,
+        },
       },
     };
   }
@@ -43,10 +55,24 @@ export default class ProjectDetail extends React.Component {
     this.submitHandler = this.submitHandler.bind(this);
   }
 
+  async componentDidMount() {
+    const { siteId } = this.props.match.params;
+
+    if (this.props.match.params.siteId) {
+      try {
+        const site = await GsfClient.fetch('GET', `site/${siteId}`);
+        this.setState({ site });
+      }
+      catch (err) {
+        console.log('error loading site');
+      }
+    }
+  }
+
   changeHandler(evt) {
     const val = evt.target.value;
-    const path = evt.target.id.split('.');
-    this.setState({ site: setIn(this.state.site, path, val) });
+    const prop = evt.target.id;
+    this.setState({ site: setIn(this.state.site, [prop], val) });
   }
 
   async submitHandler(evt) {
@@ -54,7 +80,7 @@ export default class ProjectDetail extends React.Component {
 
     try {
       await GsfClient.fetch('POST', 'site', this.state.site);
-      this.props.history.push('/projects');
+      this.props.history.push('/sites');
     }
     catch (err) {
       console.log('error saving site');
@@ -83,6 +109,7 @@ export default class ProjectDetail extends React.Component {
         </div>
       </div>
       <button id="save" type="submit" className="btn btn-primary">Save</button>
+      <button id="cancel" type="button" className="btn btn-secondary" onClick={() => this.props.history.push('/sites')}>Cancel</button>
     </form>
     );
   }
