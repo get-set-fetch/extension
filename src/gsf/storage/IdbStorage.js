@@ -1,6 +1,7 @@
 import { BaseEntity } from 'get-set-fetch';
 import IdbSite from './IdbSite';
 import IdbResource from './IdbResource';
+import IdbUserPlugin from './IdbUserPlugin';
 
 class IdbStorage {
   static init() {
@@ -21,11 +22,16 @@ class IdbStorage {
           /* create a compound index for getResourceToCrawl */
           resourceStore.createIndex('getResourceToCrawl', ['siteId', 'crawlInProgress', 'crawledAt'], { unique: false });
         }
+
+        if (!db.objectStoreNames.contains('UserPlugins')) {
+          const userPluginStore = db.createObjectStore('UserPlugins', { keyPath: 'id', autoIncrement: true });
+          userPluginStore.createIndex('name', 'name', { unique: true });
+        }
       };
 
       openRequest.onsuccess = (e) => {
         BaseEntity.db = e.target.result;
-        resolve({ Site: IdbSite, Resource: IdbResource });
+        resolve({ Site: IdbSite, Resource: IdbResource, UserPlugin: IdbUserPlugin });
       };
 
       openRequest.onerror = () => {
