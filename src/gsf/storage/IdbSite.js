@@ -16,10 +16,10 @@ class IdbSite extends BaseSite {
     return IdbSite.db.transaction('Sites', 'readwrite').objectStore('Sites');
   }
 
-  static parseResult(result) {
-    return {
-      plugins: ExtensionPluginManager.instantiate(JSON.parse(result.plugins)),
-    };
+  static async parseResult(result) {
+    const plugins = ExtensionPluginManager.instantiate(JSON.parse(result.plugins));
+    const userPlugins = result.opts.userPlugins ? (await ExtensionPluginManager.instantiateUserPlugins(result.opts.userPlugins)) : [];
+    return { plugins: ExtensionPluginManager.orderPlugins(plugins.concat(userPlugins)) };
   }
 
   static get(nameOrId) {
@@ -27,13 +27,13 @@ class IdbSite extends BaseSite {
       const rTx = IdbSite.rTx();
       const readReq = (Number.isInteger(nameOrId) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = async (e) => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
         }
         else {
-          Object.assign(result, this.parseResult(result));
+          Object.assign(result, (await this.parseResult(result)));
           resolve(Object.assign(new IdbSite(null, null, null, false), result));
         }
       };
@@ -41,25 +41,25 @@ class IdbSite extends BaseSite {
     });
   }
 
-  static getAll(nameOrId) {
+  static getAll() {
     return new Promise((resolve, reject) => {
       const rTx = IdbSite.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = async (e) => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            Object.assign(result[i], this.parseResult(result[i]));
+            Object.assign(result[i], (await this.parseResult(result[i])));
             result[i] = Object.assign(new IdbSite(null, null, null, false), result[i]);
           }
           resolve(result);
         }
       };
-      readReq.onerror = () => reject(new Error(`could not read site: ${nameOrId}`));
+      readReq.onerror = () => reject(new Error('could not read sites'));
     });
   }
 
@@ -72,12 +72,39 @@ class IdbSite extends BaseSite {
     });
   }
 
+  static delSome(ids, resolve = null, reject = null) {
+    if (resolve && reject) {
+      const rwTx = IdbSite.rwTx();
+      const req = rwTx.delete(ids.pop());
+      req.onsuccess = () => {
+        if (ids.length === 0) {
+          resolve();
+        }
+        else this.delSome(ids, resolve, reject);
+      };
+      req.onerror = () => reject(new Error('could not delSome Sites'));
+      return null;
+    }
+
+    // eslint-disable-next-line no-shadow
+    return new Promise((resolve, reject) => {
+      if (ids && ids.length > 0) {
+        this.delSome(ids, resolve, reject);
+      }
+      else {
+        resolve();
+      }
+    });
+  }
+
   constructor(name, url, opts, createDefaultPlugins = true) {
     super(name, url, opts, createDefaultPlugins);
-
     if (createDefaultPlugins) {
       this.plugins = ExtensionPluginManager.DEFAULT_PLUGINS;
     }
+
+    // resources from the same site are always crawled in the same tab
+    this.tabId = null;
   }
 
   addMaxDepthPlugin(maxDepth) {

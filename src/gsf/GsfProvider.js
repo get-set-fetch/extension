@@ -5,26 +5,24 @@ import ActiveTabHelper from './ActiveTabHelper';
 export default class GsfProvider {
   static async init() {
     // init extension storage
-    const { Site, Resource } = await IdbStorage.init();
+    const { Site, Resource, UserPlugin } = await IdbStorage.init();
     GsfProvider.Site = Site;
     GsfProvider.Resource = Resource;
+    GsfProvider.UserPlugin = UserPlugin;
 
-    /*
-    // create some sites
-    const siteA = new Site('siteA', 'www.siteA.com');
-    await siteA.save();
-    const siteB = new Site('siteB', 'www.siteB.com');
-    await siteB.save();
-    */
+    this.UserPlugin.populateUserPlugins();
 
     // wait for client requests
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       switch (true) {
         case /^site/.test(request.resource):
-          GsfProvider.siteHandler(request, sendResponse);
+          this.siteHandler(request, sendResponse);
           break;
         case /^resource/.test(request.resource):
-          GsfProvider.resourceHandler(request, sendResponse);
+          this.resourceHandler(request, sendResponse);
+          break;
+        case /^plugin/.test(request.resource):
+          this.pluginHandler(request, sendResponse);
           break;
         default:
       }
@@ -42,20 +40,28 @@ export default class GsfProvider {
         switch (true) {
           // sites
           case /^sites$/.test(request.resource):
-            reqPromise = GsfProvider.Site.getAll();
+            reqPromise = this.Site.getAll();
             break;
           // site/:siteId
           case /^site\/[0-9]+$/.test(request.resource):
             const getSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            reqPromise = GsfProvider.Site.get(getSiteId);
+            reqPromise = this.Site.get(getSiteId);
+            break;
+          // site/:siteName
+          case /^site\/.+$/.test(request.resource):
+            const getSiteName = /^site\/(.+)$/.exec(request.resource)[1];
+            reqPromise = this.Site.get(getSiteName);
             break;
           // site/{site.id}/crawl
           case /^site\/[0-9]+\/crawl$/.test(request.resource):
             const crawlSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            const crawlSite = await GsfProvider.Site.get(crawlSiteId);
+            const crawlSite = await this.Site.get(crawlSiteId);
 
             // open a new tab for the current site to be crawled into
-            await ActiveTabHelper.create();
+            const tab = await ActiveTabHelper.create();
+            crawlSite.tabId = tab.id;
+
+            // start crawling
             crawlSite.crawl({ maxResources: 10 });
             reqPromise = new Promise(resolve => resolve());
             break;
@@ -67,8 +73,18 @@ export default class GsfProvider {
         switch (true) {
           // site
           case /^site$/.test(request.resource):
-            const site = new GsfProvider.Site(request.body.name, request.body.url);
-            reqPromise = site.save();
+            const site = Object.assign(new this.Site(), request.body);
+            reqPromise = site.id ? site.update() : site.save();
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      case 'DELETE':
+        switch (true) {
+          // sites
+          case /^sites$/.test(request.resource):
+            reqPromise = this.Site.delSome(request.body.ids);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -85,20 +101,80 @@ export default class GsfProvider {
 
   static async resourceHandler(request, sendResponse) {
     let reqPromise = null;
-
     switch (request.method) {
       case 'GET':
         switch (true) {
-          // resources
-          case /^resources$/.test(request.resource):
-            reqPromise = GsfProvider.Site.getAll();
+          // resources/:siteId
+          case /^resources\/[0-9]+$/.test(request.resource):
+            const siteId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            reqPromise = this.Resource.getAll(siteId, null, false);
+            break;
+          // resources/:siteId/notcrawled
+          case /^resources\/[0-9]+\/notcrawled$/.test(request.resource):
+            const notCrawledSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            reqPromise = this.Resource.getAllNotCrawled(notCrawledSiteId);
+            break;
+          // resources/:siteId/crawled
+          case /^resources\/[0-9]+\/crawled$/.test(request.resource):
+            const crawledSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            reqPromise = this.Resource.getAllCrawled(crawledSiteId);
             break;
           // resource/:urlOrId
           case /^resource\/.+$/.test(request.resource):
             const urlOrId = /^resource\/(.+)$/.exec(request.resource)[1];
-            // console.log(urlOrId);
-            reqPromise = GsfProvider.Resource.get(urlOrId);
-            // reqPromise = new Promise(resolve => resolve(urlOrId[1]));
+            reqPromise = this.Resource.get(urlOrId);
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      default:
+    }
+
+    reqPromise.then((result) => {
+      sendResponse(result);
+    });
+  }
+
+  static async pluginHandler(request, sendResponse) {
+    let reqPromise = null;
+    switch (request.method) {
+      case 'GET':
+        switch (true) {
+          // plugins
+          case /^plugins$/.test(request.resource):
+            reqPromise = this.UserPlugin.getAll();
+            break;
+          // plugin/:pluginId
+          case /^plugin\/[0-9]+$/.test(request.resource):
+            const getPluginId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            reqPromise = this.UserPlugin.get(getPluginId);
+            break;
+          // plugin/:pluginName
+          case /^plugin\/.+$/.test(request.resource):
+            const getPluginName = /^plugin\/(.+)$/.exec(request.resource)[1];
+            reqPromise = this.UserPlugin.get(getPluginName);
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      case 'POST':
+        switch (true) {
+          // plugin
+          case /^plugin$/.test(request.resource):
+            const plugin = Object.assign(new this.UserPlugin(), request.body);
+            reqPromise = plugin.id ? plugin.update() : plugin.save();
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      case 'DELETE':
+        switch (true) {
+          // plugins
+          case /^plugins$/.test(request.resource):
+            reqPromise = this.UserPlugin.delSome(request.body.ids);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());

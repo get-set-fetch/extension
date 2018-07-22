@@ -39,6 +39,44 @@ class IdbResource extends BaseResource {
     });
   }
 
+  static getAllCrawled(siteId) {
+    const idbKey = IDBKeyRange.bound(
+      [siteId, 0, new Date(1)],
+      [siteId, 0, new Date(Date.now())],
+    );
+
+    return this.getAll(siteId, idbKey);
+  }
+
+  static getAllNotCrawled(siteId) {
+    const idbKey = IDBKeyRange.only([siteId, 0, new Date(0)]);
+    return this.getAll(siteId, idbKey);
+  }
+
+  static getAll(siteId, idbKey, instantiate = true) {
+    return new Promise((resolve, reject) => {
+      const rTx = IdbResource.rTx();
+      const readReq = idbKey ? rTx.index('getResourceToCrawl').getAll(idbKey) : rTx.getAll();
+
+      readReq.onsuccess = (e) => {
+        const { result } = e.target;
+        if (!result) {
+          resolve(null);
+        }
+        else {
+          if (instantiate) {
+            for (let i = 0; i < result.length; i += 1) {
+              Object.assign(result[i], this.parseResult(result[i]));
+              result[i] = Object.assign(new IdbResource(), result[i]);
+            }
+          }
+          resolve(result);
+        }
+      };
+      readReq.onerror = () => reject(new Error(`could not read site: ${siteId}`));
+    });
+  }
+
   // within a transaction find a resource to crawl and set its crawlInProgress flag
   static getResourceToCrawlWithKey(idbKey) {
     return new Promise((resolve, reject) => {
