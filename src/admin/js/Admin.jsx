@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 import queryString from 'query-string';
 import Header from './layout/Header';
 import Page from './layout/Page';
-import ProjectList from './pages/projects/ProjectList';
-import ProjectDetail from './pages/projects/ProjectDetail';
+import SiteList from './pages/sites/SiteList';
+import SiteDetail from './pages/sites/SiteDetail';
 import PluginList from './pages/plugins/PluginList';
 import PluginDetail from './pages/plugins/PluginDetail';
 import LogList from './pages/logs/LogList';
@@ -19,8 +19,8 @@ export default class Admin extends React.Component {
           <Header/>
           <Page>
             <Switch>
-              <Route path="/site/:siteId?" component={ProjectDetail} />
-              <Route path="/sites" component={ProjectList} />
+              <Route path="/site/:siteId?" component={SiteDetail} />
+              <Route path="/sites" component={SiteList} />
 
               <Route path="/plugins" component={PluginList} />
               <Route path="/plugin/:pluginId?" component={PluginDetail} />

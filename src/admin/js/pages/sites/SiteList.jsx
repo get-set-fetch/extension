@@ -5,7 +5,7 @@ import GsfClient from '../../components/GsfClient';
 import ExportHelper from '../../utils/ExportHelper';
 import DownloadHelper from '../../utils/DownloadHelper';
 
-export default class ProjectList extends React.Component {
+export default class SiteList extends React.Component {
   static async crawlSite(site) {
     try {
       await GsfClient.fetch('GET', `site/${site.id}/crawl`);
@@ -81,14 +81,14 @@ export default class ProjectList extends React.Component {
                 type="button"
                 className="btn-secondary"
                 value="Crawl"
-                onClick={() => ProjectList.crawlSite(site)}
+                onClick={() => SiteList.crawlSite(site)}
               />
               <a
                 id={`csv-${site.id}`}
                 href="#"
                 target="_blank"
                 download={site.name}
-                onClick={evt => ProjectList.exportCSV(site, evt)}
+                onClick={evt => SiteList.exportCSV(site, evt)}
               >CSV</a>
             </td>
           ),
