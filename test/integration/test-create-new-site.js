@@ -1,64 +1,69 @@
-const puppeteer = require('puppeteer');
-const queryString = require('query-string');
-const { assert } = require('chai');
+import BrowserHelper from 'test/utils/BrowserHelper';
 
-describe('Test Extension Admin Area, ', () => {
+const path = require('path');
+
+describe('Site Pages', () => {
   let browser = null;
-  let page = null;
 
   const gotoOpts = {
     timeout: 10 * 1000,
     waitUntil: 'load',
   };
 
-  before(async () => {
-    // launch chromium
-    browser = await puppeteer.launch({
-      headless: false,
-      args: [
-        `--disable-extensions-except=${extension.path}`,
-        `--load-extension=${extension.path}`,
-        '--no-sandbox',
-      ],
-    });
+  const actualSite = {
+    name: 'siteA',
+    url: 'http://www.sitea.com/index.html',
+  };
 
-    // open new page
-    page = await browser.newPage();
+  before(async () => {
+    browser = await BrowserHelper.launchAndStubRequests(
+      actualSite.url,
+      path.join('test', 'integration', actualSite.name),
+    );
   });
 
   after(async () => {
-    // close chromium
-    await browser.close();
+    // await browser.close();
   });
 
   it('Test Create New Site', async () => {
-    // construct extension url
-    const actualSite = {
-      name: 'siteA',
-      url: 'http://www.siteA.com',
-    };
+    // open stubbed site
+    const sitePage = await browser.newPage();
+    await sitePage.goto(actualSite.url, gotoOpts);
 
-    const queryParams = queryString.stringify({
-      redirectPath: '/project',
-      name: actualSite.name,
-      url: actualSite.url,
-    });
+    // open popup page
+    const popupPage = await browser.newPage();
+    await popupPage.goto(`chrome-extension://${extension.id}/popup/popup.html`, gotoOpts);
 
-    const adminUrl = `chrome-extension://${extension.id}/admin/admin.html?${queryParams}`;
+    // move focus to stubbed site
+    await sitePage.bringToFront();
 
-    // open admin site creation
-    await page.goto(adminUrl, gotoOpts);
+    // initiate create new site from the popup page based on currently active tab
+    await popupPage.click('a#newsite');
+
+    // retrieve the newly created admin page
+    const adminPage = await BrowserHelper.waitForPageCreation(browser);
+
+    // wait for redirection to "new site" page
+    await adminPage.waitFor('#save');
+
+    // check form fields
+    const ctx = await adminPage.mainFrame().executionContext();
+    const inputName = await ctx.evaluate(selector => document.querySelector(selector).value, 'input#name');
+    assert.strictEqual(actualSite.name, inputName);
+    const inputUrl = await ctx.evaluate(selector => document.querySelector(selector).value, 'input#url');
+    assert.strictEqual(actualSite.url, inputUrl);
 
     // save site
-    await page.click('#save');
-    await page.waitForNavigation(gotoOpts);
+    await adminPage.click('#save');
+    await adminPage.waitForNavigation(gotoOpts);
 
     // check redirection to site list
-    const projectsUrl = `chrome-extension://${extension.id}/projects`;
-    assert.strictEqual(projectsUrl, page.url());
+    const sitesUrl = `chrome-extension://${extension.id}/sites`;
+    assert.strictEqual(sitesUrl, adminPage.url());
 
     // check the newly created site is now present in extension IndexedDB
-    const sites = await page.evaluate(() => GsfClient.fetch('GET', 'sites'));
+    const sites = await adminPage.evaluate(() => GsfClient.fetch('GET', 'sites'));
     assert.strictEqual(1, sites.length);
 
     const loadedSite = sites[0];
@@ -66,7 +71,7 @@ describe('Test Extension Admin Area, ', () => {
     assert.strictEqual(actualSite.url, loadedSite.url);
 
     // check a resource with the site url has been created
-    const loadedResource = await page.evaluate(url => GsfClient.fetch('GET', `resource/${url}`), actualSite.url);
+    const loadedResource = await adminPage.evaluate(url => GsfClient.fetch('GET', `resource/${url}`), actualSite.url);
     assert.strictEqual(loadedSite.id, loadedResource.siteId);
     assert.strictEqual(loadedSite.url, loadedResource.url);
     assert.strictEqual(0, loadedResource.depth);
