@@ -70,7 +70,12 @@ export default class PluginDetail extends React.Component {
     evt.preventDefault();
 
     try {
-      await GsfClient.fetch('POST', 'plugin', this.state.plugin);
+      if (this.state.plugin.id) {
+        await GsfClient.fetch('PUT', 'plugin', this.state.plugin);
+      }
+      else {
+        await GsfClient.fetch('POST', 'plugin', this.state.plugin);
+      }
       this.props.history.push('/plugins');
     }
     catch (err) {

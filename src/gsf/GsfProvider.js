@@ -175,7 +175,18 @@ export default class GsfProvider {
           // plugin
           case /^plugin$/.test(request.resource):
             const plugin = new this.UserPlugin(request.body.name, request.body.code);
-            reqPromise = plugin.id ? plugin.update() : plugin.save();
+            reqPromise = plugin.save();
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      case 'PUT':
+        switch (true) {
+          // plugin
+          case /^plugin$/.test(request.resource):
+            const plugin = Object.assign(new this.UserPlugin(), request.body);
+            reqPromise = plugin.update();
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
