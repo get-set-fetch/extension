@@ -74,7 +74,18 @@ export default class GsfProvider {
           // site
           case /^site$/.test(request.resource):
             const site = new this.Site(request.body.name, request.body.url, request.body.opts, request.body.createDefaultPlugins);
-            reqPromise = site.id ? site.update() : site.save();
+            reqPromise = site.save();
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      case 'PUT':
+        switch (true) {
+          // site
+          case /^site$/.test(request.resource):
+            const site = Object.assign(new this.Site(), request.body);
+            reqPromise = site.update();
             break;
           default:
             reqPromise = new Promise(resolve => resolve());

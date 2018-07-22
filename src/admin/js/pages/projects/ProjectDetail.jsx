@@ -79,7 +79,12 @@ export default class ProjectDetail extends React.Component {
     evt.preventDefault();
 
     try {
-      await GsfClient.fetch('POST', 'site', this.state.site);
+      if (this.state.site.id) {
+        await GsfClient.fetch('PUT', 'site', this.state.site);
+      }
+      else {
+        await GsfClient.fetch('POST', 'site', this.state.site);
+      }
       this.props.history.push('/sites');
     }
     catch (err) {
