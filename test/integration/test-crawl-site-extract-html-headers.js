@@ -36,7 +36,7 @@ describe('Site Crawl', () => {
   });
 
   after(async () => {
-    // await browser.close();
+    await browser.close();
   });
 
   async function waitForCrawlComplete(adminPage, siteId, resolve = null) {

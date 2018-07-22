@@ -23,7 +23,7 @@ describe('Site Pages', () => {
   });
 
   after(async () => {
-    // await browser.close();
+    await browser.close();
   });
 
   it('Test Create New Site', async () => {
