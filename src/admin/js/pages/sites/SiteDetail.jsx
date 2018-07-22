@@ -4,7 +4,7 @@ import { setIn } from 'immutable';
 import queryString from 'query-string';
 import GsfClient from '../../components/GsfClient';
 
-export default class ProjectDetail extends React.Component {
+export default class SiteDetail extends React.Component {
   static get propTypes() {
     return {
       siteId: PropTypes.string,
