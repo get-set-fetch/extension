@@ -3,8 +3,8 @@ import ActiveTabHelper from '../../gsf/ActiveTabHelper';
 
 const extensionId = 'cpbaclenlbncmmagcfdlblmmppgmcjfg';
 
-function handleNewProject() {
-  document.getElementById('newproject').onclick = async (evt) => {
+function handleNewSite() {
+  document.getElementById('newsite').onclick = async (evt) => {
     evt.preventDefault();
 
     const activeTab = await ActiveTabHelper.getCurrent();
@@ -12,7 +12,7 @@ function handleNewProject() {
     const url = await ActiveTabHelper.executeScript(activeTab.id, { code: 'window.location.toString()' });
 
     const queryParams = queryString.stringify({
-      redirectPath: '/project',
+      redirectPath: '/site',
       name,
       url,
     });
@@ -22,6 +22,6 @@ function handleNewProject() {
   };
 }
 
-handleNewProject();
+handleNewSite();
 
 // te iubesc !
