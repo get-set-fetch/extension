@@ -11,8 +11,8 @@
     },
 
     "background": {
-        "scripts": ["gsf/gsf.js"]
-      },
+      "page": "background/background.html"
+    },
 
     "browser_action": {
         "default_icon": "icons/gsf_32x32.png",
@@ -25,6 +25,7 @@
     ],
 
     "permissions": ["tabs", "activeTab", "webRequest", "<all_urls>"],
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
 
     "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA19t+tu4xk/P7cNzl74zH5KCF+PehpqviDTk+eddLmPU436arcnWxGNIdK6wFNm9YXv0luBqQbD+mm/cnFflm++jDtX+sDcNqjuOlYl8rWgMhaa3ZXLgfiFjq5nIHkgk8qtaDiciXJzSDKVJnCfslFdqP/taatw+TPQsUi93ar5sRvyM0okR7nfoecJY5zXwqNa4O0rMS/v3Fh9udYQlIuDJ88iPOex9WUwG5/MkWOcZqh9YnwGM95kKOmEoIBbKphhCBxLqCcANKdXuI/h8Zl2NH2KcIJZ9VlYTDzJPfacrz9BG/nKiDoHzFxQKthhw+AV04MmHMW14eHCfH0yPkpQIDAQAB"
   }

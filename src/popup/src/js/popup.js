@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import ActiveTabHelper from '../../gsf/ActiveTabHelper';
+import ActiveTabHelper from './ActiveTabHelper';
 
 const extensionId = 'cpbaclenlbncmmagcfdlblmmppgmcjfg';
 

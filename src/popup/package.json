@@ -1,0 +1,35 @@
+{
+  "name": "get-set-fetch-extension-popup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/popup.js",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && npm run build:dist && npm run copy:resources",
+    "build:dist": "rollup --config rollup.config.js",
+    "copy:resources": "copyfiles -u 2 src/html/*.html dist"
+  },
+  "keywords": [
+    "scraper", "extension"
+  ],
+  "author": "Andrei Sabau",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/get-set-fetch/extension/issues"
+  },
+  "homepage": "https://github.com/get-set-fetch/extension#readme",
+  "devDependencies": {
+    "copyfiles": "^2.0.0",
+    "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-eslint": "^5.0.0",
+    "rollup-plugin-json": "^3.0.0",
+    "rollup-plugin-node-resolve": "^3.3.0"
+  },
+  "dependencies": {
+    "get-set-fetch-extension-background": "^1.0.0",
+    "query-string": "^6.1.0"
+  }
+}
