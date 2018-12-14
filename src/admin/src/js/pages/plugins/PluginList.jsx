@@ -15,7 +15,7 @@ export default class PluginList extends React.Component {
         },
         {
           label: 'Code',
-          render: plugin => (<td><span style={{ 'text-overflow': 'ellipsis' }}>{plugin.code}</span></td>),
+          render: plugin => (<td><span style={{ 'text-overflow': 'ellipsis' }}>{plugin.code.substr(0, 100)}</span></td>),
         },
       ],
       data: [],

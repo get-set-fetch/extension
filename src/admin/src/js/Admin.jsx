@@ -8,6 +8,7 @@ import SiteDetail from './pages/sites/SiteDetail';
 import PluginList from './pages/plugins/PluginList';
 import PluginDetail from './pages/plugins/PluginDetail';
 import LogList from './pages/logs/LogList';
+import SettingList from './pages/settings/SettingList';
 import Help from './pages/help/Help';
 
 export default class Admin extends React.Component {
@@ -26,6 +27,9 @@ export default class Admin extends React.Component {
               <Route path="/plugin/:pluginId?" component={PluginDetail} />
 
               <Route path="/logs" component={LogList} />
+
+              <Route path="/settings" component={SettingList} />
+
               <Route path="/help" component={Help} />
               <Route path="/"
                 exact={false}

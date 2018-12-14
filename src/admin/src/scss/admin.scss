@@ -1,0 +1,14 @@
+@import "node_modules/bootstrap/scss/bootstrap";
+
+@import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
+$fa-font-path: "../../node_modules/@fortawesome/fontawesome-free/webfonts";
+@import "node_modules/@fortawesome/fontawesome-free/scss/regular.scss";
+
+
+
+.table-hover-icon {
+  visibility: hidden;
+}
+.table-hover tr:hover .table-hover-icon {
+  visibility: visible;
+}

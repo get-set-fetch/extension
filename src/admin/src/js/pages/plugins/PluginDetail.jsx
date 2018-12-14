@@ -1,18 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { setIn } from 'immutable';
-import queryString from 'query-string';
 import GsfClient from '../../components/GsfClient';
 
-export default class SiteDetail extends React.Component {
+export default class PluginDetail extends React.Component {
   static get propTypes() {
     return {
-      siteId: PropTypes.string,
+      pluginId: PropTypes.string,
       history: PropTypes.shape({
         push: PropTypes.func,
-      }),
-      location: PropTypes.shape({
-        search: PropTypes.string,
       }),
       match: PropTypes.shape({
         params: PropTypes.shape({
@@ -24,12 +20,9 @@ export default class SiteDetail extends React.Component {
 
   static get defaultProps() {
     return {
-      siteId: '',
+      pluginId: '',
       history: {
         push: () => {},
-      },
-      location: {
-        search: '',
       },
       match: {
         params: {
@@ -42,12 +35,10 @@ export default class SiteDetail extends React.Component {
   constructor(props) {
     super(props);
 
-    const queryParams = queryString.parse(props.location.search);
-
     this.state = {
-      site: {
-        name: queryParams.name,
-        url: queryParams.url,
+      plugin: {
+        name: '',
+        code: '',
       },
     };
 
@@ -56,15 +47,15 @@ export default class SiteDetail extends React.Component {
   }
 
   async componentDidMount() {
-    const { siteId } = this.props.match.params;
+    const { pluginId } = this.props.match.params;
 
-    if (this.props.match.params.siteId) {
+    if (this.props.match.params.pluginId) {
       try {
-        const site = await GsfClient.fetch('GET', `site/${siteId}`);
-        this.setState({ site });
+        const plugin = await GsfClient.fetch('GET', `plugin/${pluginId}`);
+        this.setState({ plugin });
       }
       catch (err) {
-        console.log('error loading site');
+        console.log('error loading plugin');
       }
     }
   }
@@ -72,23 +63,23 @@ export default class SiteDetail extends React.Component {
   changeHandler(evt) {
     const val = evt.target.value;
     const prop = evt.target.id;
-    this.setState({ site: setIn(this.state.site, [prop], val) });
+    this.setState({ plugin: setIn(this.state.plugin, [prop], val) });
   }
 
   async submitHandler(evt) {
     evt.preventDefault();
 
     try {
-      if (this.state.site.id) {
-        await GsfClient.fetch('PUT', 'site', this.state.site);
+      if (this.state.plugin.id) {
+        await GsfClient.fetch('PUT', 'plugin', this.state.plugin);
       }
       else {
-        await GsfClient.fetch('POST', 'site', this.state.site);
+        await GsfClient.fetch('POST', 'plugin', this.state.plugin);
       }
-      this.props.history.push('/sites');
+      this.props.history.push('/plugins');
     }
     catch (err) {
-      console.log('error saving site');
+      console.log('error saving plugin');
     }
   }
 
@@ -96,25 +87,26 @@ export default class SiteDetail extends React.Component {
     return (
     <form onSubmit={this.submitHandler}>
       <div className="form-group row">
-          <label htmlFor="name" className="col-sm-2 col-form-label">Site Name</label>
+          <label htmlFor="name" className="col-sm-2 col-form-label">Plugin Name</label>
           <div className="col-sm-10">
             <input
               id="name" type="text" className="form-control"
-              value={this.state.site.name}
+              value={this.state.plugin.name}
               onChange={this.changeHandler.bind(this)}/>
           </div>
         </div>
       <div className="form-group row">
-        <label htmlFor="url" className="col-sm-2 col-form-label">Site URL</label>
+        <label htmlFor="code" className="col-sm-2 col-form-label">Plugin Code</label>
         <div className="col-sm-10">
-          <input
-            id="url" type="text" className="form-control"
-            value={this.state.site.url}
+          <textarea
+            id="code" type="text" className="form-control"
+            value={this.state.plugin.code}
             onChange={this.changeHandler.bind(this)}/>
         </div>
       </div>
       <button id="save" type="submit" className="btn btn-primary">Save</button>
-      <button id="cancel" type="button" className="btn btn-secondary" onClick={() => this.props.history.push('/sites')}>Cancel</button>
+        <button id="cancel" type="button" className="btn btn-secondary"
+          onClick={() => this.props.history.push('/plugins')}>Cancel</button>
     </form>
     );
   }

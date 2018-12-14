@@ -151,7 +151,7 @@ export default class SiteList extends React.Component {
   render() {
     return [
       <NavLink id="newsite" key="new" to="/site/" className="nav-link">Create new site</NavLink>,
-      <p key="listHeader">Site List</p>,
+      <p key="listHeader">Site List a22</p>,
       <input key="del" id="delete" type="button" value="Delete" onClick={this.deleteHandler}/>,
       <Table key="listTable"
         header={this.state.header} data={this.state.data}
