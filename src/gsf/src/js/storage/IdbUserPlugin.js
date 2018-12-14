@@ -1,7 +1,7 @@
 import { BaseEntity } from 'get-set-fetch';
 
 /* eslint-disable class-methods-use-this */
-class IdbUserPlugin extends BaseEntity {
+export default class IdbUserPlugin extends BaseEntity {
   // get a read transaction
   static rTx() {
     return IdbUserPlugin.db.transaction('UserPlugins').objectStore('UserPlugins');
@@ -10,17 +10,6 @@ class IdbUserPlugin extends BaseEntity {
   // get a read-write transaction
   static rwTx() {
     return IdbUserPlugin.db.transaction('UserPlugins', 'readwrite').objectStore('UserPlugins');
-  }
-
-  static async populateUserPlugins() {
-    const userPlugins = await this.getAll();
-    if (userPlugins.length === 0) {
-      const extractTitlePlugin = new IdbUserPlugin(
-        'ExtractTitle',
-        'class ExtractTitle { static test() {return true}; static apply() { return {info: {title: document.title }} }; }',
-      );
-      await extractTitlePlugin.save();
-    }
   }
 
   static get(nameOrId) {
@@ -145,5 +134,3 @@ class IdbUserPlugin extends BaseEntity {
     return serialized;
   }
 }
-
-module.exports = IdbUserPlugin;

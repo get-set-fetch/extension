@@ -1,5 +1,7 @@
 /* eslint-disable no-param-reassign */
-class Logger {
+import IdbLog from '../storage/IdbLog';
+
+export default class Logger {
   static setLogLevel(logLevel) {
     switch (logLevel ? String(logLevel).toLowerCase() : '') {
       case 'trace':
@@ -18,7 +20,7 @@ class Logger {
         Logger.logLevel = 4;
         break;
       default:
-        Logger.logLevel = 3;
+        Logger.logLevel = 2;
     }
   }
 
@@ -30,45 +32,46 @@ class Logger {
     return new Logger(cls);
   }
 
+  static stringifyArgs(args) {
+    return args.length > 1 ? JSON.stringify(args) : args[0];
+  }
+
   constructor(cls) {
     // ensure a default log level is set
     if (!Logger.logLevel) {
       Logger.setLogLevel();
     }
 
-    this.console = window.console;
     this.cls = cls;
   }
 
   trace(...args) {
     if (Logger.logLevel > 0) return;
-    args[0] = `[TRACE] ${this.cls} ${new Date(Date.now())} ${args[0]}`;
-    this.console.trace.apply(this, args);
+    const logEntry = new IdbLog('TRACE', this.cls, Logger.stringifyArgs(args));
+    logEntry.save();
   }
 
   debug(...args) {
     if (Logger.logLevel > 1) return;
-    args[0] = `[DEBUG] ${this.cls} ${new Date(Date.now())} ${args[0]}`;
-    this.console.debug.apply(this, args);
+    const logEntry = new IdbLog('DEBUG', this.cls, Logger.stringifyArgs(args));
+    logEntry.save();
   }
 
   info(...args) {
     if (Logger.logLevel > 2) return;
-    args[0] = `[INFO] ${this.cls} ${new Date(Date.now())} ${args[0]}`;
-    this.console.info.apply(this, args);
+    const logEntry = new IdbLog('INFO', this.cls, Logger.stringifyArgs(args));
+    logEntry.save();
   }
 
   warn(...args) {
     if (Logger.logLevel > 3) return;
-    args[0] = `[WARN] ${this.cls} ${new Date(Date.now())} ${args[0]}`;
-    this.console.warn.apply(this, args);
+    const logEntry = new IdbLog('WARN', this.cls, Logger.stringifyArgs(args));
+    logEntry.save();
   }
 
   error(...args) {
     if (Logger.logLevel > 4) return;
-    args[0] = `[ERROR] ${this.cls} ${new Date(Date.now())} ${args[0]}`;
-    this.console.error.apply(this, args);
+    const logEntry = new IdbLog('ERROR', this.cls, Logger.stringifyArgs(args));
+    logEntry.save();
   }
 }
-
-module.exports = Logger;

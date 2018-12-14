@@ -1,7 +1,7 @@
 import { BaseResource } from 'get-set-fetch';
 
 /* eslint-disable class-methods-use-this */
-class IdbResource extends BaseResource {
+export default class IdbResource extends BaseResource {
   // get a read transaction
   static rTx() {
     return IdbResource.db.transaction('Resources').objectStore('Resources');
@@ -182,5 +182,3 @@ class IdbResource extends BaseResource {
     return serialized;
   }
 }
-
-module.exports = IdbResource;

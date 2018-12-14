@@ -1,14 +1,7 @@
-import BasePlugin from 'get-set-fetch/lib/plugins/base/BasePlugin';
-import ActiveTabHelper from '../../ActiveTabHelper';
+import URL from 'url-parse';
+import ActiveTabHelper from '../../helpers/ActiveTabHelper';
 
-const URL = require('url-parse');
-
-class ExtensionFetchPlugin extends BasePlugin {
-  // eslint-disable-next-line class-methods-use-this
-  getPhase() {
-    return BasePlugin.PHASE.FETCH;
-  }
-
+export default class ExtensionFetchPlugin {
   // eslint-disable-next-line class-methods-use-this
   test(resource) {
     const { protocol } = new URL(resource.url);
@@ -46,5 +39,3 @@ class ExtensionFetchPlugin extends BasePlugin {
     });
   }
 }
-
-module.exports = ExtensionFetchPlugin;

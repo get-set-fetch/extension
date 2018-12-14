@@ -1,11 +1,13 @@
 import { BaseSite, BloomFilter } from 'get-set-fetch';
 import IdbResource from './IdbResource';
-import ExtensionPluginManager from '../plugins/ExtensionPluginManager';
-import ExtensionExtractUrlPlugin from '../plugins/process/ExtensionExtractUrlPlugin';
+import PluginManager from '../plugins/PluginManager';
 
+import Logger from '../logger/Logger';
+
+const Log = Logger.getLogger('IdbSite');
 
 /* eslint-disable class-methods-use-this */
-class IdbSite extends BaseSite {
+export default class IdbSite extends BaseSite {
   // get a read transaction
   static rTx() {
     return IdbSite.db.transaction('Sites').objectStore('Sites');
@@ -17,9 +19,8 @@ class IdbSite extends BaseSite {
   }
 
   static async parseResult(result) {
-    const plugins = ExtensionPluginManager.instantiate(JSON.parse(result.plugins));
-    const userPlugins = result.opts.userPlugins ? (await ExtensionPluginManager.instantiateUserPlugins(result.opts.userPlugins)) : [];
-    return { plugins: ExtensionPluginManager.orderPlugins(plugins.concat(userPlugins)) };
+    const plugins = PluginManager.instantiate(result.pluginDefinitions);
+    return { plugins };
   }
 
   static get(nameOrId) {
@@ -97,23 +98,105 @@ class IdbSite extends BaseSite {
     });
   }
 
-  constructor(name, url, opts, createDefaultPlugins = true) {
+  constructor(name, url, opts, pluginDefinitions) {
     super(name, url, opts, false);
 
-    if (createDefaultPlugins) {
-      this.plugins = ExtensionPluginManager.DEFAULT_PLUGINS;
+    if (!opts || !opts.crawl) {
+      this.opts.crawl = {
+        maxConnections: 1,
+        maxResources: 10,
+        delay: 100,
+      };
     }
+
+    if (!opts || !opts.resourceFilter) {
+      this.opts.resourceFilter = {
+        maxEntries: 5000,
+        probability: 0.01,
+      };
+    }
+
+    // if no plugin definitions provided use the default ones
+    this.pluginDefinitions = !pluginDefinitions ? PluginManager.getDefaultPluginDefs() : pluginDefinitions;
+    this.plugins = PluginManager.instantiate(this.pluginDefinitions);
 
     // resources from the same site are always crawled in the same tab
     this.tabId = null;
   }
 
-  addMaxDepthPlugin(maxDepth) {
-    this.addPlugins([new ExtensionExtractUrlPlugin({ maxDepth })]);
-  }
-
   getResourceToCrawl(crawlFrequency) {
     return IdbResource.getResourceToCrawl(this.id, crawlFrequency);
+  }
+
+  /**
+   * loop through ordered (based on phase) plugins and apply each one to the current (site, resource) pair
+   */
+  async crawlResource() {
+    return new Promise(async (resolve, reject) => {
+      let resource = null;
+      for (let i = 0; i < this.plugins.length; i += 1) {
+        try {
+          const result = await this.executePlugin(this.plugins[i], resource);
+          console.log(result);
+          resource = resource === null ? result : Object.assign(resource, result);
+          if (i === 0) {
+            Log.info(`${resource.url} selected for crawling`);
+          }
+          else {
+            Log.info(`Result after applying ${this.plugins[i].name}: ${JSON.stringify(result)}`);
+          }
+
+          // no resource present
+          if (resource === null) {
+            Log.info(`No crawlable resource found for site ${this.name}`);
+            console.log('no resource present');
+            resolve(null);
+            break;
+          }
+        }
+        catch (err) {
+          Log.error(
+            `Crawl error for site ${this.name}`,
+            `${this.plugins[i].constructor.name} ${resource ? resource.url : ''}`,
+            JSON.stringify(err),
+          );
+          console.log(`${this.plugins[i].constructor.name} ${resource ? resource.url : ''}`);
+          console.log(err);
+          reject(err);
+          break;
+        }
+      }
+
+      if (resource) {
+        Log.debug(`Resource successfully crawled: ${JSON.stringify(resource)}`);
+        Log.info(`Resource successfully crawled: ${resource.url}`);
+        console.log(`${resource.url} successfully crawled`);
+      }
+      resolve(resource);
+    });
+  }
+
+  async executePlugin(plugin, resource) {
+    Log.debug(
+      `Executing plugin ${plugin.constructor.name} `,
+      `using options ${JSON.stringify(plugin.opts)} `,
+      `against resource ${JSON.stringify(resource)}`,
+    );
+
+    console.log('executePlugin');
+    console.log(plugin);
+    if (plugin.opts && plugin.opts.runInTab) {
+      return PluginManager.runInTab(this.tabId, plugin, this, resource);
+    }
+
+    // test if plugin is aplicable
+    const isApplicable = await plugin.test(resource);
+
+    if (isApplicable) {
+      return plugin.apply(this, resource);
+    }
+
+    return null;
   }
 
   save() {
@@ -214,12 +297,11 @@ class IdbSite extends BaseSite {
 
   // IndexedDB can't do partial update, define all site properties to be stored
   get props() {
-    return ['id', 'name', 'url', 'opts', 'robotsTxt', 'plugins', 'resourceFilter'];
+    return ['id', 'name', 'url', 'opts', 'robotsTxt', 'pluginDefinitions', 'resourceFilter'];
   }
 
   serialize() {
     const serializedObj = this.props.reduce((acc, key) => Object.assign(acc, { [key]: this[key] }), {});
-    serializedObj.plugins = JSON.stringify(serializedObj.plugins);
     return serializedObj;
   }
 
@@ -229,5 +311,3 @@ class IdbSite extends BaseSite {
     return serialized;
   }
 }
-
-module.exports = IdbSite;

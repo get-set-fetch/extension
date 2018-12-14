@@ -1,6 +1,6 @@
-const { assert } = require('chai');
+import IdbStorage from '../../src/js/storage/IdbStorage';
 
-const IdbStorage = gsfRequire('./src/gsf/storage/IdbStorage');
+const { assert } = require('chai');
 
 const conn = { info: 'IndexedDB' };
 

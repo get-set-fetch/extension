@@ -1,20 +1,17 @@
+import GetSetFetch from 'get-set-fetch';
 import NodeFetchPlugin from 'get-set-fetch/lib/plugins/fetch/NodeFetchPlugin';
+import JsDomPlugin from 'get-set-fetch/lib/plugins/process/JsDomPlugin';
+import ExtractUrlPlugin from 'get-set-fetch/lib/plugins/process/ExtractUrlPlugin';
+import ExternalStorageTests from 'get-set-fetch/test/external/external-storage-tests';
+
+import PluginManager from '../../src/js/plugins/PluginManager';
+import IdbStorage from '../../src/js/storage/IdbStorage';
+import ExtensionFetchPlugin from '../../src/js/plugins/builtin/ExtensionFetchPlugin';
+import ExtensionExtractUrlPlugin from '../../src/js/plugins/builtin/ExtractUrlPlugin';
 
 const sinon = require('sinon');
 
-const GetSetFetch = require('get-set-fetch');
-const JsDomPlugin = require('get-set-fetch/lib/plugins/process/JsDomPlugin');
-const ExtractUrlPlugin = require('get-set-fetch/lib/plugins/process/ExtractUrlPlugin');
-const ExternalStorageTests = require('get-set-fetch/test/external/external-storage-tests');
-
-const IdbStorage = gsfRequire('./src/gsf/storage/IdbStorage');
-const ExtensionPluginManager = gsfRequire('./src/gsf/plugins/ExtensionPluginManager');
-const ExtensionFetchPlugin = gsfRequire('./src/gsf/plugins/fetch/ExtensionFetchPlugin');
-const ExtensionExtractUrlPlugin = gsfRequire('./src/gsf/plugins/process/ExtensionExtractUrlPlugin');
-
 const conn = { info: 'IndexedDB' };
-
-ExtensionPluginManager.registerDefaults();
 
 const nodeFetchPlugin = new NodeFetchPlugin();
 const extractUrlPlugin = new ExtractUrlPlugin();
@@ -65,9 +62,9 @@ const ResourceFncs = {
   checkInitialCrawledAt,
 };
 
-describe('Test Suite IndexedDB Storage', () => {
+xdescribe('Test Suite IndexedDB Storage', () => {
   Object.values(ExternalStorageTests).forEach((suite) => {
-    suite(GetSetFetch, ExtensionPluginManager, IdbStorage, conn, ResourceFncs);
+    suite(GetSetFetch, PluginManager, IdbStorage, conn, ResourceFncs);
   });
 });
 

@@ -1,0 +1,28 @@
+patch-package
+--- a/node_modules/get-set-fetch/lib/logger/Logger.js
++++ b/node_modules/get-set-fetch/lib/logger/Logger.js
+@@ -5,8 +5,8 @@ const { Console } = require('console');
+ class Logger {
+   // if no streams are set, perform like the global console
+   static setStreams(outputStream, errorStream) {
+-    Logger.outputStream = outputStream || process.stdout;
+-    Logger.errorStream = errorStream || process.stderr;
++    Logger.outputStream = outputStream || {};
++    Logger.errorStream = errorStream || {};
+   }
+ 
+   // always open log files in append mode
+@@ -56,11 +56,9 @@ class Logger {
+     node version below 10: new Console(stdout, stderr)
+     node version 10: new Console({stdout, stderr})
+     */
+-    const nodeVersion = parseInt(process.versions.node, 10);
++    const nodeVersion = 3;
+
+-    this.console = nodeVersion < 10 ?
+-      new Console(Logger.outputStream, Logger.errorStream) :
+-      new Console({ stdout: Logger.outputStream, stderr: Logger.errorStream });
++    this.console = {};
+ 
+     this.cls = cls;
+   }
