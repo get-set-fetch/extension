@@ -1,13 +1,16 @@
-import BrowserHelper from 'test/utils/BrowserHelper';
+import queryString from 'query-string';
+import BrowserHelper from '../../utils/BrowserHelper';
 
 const path = require('path');
+const { assert } = require('chai');
 
 describe('Site Pages', () => {
   let browser = null;
+  let sitePage = null;
 
   const gotoOpts = {
     timeout: 10 * 1000,
-    waitUntil: 'load',
+    waitUntil: ['load', 'domcontentloaded', 'networkidle0'],
   };
 
   const actualSite = {
@@ -18,8 +21,20 @@ describe('Site Pages', () => {
   before(async () => {
     browser = await BrowserHelper.launchAndStubRequests(
       actualSite.url,
-      path.join('test', 'integration', actualSite.name),
+      path.join('..', '..', 'test', 'integration', actualSite.name),
     );
+  });
+
+  afterEach(async () => {
+    // move to admin page
+    const queryParams = queryString.stringify({ redirectPath: '/sites' });
+    await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+
+    // delete existing sites
+    const existingSites = await sitePage.evaluate(() => GsfClient.fetch('GET', 'sites'));
+    if (!existingSites) return;
+    const siteIds = existingSites.map(existingSite => existingSite.id);
+    await sitePage.evaluate(siteIds => GsfClient.fetch('DELETE', 'sites', { ids: siteIds }), siteIds);
   });
 
   after(async () => {
@@ -28,7 +43,7 @@ describe('Site Pages', () => {
 
   it('Test Create New Site', async () => {
     // open stubbed site
-    const sitePage = await browser.newPage();
+    sitePage = await browser.newPage();
     await sitePage.goto(actualSite.url, gotoOpts);
 
     // open popup page
@@ -39,7 +54,10 @@ describe('Site Pages', () => {
     await sitePage.bringToFront();
 
     // initiate create new site from the popup page based on currently active tab
-    await popupPage.click('a#newsite');
+    await popupPage.waitFor('a#newsite');
+
+    // interesting enough await popupPage.click('a#newsite') does not work but the workaround does
+    await popupPage.evaluate(anchorId => document.getElementById(anchorId).click(), 'newsite');
 
     // retrieve the newly created admin page
     const adminPage = await BrowserHelper.waitForPageCreation(browser);

@@ -1,5 +1,4 @@
 --recursive
 --require babel-core/register
 --require test/utils/init.js
---require test/utils/shims.js
 --timeout 15000

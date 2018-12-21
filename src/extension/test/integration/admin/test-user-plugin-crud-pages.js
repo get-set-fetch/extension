@@ -1,5 +1,5 @@
-import BrowserHelper from 'test/utils/BrowserHelper';
 import queryString from 'query-string';
+import BrowserHelper from '../../utils/BrowserHelper';
 
 const { assert } = require('chai');
 
@@ -29,7 +29,7 @@ describe('UserPlugin CRUD Pages', () => {
     await pluginPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
   });
 
-  beforeEach(async () => {
+  afterEach(async () => {
     // delete existing plugins
     const existingPlugins = await pluginPage.evaluate(() => GsfClient.fetch('GET', 'plugins'));
     if (!existingPlugins) return;
