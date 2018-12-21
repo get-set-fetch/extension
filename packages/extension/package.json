@@ -1,26 +1,24 @@
 {
-  "name": "gsf-extension",
+  "name": "get-set-fetch-extension",
   "version": "1.0.0",
   "description": "",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
-    "clean": "rimraf dist/*",
-
-    "build": "npm run clean && npm run copy:resources",
-    "copy:resources": "npm run copy:local && npm run copy:bkg && npm run copy:popup && npm run copy:admin",    
+    "build": "npm run copy:resources",
+    "copy:resources": "npm run copy:local && npm run copy:bkg && npm run copy:popup && npm run copy:admin",
     "copy:local": "cpx \"src/resources/**/*\" dist",
     "copy:bkg": "cpx  \"node_modules/get-set-fetch-extension-background/dist/**/*\" dist/background",
     "copy:popup": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup",
     "copy:admin": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin",
-
     "build:watch:admin": "npm run build && npm run copy:admin:watch",
     "build:watch:popup": "npm run build && npm run copy:popup:watch",
     "build:watch:bkg": "npm run build && npm run copy:bkg:watch",
-
     "copy:local:watch": "cpx \"src/resources/**/*\" dist --watch",
     "copy:bkg:watch": "cpx  \"node_modules/get-set-fetch-extension-background/dist/**/*\" dist/background --watch",
     "copy:popup:watch": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup --watch",
     "copy:admin:watch": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin --watch",
-
     "test": "mocha test",
     "test:single": "mocha test --grep \"Site Crawl\""
   },
@@ -40,7 +38,6 @@
     "cpx": "^1.5.0",
     "mocha": "^5.2.0",
     "puppeteer": "^1.6.1",
-    "query-string": "^6.1.0",
-    "rimraf": "^2.6.2"
+    "query-string": "^6.1.0"
   }
 }

@@ -1,9 +1,12 @@
 {
-  "name": "get-set-fetch-extension",
+  "name": "get-set-fetch-extension-root",
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "bootstrap": "lerna bootstrap --hoist"
+    "bootstrap": "lerna bootstrap --ci",
+    "clean": "lerna exec -- rimraf dist",
+    "build": "npm run clean && lerna run build",
+    "build:dist": "lerna run build:dist"
   },
   "keywords": [
     "scraper"
@@ -15,6 +18,7 @@
   },
   "homepage": "https://github.com/get-set-fetch/extension#readme",
   "devDependencies": {
-    "lerna": "^3.8.0"
+    "lerna": "^3.8.0",
+    "rimraf": "^2.6.2"
   }
 }

@@ -102,4 +102,3 @@ SystemJS.config({
     Log.info(`SystemJS importing plugin ${availablePlugins[i].name} DONE`);
   }
 })();
-

@@ -7,4 +7,3 @@ export {
   PluginManager,
   ActiveTabHelper,
 };
-
