@@ -21,7 +21,7 @@ describe('Site Pages', () => {
   before(async () => {
     browser = await BrowserHelper.launchAndStubRequests(
       actualSite.url,
-      path.join('..', '..', 'test', 'integration', actualSite.name),
+      path.join('test', 'resources', actualSite.name),
     );
   });
 

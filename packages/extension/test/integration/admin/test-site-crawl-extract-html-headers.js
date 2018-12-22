@@ -12,7 +12,7 @@ describe('Site Crawl', () => {
   let browser = null;
   let adminPage = null;
 
-  const targetDir = '../../test/tmp';
+  const targetDir = path.join('test', 'tmp'); //../../test/tmp';
 
   const gotoOpts = {
     timeout: 10 * 1000,
@@ -46,7 +46,7 @@ describe('Site Crawl', () => {
   };
 
   before(async () => {
-    browser = await BrowserHelper.launchAndStubRequests(actualSite.url, path.join('..', '..', 'test', 'integration', actualSite.name));
+    browser = await BrowserHelper.launchAndStubRequests(actualSite.url, path.join('test', 'resources', actualSite.name));
   });
 
   afterEach(async () => {
