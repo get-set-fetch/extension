@@ -1,0 +1,335 @@
+have it work in travis ci
+  - install via lerna bootstrap
+  - scripts for test / build
+
+
+12:15 - 14:55 : 2:40
+
+run admin package from root, current: webpack not found
+
+move nock, pupetter dependencies to lerna root package
+
+to do:
+- move and commit extension, load it in browser, make it works, make sure integration testing works
+
+to do:
+  - re-enable gsf unit tests failing due to System is not defined, need to configure systemjs in tests as well
+  - remove lots of console calls, replace some with Log calls
+
+
+to do:
+  - ability to add plugins to site via UI
+  - plugins are stored in a single location, not plugins and opts.userPlugins
+  - opts.userPlugins becomes normal this.plugins instantiated via BrowserPlugin
+  - maybe rename BrowserPlugin ....
+  - test browser plugin for an url or other previously open tab
+
+fix:
+  - when creating a new project, the tab is from the 1st window, not from the current window
+
+- add: global loader/waiting ctrl
+
+to do:
+  - ability to add plugins to site
+  - define plugin options
+
+to do:
+  - rename storage test external
+
+
+gsf:
+  - make plugin test and apply, gtetPhase static
+  - add more unit tests for delSome for each storage type
+
+integration test:
+  - default plugins
+
+roadmap:
+  with BrowserPlugin:
+    - no need to register or import dynamic module
+    - code already is persisted in the database
+    - declare / list and re-use a plugin:
+      - use opts.name to load the appropriate code
+      - have a separate table to save/load/ {name, code} objects: IdbScript
+
+
+  invoke user plugins from site.crawl:
+    - save at site level, userPlugins list containing just the userPlugin name, on save 
+    - when instantiate a site, for each opts.userPlugins entry, add a BrowserPlugin entry
+    - crawl will just invoke each BrowserPlugin instance
+
+  test on page:
+    - just run a BrowserPlugin instance on target tab
+
+------------
+- fix webpack production mode pretest: run build:prod fails tests
+
+- save to disk and implement node "folders as module" ?
+  https://nodejs.org/api/modules.html
+
+to do:
+  - manullay add plugin using eval
+  https://medium.com/@oprearocks/serializing-object-methods-using-es6-template-strings-and-eval-c77c894651f0
+  https://stackoverflow.com/questions/39298985/using-eval-method-to-get-class-from-string-in-firefox
+
+
+
+instantiate plugins via:
+  - dynamic require
+  - load from db
+
+
+- if in db:
+  - easy export
+  - easily testable
+  - IdbPluginManager
+
+
+
+how to save a site with custom plugins:
+  - define customplugin
+  - register it with PluginManager
+  - add it to site
+  - save site
+  - do site crawl
+
+
+to do:
+  - how to add plugins to a site
+    - predefined ones
+    - dynamic ones
+
+to do Site uses correct PluginManager
+
+to do:
+  - integration tests:
+    - crawl site (extract html headers):
+      - define site with custom process plugin for extracting something simple title
+      - check all resources have been crawled and their content
+      - save as csv all resources
+
+to do:
+  - get all crawled resources + storage unit tests
+
+to do:
+- resource crawling fails but it remains crawlInProgress: 1, how to handle resources crawled in error ? (new github issue)
+- how to retrieve all crawled resources if the errors ones are stuck with inProgress: 1 ?
+
+to do:
+- stop crawling when closing tab
+- delay between resource crawling - already option in BaseSite, add it to create new project ui
+
+--
+add storage unit test in main project for Resource.getAll(siteId, crawledAt(date))
+add unit tests for bloomfilter where the same url with domain name lowercase and uppercase results in two resources
+  https://stackoverflow.com/questions/7996919/should-url-be-case-sensitive
+--
+
+
+- handle duplicate site name/url in browser on save error, show some kind of popup
+
+
+----------
+
+stop crawling when closing the crawl tab
+always use the same tabid when crawling (the new one initiallu opened)
+make Logger.info work
+add resource list page
+
+to do:
+    - start crawl on project
+
+workaround for test
+ 
+
+mechanism for display errors from gsf when interacting with admin
+i18next
+
+to do:
+  - AdminHelper: 
+    - create site
+    - get site
+    - list sites
+    - list resources
+
+howto:
+  - test extension with puppeteer
+    - test create new project:
+      - click create project
+      - check site has been created
+      - check single resource has been created
+
+add project detail unit test, check site is saved
+
+DONE:
+  - gsf: PluginManager works for register even if extended
+  - gsf: add OPTIONAL_PLUGINS similar to DEFAULT_PLUGINS
+  - gsf: modified external tests to remove PluginManager instance, needed for downstream custom implementation of PluginManager
+
+do:
+  - closing active crawling tab stops the crawling process
+  - resources are re-added over and over again
+  - create chrome extension test with puppetteer:
+    - click icon
+    - click anchor from popup
+    - wait for crawl to complete
+    - check results from db
+
+
+
+- relative dependency to get-set-fetch:DONE
+- modify extract url plugin to use cross-env url: DONE
+- delete mocked UrlUtils
+
+- for each plugin:
+  - inject plugin class: DONE
+  - instantiate and execute plugin: DONE
+
+- fix default plugins related tests
+- add greenkeeper
+
+- rename projectlist/detail to sitelist/detail
+
+
+
+have injected-code.txt work in chrome console
+  - replace class mention: resourceUrl = Url.parse(ExtractUrlPlugin.absoluteUrl(currentUrl.path, partialUrl)); DONE
+  - fix const currentUrl = Url.parse(resource.url);
+    - browser URL has path
+    - nodejs Url has pathname
+    - ? use https://github.com/unshiftio/url-parse for cross-env node and browser via new URL(..)
+  - make other changes so that it returns the correct link list
+
+inject existing ExtractUrlPlugin code into current tab
+  it uses resource input param with:
+    resource.document
+    node.js Url.parse
+    resource.url
+
+
+
+from popup: 
+  - create new project:
+    - create new site
+    - add current resource (current tab url) to site
+    - select site
+    - do site start crawl
+      - invoke each plugin
+        - open, parse, close tab
+
+------------
+
+to do:
+  - chrome.tabs.executeScript and return answer: DONE
+  - new site default plugins:
+    - open tab
+    - execute script on tab - different plugins for different tasks
+    - save resource
+    - close tab
+
+to do:
+  - spike for extract title + description scenario
+  - open tabs with newly founded resources
+  - extract tab info
+  - save resources
+  - export all project as excel
+  - triger download prompt from extension
+
+to do:
+  - spike for injecting content script from bacground script and communicate
+  - spike for selecting plugins
+
+
+tasks:
+- add long lived connection between background and popup scripts (popup script being the initiator)
+
+to do minor:
+- handle different resolution, get window.size and send it to the background script
+- add admin favicon.ico from a png icon
+- all gsf projects shoudl rely on peerDependencies:
+    In some cases, you want to express the compatibility of your package with a host tool or library,
+     while not necessarily doing a require of this host. This is usually referred to as a plugin. 
+- dynamically load js file via webpackChunkName
+- add internationalization via react-next
+
+----
+use case:
+1) background script listens for incoming messages
+
+1) user clicks extension button
+2) extension popup appears, inits connection and send message to background script for loading existing sites
+3) background script sends the data
+4) popup script displays via react the data
+
+
+5) user clicks fetch site
+  5.1) selects plugin(s)
+6) popup script send configuration to background script
+7) background script injects content script
+8) content script extracts info, sends it to bacground script
+9) background script opens next url to crawl
+
+loop: 7-9
+------
+
+
+
+-----------
+//for sending a message
+chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
+
+});
+
+//for listening any message which comes from runtime
+chrome.runtime.onMessage.addListener(messageReceived);
+
+function messageReceived(msg) {
+   // Do your work here
+}
+-------------
+
+
+icon for:
+  a1sabau
+  get-set-fetch organization
+
+
+
+
+get-set-fetch-extension:
+  - 1) use new icon from http://icoconvert.com/
+  - 2) 1st commit using IdbStorage
+
+  - open popup and click "crawl this site"
+  - open poup and click "admin area"
+  
+  - list existing plugins
+  - use any one of the existing plugins
+  - ability to upload a new plugin
+  - add plugins like extract products
+
+-----
+
+
+
+
+  - mono repo admin, gsf, popup : each with its own package.json but a single 
+
+
+--
+- remove background dir
+
+- have get-set-fetch use generic tests
+- commit project
+
+
+--
+- webpack target: "webworker" for background.js
+- list sites
+
+--
+decide on how serialize, serializeWithoutId is shared among projects
+--
+
+--
+Education is not something you can finish - Isaac Asimov

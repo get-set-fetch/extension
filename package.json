@@ -6,7 +6,8 @@
     "bootstrap": "lerna bootstrap --ci",
     "clean": "lerna exec -- rimraf dist",
     "build": "npm run clean && lerna run build",
-    "build:dist": "lerna run build:dist"
+    "build:dist": "lerna run build:dist",
+    "test": "lerna run test"
   },
   "keywords": [
     "scraper"
