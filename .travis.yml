@@ -2,6 +2,7 @@ language: node_js
 node_js:
   - "10"
 install:
+  - npm ci
   - npm install --global rollup
 before_script:
   - "export DISPLAY=:99.0"
