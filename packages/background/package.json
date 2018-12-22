@@ -41,6 +41,8 @@
     "eslint-plugin-react": "^7.11.1",
     "indexeddbshim": "^3.8.0",
     "mocha": "^5.2.0",
+    "nock": "^10.0.4",
+    "puppeteer": "^1.11.0",
     "rimraf": "^2.6.2",
     "rollup-plugin-commonjs": "^9.1.0",
     "rollup-plugin-eslint": "^5.0.0",

@@ -67,4 +67,3 @@ xdescribe('Test Suite IndexedDB Storage', () => {
     suite(GetSetFetch, PluginManager, IdbStorage, conn, ResourceFncs);
   });
 });
-
