@@ -27,7 +27,7 @@ export default class ExtractUrlPlugin {
         },
         allowNoExtension: {
           type: 'boolean',
-          default: 'true',
+          default: true,
         },
         maxDepth: {
           type: 'number',
@@ -35,7 +35,7 @@ export default class ExtractUrlPlugin {
         },
         runInTab: {
           type: 'boolean',
-          default: 'true',
+          default: true,
         },
       },
     };
@@ -60,7 +60,6 @@ export default class ExtractUrlPlugin {
 
     const anchors = doc.getElementsByTagName('a');
     const anchorHrefs = Array.from(new Set(Object.keys(anchors).map(key => anchors[key].href)));
-    console.log(anchorHrefs);
 
     const imgs = doc.getElementsByTagName('img');
     const imgSrcs = Array.from(new Set(Object.keys(imgs).map(key => imgs[key].src)));
@@ -75,8 +74,6 @@ export default class ExtractUrlPlugin {
         validUrls.add(resourceUrl.toString());
       }
     });
-
-    console.log(validUrls);
 
     return Array.from(validUrls);
   }

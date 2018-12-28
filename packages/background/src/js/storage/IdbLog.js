@@ -51,7 +51,7 @@ export default class IdbLog extends BaseEntity {
   }
 
   save() {
-    console.log(`saving log: ${this.cls} ${this.msg}`);
+    // console.log(`log: ${this.cls} ${this.msg}`);
     return new Promise((resolve, reject) => {
       const rwTx = IdbLog.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());

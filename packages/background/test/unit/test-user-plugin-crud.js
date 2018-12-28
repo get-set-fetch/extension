@@ -4,7 +4,6 @@ const { assert } = require('chai');
 
 const conn = { info: 'IndexedDB' };
 
-
 describe(`Test Storage UserPlugin - CRUD, using connection ${conn.info}`, () => {
   let UserPlugin = null;
   const expectedPlugin = {
@@ -14,7 +13,7 @@ describe(`Test Storage UserPlugin - CRUD, using connection ${conn.info}`, () => 
   };
 
   before(async () => {
-    ({ UserPlugin } = await IdbStorage.init(conn));
+    ({ UserPlugin } = await IdbStorage.init());
   });
 
 

@@ -107,7 +107,7 @@ export default class IdbResource extends BaseResource {
     let resource = await this.getResourceToCrawlWithKey(IDBKeyRange.only([siteId, 0, new Date(0)]));
 
     // try to find a resource matching {siteId, crawlInProgress : false, crawledAt: older than crawlFrequency}
-    if (!resource && crawlFrequency) {
+    if (!resource && crawlFrequency >= 0) {
       resource = await this.getResourceToCrawlWithKey(IDBKeyRange.bound(
         [siteId, 0, new Date(0)],
         [siteId, 0, new Date(Date.now() - (crawlFrequency * 60 * 60 * 1000))],

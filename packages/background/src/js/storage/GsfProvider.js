@@ -16,8 +16,6 @@ export default class GsfProvider {
     GsfProvider.Log = Log;
     GsfProvider.Setting = Setting;
 
-    console.log('GSFPorvide init done');
-
     // wait for client requests
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       switch (true) {

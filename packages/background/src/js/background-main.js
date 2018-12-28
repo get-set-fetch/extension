@@ -1,7 +1,7 @@
-import { GsfProvider } from './background-bundle';
+import { GsfProvider, PluginManager } from './background-bundle';
 import Logger from './logger/Logger';
 
-const Log = Logger.getLogger('background-main');
+// const Log = Logger.getLogger('background-main');
 
 /*
 register GsfProvider at window level, required for:
@@ -9,45 +9,6 @@ register GsfProvider at window level, required for:
   - accessing plugin module content from GsfProvider.UserPlugins.availablePlugins
 */
 window.GsfProvider = GsfProvider;
-
-function getPluginContent(pluginFileEntry) {
-  return new Promise((resolve) => {
-    pluginFileEntry.file((pluginFile) => {
-      const fileReader = new FileReader();
-      fileReader.onloadend = () => resolve(fileReader.result);
-      fileReader.readAsText(pluginFile);
-    });
-  });
-}
-
-function getPlugins() {
-  return new Promise((resolve) => {
-    const plugins = [];
-    chrome.runtime.getPackageDirectoryEntry((root) => {
-      root.getDirectory('background/plugins', { create: false }, (pluginsDir) => {
-        const reader = pluginsDir.createReader();
-        // assume there are just a dozen plugins,
-        // otherwise a loop mechanism should be implemented in order to call readEntries multiple times
-        reader.readEntries(
-          async (pluginFileEntries) => {
-            for (let i = 0; i < pluginFileEntries.length; i += 1) {
-              // ignore systemjs config plugins
-              // eslint-disable-next-line no-continue
-              if (pluginFileEntries[i].fullPath.indexOf('systemjs') !== -1) continue;
-              const pluginContent = await getPluginContent(pluginFileEntries[i]);
-              const pluginName = pluginFileEntries[i].name.match(/^(\w+).js$/)[1];
-              plugins.push(new GsfProvider.UserPlugin(pluginName, pluginContent));
-            }
-            resolve(plugins);
-          },
-          (err) => {
-            console.log(err);
-          },
-        );
-      });
-    });
-  });
-}
 
 SystemJS.config({
   map: {
@@ -72,7 +33,7 @@ SystemJS.config({
 (async () => {
   await GsfProvider.init();
 
-  // 1.1 populate settings - logLevel - if not present
+  // 1. populate settings - logLevel - if not present
   const storedSettings = await GsfProvider.Setting.getAll();
   let logLevel = storedSettings.find(setting => setting.key === 'logLevel');
   if (!logLevel) {
@@ -81,24 +42,6 @@ SystemJS.config({
   }
   Logger.setLogLevel(logLevel.val);
 
-
-  // 2.1. make sure all builtin plugins are present in db
-  const builtinPlugins = await getPlugins();
-
-  for (let i = 0; i < builtinPlugins.length; i += 1) {
-    const storedPlugin = await GsfProvider.UserPlugin.get(builtinPlugins[i].name);
-    if (!storedPlugin) {
-      Log.info(`Saving plugin ${builtinPlugins[i].name} to database`);
-      await builtinPlugins[i].save();
-      Log.info(`Saving plugin ${builtinPlugins[i].name} to database DONE`);
-    }
-  }
-
-  // 2.2. import via SystemJS all available plugins: builtin and user defined ones
-  const availablePlugins = await GsfProvider.UserPlugin.getAll();
-  for (let i = 0; i < availablePlugins.length; i += 1) {
-    Log.info(`SystemJS importing plugin ${availablePlugins[i].name}`);
-    await SystemJS.import(`${availablePlugins[i].name}!idb`);
-    Log.info(`SystemJS importing plugin ${availablePlugins[i].name} DONE`);
-  }
+  // 2. read all builtin plugins, persist them as UserPlugin, import them in SystemJS
+  await PluginManager.discoverPlugins();
 })();

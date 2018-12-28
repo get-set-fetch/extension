@@ -55,6 +55,6 @@ export default class SchemaHelper {
   }
 
   static parseBoolean(schema, data) {
-    return (data || schema.default) === 'true';
+    return (data || schema.default) === true;
   }
 }

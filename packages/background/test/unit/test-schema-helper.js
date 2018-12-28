@@ -2,7 +2,6 @@ import SchemaHelper from '../../src/js/schema/SchemaHelper';
 
 const { assert } = require('chai');
 
-
 describe('Test Schema Helper', () => {
   it('parse normal string', async () => {
     const schema = {
@@ -47,7 +46,7 @@ describe('Test Schema Helper', () => {
   it('parse boolean', async () => {
     const schema = {
       type: 'boolean',
-      default: 'true',
+      default: true,
     };
 
     let inst = SchemaHelper.instantiate(schema, undefined);

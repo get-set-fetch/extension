@@ -14,7 +14,7 @@ export default class ExtractTitlePlugin {
       properties: {
         runInTab: {
           type: 'boolean',
-          default: 'true',
+          default: true,
         },
       },
     };

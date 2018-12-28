@@ -1,33 +1,11 @@
-import GetSetFetch from 'get-set-fetch';
-import NodeFetchPlugin from 'get-set-fetch/lib/plugins/fetch/NodeFetchPlugin';
-import JsDomPlugin from 'get-set-fetch/lib/plugins/process/JsDomPlugin';
-import ExtractUrlPlugin from 'get-set-fetch/lib/plugins/process/ExtractUrlPlugin';
+import SystemJS from 'systemjs';
 import ExternalStorageTests from 'get-set-fetch/test/external/external-storage-tests';
-
 import PluginManager from '../../src/js/plugins/PluginManager';
 import IdbStorage from '../../src/js/storage/IdbStorage';
-import ExtensionFetchPlugin from '../../src/js/plugins/builtin/ExtensionFetchPlugin';
-import ExtensionExtractUrlPlugin from '../../src/js/plugins/builtin/ExtractUrlPlugin';
+import PluginHelper from '../utils/PluginHelper';
 
-const sinon = require('sinon');
-
+global.System = SystemJS;
 const conn = { info: 'IndexedDB' };
-
-const nodeFetchPlugin = new NodeFetchPlugin();
-const extractUrlPlugin = new ExtractUrlPlugin();
-const jsdomPlugin = new JsDomPlugin();
-
-sinon.stub(ExtensionFetchPlugin.prototype, 'apply').callsFake((site, resource) => nodeFetchPlugin.apply(site, resource));
-sinon.stub(ExtensionExtractUrlPlugin.prototype, 'extractResourceUrls').callsFake((site, resource) => {
-  // init jsdom in order to parse html
-  const jsdomProps = jsdomPlugin.apply(site, resource);
-  const updatedResource = Object.assign(resource, jsdomProps);
-
-  // extract links
-  const { urlsToAdd } = extractUrlPlugin.apply(site, updatedResource);
-  return urlsToAdd;
-});
-
 
 /* functions needed by some tests, can't achieve the logic just using the Resource API */
 async function updateCrawledAt(IdbResource, resourceId, deltaHours) {
@@ -62,8 +40,20 @@ const ResourceFncs = {
   checkInitialCrawledAt,
 };
 
-xdescribe('Test Suite IndexedDB Storage', () => {
-  Object.values(ExternalStorageTests).forEach((suite) => {
-    suite(GetSetFetch, PluginManager, IdbStorage, conn, ResourceFncs);
+describe('Test Suite IndexedDB Storage', () => {
+  // 'testSiteCrawl' suite is missing as the extension uses a new plugin management system from the core
+  const suites = ['testResourceCrud', 'testSiteCrud', 'testResourceCrawl'];
+
+  before(async () => {
+    // 1. storage init, populate GsfProvider used by some plugin related classes
+    const { UserPlugin } = await IdbStorage.init();
+    UserPlugin.modules = {};
+    global.GsfProvider = { UserPlugin };
+
+    await PluginHelper.init();
+  });
+
+  suites.forEach((suite) => {
+    ExternalStorageTests[suite]({ plugins: [] }, PluginManager, IdbStorage, conn, ResourceFncs);
   });
 });

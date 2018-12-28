@@ -16,7 +16,7 @@
     "copy:resources:html": "copyfiles -u 2 src/html/*.html dist",
     "copy:resources:systemjs": "copyfiles -f node_modules/systemjs/dist/system.js dist/plugins/systemjs && copyfiles -f node_modules/systemjs-plugin-babel/plugin-babel.js node_modules/systemjs-plugin-babel/systemjs-babel-browser.js dist/plugins/systemjs",
     "test": "mocha test",
-    "test:single": "mocha test --grep \"Test Schema\""
+    "test:single": "mocha test --grep \"Test Site Crawl\""
   },
   "keywords": [
     "scraper",
@@ -40,6 +40,7 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-react": "^7.11.1",
     "indexeddbshim": "^3.8.0",
+    "jsdom": "^13.1.0",
     "mocha": "^5.2.0",
     "nock": "^10.0.4",
     "puppeteer": "^1.11.0",

@@ -137,22 +137,23 @@ export default class IdbSite extends BaseSite {
       for (let i = 0; i < this.plugins.length; i += 1) {
         try {
           const result = await this.executePlugin(this.plugins[i], resource);
-          console.log(result);
           resource = resource === null ? result : Object.assign(resource, result);
-          if (i === 0) {
-            Log.info(`${resource.url} selected for crawling`);
-          }
-          else {
-            Log.info(`Result after applying ${this.plugins[i].name}: ${JSON.stringify(result)}`);
-          }
 
           // no resource present
           if (resource === null) {
             Log.info(`No crawlable resource found for site ${this.name}`);
-            console.log('no resource present');
             resolve(null);
             break;
           }
+
+          if (i === 0) {
+            Log.info(`${resource.url} selected for crawling`);
+          }
+          /*
+          else {
+            Log.info(`Result after applying ${this.plugins[i].name}: ${JSON.stringify(result)}`);
+          }
+          */
         }
         catch (err) {
           Log.error(
@@ -160,8 +161,6 @@ export default class IdbSite extends BaseSite {
             `${this.plugins[i].constructor.name} ${resource ? resource.url : ''}`,
             JSON.stringify(err),
           );
-          console.log(`${this.plugins[i].constructor.name} ${resource ? resource.url : ''}`);
-          console.log(err);
           reject(err);
           break;
         }
@@ -170,7 +169,6 @@ export default class IdbSite extends BaseSite {
       if (resource) {
         Log.debug(`Resource successfully crawled: ${JSON.stringify(resource)}`);
         Log.info(`Resource successfully crawled: ${resource.url}`);
-        console.log(`${resource.url} successfully crawled`);
       }
       resolve(resource);
     });
@@ -183,8 +181,6 @@ export default class IdbSite extends BaseSite {
       `against resource ${JSON.stringify(resource)}`,
     );
 
-    console.log('executePlugin');
-    console.log(plugin);
     if (plugin.opts && plugin.opts.runInTab) {
       return PluginManager.runInTab(this.tabId, plugin, this, resource);
     }
