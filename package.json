@@ -7,7 +7,8 @@
     "clean": "lerna exec -- rimraf dist",
     "build": "npm run clean && lerna run build",
     "build:dist": "lerna run build:dist",
-    "test": "lerna run test"
+    "test": "lerna run test",
+    "test:report": "lerna run test:report"
   },
   "keywords": [
     "scraper"
