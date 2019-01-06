@@ -30,7 +30,7 @@ export default class IdbResource extends BaseResource {
         }
         else {
           Object.assign(result, this.parseResult(result));
-          resolve(Object.assign(new IdbResource(), result));
+          resolve(Object.assign(new IdbResource(null, null, null), result));
         }
       };
       readReq.onerror = () => {
@@ -67,7 +67,7 @@ export default class IdbResource extends BaseResource {
           if (instantiate) {
             for (let i = 0; i < result.length; i += 1) {
               Object.assign(result[i], this.parseResult(result[i]));
-              result[i] = Object.assign(new IdbResource(), result[i]);
+              result[i] = Object.assign(new IdbResource(null, null, null), result[i]);
             }
           }
           resolve(result);
@@ -89,7 +89,7 @@ export default class IdbResource extends BaseResource {
           resolve(null);
         }
         else {
-          const resource = Object.assign(new IdbResource(), result);
+          const resource = Object.assign(new IdbResource(null, null, null), result);
           resource.crawlInProgress = true;
           const reqUpdateResource = rwTx.put(resource.serialize());
           reqUpdateResource.onsuccess = () => resolve(resource);
@@ -131,7 +131,7 @@ export default class IdbResource extends BaseResource {
   url: any;
   crawlInProgress: any;
 
-  constructor(siteId?, url?, depth?) {
+  constructor(siteId, url, depth) {
     super(siteId, url, depth);
     this.crawledAt = new Date(0);
   }

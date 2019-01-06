@@ -112,7 +112,7 @@ export default class IdbSite extends BaseSite {
   id: any;
   url: any;
 
-  constructor(name?, url?, opts?, pluginDefinitions?) {
+  constructor(name, url, opts, pluginDefinitions) {
     super(name, url, opts, false);
 
     if (!opts || !opts.crawl) {

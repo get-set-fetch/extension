@@ -1,5 +1,5 @@
 import SystemJS from 'systemjs';
-import PluginManager from '../../src/js/plugins/PluginManager';
+import PluginManager from '../../src/js/plugins/PluginManager.ts';
 
 const fs = require('fs');
 const path = require('path');

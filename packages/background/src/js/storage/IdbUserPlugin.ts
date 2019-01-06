@@ -31,7 +31,7 @@ export default class IdbUserPlugin extends BaseEntity {
           resolve(null);
         }
         else {
-          resolve(Object.assign(new IdbUserPlugin(), result));
+          resolve(Object.assign(new IdbUserPlugin(null, null), result));
         }
       };
       readReq.onerror = () => {
@@ -52,7 +52,7 @@ export default class IdbUserPlugin extends BaseEntity {
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            result[i] = Object.assign(new IdbUserPlugin(), result[i]);
+            result[i] = Object.assign(new IdbUserPlugin(null, null), result[i]);
           }
           resolve(result);
         }
@@ -99,7 +99,7 @@ export default class IdbUserPlugin extends BaseEntity {
   id: any;
   code: string;
 
-  constructor(name?, code?) {
+  constructor(name, code) {
     super();
     this.name = name;
     this.code = code;

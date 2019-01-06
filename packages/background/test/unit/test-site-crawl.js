@@ -1,6 +1,7 @@
-import IdbStorage from '../../src/js/storage/IdbStorage';
-import PluginManager from '../../src/js/plugins/PluginManager';
+import IdbStorage from '../../src/js/storage/IdbStorage.ts';
+import PluginManager from '../../src/js/plugins/PluginManager.ts';
 import PluginHelper from '../utils/PluginHelper';
+import GsfProvider from '../../src/js/storage/GsfProvider.ts';
 
 const sinon = require('sinon');
 
@@ -13,8 +14,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
   before(async () => {
     ({ Site, Resource, UserPlugin } = await IdbStorage.init());
-    UserPlugin.modules = {};
-    global.GsfProvider = { UserPlugin };
+    GsfProvider.UserPlugin = UserPlugin;
 
     global.document = { contentType: 'html' };
 
@@ -26,7 +26,9 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     await Site.delAll();
 
     // save site
-    const pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(pluginDef => ['SelectResourcePlugin', 'UpdateResourcePlugin'].indexOf(pluginDef.name) !== -1);
+    const pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
+      pluginDef => ['SelectResourcePlugin', 'UpdateResourcePlugin'].indexOf(pluginDef.name) !== -1,
+    );
 
     const site = new Site('siteA', 'http://siteA/page-0.html', null, pluginDefinitions);
     await site.save();

@@ -30,7 +30,7 @@ export default class IdbLog extends BaseEntity {
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            result[i] = Object.assign(new IdbLog(), result[i], { date: result[i].date.toISOString() });
+            result[i] = Object.assign(new IdbLog(null, null, null), result[i], { date: result[i].date.toISOString() });
           }
           resolve(result);
         }
@@ -54,7 +54,7 @@ export default class IdbLog extends BaseEntity {
   msg: string;
   id: any;
 
-  constructor(level?: number, cls?: string, msg?: string) {
+  constructor(level: number, cls: string, msg: string) {
     super();
     this.date = new Date();
     this.level = level;

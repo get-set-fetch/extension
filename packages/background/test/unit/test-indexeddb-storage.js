@@ -48,7 +48,6 @@ describe('Test Suite IndexedDB Storage', () => {
   before(async () => {
     // 1. storage init, populate GsfProvider used by some plugin related classes
     const { UserPlugin } = await IdbStorage.init();
-    UserPlugin.modules = {};
     GsfProvider.UserPlugin = UserPlugin;
     global.GsfProvider = { UserPlugin };
 

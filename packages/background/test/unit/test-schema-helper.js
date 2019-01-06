@@ -1,4 +1,4 @@
-import SchemaHelper from '../../src/js/schema/SchemaHelper';
+import SchemaHelper from '../../src/js/schema/SchemaHelper.ts';
 
 const { assert } = require('chai');
 

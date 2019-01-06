@@ -23,7 +23,7 @@ export default class IdbSetting extends BaseEntity {
           resolve(null);
         }
         else {
-          resolve(Object.assign(new IdbSetting(), result));
+          resolve(Object.assign(new IdbSetting(null, null), result));
         }
       };
       readReq.onerror = () => {
@@ -44,7 +44,7 @@ export default class IdbSetting extends BaseEntity {
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            result[i] = Object.assign(new IdbSetting(), result[i]);
+            result[i] = Object.assign(new IdbSetting(null, null), result[i]);
           }
           resolve(result);
         }
@@ -57,7 +57,7 @@ export default class IdbSetting extends BaseEntity {
   key: string;
   val: string;
 
-  constructor(key?, val?) {
+  constructor(key, val) {
     super();
     this.key = key;
     this.val = val;
