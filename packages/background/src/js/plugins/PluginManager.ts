@@ -1,6 +1,9 @@
+import GsfProvider from './../storage/GsfProvider';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
+import { System } from 'systemjs';
 import Logger from '../logger/Logger';
 
+declare const SystemJS: System;
 const Log = Logger.getLogger('PluginManager');
 
 class PluginManager {
@@ -27,7 +30,7 @@ class PluginManager {
           // assume there are just a dozen plugins,
           // otherwise a loop mechanism should be implemented in order to call readEntries multiple times
           reader.readEntries(
-            async (pluginFileEntries) => {
+            async (pluginFileEntries: FileEntry[]) => {
               for (let i = 0; i < pluginFileEntries.length; i += 1) {
               // ignore systemjs config plugins
               // eslint-disable-next-line no-continue
@@ -40,7 +43,7 @@ class PluginManager {
             },
             (err) => {
               reject(err);
-            },
+            }
           );
         });
       });
@@ -73,10 +76,10 @@ class PluginManager {
   static async discoverPlugins() {
     const plugins = await PluginManager.readPluginFiles();
     await PluginManager.persistPlugins(plugins);
-    await PluginManager.importPlugins(plugins);
+    await PluginManager.importPlugins();
   }
 
-  static get DEFAULT_PLUGINS() {
+  static get DEFAULT_PLUGINS(): string[] {
     return ['SelectResourcePlugin', 'ExtensionFetchPlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin'];
   }
 
@@ -87,7 +90,7 @@ class PluginManager {
 
   static getAvailablePluginDefs() {
     // filter plugins so only those loaded from the db via IdbFetchPlugin qualify
-    const pluginKeys = Array.from(SystemJS.registry.keys()).filter(key => key.match(/^.+!.+IdbFetchPlugin.js$/));
+    const pluginKeys = Array.from(SystemJS.registry.keys()).filter((key: any) => key.toString().match(/^.+!.+IdbFetchPlugin.js$/));
     return pluginKeys.map((pluginKey) => {
       const classDef = SystemJS.registry.get(pluginKey).default;
 
@@ -98,14 +101,14 @@ class PluginManager {
       return {
         name: pluginInstance.constructor.name,
         opts: pluginInstance.opts || {},
-        schema: pluginInstance.OPTS_SCHEMA,
+        schema: pluginInstance.OPTS_SCHEMA
       };
     });
   }
 
   static instantiate(pluginDefinitions) {
     return pluginDefinitions.map((pluginDefinition) => {
-      const pluginKey = Array.from(SystemJS.registry.keys()).find(key => key.indexOf(`/${pluginDefinition.name}!`) !== -1);
+      const pluginKey = Array.from(SystemJS.registry.keys()).find((key: any) => key.toString().indexOf(`/${pluginDefinition.name}!`) !== -1);
       Log.info(`Instantiating plugin ${pluginDefinition.name}`);
       if (pluginKey) {
         const classDef = SystemJS.registry.get(pluginKey).default;
@@ -129,7 +132,7 @@ class PluginManager {
       "Uncaught SyntaxError: Identifier 'ClassName' has already been declared at "
       but the other classes present in module will still load
       */
-      const moduleContent = GsfProvider.UserPlugin.modules[plugin.constructor.name];
+      const moduleContent: string = GsfProvider.UserPlugin.modules[plugin.constructor.name];
       // use negative lookahead (?!) to match anyting starting with a class definition but not containing another class definition
       const moduleClasses = moduleContent.match(/(class \w+ {([\s\S](?!(class \w+ {)))+)/gm);
       for (let i = 0; i < moduleClasses.length; i += 1) {
@@ -140,20 +143,20 @@ class PluginManager {
       const pluginInstanceName = `inst${plugin.constructor.name}`;
       await ActiveTabHelper.executeScript(
         tabId,
-        { code: `const ${pluginInstanceName} = new ${plugin.constructor.name}(${JSON.stringify(plugin.opts)})` },
+        { code: `const ${pluginInstanceName} = new ${plugin.constructor.name}(${JSON.stringify(plugin.opts)})` }
       );
 
       // test if plugin is aplicable
       const isAplicable = await ActiveTabHelper.executeScript(
         tabId,
-        { code: `${pluginInstanceName}.test(${JSON.stringify(site)}, ${JSON.stringify(resource)})` },
+        { code: `${pluginInstanceName}.test(${JSON.stringify(site)}, ${JSON.stringify(resource)})` }
       );
       if (!isAplicable) return null;
 
       // apply plugin, the result will be merged at a higher level into the current resource
       result = await ActiveTabHelper.executeScript(
         tabId,
-        { code: `${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)})` },
+        { code: `${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)})` }
       );
     }
     catch (err) {

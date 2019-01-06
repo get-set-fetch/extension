@@ -1,16 +1,17 @@
 import commonjs from 'rollup-plugin-commonjs';
+import typescript from 'rollup-plugin-typescript';
 import json from 'rollup-plugin-json';
 import ignore from 'rollup-plugin-ignore';
 import resolve from 'rollup-plugin-node-resolve';
 import globals from 'rollup-plugin-node-globals';
 import builtins from 'rollup-plugin-node-builtins';
-import { eslint } from 'rollup-plugin-eslint';
+import tslint from 'rollup-plugin-tslint';
 
 
 const mainConfig = {
   input: [
-    'src/js/background-bundle',
-    'src/js/background-main',
+    'src/js/background-bundle.ts',
+    'src/js/background-main.ts',
   ],
   output: {
     dir: 'dist',
@@ -19,9 +20,10 @@ const mainConfig = {
   experimentalCodeSplitting: true,
   sourceMap: true,
   plugins: [
+    ignore(['https', 'http', 'jsdom', 'fs', 'path', 'puppeteer', 'console', 'knex', 'mongodb', '__filename']),
+    typescript(),
     commonjs(),
     json(),
-    ignore(['https', 'http', 'jsdom', 'fs', 'path', 'puppeteer', 'console', 'knex', 'mongodb', '__filename']),
     resolve({
       browser: true,
       preferBuiltins: true,
@@ -36,12 +38,12 @@ const mainConfig = {
     }),
     globals(),
     builtins(),
-    eslint(),
+    tslint(),
   ],
 };
 
 const systemjsPlugins = [
-  { name: 'IdbFetchPlugin', src: 'src/js/plugins/systemjs/IdbFetchPlugin' },
+  { name: 'IdbFetchPlugin', src: 'src/js/plugins/systemjs/IdbFetchPlugin.ts' },
 ];
 const systemjsPluginConfig = systemjsPlugins.map(plugin => ({
   input: plugin.src,
@@ -50,6 +52,7 @@ const systemjsPluginConfig = systemjsPlugins.map(plugin => ({
     format: 'esm',
   },
   plugins: [
+    typescript(),
     commonjs(),
     resolve({
       browser: true,
@@ -57,17 +60,17 @@ const systemjsPluginConfig = systemjsPlugins.map(plugin => ({
       extensions: ['.js', '.json'],
       jsnext: true,
     }),
-    // eslint(),
+    tslint(),
   ],
 }));
 
 const crawlPlugins = [
-  { name: 'SelectResourcePlugin', src: 'src/js/plugins/builtin/SelectResourcePlugin' },
-  { name: 'UpdateResourcePlugin', src: 'src/js/plugins/builtin/UpdateResourcePlugin' },
-  { name: 'InsertResourcePlugin', src: 'src/js/plugins/builtin/InsertResourcePlugin' },
-  { name: 'ExtensionFetchPlugin', src: 'src/js/plugins/builtin/ExtensionFetchPlugin' },
-  { name: 'ExtractUrlPlugin', src: 'src/js/plugins/builtin/ExtractUrlPlugin' },
-  { name: 'ExtractTitlePlugin', src: 'src/js/plugins/builtin/ExtractTitlePlugin' },
+  { name: 'SelectResourcePlugin', src: 'src/js/plugins/builtin/SelectResourcePlugin.ts' },
+  { name: 'UpdateResourcePlugin', src: 'src/js/plugins/builtin/UpdateResourcePlugin.ts' },
+  { name: 'InsertResourcePlugin', src: 'src/js/plugins/builtin/InsertResourcePlugin.ts' },
+  { name: 'ExtensionFetchPlugin', src: 'src/js/plugins/builtin/ExtensionFetchPlugin.ts' },
+  { name: 'ExtractUrlPlugin', src: 'src/js/plugins/builtin/ExtractUrlPlugin.ts' },
+  { name: 'ExtractTitlePlugin', src: 'src/js/plugins/builtin/ExtractTitlePlugin.ts' },
 ];
 const crawlPluginConfig = crawlPlugins.map(plugin => ({
   input: plugin.src,
@@ -76,6 +79,7 @@ const crawlPluginConfig = crawlPlugins.map(plugin => ({
     format: 'esm',
   },
   plugins: [
+    typescript(),
     commonjs(),
     resolve({
       browser: true,
@@ -83,7 +87,7 @@ const crawlPluginConfig = crawlPlugins.map(plugin => ({
       extensions: ['.js', '.json'],
       jsnext: true,
     }),
-    eslint(),
+    tslint(),
   ],
 }));
 

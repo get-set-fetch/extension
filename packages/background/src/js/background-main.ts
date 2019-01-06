@@ -1,5 +1,6 @@
 import { GsfProvider, PluginManager } from './background-bundle';
-import Logger from './logger/Logger';
+import Logger, { LogLevel } from './logger/Logger';
+import IdbSetting from './storage/IdbSetting';
 
 // const Log = Logger.getLogger('background-main');
 
@@ -9,12 +10,13 @@ register GsfProvider at window level, required for:
   - accessing plugin module content from GsfProvider.UserPlugins.availablePlugins
 */
 window.GsfProvider = GsfProvider;
+declare const SystemJS;
 
 SystemJS.config({
   map: {
-    idb: './plugins/systemjs/IdbFetchPlugin.js',
+    'idb': './plugins/systemjs/IdbFetchPlugin.js',
     'plugin-babel': './plugins/systemjs/plugin-babel.js',
-    'systemjs-babel-build': './plugins/systemjs/systemjs-babel-browser.js',
+    'systemjs-babel-build': './plugins/systemjs/systemjs-babel-browser.js'
   },
   transpiler: 'plugin-babel',
   meta: {
@@ -24,10 +26,10 @@ SystemJS.config({
         es2015: false,
         stage1: false,
         stage2: false,
-        stage3: false,
-      },
-    },
-  },
+        stage3: false
+      }
+    }
+  }
 });
 
 (async () => {
@@ -37,10 +39,10 @@ SystemJS.config({
   const storedSettings = await GsfProvider.Setting.getAll();
   let logLevel = storedSettings.find(setting => setting.key === 'logLevel');
   if (!logLevel) {
-    logLevel = new GsfProvider.Setting('logLevel', 3);
+    logLevel = new GsfProvider.Setting('logLevel', LogLevel.WARN);
     await logLevel.save();
   }
-  Logger.setLogLevel(logLevel.val);
+  Logger.setLogLevel(parseInt(logLevel.val, 10));
 
   // 2. read all builtin plugins, persist them as UserPlugin, import them in SystemJS
   await PluginManager.discoverPlugins();

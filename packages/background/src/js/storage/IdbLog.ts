@@ -2,6 +2,12 @@ import { BaseEntity } from 'get-set-fetch';
 
 /* eslint-disable class-methods-use-this */
 export default class IdbLog extends BaseEntity {
+
+  // IndexedDB can't do partial update, define all resource properties to be stored
+  get props() {
+    return ['id', 'date', 'level', 'cls', 'msg'];
+  }
+
   // get a read transaction
   static rTx() {
     return IdbLog.db.transaction('Logs').objectStore('Logs');
@@ -12,7 +18,7 @@ export default class IdbLog extends BaseEntity {
     return IdbLog.db.transaction('Logs', 'readwrite').objectStore('Logs');
   }
 
-  static getAll() {
+  static getAll(): Promise<IdbLog[]> {
     return new Promise((resolve, reject) => {
       const rTx = IdbLog.rTx();
       const readReq = rTx.getAll();
@@ -42,7 +48,13 @@ export default class IdbLog extends BaseEntity {
     });
   }
 
-  constructor(level, cls, msg) {
+  date: Date;
+  level: number;
+  cls: string;
+  msg: string;
+  id: any;
+
+  constructor(level?: number, cls?: string, msg?: string) {
     super();
     this.date = new Date();
     this.level = level;
@@ -61,11 +73,6 @@ export default class IdbLog extends BaseEntity {
       };
       reqAddResource.onerror = () => reject(new Error(`could not add log entry: ${this.msg}`));
     });
-  }
-
-  // IndexedDB can't do partial update, define all resource properties to be stored
-  get props() {
-    return ['id', 'date', 'level', 'cls', 'msg'];
   }
 
   serializeWithoutId() {

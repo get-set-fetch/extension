@@ -1,6 +1,7 @@
 import PluginHelper from '../utils/PluginHelper';
-import PluginManager from '../../src/js/plugins/PluginManager';
-import IdbStorage from '../../src/js/storage/IdbStorage';
+import PluginManager from '../../src/js/plugins/PluginManager.ts';
+import GsfProvider from '../../src/js/storage/GsfProvider.ts';
+import IdbStorage from '../../src/js/storage/IdbStorage.ts';
 
 const { assert } = require('chai');
 
@@ -8,7 +9,7 @@ describe('Test PluginManager', () => {
   before(async () => {
     // 1. storage init, populate GsfProvider used by some plugin related classes
     const { UserPlugin } = await IdbStorage.init();
-    UserPlugin.modules = {};
+    GsfProvider.UserPlugin = UserPlugin;
     global.GsfProvider = { UserPlugin };
 
     // discover, register builtin plugins

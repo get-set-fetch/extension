@@ -1,18 +1,28 @@
 import IdbStorage from './IdbStorage';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 import PluginManager from '../plugins/PluginManager';
+import IdbUserPlugin from './IdbUserPlugin';
+import IdbSite from './IdbSite';
+import IdbResource from './IdbResource';
+import IdbLog from './IdbLog';
+import IdbSetting from './IdbSetting';
 
 /* eslint-disable no-case-declarations */
 export default class GsfProvider {
+  static Site: typeof IdbSite;
+  static Resource: typeof IdbResource;
+  static UserPlugin: typeof IdbUserPlugin;
+  static Log: typeof IdbLog;
+  static Setting: typeof IdbSetting;
+
   static async init() {
     // init extension storage
     const {
-      Site, Resource, UserPlugin, Log, Setting,
+      Site, Resource, UserPlugin, Log, Setting
     } = await IdbStorage.init();
     GsfProvider.Site = Site;
     GsfProvider.Resource = Resource;
     GsfProvider.UserPlugin = UserPlugin;
-    GsfProvider.UserPlugin.modules = {};
     GsfProvider.Log = Log;
     GsfProvider.Setting = Setting;
 
@@ -50,22 +60,22 @@ export default class GsfProvider {
         switch (true) {
           // sites
           case /^sites$/.test(request.resource):
-            reqPromise = this.Site.getAll();
+            reqPromise = GsfProvider.Site.getAll();
             break;
           // site/:siteId
           case /^site\/[0-9]+$/.test(request.resource):
             const getSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            reqPromise = this.Site.get(getSiteId);
+            reqPromise = GsfProvider.Site.get(getSiteId);
             break;
           // site/:siteName , don't allow "/" so that we can differentiate /crawl verb as another switch option
           case /^site\/[^/]+$/.test(request.resource):
             const getSiteName = /^site\/(.+)$/.exec(request.resource)[1];
-            reqPromise = this.Site.get(getSiteName);
+            reqPromise = GsfProvider.Site.get(getSiteName);
             break;
           // site/{site.id}/crawl
           case /^site\/[0-9]+\/crawl$/.test(request.resource):
             const crawlSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            const crawlSite = await this.Site.get(crawlSiteId);
+            const crawlSite = await GsfProvider.Site.get(crawlSiteId);
 
             // open a new tab for the current site to be crawled into
             const tab = await ActiveTabHelper.create();
@@ -83,7 +93,7 @@ export default class GsfProvider {
         switch (true) {
           // site
           case /^site$/.test(request.resource):
-            const site = new this.Site(request.body.name, request.body.url, request.body.opts, request.body.pluginDefinitions);
+            const site = new GsfProvider.Site(request.body.name, request.body.url, request.body.opts, request.body.pluginDefinitions);
             reqPromise = site.save();
             break;
           default:
@@ -94,7 +104,7 @@ export default class GsfProvider {
         switch (true) {
           // site
           case /^site$/.test(request.resource):
-            const site = Object.assign(new this.Site(), request.body);
+            const site = Object.assign(new GsfProvider.Site(), request.body);
             reqPromise = site.update();
             break;
           default:
@@ -105,7 +115,7 @@ export default class GsfProvider {
         switch (true) {
           // sites
           case /^sites$/.test(request.resource):
-            reqPromise = this.Site.delSome(request.body.ids);
+            reqPromise = GsfProvider.Site.delSome(request.body.ids);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -128,22 +138,22 @@ export default class GsfProvider {
           // resources/:siteId
           case /^resources\/[0-9]+$/.test(request.resource):
             const siteId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            reqPromise = this.Resource.getAll(siteId, null, false);
+            reqPromise = GsfProvider.Resource.getAll(siteId, null, false);
             break;
           // resources/:siteId/notcrawled
           case /^resources\/[0-9]+\/notcrawled$/.test(request.resource):
             const notCrawledSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            reqPromise = this.Resource.getAllNotCrawled(notCrawledSiteId);
+            reqPromise = GsfProvider.Resource.getAllNotCrawled(notCrawledSiteId);
             break;
           // resources/:siteId/crawled
           case /^resources\/[0-9]+\/crawled$/.test(request.resource):
             const crawledSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            reqPromise = this.Resource.getAllCrawled(crawledSiteId);
+            reqPromise = GsfProvider.Resource.getAllCrawled(crawledSiteId);
             break;
           // resource/:urlOrId
           case /^resource\/.+$/.test(request.resource):
             const urlOrId = /^resource\/(.+)$/.exec(request.resource)[1];
-            reqPromise = this.Resource.get(urlOrId);
+            reqPromise = GsfProvider.Resource.get(urlOrId);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -173,17 +183,17 @@ export default class GsfProvider {
             break;
           // plugins
           case /^plugins$/.test(request.resource):
-            reqPromise = this.UserPlugin.getAll();
+            reqPromise = GsfProvider.UserPlugin.getAll();
             break;
           // plugin/:pluginId
           case /^plugin\/[0-9]+$/.test(request.resource):
             const getPluginId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            reqPromise = this.UserPlugin.get(getPluginId);
+            reqPromise = GsfProvider.UserPlugin.get(getPluginId);
             break;
           // plugin/:pluginName
           case /^plugin\/.+$/.test(request.resource):
             const getPluginName = /^plugin\/(.+)$/.exec(request.resource)[1];
-            reqPromise = this.UserPlugin.get(getPluginName);
+            reqPromise = GsfProvider.UserPlugin.get(getPluginName);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -193,7 +203,7 @@ export default class GsfProvider {
         switch (true) {
           // plugin
           case /^plugin$/.test(request.resource):
-            const plugin = new this.UserPlugin(request.body.name, request.body.code);
+            const plugin = new GsfProvider.UserPlugin(request.body.name, request.body.code);
             reqPromise = plugin.save();
             break;
           default:
@@ -204,7 +214,7 @@ export default class GsfProvider {
         switch (true) {
           // plugin
           case /^plugin$/.test(request.resource):
-            const plugin = Object.assign(new this.UserPlugin(), request.body);
+            const plugin = Object.assign(new GsfProvider.UserPlugin(), request.body);
             reqPromise = plugin.update();
             break;
           default:
@@ -215,7 +225,7 @@ export default class GsfProvider {
         switch (true) {
           // plugins
           case /^plugins$/.test(request.resource):
-            reqPromise = this.UserPlugin.delSome(request.body.ids);
+            reqPromise = GsfProvider.UserPlugin.delSome(request.body.ids);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -237,7 +247,7 @@ export default class GsfProvider {
         switch (true) {
           // logs
           case /^logs$/.test(request.resource):
-            reqPromise = this.Log.getAll();
+            reqPromise = GsfProvider.Log.getAll();
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -247,7 +257,7 @@ export default class GsfProvider {
         switch (true) {
           // logs
           case /^logs$/.test(request.resource):
-            reqPromise = this.Log.delAll();
+            reqPromise = GsfProvider.Log.delAll();
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -269,12 +279,12 @@ export default class GsfProvider {
         switch (true) {
           // settings
           case /^settings$/.test(request.resource):
-            reqPromise = this.Setting.getAll();
+            reqPromise = GsfProvider.Setting.getAll();
             break;
           // setting/:key
           case /^setting\/.+$/.test(request.resource):
             const key = /^setting\/(.+)$/.exec(request.resource)[1];
-            reqPromise = this.Setting.get(key);
+            reqPromise = GsfProvider.Setting.get(key);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -284,18 +294,8 @@ export default class GsfProvider {
         switch (true) {
           // settings
           case /^setting$/.test(request.resource):
-            const setting = Object.assign(new this.Setting(), request.body);
+            const setting = Object.assign(new GsfProvider.Setting(), request.body);
             reqPromise = setting.update();
-            break;
-          default:
-            reqPromise = new Promise(resolve => resolve());
-        }
-        break;
-      case 'DELETE':
-        switch (true) {
-          // logs
-          case /^logs$/.test(request.resource):
-            reqPromise = this.Log.delAll();
             break;
           default:
             reqPromise = new Promise(resolve => resolve());

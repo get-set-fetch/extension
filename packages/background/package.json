@@ -10,6 +10,7 @@
   "scripts": {
     "postinstall": "patch-package",
     "clean": "rimraf dist",
+    "lint": "tslint -c tslint.json \"src/**/*.ts\"",
     "build": "npm run clean && npm run build:dist && npm run copy:resources",
     "build:dist": "rollup --config rollup.config.js",
     "copy:resources": "npm run copy:resources:html && npm run copy:resources:systemjs",
@@ -30,6 +31,9 @@
   },
   "homepage": "https://github.com/get-set-fetch/extension#readme",
   "devDependencies": {
+    "@types/chrome": "0.0.76",
+    "@types/node": "^10.12.18",
+    "@types/systemjs": "^0.20.6",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-plugin-module-resolver": "^3.1.1",
@@ -47,13 +51,21 @@
     "puppeteer": "^1.11.0",
     "rimraf": "^2.6.2",
     "rollup-plugin-commonjs": "^9.1.0",
-    "rollup-plugin-eslint": "^5.0.0",
     "rollup-plugin-ignore": "^1.0.3",
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-globals": "^1.2.1",
     "rollup-plugin-node-resolve": "^3.3.0",
-    "sinon": "^6.1.4"
+    "rollup-plugin-tslint": "^0.1.38",
+    "rollup-plugin-typescript": "^1.0.0",
+    "rollup-plugin-typescript2": "^0.18.1",
+    "sinon": "^6.1.4",
+    "ts-node": "^7.0.1",
+    "tslib": "^1.9.3",
+    "tslint": "^5.12.0",
+    "tslint-config-airbnb": "^5.11.1",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.2.2"
   },
   "dependencies": {
     "coveralls": "^3.0.2",

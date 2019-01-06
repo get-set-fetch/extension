@@ -14,11 +14,11 @@ export default class IdbResource extends BaseResource {
 
   static parseResult(result) {
     return {
-      crawlInProgress: result.crawlInProgress === 1,
+      crawlInProgress: result.crawlInProgress === 1
     };
   }
 
-  static get(urlOrId) {
+  static get(urlOrId): Promise<IdbResource> {
     return new Promise((resolve, reject) => {
       const rTx = IdbResource.rTx();
       const readReq = (Number.isInteger(urlOrId) ? rTx.get(urlOrId) : rTx.index('url').get(urlOrId));
@@ -42,7 +42,7 @@ export default class IdbResource extends BaseResource {
   static getAllCrawled(siteId) {
     const idbKey = IDBKeyRange.bound(
       [siteId, 0, new Date(1)],
-      [siteId, 0, new Date(Date.now())],
+      [siteId, 0, new Date(Date.now())]
     );
 
     return this.getAll(siteId, idbKey);
@@ -53,7 +53,7 @@ export default class IdbResource extends BaseResource {
     return this.getAll(siteId, idbKey);
   }
 
-  static getAll(siteId, idbKey, instantiate = true) {
+  static getAll(siteId, idbKey, instantiate: boolean = true): Promise<IdbResource[]> {
     return new Promise((resolve, reject) => {
       const rTx = IdbResource.rTx();
       const readReq = idbKey ? rTx.index('getResourceToCrawl').getAll(idbKey) : rTx.getAll();
@@ -93,11 +93,11 @@ export default class IdbResource extends BaseResource {
           resource.crawlInProgress = true;
           const reqUpdateResource = rwTx.put(resource.serialize());
           reqUpdateResource.onsuccess = () => resolve(resource);
-          reqUpdateResource.onerror = () => reject(new Error(`could not update crawlInProgress for resource: ${this.url}`));
+          reqUpdateResource.onerror = () => reject(new Error(`could not update crawlInProgress for resource: ${resource.url}`));
         }
       };
       getReq.onerror = (err) => {
-        reject(new Error('could not read resource to crawl'), err);
+        reject(new Error('could not read resource to crawl: ' + err.message));
       };
     });
   }
@@ -110,7 +110,7 @@ export default class IdbResource extends BaseResource {
     if (!resource && crawlFrequency >= 0) {
       resource = await this.getResourceToCrawlWithKey(IDBKeyRange.bound(
         [siteId, 0, new Date(0)],
-        [siteId, 0, new Date(Date.now() - (crawlFrequency * 60 * 60 * 1000))],
+        [siteId, 0, new Date(Date.now() - (crawlFrequency * 60 * 60 * 1000))]
       ));
     }
 
@@ -126,11 +126,15 @@ export default class IdbResource extends BaseResource {
     });
   }
 
-  constructor(siteId, url, depth) {
+  crawledAt: any;
+  id: any;
+  url: any;
+  crawlInProgress: any;
+
+  constructor(siteId?, url?, depth?) {
     super(siteId, url, depth);
     this.crawledAt = new Date(0);
   }
-
 
   save() {
     return new Promise((resolve, reject) => {
@@ -169,8 +173,8 @@ export default class IdbResource extends BaseResource {
     return ['id', 'siteId', 'url', 'depth', 'info', 'crawledAt', 'crawlInProgress', 'content', 'contentType'];
   }
 
-  serialize() {
-    const serialized = this.props.reduce((acc, key) => Object.assign(acc, { [key]: this[key] }), {});
+  serialize(): any {
+    const serialized: any = this.props.reduce((acc, key) => Object.assign(acc, { [key]: this[key] }), {});
     // crawlInProgress is an IndexedDB index with boolean values not supported
     serialized.crawlInProgress = serialized.crawlInProgress ? 1 : 0;
     return serialized;

@@ -1,6 +1,8 @@
 import SchemaHelper from '../../schema/SchemaHelper';
 
 export default class ExtractTitlePlugin {
+  opts: any;
+
   constructor(opts) {
     this.opts = SchemaHelper.instantiate(ExtractTitlePlugin.OPTS_SCHEMA, opts);
   }
@@ -14,9 +16,9 @@ export default class ExtractTitlePlugin {
       properties: {
         runInTab: {
           type: 'boolean',
-          default: true,
-        },
-      },
+          default: true
+        }
+      }
     };
   }
 
@@ -29,8 +31,8 @@ export default class ExtractTitlePlugin {
   apply() {
     return {
       info: {
-        title: document.title,
-      },
+        title: document.title
+      }
     };
   }
 }

@@ -9,7 +9,7 @@ export default class ActiveTabHelper {
             resolve(result[0]);
           }
           else resolve(result);
-        },
+        }
       );
     });
   }
@@ -20,12 +20,12 @@ export default class ActiveTabHelper {
         { active: true },
         (tabs) => {
           resolve(tabs[0]);
-        },
+        }
       );
     });
   }
 
-  static create(createProperties) {
+  static create(createProperties = {}): any {
     return new Promise((resolve) => {
       chrome.tabs.create(
         createProperties || {},
@@ -36,7 +36,7 @@ export default class ActiveTabHelper {
           */
           const resolveFnc = () => resolve(tab);
           setTimeout(resolveFnc, 1000);
-        },
+        }
       );
     });
   }
@@ -55,7 +55,7 @@ export default class ActiveTabHelper {
             }
           };
           chrome.tabs.onUpdated.addListener(updateHandler);
-        },
+        }
       );
     });
   }

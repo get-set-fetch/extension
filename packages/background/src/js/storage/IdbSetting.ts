@@ -12,7 +12,7 @@ export default class IdbSetting extends BaseEntity {
     return IdbSetting.db.transaction('Settings', 'readwrite').objectStore('Settings');
   }
 
-  static get(key) {
+  static get(key): Promise<IdbSetting> {
     return new Promise((resolve, reject) => {
       const rTx = IdbSetting.rTx();
       const readReq = rTx.get(key);
@@ -32,7 +32,7 @@ export default class IdbSetting extends BaseEntity {
     });
   }
 
-  static getAll() {
+  static getAll(): Promise<IdbSetting[]> {
     return new Promise((resolve, reject) => {
       const rTx = IdbSetting.rTx();
       const readReq = rTx.getAll();
@@ -53,7 +53,11 @@ export default class IdbSetting extends BaseEntity {
     });
   }
 
-  constructor(key, val) {
+  id: string;
+  key: string;
+  val: string;
+
+  constructor(key?, val?) {
     super();
     this.key = key;
     this.val = val;

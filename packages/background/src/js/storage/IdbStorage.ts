@@ -6,12 +6,14 @@ import IdbLog from './IdbLog';
 import IdbSetting from './IdbSetting';
 
 export default class IdbStorage {
-  static init() {
+  static init(): Promise<{
+    Site: typeof IdbSite, Resource: typeof IdbResource, UserPlugin: typeof IdbUserPlugin, Log: typeof IdbLog, Setting: typeof IdbSetting
+  }> {
     return new Promise((resolve, reject) => {
       const openRequest = indexedDB.open('gsf_db', 1);
 
-      openRequest.onupgradeneeded = (e) => {
-        const db = e.target.result;
+      openRequest.onupgradeneeded = (e: IDBVersionChangeEvent) => {
+        const db = openRequest.result;
         if (!db.objectStoreNames.contains('Sites')) {
           const siteStore = db.createObjectStore('Sites', { keyPath: 'id', autoIncrement: true });
           siteStore.createIndex('name', 'name', { unique: true });
@@ -41,11 +43,12 @@ export default class IdbStorage {
         }
       };
 
-      openRequest.onsuccess = (e) => {
-        BaseEntity.db = e.target.result;
+      openRequest.onsuccess = (e: any) => {
+        BaseEntity.db = openRequest.result;
         resolve({
-          Site: IdbSite, Resource: IdbResource, UserPlugin: IdbUserPlugin, Log: IdbLog, Setting: IdbSetting,
+          Site: IdbSite, Resource: IdbResource, UserPlugin: IdbUserPlugin, Log: IdbLog, Setting: IdbSetting
         });
+
       };
 
       openRequest.onerror = () => {

@@ -1,8 +1,9 @@
 import SystemJS from 'systemjs';
 import ExternalStorageTests from 'get-set-fetch/test/external/external-storage-tests';
-import PluginManager from '../../src/js/plugins/PluginManager';
-import IdbStorage from '../../src/js/storage/IdbStorage';
+import IdbStorage from '../../src/js/storage/IdbStorage.ts';
 import PluginHelper from '../utils/PluginHelper';
+import PluginManager from '../../src/js/plugins/PluginManager.ts';
+import GsfProvider from '../../src/js/storage/GsfProvider.ts';
 
 global.System = SystemJS;
 const conn = { info: 'IndexedDB' };
@@ -48,6 +49,7 @@ describe('Test Suite IndexedDB Storage', () => {
     // 1. storage init, populate GsfProvider used by some plugin related classes
     const { UserPlugin } = await IdbStorage.init();
     UserPlugin.modules = {};
+    GsfProvider.UserPlugin = UserPlugin;
     global.GsfProvider = { UserPlugin };
 
     await PluginHelper.init();

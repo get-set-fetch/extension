@@ -2,6 +2,14 @@ import { BaseEntity } from 'get-set-fetch';
 
 /* eslint-disable class-methods-use-this */
 export default class IdbUserPlugin extends BaseEntity {
+
+  // IndexedDB can't do partial update, define all resource properties to be stored
+  get props() {
+    return ['id', 'name', 'code'];
+  }
+
+  static modules: Map<string,string> = new Map<string, string>();
+
   // get a read transaction
   static rTx() {
     return IdbUserPlugin.db.transaction('UserPlugins').objectStore('UserPlugins');
@@ -12,7 +20,7 @@ export default class IdbUserPlugin extends BaseEntity {
     return IdbUserPlugin.db.transaction('UserPlugins', 'readwrite').objectStore('UserPlugins');
   }
 
-  static get(nameOrId) {
+  static get(nameOrId): Promise<IdbUserPlugin> {
     return new Promise((resolve, reject) => {
       const rTx = IdbUserPlugin.rTx();
       const readReq = (Number.isInteger(nameOrId) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
@@ -32,7 +40,7 @@ export default class IdbUserPlugin extends BaseEntity {
     });
   }
 
-  static getAll() {
+  static getAll(): Promise<IdbUserPlugin[]> {
     return new Promise((resolve, reject) => {
       const rTx = IdbUserPlugin.rTx();
       const readReq = rTx.getAll();
@@ -87,7 +95,11 @@ export default class IdbUserPlugin extends BaseEntity {
     });
   }
 
-  constructor(name, code) {
+  name: string;
+  id: any;
+  code: string;
+
+  constructor(name?, code?) {
     super();
     this.name = name;
     this.code = code;
@@ -121,11 +133,6 @@ export default class IdbUserPlugin extends BaseEntity {
       reqUpdateResource.onsuccess = () => resolve();
       reqUpdateResource.onerror = () => reject(new Error(`could not delete userPlugin: ${this.name}`));
     });
-  }
-
-  // IndexedDB can't do partial update, define all resource properties to be stored
-  get props() {
-    return ['id', 'name', 'code'];
   }
 
   serializeWithoutId() {

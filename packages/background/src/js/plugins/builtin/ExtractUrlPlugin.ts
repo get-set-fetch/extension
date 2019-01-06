@@ -3,10 +3,9 @@ import SchemaHelper from '../../schema/SchemaHelper';
 /**
  * Plugin responsible for extracting new resources from a resource document.
  */
+
+declare const document;
 export default class ExtractUrlPlugin {
-  constructor(opts) {
-    this.opts = SchemaHelper.instantiate(ExtractUrlPlugin.OPTS_SCHEMA, opts);
-  }
 
   static get OPTS_SCHEMA() {
     return {
@@ -18,27 +17,57 @@ export default class ExtractUrlPlugin {
         contentTypeRe: {
           type: 'string',
           subType: 'regexp',
-          default: '/html/i',
+          default: '/html/i'
         },
         extensionRe: {
           type: 'string',
           subType: 'regexp',
-          default: '/^(html|htm|php)$/i',
+          default: '/^(html|htm|php)$/i'
         },
         allowNoExtension: {
           type: 'boolean',
-          default: true,
+          default: true
         },
         maxDepth: {
           type: 'number',
-          default: '-1',
+          default: '-1'
         },
         runInTab: {
           type: 'boolean',
-          default: true,
-        },
-      },
+          default: true
+        }
+      }
     };
+  }
+
+  static absoluteUrl(absolutePath, relativePath) {
+    const absSegments = absolutePath.split('/');
+    const relSegments = relativePath.split('/');
+
+    // get to current directory by removing filename or extra slash if present
+    const lastSegment = absSegments[absSegments.length - 1];
+    if (lastSegment.length === 0 || lastSegment.indexOf('.') !== -1) {
+      absSegments.pop();
+    }
+
+    for (let i = 0; i < relSegments.length; i += 1) {
+      switch (relSegments[i]) {
+        case '.':
+          break;
+        case '..':
+          absSegments.pop();
+          break;
+        default:
+          absSegments.push(relSegments[i]);
+      }
+    }
+    return absSegments.join('/');
+  }
+
+  opts: any;
+
+  constructor(opts) {
+    this.opts = SchemaHelper.instantiate(ExtractUrlPlugin.OPTS_SCHEMA, opts);
   }
 
   test() {
@@ -77,31 +106,6 @@ export default class ExtractUrlPlugin {
 
     return Array.from(validUrls);
   }
-
-  static absoluteUrl(absolutePath, relativePath) {
-    const absSegments = absolutePath.split('/');
-    const relSegments = relativePath.split('/');
-
-    // get to current directory by removing filename or extra slash if present
-    const lastSegment = absSegments[absSegments.length - 1];
-    if (lastSegment.length === 0 || lastSegment.indexOf('.') !== -1) {
-      absSegments.pop();
-    }
-
-    for (let i = 0; i < relSegments.length; i += 1) {
-      switch (relSegments[i]) {
-        case '.':
-          break;
-        case '..':
-          absSegments.pop();
-          break;
-        default:
-          absSegments.push(relSegments[i]);
-      }
-    }
-    return absSegments.join('/');
-  }
-
 
   // eslint-disable-next-line class-methods-use-this
   createResourceUrl(currentUrl, partialUrl) {

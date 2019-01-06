@@ -4,6 +4,8 @@ import SchemaHelper from '../../schema/SchemaHelper';
  * Plugin responsible for selecting a resource to crawl from the current site.
  */
 export default class SelectResourcePlugin {
+  opts: any;
+
   constructor(opts) {
     this.opts = SchemaHelper.instantiate(SelectResourcePlugin.OPTS_SCHEMA, opts);
   }
@@ -18,9 +20,9 @@ export default class SelectResourcePlugin {
         crawlFrequency: {
           type: 'number',
           default: '-1',
-          help: 'How often a resource should be re-crawled (hours), enter -1 to never re-crawl',
-        },
-      },
+          help: 'How often a resource should be re-crawled (hours), enter -1 to never re-crawl'
+        }
+      }
     };
   }
 

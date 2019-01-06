@@ -8,6 +8,12 @@ const Log = Logger.getLogger('IdbSite');
 
 /* eslint-disable class-methods-use-this */
 export default class IdbSite extends BaseSite {
+
+  // IndexedDB can't do partial update, define all site properties to be stored
+  get props() {
+    return ['id', 'name', 'url', 'opts', 'robotsTxt', 'pluginDefinitions', 'resourceFilter'];
+  }
+
   // get a read transaction
   static rTx() {
     return IdbSite.db.transaction('Sites').objectStore('Sites');
@@ -23,7 +29,7 @@ export default class IdbSite extends BaseSite {
     return { plugins };
   }
 
-  static get(nameOrId) {
+  static get(nameOrId): Promise<IdbSite> {
     return new Promise((resolve, reject) => {
       const rTx = IdbSite.rTx();
       const readReq = (Number.isInteger(nameOrId) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
@@ -42,7 +48,7 @@ export default class IdbSite extends BaseSite {
     });
   }
 
-  static getAll() {
+  static getAll(): Promise<IdbSite[]> {
     return new Promise((resolve, reject) => {
       const rTx = IdbSite.rTx();
       const readReq = rTx.getAll();
@@ -98,21 +104,29 @@ export default class IdbSite extends BaseSite {
     });
   }
 
-  constructor(name, url, opts, pluginDefinitions) {
+  opts: any;
+  pluginDefinitions: any;
+  plugins: any;
+  tabId: any;
+  name: any;
+  id: any;
+  url: any;
+
+  constructor(name?, url?, opts?, pluginDefinitions?) {
     super(name, url, opts, false);
 
     if (!opts || !opts.crawl) {
       this.opts.crawl = {
         maxConnections: 1,
         maxResources: 10,
-        delay: 100,
+        delay: 100
       };
     }
 
     if (!opts || !opts.resourceFilter) {
       this.opts.resourceFilter = {
         maxEntries: 5000,
-        probability: 0.01,
+        probability: 0.01
       };
     }
 
@@ -159,7 +173,7 @@ export default class IdbSite extends BaseSite {
           Log.error(
             `Crawl error for site ${this.name}`,
             `${this.plugins[i].constructor.name} ${resource ? resource.url : ''}`,
-            JSON.stringify(err),
+            JSON.stringify(err)
           );
           reject(err);
           break;
@@ -178,7 +192,7 @@ export default class IdbSite extends BaseSite {
     Log.debug(
       `Executing plugin ${plugin.constructor.name} `,
       `using options ${JSON.stringify(plugin.opts)} `,
-      `against resource ${JSON.stringify(resource)}`,
+      `against resource ${JSON.stringify(resource)}`
     );
 
     if (plugin.opts && plugin.opts.runInTab) {
@@ -290,13 +304,7 @@ export default class IdbSite extends BaseSite {
     });
   }
 
-
-  // IndexedDB can't do partial update, define all site properties to be stored
-  get props() {
-    return ['id', 'name', 'url', 'opts', 'robotsTxt', 'pluginDefinitions', 'resourceFilter'];
-  }
-
-  serialize() {
+  serialize(): any {
     const serializedObj = this.props.reduce((acc, key) => Object.assign(acc, { [key]: this[key] }), {});
     return serializedObj;
   }
