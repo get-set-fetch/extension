@@ -64,7 +64,13 @@ export default class ExtractUrlPlugin {
     return absSegments.join('/');
   }
 
-  opts: any;
+  opts: {
+    contentTypeRe: RegExp,
+    extensionRe: RegExp,
+    allowNoExtension: boolean,
+    maxDepth: number,
+    runInTab: boolean
+  };
 
   constructor(opts) {
     this.opts = SchemaHelper.instantiate(ExtractUrlPlugin.OPTS_SCHEMA, opts);
@@ -107,7 +113,6 @@ export default class ExtractUrlPlugin {
     return Array.from(validUrls);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   createResourceUrl(currentUrl, partialUrl) {
     let resourceUrl = null;
     // absolute path starting with "/" or http://, https://

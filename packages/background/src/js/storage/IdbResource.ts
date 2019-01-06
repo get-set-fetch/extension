@@ -128,8 +128,8 @@ export default class IdbResource extends BaseResource {
 
   crawledAt: any;
   id: any;
-  url: any;
-  crawlInProgress: any;
+  url: string;
+  crawlInProgress: boolean;
 
   constructor(siteId, url, depth) {
     super(siteId, url, depth);

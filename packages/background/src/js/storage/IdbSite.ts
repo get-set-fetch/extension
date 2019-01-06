@@ -93,7 +93,7 @@ export default class IdbSite extends BaseSite {
       return null;
     }
 
-    // eslint-disable-next-line no-shadow
+    // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
       if (ids && ids.length > 0) {
         this.delSome(ids, resolve, reject);
@@ -104,13 +104,24 @@ export default class IdbSite extends BaseSite {
     });
   }
 
-  opts: any;
+  opts: {
+    crawl: {
+      maxConnections: number,
+      maxResources: number,
+      delay: number
+    },
+    resourceFilter: {
+      maxEntries: number,
+      probability: number
+    }
+  };
+
   pluginDefinitions: any;
   plugins: any;
   tabId: any;
-  name: any;
+  name: string;
   id: any;
-  url: any;
+  url: string;
 
   constructor(name, url, opts, pluginDefinitions) {
     super(name, url, opts, false);
@@ -210,7 +221,6 @@ export default class IdbSite extends BaseSite {
   }
 
   save() {
-    // eslint-disable-next-line no-unused-vars
     return new Promise(async (resolve, reject) => {
       const rwTx = IdbSite.rwTx();
       // save the site and wait for the return result containing the new inserted id

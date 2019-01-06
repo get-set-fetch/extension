@@ -84,7 +84,7 @@ export default class IdbUserPlugin extends BaseEntity {
       return null;
     }
 
-    // eslint-disable-next-line no-shadow
+    // tslint:disable-next-line:no-shadowed-variable
     return new Promise((resolve, reject) => {
       if (ids && ids.length > 0) {
         this.delSome(ids, resolve, reject);

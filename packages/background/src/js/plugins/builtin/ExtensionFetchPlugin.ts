@@ -2,13 +2,11 @@ import URL from 'url-parse';
 import ActiveTabHelper from '../../helpers/ActiveTabHelper';
 
 export default class ExtensionFetchPlugin {
-  // eslint-disable-next-line class-methods-use-this
   test(resource) {
     const { protocol } = new URL(resource.url);
     return protocol === 'http:' || protocol === 'https:';
   }
 
-  // eslint-disable-next-line
   async apply(site, resource) {
     return new Promise(async (resolve, reject) => {
       let statusCode = null;

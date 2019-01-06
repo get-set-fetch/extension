@@ -1,7 +1,9 @@
 import SchemaHelper from '../../schema/SchemaHelper';
 
 export default class ExtractTitlePlugin {
-  opts: any;
+  opts: {
+    runInTab: boolean
+  };
 
   constructor(opts) {
     this.opts = SchemaHelper.instantiate(ExtractTitlePlugin.OPTS_SCHEMA, opts);
@@ -22,12 +24,10 @@ export default class ExtractTitlePlugin {
     };
   }
 
-  // eslint-disable-next-line class-methods-use-this
   test() {
     return true;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   apply() {
     return {
       info: {

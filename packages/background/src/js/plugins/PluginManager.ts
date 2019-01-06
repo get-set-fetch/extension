@@ -33,7 +33,6 @@ class PluginManager {
             async (pluginFileEntries: FileEntry[]) => {
               for (let i = 0; i < pluginFileEntries.length; i += 1) {
               // ignore systemjs config plugins
-              // eslint-disable-next-line no-continue
                 if (pluginFileEntries[i].fullPath.indexOf('systemjs') !== -1) continue;
                 const pluginContent = await PluginManager.getPluginContent(pluginFileEntries[i]);
                 const pluginName = pluginFileEntries[i].name.match(/^(\w+).js$/)[1];
@@ -94,7 +93,6 @@ class PluginManager {
     return pluginKeys.map((pluginKey) => {
       const classDef = SystemJS.registry.get(pluginKey).default;
 
-      // eslint-disable-next-line new-cap
       const pluginInstance = new (classDef)();
 
       // for each plugin, based on its instance, return its name and default options
@@ -113,7 +111,6 @@ class PluginManager {
       if (pluginKey) {
         const classDef = SystemJS.registry.get(pluginKey).default;
 
-        // eslint-disable-next-line new-cap
         return new (classDef)(pluginDefinition.opts);
       }
 
