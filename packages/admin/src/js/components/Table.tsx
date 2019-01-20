@@ -1,28 +1,21 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 
-export default class Table extends React.Component {
-  static get propTypes() {
-    return {
-      onRowSelectionChange: PropTypes.func,
-      onHeaderSelectionChange: PropTypes.func,
-      selectedRows: PropTypes.arrayOf(PropTypes.number),
-      header: PropTypes.arrayOf(PropTypes.object),
-      data: PropTypes.arrayOf(PropTypes.object),
-      emptyTableMsg: PropTypes.string,
-    };
-  }
+interface IProps {
+  onRowSelectionChange?:  (idx:number) => void;
+  onHeaderSelectionChange?:  (evt: React.ChangeEvent<HTMLInputElement>) => void;
+  selectedRows: number[];
+  header: any[];
+  data: any[];
+  emptyTableMsg:string;
+}
 
-  static get defaultProps() {
-    return {
-      onRowSelectionChange: null,
-      onHeaderSelectionChange: null,
-      selectedRows: [],
-      header: [],
-      data: [],
-      emptyTableMsg: 'No entries found',
-    };
-  }
+export default class Table extends React.Component<IProps, {}> {
+  static defaultProps = {
+    selectedRows: [],
+    header: [],
+    data: [],
+    emptyTableMsg: 'No entries found',
+  };
 
   constructor(props) {
     super(props);

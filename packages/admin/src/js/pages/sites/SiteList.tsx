@@ -1,14 +1,22 @@
-import React from 'react';
+import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 import Table from '../../components/Table';
-import GsfClient from '../../components/GsfClient';
+import GsfClient, { HttpMethod } from '../../components/GsfClient';
 import ExportHelper from '../../utils/ExportHelper';
 import DownloadHelper from '../../utils/DownloadHelper';
+import Site from './model/Site';
+import Resource from './model/Resource';
 
-export default class SiteList extends React.Component {
+interface IState {
+  header: any[];
+  data: Site[];
+  selectedRows: number[];
+}
+
+export default class SiteList extends React.Component<{}, IState> {
   static async crawlSite(site) {
     try {
-      await GsfClient.fetch('GET', `site/${site.id}/crawl`);
+      await GsfClient.fetch(HttpMethod.GET, `site/${site.id}/crawl`);
     }
     catch (err) {
       console.log('error crawling site');
@@ -29,9 +37,9 @@ export default class SiteList extends React.Component {
     evt.preventDefault();
 
     // load just the crawled resources for the current site
-    let crawledResources = [];
+    let crawledResources:Resource[] = [];
     try {
-      crawledResources = await GsfClient.fetch('GET', `resources/${site.id}/crawled`);
+      crawledResources = (await GsfClient.fetch(HttpMethod.GET, `resources/${site.id}/crawled`)) as Resource[];
     }
     catch (err) {
       console.log(err);
@@ -68,13 +76,13 @@ export default class SiteList extends React.Component {
         {
           label: 'Name',
           prop: 'name',
-          render: site => (<td><NavLink to={`/site/${site.id}`} className="nav-link">{site.name}</NavLink></td>),
+          render: (site:Site) => (<td><NavLink to={`/site/${site.id}`} className="nav-link">{site.name}</NavLink></td>),
         },
         { label: 'URL', prop: 'url' },
         { label: 'Status', prop: 'status' },
         {
           label: 'Actions',
-          render: site => (
+          render: (site:Site) => (
             <td>
               <input
                 id={`crawl-${site.id}`}
@@ -108,7 +116,7 @@ export default class SiteList extends React.Component {
   }
 
   async loadSites() {
-    const data = await GsfClient.fetch('GET', 'sites');
+    const data:Site[] = (await GsfClient.fetch(HttpMethod.GET, 'sites')) as Site[];
     this.setState({ data });
   }
 
@@ -121,7 +129,7 @@ export default class SiteList extends React.Component {
 
     try {
       // remove sites
-      await GsfClient.fetch('DELETE', 'sites', { ids: deleteIds });
+      await GsfClient.fetch(HttpMethod.DELETE, 'sites', { ids: deleteIds });
 
       // clear row selection
       this.setState({ selectedRows: [] });
@@ -140,7 +148,7 @@ export default class SiteList extends React.Component {
 
   onHeaderSelectionChange(evt) {
     if (evt.target.checked) {
-      this.setState({ selectedRows: Array(this.state.data.length).fill().map((elm, idx) => idx) });
+      this.setState({ selectedRows: Array(this.state.data.length).fill(1).map((elm, idx) => idx) });
     }
     else {
       this.setState({ selectedRows: [] });

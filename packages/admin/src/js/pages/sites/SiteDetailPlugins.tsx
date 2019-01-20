@@ -1,8 +1,8 @@
 // https://codesandbox.io/s/32yrn7nj6p
 
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import PluginDefinition from './model/PluginDefinition';
 
 
 const getItemStyle = (isDragging, draggableStyle) => ({
@@ -21,26 +21,16 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   ...draggableStyle,
 });
 
-export default class SiteDetailPlugins extends Component {
-  static get propTypes() {
-    return {
-      pluginDefinitions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        opts: PropTypes.object,
-      })),
-      reorderPluginDef: PropTypes.func,
-      changePluginDef: PropTypes.func,
-      removePluginDef: PropTypes.func,
-    };
-  }
+interface IProps {
+  pluginDefinitions: PluginDefinition[];
+  reorderPluginDef: (result: any) => void;
+  changePluginDef: (evt:any) => void;
+  removePluginDef: (evt:any) => void;
+}
 
-  static get defaultProps() {
-    return {
-      pluginDefinitions: [],
-      reorderPluginDef: null,
-      changePluginDef: null,
-      removePluginDef: null,
-    };
+export default class SiteDetailPlugins extends React.Component<IProps, {}> {
+  static defaultProps = {
+    pluginDefinitions: [],
   }
 
   render() {

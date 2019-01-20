@@ -1,26 +1,19 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 import Table from '../../components/Table';
+import PluginDefinition from './model/PluginDefinition';
 
-export default class SitePlugins extends React.Component {
-  static get propTypes() {
-    return {
-      siteId: PropTypes.string,
-      pluginDefinitions: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        opts: PropTypes.object,
-      })),
-    };
-  }
+interface IProps {
+  siteId: string;
+  pluginDefinitions: PluginDefinition[];
+}
 
-  static get defaultProps() {
-    return {
-      siteId: '',
-      pluginDefinitions: [],
-    };
-  }
+interface IState {
+  header: any[];
+  availablePlugins: PluginDefinition[];
+}
 
+export default class SitePluginDefinitions extends React.Component<IProps, IState> {
   constructor(props) {
     super(props);
 
@@ -59,7 +52,7 @@ export default class SitePlugins extends React.Component {
   }
 
   async componentDidMount() {
-    const availablePlugins = await GsfClient.fetch('GET', 'plugins');
+    const availablePlugins = await window.GsfClient.fetch('GET', 'plugins');
     this.setState({ availablePlugins });
   }
 
@@ -76,6 +69,10 @@ export default class SitePlugins extends React.Component {
     const val = evt.target.value;
     const prop = evt.target.id;
     console.log(`${prop} : ${val}`);
+  }
+
+  addPlugin(pluginId) {
+
   }
 
 

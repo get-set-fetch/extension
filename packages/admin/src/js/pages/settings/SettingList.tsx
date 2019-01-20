@@ -1,8 +1,13 @@
-import React from 'react';
+import * as React from 'react';
 import { setIn } from 'immutable';
-import GsfClient from '../../components/GsfClient';
+import GsfClient, { HttpMethod } from '../../components/GsfClient';
+import Setting from './model/Setting';
 
-export default class SettingList extends React.Component {
+interface IState {
+  settings: Setting[];
+}
+
+export default class SettingList extends React.Component<{}, IState> {
   constructor(props) {
     super(props);
 
@@ -19,12 +24,14 @@ export default class SettingList extends React.Component {
   }
 
   async loadSettings() {
-    const settings = {};
-    const data = await GsfClient.fetch('GET', 'settings');
+    //const settings = {};
+    const settings:Setting[] = (await GsfClient.fetch(HttpMethod.GET, 'settings')) as Setting[];
+    /*
     data.forEach((row) => {
       settings[row.key] = row.val;
     });
     console.log(settings);
+    */
     this.setState({ settings });
   }
 
@@ -37,18 +44,19 @@ export default class SettingList extends React.Component {
       val = parseInt(val, 10);
     }
 
-    this.setState({ settings: setIn(this.state.settings, [key], val) });
+    const idx = this.state.settings.findIndex(entry => entry.key === key)
+    this.setState({ settings: setIn(this.state.settings, [idx], val) });
   }
 
   async submitHandler(evt) {
     evt.preventDefault();
 
-    Array.from(Object.keys(this.state.settings)).forEach(async (key) => {
+    this.state.settings.forEach(async (entry:Setting) => {
       try {
-        await GsfClient.fetch('PUT', 'setting', { key, val: this.state.settings[key] });
+        await GsfClient.fetch(HttpMethod.PUT, 'setting', { key: entry.key, val: entry.val });
       }
       catch (err) {
-        console.log(`error saving setting ${key}`);
+        console.log(`error saving setting ${entry.key}`);
       }
     });
   }
@@ -67,7 +75,7 @@ export default class SettingList extends React.Component {
             className="custom-select custom-select-lg mb-3"
             data-type="int"
             onChange={this.changeHandler}
-            value={this.state.settings.logLevel}
+            value={this.state.settings.find(entry => entry.key === "logLevel").val}
             >
               <option value="0">TRACE</option>
               <option value="1">DEBUG</option>

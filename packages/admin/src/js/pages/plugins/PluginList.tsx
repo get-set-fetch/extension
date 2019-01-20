@@ -1,9 +1,16 @@
-import React from 'react';
+import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 import Table from '../../components/Table';
-import GsfClient from '../../components/GsfClient';
+import GsfClient, { HttpMethod } from '../../components/GsfClient';
+import Plugin from './model/Plugin';
 
-export default class PluginList extends React.Component {
+interface IState {
+  header: any[];
+  data: Plugin[];
+  selectedRows: number[];
+}
+
+export default class PluginList extends React.Component<{}, IState> {
   constructor(props) {
     super(props);
 
@@ -11,11 +18,11 @@ export default class PluginList extends React.Component {
       header: [
         {
           label: 'Name',
-          render: plugin => (<td><NavLink to={`/plugin/${plugin.id}`} className="nav-link">{plugin.name}</NavLink></td>),
+          render: (plugin:Plugin) => (<td><NavLink to={`/plugin/${plugin.id}`} className="nav-link">{plugin.name}</NavLink></td>),
         },
         {
           label: 'Code',
-          render: plugin => (<td><span style={{ 'text-overflow': 'ellipsis' }}>{plugin.code.substr(0, 100)}</span></td>),
+          render: (plugin:Plugin) => (<td><span style={{ textOverflow: 'ellipsis' }}>{plugin.code.substr(0, 100)}</span></td>),
         },
       ],
       data: [],
@@ -32,7 +39,7 @@ export default class PluginList extends React.Component {
   }
 
   async loadPlugins() {
-    const data = await GsfClient.fetch('GET', 'plugins');
+    const data:Plugin[] = (await GsfClient.fetch(HttpMethod.GET, 'plugins')) as Plugin[];
     this.setState({ data });
   }
 
@@ -45,7 +52,7 @@ export default class PluginList extends React.Component {
 
     try {
       // remove plugins
-      await GsfClient.fetch('DELETE', 'plugins', { ids: deleteIds });
+      await GsfClient.fetch(HttpMethod.DELETE, 'plugins', { ids: deleteIds });
 
       // clear row selection
       this.setState({ selectedRows: [] });
@@ -64,7 +71,7 @@ export default class PluginList extends React.Component {
 
   onHeaderSelectionChange(evt) {
     if (evt.target.checked) {
-      this.setState({ selectedRows: Array(this.state.data.length).fill().map((elm, idx) => idx) });
+      this.setState({ selectedRows: Array<number>(this.state.data.length).fill(1).map((elm, idx) => idx) });
     }
     else {
       this.setState({ selectedRows: [] });

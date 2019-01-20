@@ -1,6 +1,6 @@
-import React from 'react';
+import * as React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-import queryString from 'query-string';
+import * as queryString from 'query-string';
 import Header from './layout/Header';
 import Page from './layout/Page';
 import SiteList from './pages/sites/SiteList';

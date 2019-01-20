@@ -5,7 +5,7 @@ import 'bootstrap/js/dist/dropdown';
 import 'bootstrap/js/dist/modal';
 import 'bootstrap/js/dist/collapse';
 
-import React from 'react';
+import * as React from 'react';
 import ReactDOM from 'react-dom';
 import Admin from './Admin';
 import GsfClient from './components/GsfClient';

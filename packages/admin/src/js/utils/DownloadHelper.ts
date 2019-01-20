@@ -1,4 +1,6 @@
 export default class DownloadHelper {
+  static objectURLs: string[];
+
   static createBlobURL(anchor, content, type) {
     if (!DownloadHelper.objectURLs) {
       DownloadHelper.objectURLs = [];

@@ -1,8 +1,14 @@
-import React from 'react';
+import * as React from 'react';
 import Table from '../../components/Table';
-import GsfClient from '../../components/GsfClient';
+import GsfClient, { HttpMethod } from '../../components/GsfClient';
+import Log from './model/Log';
 
-export default class LogList extends React.Component {
+interface IState {
+  header: any[];
+  data: Log[];
+}
+
+export default class LogList extends React.Component<{}, IState> {
   constructor(props) {
     super(props);
 
@@ -10,19 +16,19 @@ export default class LogList extends React.Component {
       header: [
         {
           label: 'Level',
-          render: log => (<td>{log.level}</td>),
+          render: (log:Log) => (<td>{log.level}</td>),
         },
         {
           label: 'Date',
-          render: log => (<td>{log.date.toString()}</td>),
+          render: (log:Log) => (<td>{log.date.toString()}</td>),
         },
         {
           label: 'Class',
-          render: log => (<td>{log.cls}</td>),
+          render: (log:Log) => (<td>{log.cls}</td>),
         },
         {
           label: 'Message',
-          render: log => (<td><span style={{ 'text-overflow': 'ellipsis' }}>{log.msg.substr(0, 100)}</span></td>),
+          render: (log:Log) => (<td><span style={{ textOverflow: 'ellipsis' }}>{log.msg.substr(0, 100)}</span></td>),
         },
       ],
       data: [],
@@ -36,7 +42,7 @@ export default class LogList extends React.Component {
   }
 
   async loadLogs() {
-    const data = await GsfClient.fetch('GET', 'logs');
+    const data:Log[] = (await GsfClient.fetch(HttpMethod.GET, 'logs')) as Log[];
     console.log(data);
     this.setState({ data });
   }
@@ -44,7 +50,7 @@ export default class LogList extends React.Component {
   async deleteAllHandler() {
     try {
       // remove plugins
-      await GsfClient.fetch('DELETE', 'logs');
+      await GsfClient.fetch(HttpMethod.DELETE, 'logs');
     }
     catch (err) {
       console.log('error deleting logs');

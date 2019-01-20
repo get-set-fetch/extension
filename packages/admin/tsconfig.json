@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "target": "ES2017",
+        "strict": false,
+        "moduleResolution": "node",
+        "jsx": "react"
+    },
+    "exclude": ["node_modules"],
+    "newLine": "LF",
+}

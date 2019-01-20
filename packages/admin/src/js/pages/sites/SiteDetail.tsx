@@ -1,67 +1,33 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import * as React from 'react';
+import { History, Location } from 'history';
+import { match } from 'react-router';
 import { setIn, removeIn } from 'immutable';
-import queryString from 'query-string';
-import GsfClient from '../../components/GsfClient';
+import * as queryString from 'query-string';
+import GsfClient, { HttpMethod } from '../../components/GsfClient';
 import SiteDetailPlugins from './SiteDetailPlugins';
+import Site from './model/Site';
+import PluginDefinition from './model/PluginDefinition';
 
 
-export default class SiteDetail extends React.Component {
-  static get propTypes() {
-    return {
-      siteId: PropTypes.string,
-      history: PropTypes.shape({
-        push: PropTypes.func,
-      }),
-      location: PropTypes.shape({
-        search: PropTypes.string,
-      }),
-      match: PropTypes.shape({
-        params: PropTypes.shape({
-          pluginId: PropTypes.string,
-        }),
-      }),
-    };
-  }
+interface IProps {
+  siteId: string;
+  history: History;
+  location: Location;
+  match: match<{
+    siteId: string;
+  }>
+}
 
-  static get defaultProps() {
-    return {
-      siteId: '',
-      history: {
-        push: () => {},
-      },
-      location: {
-        search: '',
-      },
-      match: {
-        params: {
-          pluginId: null,
-        },
-      },
-    };
-  }
+interface IState {
+  site:Site;
+  availablePluginDefinitions:PluginDefinition[];
+}
 
+export default class SiteDetail extends React.Component<IProps, IState> {
   constructor(props) {
     super(props);
-
-    const queryParams = queryString.parse(props.location.search);
-
     this.state = {
-      site: {
-        name: queryParams.name,
-        url: queryParams.url,
-        pluginDefinitions: [],
-        opts: {
-          crawl: {
-            delay: 200,
-            maxResources: -1,
-          },
-          resourceFilter: {
-            maxEntries: 5000,
-            probability: 0.01,
-          },
-        },
-      },
+      site: null,
       availablePluginDefinitions: [],
     };
 
@@ -76,23 +42,34 @@ export default class SiteDetail extends React.Component {
 
   async componentDidMount() {
     const { siteId } = this.props.match.params;
+    let site:Site;
 
+    // existing site
     if (this.props.match.params.siteId) {
       try {
-        const site = await GsfClient.fetch('GET', `site/${siteId}`);
-        this.setState({ site });
+        const data = await GsfClient.fetch(HttpMethod.GET, `site/${siteId}`);
+        site = new Site(data);
       }
       catch (err) {
         console.log('error loading site');
       }
     }
+    // new site
+    else {
+      const queryParams = queryString.parse(this.props.location.search);
+      site = new Site({
+        name: queryParams.name as string,
+        url: queryParams.url as string,
+      });
+    }
+    this.setState({ site });
 
-    const availablePluginDefinitions = await GsfClient.fetch('GET', 'plugindefs/available');
+    const availablePluginDefinitions:PluginDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'plugindefs/available')) as PluginDefinition[];
     this.setState({ availablePluginDefinitions });
 
     // default plugins for a new site
     if (!this.props.match.params.siteId) {
-      const defaultPluginDefinition = await GsfClient.fetch('GET', 'plugindefs/default');
+      const defaultPluginDefinition = await GsfClient.fetch(HttpMethod.GET, 'plugindefs/default');
       this.setState({ site: setIn(this.state.site, ['pluginDefinitions'], defaultPluginDefinition) });
     }
   }
@@ -108,10 +85,10 @@ export default class SiteDetail extends React.Component {
 
     try {
       if (this.state.site.id) {
-        await GsfClient.fetch('PUT', 'site', this.state.site);
+        await GsfClient.fetch(HttpMethod.PUT, 'site', this.state.site);
       }
       else {
-        await GsfClient.fetch('POST', 'site', this.state.site);
+        await GsfClient.fetch(HttpMethod.POST, 'site', this.state.site);
       }
       this.props.history.push('/sites');
     }
@@ -170,6 +147,8 @@ export default class SiteDetail extends React.Component {
 
 
   render() {
+    if (!this.state.site) return null;
+
     const notUsedPluginDefs = this.getNotUsedPluginDefinitions();
 
     return (
