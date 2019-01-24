@@ -6,10 +6,12 @@ import IdbSite from './IdbSite';
 import IdbResource from './IdbResource';
 import IdbLog from './IdbLog';
 import IdbSetting from './IdbSetting';
+import IdbProject from './IdbProject';
 
 /* eslint-disable no-case-declarations */
 export default class GsfProvider {
   static Site: typeof IdbSite;
+  static Project: typeof IdbProject;
   static Resource: typeof IdbResource;
   static UserPlugin: typeof IdbUserPlugin;
   static Log: typeof IdbLog;
@@ -21,6 +23,7 @@ export default class GsfProvider {
       Site, Resource, UserPlugin, Log, Setting
     } = await IdbStorage.init();
     GsfProvider.Site = Site;
+    GsfProvider.Project = Project;
     GsfProvider.Resource = Resource;
     GsfProvider.UserPlugin = UserPlugin;
     GsfProvider.Log = Log;
@@ -116,6 +119,72 @@ export default class GsfProvider {
           // sites
           case /^sites$/.test(request.resource):
             reqPromise = GsfProvider.Site.delSome(request.body.ids);
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      default:
+        reqPromise = new Promise(resolve => resolve());
+    }
+
+    reqPromise.then((result) => {
+      sendResponse(result);
+    });
+  }
+
+  static async projectHandler(request, sendResponse) {
+    let reqPromise = null;
+
+    switch (request.method) {
+      case 'GET':
+        switch (true) {
+          // projects
+          case /^projects$/.test(request.resource):
+            reqPromise = GsfProvider.Project.getAll();
+            break;
+          // projects/:projectId
+          case /^projects\/[0-9]+$/.test(request.resource):
+            const getProjectId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            reqPromise = GsfProvider.Project.get(getProjectId);
+            break;
+          // project/{project.id}/crawl
+          case /^project\/[0-9]+\/crawl$/.test(request.resource):
+            const crawlProjectId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            const crawlProject = await GsfProvider.Project.get(crawlProjectId);
+            reqPromise = new Promise(resolve => resolve());
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      case 'POST':
+        switch (true) {
+          // project
+          case /^project$/.test(request.resource):
+            const project = new GsfProvider.Project(request.body.name, request.body.description, request.body.scenarioId);
+            reqPromise = project.save();
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      case 'PUT':
+        switch (true) {
+          // project
+          case /^project$/.test(request.resource):
+            const project = Object.assign(new GsfProvider.Project(null, null, null), request.body);
+            reqPromise = project.update();
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      case 'DELETE':
+        switch (true) {
+          // project
+          case /^project$/.test(request.resource):
+            reqPromise = GsfProvider.Project.delSome(request.body.ids);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
