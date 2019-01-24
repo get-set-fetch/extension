@@ -7,11 +7,13 @@
   ],
   "scripts": {
     "build": "npm run copy:resources",
-    "copy:resources": "npm run copy:local && npm run copy:bkg && npm run copy:popup && npm run copy:admin",
+    "copy:resources": "npm run copy:local && npm run copy:bkg && npm run copy:popup && npm run copy:admin && npm run copy:scenarios",
     "copy:local": "cpx \"src/resources/**/*\" dist",
     "copy:bkg": "cpx  \"node_modules/get-set-fetch-extension-background/dist/**/*\" dist/background",
     "copy:popup": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup",
     "copy:admin": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin",
+    "copy:scenario-extract-resource": "cpx \"node_modules/get-set-fetch-scenario-extract-resources/dist/**/*\" dist/scenarios",
+    "copy:scenarios": "npm run copy:scenario-extract-resource",
     "build:watch:admin": "npm run build && npm run copy:admin:watch",
     "build:watch:popup": "npm run build && npm run copy:popup:watch",
     "build:watch:bkg": "npm run build && npm run copy:bkg:watch",
@@ -28,7 +30,8 @@
     "get-set-fetch": "^0.3.8",
     "get-set-fetch-extension-background": "1.0.0",
     "get-set-fetch-extension-popup": "^1.0.0",
-    "get-set-fetch-extension-admin": "^1.0.0"
+    "get-set-fetch-extension-admin": "^1.0.0",
+    "get-set-fetch-scenario-extract-resources": "^1.0.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
