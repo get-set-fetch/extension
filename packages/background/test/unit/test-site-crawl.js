@@ -1,6 +1,6 @@
 import IdbStorage from '../../src/js/storage/IdbStorage.ts';
 import PluginManager from '../../src/js/plugins/PluginManager.ts';
-import PluginHelper from '../utils/PluginHelper';
+import ModuleHelper from '../utils/ModuleHelper.ts';
 import GsfProvider from '../../src/js/storage/GsfProvider.ts';
 
 const sinon = require('sinon');
@@ -18,7 +18,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     global.document = { contentType: 'html' };
 
-    await PluginHelper.init();
+    await ModuleHelper.init();
   });
 
   beforeEach(async () => {

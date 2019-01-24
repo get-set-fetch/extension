@@ -2,62 +2,24 @@ import GsfProvider from './../storage/GsfProvider';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 import { System } from 'systemjs';
 import Logger from '../logger/Logger';
+import AbstractModuleManager from '../systemjs/AbstractModuleManager';
+import { BaseNamedEntity } from 'get-set-fetch';
 
 declare const SystemJS: System;
 const Log = Logger.getLogger('PluginManager');
 
-class PluginManager {
-  static getPluginContent(pluginFileEntry) {
-    return new Promise((resolve) => {
-      pluginFileEntry.file((pluginFile) => {
-        const fileReader = new FileReader();
-        fileReader.onloadend = () => resolve(fileReader.result);
-        fileReader.readAsText(pluginFile);
-      });
-    });
+class PluginManager extends AbstractModuleManager {
+
+  static getStoredModule(moduleName): Promise<BaseNamedEntity> {
+    return GsfProvider.UserPlugin.get(moduleName);
   }
 
-  /*
-    identify all builtin plugins
-  */
-  static async readPluginFiles() {
-    return new Promise((resolve, reject) => {
-      const plugins = [];
-
-      chrome.runtime.getPackageDirectoryEntry((root) => {
-        root.getDirectory('background/plugins', { create: false }, (pluginsDir) => {
-          const reader = pluginsDir.createReader();
-          // assume there are just a dozen plugins,
-          // otherwise a loop mechanism should be implemented in order to call readEntries multiple times
-          reader.readEntries(
-            async (pluginFileEntries: FileEntry[]) => {
-              for (let i = 0; i < pluginFileEntries.length; i += 1) {
-              // ignore systemjs config plugins
-                if (pluginFileEntries[i].fullPath.indexOf('systemjs') !== -1) continue;
-                const pluginContent = await PluginManager.getPluginContent(pluginFileEntries[i]);
-                const pluginName = pluginFileEntries[i].name.match(/^(\w+).js$/)[1];
-                plugins.push(new GsfProvider.UserPlugin(pluginName, pluginContent));
-              }
-              resolve(plugins);
-            },
-            (err) => {
-              reject(err);
-            }
-          );
-        });
-      });
-    });
+  static getStoredModules(): Promise<BaseNamedEntity[]> {
+    return GsfProvider.UserPlugin.getAll();
   }
 
-  static async persistPlugins(plugins) {
-    for (let i = 0; i < plugins.length; i += 1) {
-      const storedPlugin = await GsfProvider.UserPlugin.get(plugins[i].name);
-      if (!storedPlugin) {
-        Log.info(`Saving plugin ${plugins[i].name} to database`);
-        await plugins[i].save();
-        Log.info(`Saving plugin ${plugins[i].name} to database DONE`);
-      }
-    }
+  static instantiateModule(data): BaseNamedEntity {
+    return new GsfProvider.UserPlugin(data.name,  data.content);
   }
 
   static async importPlugins() {
@@ -72,11 +34,11 @@ class PluginManager {
   /*
     import via SystemJS all available plugins: builtin and user defined ones
   */
-  static async discoverPlugins() {
-    const plugins = await PluginManager.readPluginFiles();
-    await PluginManager.persistPlugins(plugins);
-    await PluginManager.importPlugins();
-  }
+ static async discoverPlugins() {
+  const plugins = await this.getModulesContent('background/plugins');
+  await this.persistModules(plugins);
+  await this.importPlugins();
+}
 
   static get DEFAULT_PLUGINS(): string[] {
     return ['SelectResourcePlugin', 'ExtensionFetchPlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin'];

@@ -1,10 +1,16 @@
 declare module 'get-set-fetch' {
   export class BaseEntity {
+    id: string|number;
     static db:any;
     
-    static get(prop:string):Promise<BaseEntity>;
+    static get(nameOrId:string|number):Promise<BaseEntity>;
+    save():Promise<number>;
     serialize():any;
     static props():string[];
+  }
+
+  export class BaseNamedEntity extends BaseEntity {
+    name: string;
   }
 
   export class BaseSite extends BaseEntity {
@@ -14,7 +20,7 @@ declare module 'get-set-fetch' {
   }
 
   export class BaseResource extends BaseEntity {
-    constructor(siteId:string, url:string, depth:number);
+    constructor(siteId:number|string, url:string, depth:number);
     static getAll(siteId, idbKey, instantiate?:boolean):Promise<BaseResource[]>;
   }
 

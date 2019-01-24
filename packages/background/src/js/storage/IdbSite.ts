@@ -29,10 +29,10 @@ export default class IdbSite extends BaseSite {
     return { plugins };
   }
 
-  static get(nameOrId): Promise<IdbSite> {
+  static get(nameOrId: number|string): Promise<IdbSite> {
     return new Promise((resolve, reject) => {
       const rTx = IdbSite.rTx();
-      const readReq = (Number.isInteger(nameOrId) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
+      const readReq = (Number.isInteger(nameOrId as number) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
       readReq.onsuccess = async (e) => {
         const { result } = e.target;
@@ -120,7 +120,7 @@ export default class IdbSite extends BaseSite {
   plugins: any;
   tabId: any;
   name: string;
-  id: any;
+  id: number;
   url: string;
 
   constructor(name, url, opts, pluginDefinitions) {
@@ -220,7 +220,7 @@ export default class IdbSite extends BaseSite {
     return null;
   }
 
-  save() {
+  save(): Promise<number> {
     return new Promise(async (resolve, reject) => {
       const rwTx = IdbSite.rwTx();
       // save the site and wait for the return result containing the new inserted id

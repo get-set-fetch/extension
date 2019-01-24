@@ -53,7 +53,7 @@ export default class IdbSetting extends BaseEntity {
     });
   }
 
-  id: string;
+  id: number;
   key: string;
   val: string;
 
@@ -63,7 +63,7 @@ export default class IdbSetting extends BaseEntity {
     this.val = val;
   }
 
-  save() {
+  save(): Promise<number> {
     return new Promise((resolve, reject) => {
       const rwTx = IdbSetting.rwTx();
       const reqAddResource = rwTx.add(this.serialize());

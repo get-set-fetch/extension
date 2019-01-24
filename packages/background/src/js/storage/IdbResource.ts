@@ -127,7 +127,7 @@ export default class IdbResource extends BaseResource {
   }
 
   crawledAt: any;
-  id: any;
+  id: number;
   url: string;
   crawlInProgress: boolean;
 
@@ -136,7 +136,7 @@ export default class IdbResource extends BaseResource {
     this.crawledAt = new Date(0);
   }
 
-  save() {
+  save(): Promise<number> {
     return new Promise((resolve, reject) => {
       const rwTx = IdbResource.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());

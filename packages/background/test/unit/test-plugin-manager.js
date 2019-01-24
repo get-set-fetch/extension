@@ -1,4 +1,4 @@
-import PluginHelper from '../utils/PluginHelper';
+import ModuleHelper from '../utils/ModuleHelper.ts';
 import PluginManager from '../../src/js/plugins/PluginManager.ts';
 import GsfProvider from '../../src/js/storage/GsfProvider.ts';
 import IdbStorage from '../../src/js/storage/IdbStorage.ts';
@@ -12,7 +12,7 @@ describe('Test PluginManager', () => {
     GsfProvider.UserPlugin = UserPlugin;
 
     // discover, register builtin plugins
-    await PluginHelper.init();
+    await ModuleHelper.init();
   });
 
   it('instantiate default plugins', () => {

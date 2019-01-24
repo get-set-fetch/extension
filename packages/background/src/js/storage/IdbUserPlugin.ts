@@ -20,10 +20,10 @@ export default class IdbUserPlugin extends BaseEntity {
     return IdbUserPlugin.db.transaction('UserPlugins', 'readwrite').objectStore('UserPlugins');
   }
 
-  static get(nameOrId): Promise<IdbUserPlugin> {
+  static get(nameOrId: string|number): Promise<IdbUserPlugin> {
     return new Promise((resolve, reject) => {
       const rTx = IdbUserPlugin.rTx();
-      const readReq = (Number.isInteger(nameOrId) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
+      const readReq = (Number.isInteger(nameOrId as number) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
       readReq.onsuccess = (e) => {
         const { result } = e.target;
@@ -105,7 +105,7 @@ export default class IdbUserPlugin extends BaseEntity {
     this.code = code;
   }
 
-  save() {
+  save(): Promise<number> {
     return new Promise((resolve, reject) => {
       const rwTx = IdbUserPlugin.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());

@@ -52,7 +52,7 @@ export default class IdbLog extends BaseEntity {
   level: number;
   cls: string;
   msg: string;
-  id: any;
+  id: number;
 
   constructor(level: number, cls: string, msg: string) {
     super();
@@ -62,7 +62,7 @@ export default class IdbLog extends BaseEntity {
     this.msg = msg;
   }
 
-  save() {
+  save(): Promise<number> {
     // console.log(`log: ${this.cls} ${this.msg}`);
     return new Promise((resolve, reject) => {
       const rwTx = IdbLog.rwTx();
