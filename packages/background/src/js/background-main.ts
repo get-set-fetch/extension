@@ -1,6 +1,7 @@
 import { GsfProvider, PluginManager } from './background-bundle';
 import Logger, { LogLevel } from './logger/Logger';
 import IdbSetting from './storage/IdbSetting';
+import ScenarioManager from './scenarios/ScenarioManager';
 
 // const Log = Logger.getLogger('background-main');
 
@@ -46,4 +47,7 @@ SystemJS.config({
 
   // 2. read all builtin plugins, persist them as UserPlugin, import them in SystemJS
   await PluginManager.discoverPlugins();
+
+  // 3. read all builtin scenarios, persist them as Scenario
+  await ScenarioManager.discoverPlugins();
 })();

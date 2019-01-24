@@ -4,10 +4,18 @@ import IdbResource from './IdbResource';
 import IdbUserPlugin from './IdbUserPlugin';
 import IdbLog from './IdbLog';
 import IdbSetting from './IdbSetting';
+import IdbProject from './IdbProject';
+import IdbScenario from './IdbScenario';
 
 export default class IdbStorage {
   static init(): Promise<{
-    Site: typeof IdbSite, Resource: typeof IdbResource, UserPlugin: typeof IdbUserPlugin, Log: typeof IdbLog, Setting: typeof IdbSetting
+    Site: typeof IdbSite,
+    Project: typeof IdbProject,
+    Scenario: typeof IdbScenario,
+    Resource: typeof IdbResource,
+    UserPlugin: typeof IdbUserPlugin,
+    Log: typeof IdbLog,
+    Setting: typeof IdbSetting
   }> {
     return new Promise((resolve, reject) => {
       const openRequest = indexedDB.open('gsf_db', 1);
@@ -18,6 +26,17 @@ export default class IdbStorage {
           const siteStore = db.createObjectStore('Sites', { keyPath: 'id', autoIncrement: true });
           siteStore.createIndex('name', 'name', { unique: true });
         }
+
+        if (!db.objectStoreNames.contains('Projects')) {
+          const projectStore = db.createObjectStore('Projects', { keyPath: 'id', autoIncrement: true });
+          projectStore.createIndex('name', 'name', { unique: true });
+        }
+
+        if (!db.objectStoreNames.contains('Scenarios')) {
+          const scenarioStore = db.createObjectStore('Scenarios', { keyPath: 'id', autoIncrement: true });
+          scenarioStore.createIndex('name', 'name', { unique: true });
+        }
+
         if (!db.objectStoreNames.contains('Resources')) {
           const resourceStore = db.createObjectStore('Resources', { keyPath: 'id', autoIncrement: true });
           /* don't enforce url as unique, same site may be scrapped using multiple scenarios */
@@ -46,7 +65,13 @@ export default class IdbStorage {
       openRequest.onsuccess = (e: any) => {
         BaseEntity.db = openRequest.result;
         resolve({
-          Site: IdbSite, Resource: IdbResource, UserPlugin: IdbUserPlugin, Log: IdbLog, Setting: IdbSetting
+          Site: IdbSite,
+          Project: IdbProject,
+          Scenario: IdbScenario,
+          Resource: IdbResource,
+          UserPlugin: IdbUserPlugin,
+          Log: IdbLog,
+          Setting: IdbSetting
         });
 
       };

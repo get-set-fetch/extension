@@ -7,11 +7,13 @@ import IdbResource from './IdbResource';
 import IdbLog from './IdbLog';
 import IdbSetting from './IdbSetting';
 import IdbProject from './IdbProject';
+import IdbScenario from './IdbScenario';
 
 /* eslint-disable no-case-declarations */
 export default class GsfProvider {
   static Site: typeof IdbSite;
   static Project: typeof IdbProject;
+  static Scenario: typeof IdbScenario;
   static Resource: typeof IdbResource;
   static UserPlugin: typeof IdbUserPlugin;
   static Log: typeof IdbLog;
@@ -20,10 +22,11 @@ export default class GsfProvider {
   static async init() {
     // init extension storage
     const {
-      Site, Resource, UserPlugin, Log, Setting
+      Site, Project, Scenario, Resource, UserPlugin, Log, Setting
     } = await IdbStorage.init();
     GsfProvider.Site = Site;
     GsfProvider.Project = Project;
+    GsfProvider.Scenario = Scenario;
     GsfProvider.Resource = Resource;
     GsfProvider.UserPlugin = UserPlugin;
     GsfProvider.Log = Log;
@@ -34,6 +37,9 @@ export default class GsfProvider {
       switch (true) {
         case /^site/.test(request.resource):
           this.siteHandler(request, sendResponse);
+          break;
+        case /^project/.test(request.resource):
+          this.projectHandler(request, sendResponse);
           break;
         case /^resource/.test(request.resource):
           this.resourceHandler(request, sendResponse);
