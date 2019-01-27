@@ -12,6 +12,7 @@ import SettingList from './pages/settings/SettingList';
 import Help from './pages/help/Help';
 import ProjectList from './pages/projects/ProjectList';
 import ScenarioList from './pages/scenarios/ScenarioList';
+import ProjectDetail from './pages/projects/ProjectDetail';
 
 export default class Admin extends React.Component {
   // eslint-disable-next-line class-methods-use-this
@@ -26,10 +27,12 @@ export default class Admin extends React.Component {
               <Route path="/sites" component={SiteList} />
 
               <Route path="/projects" component={ProjectList} />
-              <Route path="/project/:projectId?" component={ProjectList} />
+              <Route path="/project/:projectId?" component={ProjectDetail} />
 
               <Route path="/plugins" component={PluginList} />
               <Route path="/plugin/:pluginId?" component={PluginDetail} />
+
+              <Route path="/scenarios" component={ScenarioList} />
 
               <Route path="/logs" component={LogList} />
 

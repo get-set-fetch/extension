@@ -39,7 +39,9 @@ export default class ProjectList extends React.Component<{}, IState> {
   }
 
   async loadProjects() {
-    const data:Project[] = (await GsfClient.fetch(HttpMethod.GET, 'project')) as Project[];
+    const data:Project[] = (await GsfClient.fetch(HttpMethod.GET, 'projects')) as Project[];
+    console.log("projects");
+    console.log(data)
     this.setState({ data });
   }
 

@@ -19,6 +19,12 @@ export default class Header extends React.Component {
                 <NavLink to="/sites" className="nav-link">Sites</NavLink>
             </li>
             <li className="nav-item">
+                <NavLink to="/projects" className="nav-link">Projects</NavLink>
+            </li>
+            <li className="nav-item">
+                <NavLink to="/scenarios" className="nav-link">Scenarios</NavLink>
+            </li>
+            <li className="nav-item">
                 <NavLink to="/plugins" className="nav-link">Plugins</NavLink>
             </li>
             <li className="nav-item">

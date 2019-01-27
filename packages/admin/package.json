@@ -46,14 +46,16 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.3.1",
     "bootstrap": "^4.1.1",
+    "immutable": "^4.0.0-rc.12",
     "indexeddbshim": "^3.6.2",
     "jquery": "^3.3.1",
-    "immutable": "^4.0.0-rc.12",
     "popper.js": "^1.14.3",
     "query-string": "^6.1.0",
     "react": "^16.4.0",
     "react-beautiful-dnd": "^9.0.2",
     "react-dom": "^16.4.0",
-    "react-router-dom": "^4.3.1"
+    "react-jsonschema-form": "^1.2.0",
+    "react-router-dom": "^4.3.1",
+    "systemjs": "^3.0.0"
   }
 }
