@@ -39,6 +39,11 @@ module.exports = {
   module: {
     rules: [
       {
+        parser: {
+          system: false
+        }
+      },
+      {
         test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
         use: {
