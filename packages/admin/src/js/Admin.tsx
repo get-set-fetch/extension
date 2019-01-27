@@ -11,6 +11,7 @@ import LogList from './pages/logs/LogList';
 import SettingList from './pages/settings/SettingList';
 import Help from './pages/help/Help';
 import ProjectList from './pages/projects/ProjectList';
+import ScenarioList from './pages/scenarios/ScenarioList';
 
 export default class Admin extends React.Component {
   // eslint-disable-next-line class-methods-use-this

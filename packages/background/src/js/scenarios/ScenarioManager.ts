@@ -12,7 +12,7 @@ export default class ScenarioManager extends AbstractModuleManager {
   }
 
   static instantiateModule(data): BaseNamedEntity {
-    return new GsfProvider.Scenario(data.name,  data.content);
+    return new GsfProvider.Scenario(data.name,  null, data.content);
   }
 
   static async discoverPlugins() {

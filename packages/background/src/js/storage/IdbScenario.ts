@@ -8,7 +8,7 @@ export default class IdbScenario extends BaseEntity {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'name', 'description'];
+    return ['id', 'name', 'description', 'code'];
   }
 
   // get a read transaction
@@ -32,7 +32,7 @@ export default class IdbScenario extends BaseEntity {
           resolve(null);
         }
         else {
-          resolve(Object.assign(new IdbScenario(null, null), result));
+          resolve(Object.assign(new IdbScenario(null, null, null), result));
         }
       };
       readReq.onerror = () => {
@@ -53,7 +53,7 @@ export default class IdbScenario extends BaseEntity {
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            result[i] = Object.assign(new IdbScenario(null, null), result[i]);
+            result[i] = Object.assign(new IdbScenario(null, null, null), result[i]);
           }
           resolve(result);
         }
@@ -99,11 +99,13 @@ export default class IdbScenario extends BaseEntity {
   id: number;
   name: string;
   description: string;
+  code: string;
 
-  constructor(name, description) {
+  constructor(name, description, code) {
     super();
     this.name = name;
     this.description = description;
+    this.code = code;
   }
 
   save(): Promise<number> {

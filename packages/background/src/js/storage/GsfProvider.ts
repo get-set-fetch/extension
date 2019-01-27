@@ -47,6 +47,9 @@ export default class GsfProvider {
         case /^plugin/.test(request.resource):
           this.pluginHandler(request, sendResponse);
           break;
+        case /^scenario/.test(request.resource):
+          this.scenarioHandler(request, sendResponse);
+          break;
         case /^log/.test(request.resource):
           this.logHandler(request, sendResponse);
           break;
@@ -150,7 +153,7 @@ export default class GsfProvider {
             reqPromise = GsfProvider.Project.getAll();
             break;
           // projects/:projectId
-          case /^projects\/[0-9]+$/.test(request.resource):
+          case /^project\/[0-9]+$/.test(request.resource):
             const getProjectId = parseInt(/\d+/.exec(request.resource)[0], 10);
             reqPromise = GsfProvider.Project.get(getProjectId);
             break;
@@ -301,6 +304,43 @@ export default class GsfProvider {
           // plugins
           case /^plugins$/.test(request.resource):
             reqPromise = GsfProvider.UserPlugin.delSome(request.body.ids);
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      default:
+        reqPromise = new Promise(resolve => resolve());
+    }
+
+    reqPromise.then((result) => {
+      sendResponse(result);
+    });
+  }
+
+  static async scenarioHandler(request, sendResponse) {
+    let reqPromise = null;
+    switch (request.method) {
+      case 'GET':
+        switch (true) {
+          // scenarios
+          case /^scenarios$/.test(request.resource):
+            reqPromise = GsfProvider.Scenario.getAll();
+            break;
+          // scenario/:scenarioId
+          case /^scenario\/[0-9]+$/.test(request.resource):
+            const getScenarioId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            reqPromise = GsfProvider.Scenario.get(getScenarioId);
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      case 'DELETE':
+        switch (true) {
+          // scenarios
+          case /^scenarios$/.test(request.resource):
+            reqPromise = GsfProvider.Scenario.delSome(request.body.ids);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
