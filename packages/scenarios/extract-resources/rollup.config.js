@@ -8,7 +8,7 @@ export default {
   input: 'src/ts/ExtractResources.ts',
   output: {
     file: `dist/ExtractResources.js`,
-    format: 'esm',
+    format: 'system',
   },
   plugins: [
     typescript(),
