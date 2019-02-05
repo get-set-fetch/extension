@@ -1,6 +1,6 @@
-export default class Scenario {
-  public readonly id: number;
-  public readonly name: string;
-  public readonly description: string;
-  public readonly code: string;
+export default interface IScenario {
+  id: number;
+  name: string;
+  description: string;
+  code: string;
 }

@@ -4,6 +4,8 @@ import GsfClient, { HttpMethod } from '../../components/GsfClient';
 import { History } from 'history';
 import { match } from 'react-router';
 import Plugin from './model/Plugin';
+import Page from '../../layout/Page';
+import { NavLink } from 'react-router-dom';
 
 interface IProps {
   pluginId: string;
@@ -59,13 +61,10 @@ export default class PluginDetail extends React.Component<IProps, IState> {
     const val = evt.target.value;
     const prop = evt.target.id;
     this.setState({ plugin: setIn(this.state.plugin, [prop], val) });
-    console.log(this.state.plugin)
   }
 
   async submitHandler(evt) {
     evt.preventDefault();
-    console.log("save plugin")
-    console.log(this.state.plugin)
 
     try {
       if (this.state.plugin.id) {
@@ -85,29 +84,38 @@ export default class PluginDetail extends React.Component<IProps, IState> {
     if (!this.state.plugin) return null;
 
     return (
-    <form onSubmit={this.submitHandler}>
-      <div className="form-group row">
-          <label htmlFor="name" className="col-sm-2 col-form-label">Plugin Name</label>
-          <div className="col-sm-10">
-            <input
-              id="name" type="text" className="form-control"
-              value={this.state.plugin.name}
-              onChange={this.changeHandler}/>
+      <Page
+        title={this.state.plugin.name ? this.state.plugin.name : "New Plugin"}
+        >
+        <form className="form-main" onSubmit={this.submitHandler}>
+          <div className="form-group row">
+              <label htmlFor="name" className="col-sm-2 col-form-label text-right">Name</label>
+              <div className="col-sm-5">
+                <input
+                  id="name" type="text" className="form-control"
+                  value={this.state.plugin.name}
+                  onChange={this.changeHandler}/>
+              </div>
+            </div>
+          <div className="form-group row">
+            <label htmlFor="code" className="col-sm-2 col-form-label text-right">Source Code</label>
+            <div className="col-sm-5">
+              <textarea
+                id="code" className="form-control"
+                value={this.state.plugin.code}
+                onChange={this.changeHandler}/>
+            </div>
           </div>
-        </div>
-      <div className="form-group row">
-        <label htmlFor="code" className="col-sm-2 col-form-label">Plugin Code</label>
-        <div className="col-sm-10">
-          <textarea
-            id="code" className="form-control"
-            value={this.state.plugin.code}
-            onChange={this.changeHandler}/>
-        </div>
-      </div>
-      <button id="save" type="submit" className="btn btn-primary">Save</button>
-        <button id="cancel" type="button" className="btn btn-secondary"
-          onClick={() => this.props.history.push('/plugins')}>Cancel</button>
-    </form>
+
+          <div className="form-group row">
+            <div className="col-sm-2"/>
+            <div className="col-sm-5">
+              <a id="save" className="btn btn-secondary" href="#" role="button" onClick={this.submitHandler}>Save</a>
+              <NavLink id="cancel" to="/plugins" className="btn btn-light ml-4">Cancel</NavLink>
+            </div>
+          </div>
+        </form>
+      </Page>
     );
   }
 }

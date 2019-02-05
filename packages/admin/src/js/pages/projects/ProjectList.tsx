@@ -1,11 +1,12 @@
 import * as React from 'react';
-import { NavLink } from 'react-router-dom';
-import Table from '../../components/Table';
+import Table, { IHeaderCol } from '../../components/Table';
 import GsfClient, { HttpMethod } from '../../components/GsfClient';
 import Project from './model/Project';
+import Page from '../../layout/Page';
+import { NavLink } from 'react-router-dom';
 
 interface IState {
-  header: any[];
+  header: IHeaderCol[];
   data: Project[];
   selectedRows: number[];
 }
@@ -18,11 +19,11 @@ export default class ProjectList extends React.Component<{}, IState> {
       header: [
         {
           label: 'Name',
-          render: (project:Project) => (<td><NavLink to={`/project/${project.id}`} className="nav-link">{project.name}</NavLink></td>),
+          render: (project:Project) => (project.name),
         },
         {
           label: 'Description',
-          render: (project:Project) => (<td><span style={{ textOverflow: 'ellipsis' }}>{project.description.substr(0, 100)}</span></td>),
+          render: (project:Project) => (<span style={{ textOverflow: 'ellipsis' }}>{project.description ? project.description.substr(0, 100) : ""}</span>),
         },
       ],
       data: [],
@@ -30,8 +31,6 @@ export default class ProjectList extends React.Component<{}, IState> {
     };
 
     this.deleteHandler = this.deleteHandler.bind(this);
-    this.onHeaderSelectionChange = this.onHeaderSelectionChange.bind(this);
-    this.onRowSelectionChange = this.onRowSelectionChange.bind(this);
   }
 
   componentDidMount() {
@@ -40,8 +39,6 @@ export default class ProjectList extends React.Component<{}, IState> {
 
   async loadProjects() {
     const data:Project[] = (await GsfClient.fetch(HttpMethod.GET, 'projects')) as Project[];
-    console.log("projects");
-    console.log(data)
     this.setState({ data });
   }
 
@@ -66,30 +63,24 @@ export default class ProjectList extends React.Component<{}, IState> {
     this.loadProjects();
   }
 
-  onRowSelectionChange(toggleRow) {
-    const newSelectedRows = Table.toggleSelection(this.state.selectedRows, toggleRow);
-    this.setState({ selectedRows: newSelectedRows });
-  }
-
-  onHeaderSelectionChange(evt) {
-    if (evt.target.checked) {
-      this.setState({ selectedRows: Array<number>(this.state.data.length).fill(1).map((elm, idx) => idx) });
-    }
-    else {
-      this.setState({ selectedRows: [] });
-    }
-  }
-
-  // eslint-disable-next-line class-methods-use-this
   render() {
-    return [
-      <NavLink id="newproject" key="newproject" to="/project/" className="nav-link">Create new crawl project</NavLink>,
-      <p key="title">Project List</p>,
-      <input key="del" id="delete" type="button" value="Delete" onClick={this.deleteHandler}/>,
-      <Table key="listTable"
-        header={this.state.header} data={this.state.data}
-        onRowSelectionChange={this.onRowSelectionChange} onHeaderSelectionChange={this.onHeaderSelectionChange}
-        selectedRows={this.state.selectedRows} />,
-    ];
+    return (
+      <Page
+        title="Projects"
+        actions={[
+          <NavLink to="/project/" className="btn btn-secondary float-right">New Project</NavLink>
+        ]}
+        >
+        <Table
+          header={this.state.header}
+          rowLink={this.rowLink}
+          data={this.state.data}       
+        />
+      </Page>
+    );
+  }
+
+  rowLink(row:Project) {
+    return `/project/${row.id}`;
   }
 }

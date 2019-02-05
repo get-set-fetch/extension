@@ -161,19 +161,15 @@ describe('UserPlugin CRUD Pages', () => {
     const queryParams = queryString.stringify({ redirectPath: '/plugins' });
     await pluginPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
-    // select checkbox corresponding to the newly created plugin
-    await pluginPage.waitFor(`a[href=\\/plugin\\/${pluginId}`);
-    await pluginPage.evaluate(
-      id => document.querySelector(`a[href=\\/plugin\\/${id}`).parentNode.parentNode.querySelector('input[type=checkbox]').click(),
-      pluginId,
-    );
+    // wait for delete button to show up
+    await pluginPage.waitFor(`input#delete-${pluginId}`);
 
     // delete it
-    await pluginPage.click('input#delete');
+    await pluginPage.click(`input#delete-${pluginId}`);
 
     // reload plugin list
     await pluginPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-    await pluginPage.waitFor('input#delete');
+    await pluginPage.waitFor('p#no-entries');
 
     // check plugin is no longer present
     const pluginLinksCount = await pluginPage.evaluate(() => document.querySelectorAll('a[href=\\/plugin\\/]:not(.nav-link)').length);

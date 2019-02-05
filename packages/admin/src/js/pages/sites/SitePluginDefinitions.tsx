@@ -21,29 +21,25 @@ export default class SitePluginDefinitions extends React.Component<IProps, IStat
       header: [
         {
           label: 'Name',
-          render: pluginDef => (<td><NavLink to={`/plugin/${pluginDef.id}`} className="nav-link">{pluginDef.name}</NavLink></td>),
+          render: pluginDef => pluginDef.name,
         },
         {
           label: 'Options',
           render: pluginDef => (
-            <td>
-            {
-              Object.keys(pluginDef.opts).length > 0 ?
-                Object.keys(pluginDef.opts).map(optKey => (
-                  <div className="form-group row" key={optKey}>
-                    <label htmlFor={optKey} className="col-sm-2 col-form-label">{optKey}</label>
-                    <div className="col-sm-10">
-                      <input
-                        id={optKey} type="text" className="form-control"
-                        value={pluginDef.opts[optKey]}
-                        onChange={this.changeHandler}/>
-                    </div>
+            Object.keys(pluginDef.opts).length > 0 ?
+              Object.keys(pluginDef.opts).map(optKey => (
+                <div className="form-group row" key={optKey}>
+                  <label htmlFor={optKey} className="col-sm-2 col-form-label">{optKey}</label>
+                  <div className="col-sm-10">
+                    <input
+                      id={optKey} type="text" className="form-control"
+                      value={pluginDef.opts[optKey]}
+                      onChange={this.changeHandler}/>
                   </div>
-                ))
+                </div>
+              ))
               :
-                <p>No options available</p>
-            }
-            </td>
+              <p>No options available</p>
           ),
         },
       ],

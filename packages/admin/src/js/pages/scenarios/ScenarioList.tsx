@@ -1,9 +1,12 @@
 import * as React from 'react';
 import GsfClient, { HttpMethod } from '../../components/GsfClient';
-import Scenario from './model/Scenario';
+import IScenario from './model/Scenario';
+import Page from '../../layout/Page';
+import Table, { IHeaderCol } from '../../components/Table';
 
 interface IState {
-  scenarios: Scenario[];
+  scenarios: IScenario[];
+  header: IHeaderCol[];
 }
 
 export default class ScenarioList extends React.Component<{}, IState> {
@@ -11,7 +14,17 @@ export default class ScenarioList extends React.Component<{}, IState> {
     super(props);
 
     this.state = {
-      scenarios: null,
+      header: [
+        {
+          label: 'Name',
+          render: (scenario:IScenario) => (scenario.name),
+        },
+        {
+          label: 'Description',
+          render: (scenario:IScenario) => (<span style={{ textOverflow: 'ellipsis' }}>{scenario.description ? scenario.description.substr(0, 100): ""}</span>),
+        },
+      ],
+      scenarios: [],
     };
   }
 
@@ -20,7 +33,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
   }
 
   async loadScenarios() {
-    const scenarios:Scenario[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as Scenario[];
+    const scenarios:IScenario[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenario[];
     this.setState({ scenarios });
   }
 
@@ -28,14 +41,16 @@ export default class ScenarioList extends React.Component<{}, IState> {
   render() {
     if (!this.state.scenarios) return null;
 
-    return [
-      <p key="title">Available scenarios</p>,
-      this.state.scenarios.map(scenario => (
-        <div>
-          <p>{scenario.name}</p>
-          <p>{scenario.description}</p>
-        </div>
-      ))
-    ];
+    return (
+      <Page
+        title="Available Scenarios"
+        actions={[]}
+        >
+        <Table
+          header={this.state.header}
+          data={this.state.scenarios}          
+        />
+      </Page>
+    );
   }
 }

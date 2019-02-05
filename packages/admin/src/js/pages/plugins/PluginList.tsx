@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
-import Table from '../../components/Table';
+import Table, { IHeaderCol } from '../../components/Table';
 import GsfClient, { HttpMethod } from '../../components/GsfClient';
 import Plugin from './model/Plugin';
+import Page from '../../layout/Page';
 
 interface IState {
-  header: any[];
+  header: IHeaderCol[];
   data: Plugin[];
   selectedRows: number[];
 }
@@ -18,20 +19,31 @@ export default class PluginList extends React.Component<{}, IState> {
       header: [
         {
           label: 'Name',
-          render: (plugin:Plugin) => (<td><NavLink to={`/plugin/${plugin.id}`} className="nav-link">{plugin.name}</NavLink></td>),
+          render: (plugin:Plugin) => plugin.name,
         },
         {
           label: 'Code',
-          render: (plugin:Plugin) => (<td><span style={{ textOverflow: 'ellipsis' }}>{plugin.code.substr(0, 100)}</span></td>),
+          render: (plugin:Plugin) => (<span style={{ textOverflow: 'ellipsis' }}>{plugin.code.substr(0, 100)}</span>),
+        },
+        {
+          label: 'Actions',
+          renderLink: false,
+          render: (plugin:Plugin) => ([
+              <input
+                id={`delete-${plugin.id}`}
+                type="button"
+                className="btn-secondary"
+                value="Delete"
+                onClick={evt => this.deletePlugin(plugin)}
+              />,
+          ]),
         },
       ],
       data: [],
       selectedRows: [],
     };
 
-    this.deleteHandler = this.deleteHandler.bind(this);
-    this.onHeaderSelectionChange = this.onHeaderSelectionChange.bind(this);
-    this.onRowSelectionChange = this.onRowSelectionChange.bind(this);
+    this.deletePlugin = this.deletePlugin.bind(this);
   }
 
   componentDidMount() {
@@ -43,16 +55,10 @@ export default class PluginList extends React.Component<{}, IState> {
     this.setState({ data });
   }
 
-  async deleteHandler() {
-    // no plugin(s) selected for deletion
-    if (this.state.selectedRows.length === 0) return;
-
-    // retrieve ids for the plugins to be deleted
-    const deleteIds = this.state.selectedRows.map(selectedRow => this.state.data[selectedRow].id);
-
+  async deletePlugin(plugin:Plugin) {
     try {
       // remove plugins
-      await GsfClient.fetch(HttpMethod.DELETE, 'plugins', { ids: deleteIds });
+      await GsfClient.fetch(HttpMethod.DELETE, 'plugins', { ids: [plugin.id] });
 
       // clear row selection
       this.setState({ selectedRows: [] });
@@ -64,30 +70,25 @@ export default class PluginList extends React.Component<{}, IState> {
     this.loadPlugins();
   }
 
-  onRowSelectionChange(toggleRow) {
-    const newSelectedRows = Table.toggleSelection(this.state.selectedRows, toggleRow);
-    this.setState({ selectedRows: newSelectedRows });
-  }
-
-  onHeaderSelectionChange(evt) {
-    if (evt.target.checked) {
-      this.setState({ selectedRows: Array<number>(this.state.data.length).fill(1).map((elm, idx) => idx) });
-    }
-    else {
-      this.setState({ selectedRows: [] });
-    }
-  }
-
   // eslint-disable-next-line class-methods-use-this
   render() {
-    return [
-      <NavLink id="newplugin" key="new" to="/plugin/" className="nav-link">Create new user plugin</NavLink>,
-      <p key="title">Plugin List</p>,
-      <input key="del" id="delete" type="button" value="Delete" onClick={this.deleteHandler}/>,
-      <Table key="listTable"
-        header={this.state.header} data={this.state.data}
-        onRowSelectionChange={this.onRowSelectionChange} onHeaderSelectionChange={this.onHeaderSelectionChange}
-        selectedRows={this.state.selectedRows} />,
-    ];
+    return (
+      <Page
+        title="Available Plugins"
+        actions={[
+          <NavLink id="newplugin" to="/plugin/" className="btn btn-secondary float-right">New Plugin</NavLink>
+        ]}
+        >
+        <Table
+          header={this.state.header}
+          rowLink={this.rowLink}
+          data={this.state.data}                 
+        />
+      </Page>
+    );
+  }
+
+  rowLink(row:Plugin) {
+    return `/plugin/${row.id}`;
   }
 }

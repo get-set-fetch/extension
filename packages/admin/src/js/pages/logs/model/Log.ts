@@ -1,6 +1,6 @@
-export default class Log {
-  public readonly level: number;
-  public readonly date: Date;
-  public readonly cls: string;
-  public readonly msg: string;
+export default interface ILog {
+  level: number;
+  date: Date;
+  cls: string;
+  msg: string;
 }

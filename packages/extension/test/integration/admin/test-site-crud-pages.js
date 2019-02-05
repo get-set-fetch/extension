@@ -161,23 +161,15 @@ describe('Site CRUD Pages', () => {
     const queryParams = queryString.stringify({ redirectPath: '/sites' });
     await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
-    // select checkbox corresponding to the newly created site
-    await sitePage.waitFor(`a[href=\\/site\\/${siteId}`);
-    await sitePage.evaluate(
-      id => document.querySelector(`a[href=\\/site\\/${id}`).parentNode.parentNode.querySelector('input[type=checkbox]').click(),
-      siteId,
-    );
+    // wait for delete button to show up
+    await sitePage.waitFor(`input#delete-${siteId}`);
 
     // delete it
-    await sitePage.click('input#delete');
+    await sitePage.click(`input#delete-${siteId}`);
 
     // reload site list
     await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-    await sitePage.waitFor('input#delete');
-
-    // check site is no longer present
-    const siteLinksCount = await sitePage.evaluate(() => document.querySelectorAll('a[href=\\/site\\/]:not(.nav-link)').length);
-    assert.strictEqual(siteLinksCount, 0);
+    await sitePage.waitFor('p#no-entries');
 
     // check table is no longer present since there are no sites to display
     const tableCount = await sitePage.evaluate(() => document.querySelectorAll('table').length);

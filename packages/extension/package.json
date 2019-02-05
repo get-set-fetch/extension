@@ -22,7 +22,7 @@
     "copy:popup:watch": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup --watch",
     "copy:admin:watch": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin --watch",
     "test": "mocha test",
-    "test:single": "mocha test --grep \"Site Crawl\""
+    "test:single": "mocha test --grep \"Site CRUD\""
   },
   "author": "",
   "license": "ISC",

@@ -1,14 +1,103 @@
+@import "custom-variables";
 @import "node_modules/bootstrap/scss/bootstrap";
 
+/*
 @import "node_modules/@fortawesome/fontawesome-free/scss/fontawesome";
 $fa-font-path: "../../node_modules/@fortawesome/fontawesome-free/webfonts";
 @import "node_modules/@fortawesome/fontawesome-free/scss/regular.scss";
+*/
 
-
-
-.table-hover-icon {
-  visibility: hidden;
+html, body{
+  height:100%;
 }
-.table-hover tr:hover .table-hover-icon {
-  visibility: visible;
+
+body {
+  padding-top: $spacer * 1.5;
+  padding-bottom: $spacer * 1.5;
+}
+
+a.nav-link {
+  text-decoration: underline;
+  font-size: $font-size-base * 1.05;
+  line-height: 25px;
+
+  &:hover {
+    text-decoration: underline;
+    background-color: $gray-100;
+  }
+
+  &.active {
+    font-weight: $font-weight-bold;
+    font-size: $font-size-base * 1.25;
+    text-decoration: underline;
+  }
+}
+
+
+div.card-main {
+  & .card-header {
+    padding: 0.75rem 0.75rem 0.75rem $spacer * 2.5;    
+    & h3 {
+      margin-bottom: 0;
+      font-weight: $font-weight-bold; 
+    }
+    & .btn {
+      font-weight: $font-weight-bold; 
+    }
+  }
+  
+
+  & .card-body {
+    padding: 0;
+    margin-bottom: $spacer * 2;
+  }
+}
+
+.table-main {
+  & thead th {
+    border: none;
+    font-weight: $font-weight-bold;
+
+    &:first-child {
+      padding: 0.75rem 0.75rem 0.75rem $spacer * 2.5; 
+    }
+  }
+
+  & tbody {    
+    & tr:hover {
+      color: darken($secondary, 15%);
+    }
+
+    & tr:last-child {
+      border-bottom: 1px solid $gray-300;
+    }
+
+    & th {
+      padding: .75rem .75rem .75rem $spacer * 2;
+      font-weight: $font-weight-normal;
+    }
+
+    & td {
+      padding: .75rem;;
+    }
+
+    & a {
+      text-decoration: none;
+      // padding: .75rem;
+      color: inherit;
+  
+      &:hover {
+        color: darken($secondary, 15%);
+      }
+    }
+  }
+}
+
+form.form-main {
+  padding: $spacer $spacer $spacer $spacer * 2.5;
+
+  & label {
+    color:$primary;
+    font-weight: $font-weight-bold;
+  }
 }

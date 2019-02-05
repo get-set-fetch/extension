@@ -1,10 +1,11 @@
 import * as React from 'react';
+import Page from '../../layout/Page';
 
 export default class Help extends React.Component {
-  // eslint-disable-next-line class-methods-use-this
   render() {
     return (
-      <p>Help</p>
+      <Page title="Help">
+      </Page>
     );
   }
 }

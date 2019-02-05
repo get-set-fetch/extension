@@ -7,6 +7,8 @@ import GsfClient, { HttpMethod } from '../../components/GsfClient';
 import SiteDetailPlugins from './SiteDetailPlugins';
 import Site from './model/Site';
 import PluginDefinition from './model/PluginDefinition';
+import Page from '../../layout/Page';
+import { NavLink } from 'react-router-dom';
 
 
 interface IProps {
@@ -152,111 +154,112 @@ export default class SiteDetail extends React.Component<IProps, IState> {
     const notUsedPluginDefs = this.getNotUsedPluginDefinitions();
 
     return (
-    <form onSubmit={this.submitHandler}>
-      <div className="form-group row">
-          <label htmlFor="name" className="col-sm-2 col-form-label">Name</label>
-          <div className="col-sm-10">
-            <input
-              id="name" type="text" className="form-control"
-              value={this.state.site.name}
-              onChange={this.changeHandler.bind(this)}/>
-          </div>
-        </div>
-      <div className="form-group row">
-        <label htmlFor="url" className="col-sm-2 col-form-label">URL</label>
-        <div className="col-sm-10">
-          <input
-            id="url" type="text" className="form-control"
-            value={this.state.site.url}
-            onChange={this.changeHandler.bind(this)}/>
-        </div>
-      </div>
-      <div className="form-group row">
-        <label htmlFor="url" className="col-sm-2 col-form-label">Crawl Options</label>
-      </div>
-      <div className="form-group row">
-        <label htmlFor="opts.crawl.delay" className="col-sm-2 col-form-label">Delay</label>
-        <div className="col-sm-10">
-          <input
-            id="opts.crawl.delay" type="text" className="form-control"
-            value={this.state.site.opts.crawl.delay}
-            onChange={this.changeHandler.bind(this)}/>
-        </div>
-      </div>
-      <div className="form-group row">
-        <label htmlFor="opts.crawl.maxResources" className="col-sm-2 col-form-label">Max Resources</label>
-        <div className="col-sm-10">
-          <input
-            id="opts.crawl.maxResources" type="text" className="form-control"
-            value={this.state.site.opts.crawl.maxResources}
-            onChange={this.changeHandler.bind(this)}/>
-        </div>
-      </div>
-      <div className="form-group row">
-        <label htmlFor="url" className="col-sm-2 col-form-label">Resource Storage Options</label>
-      </div>
-      <div className="form-group row">
-        <label htmlFor="opts.resourceFilter.maxEntries" className="col-sm-2 col-form-label">Max Entries</label>
-        <div className="col-sm-10">
-          <input
-            id="opts.resourceFilter.maxEntries" type="text" className="form-control"
-            value={this.state.site.opts.resourceFilter.maxEntries}
-            onChange={this.changeHandler.bind(this)}/>
-        </div>
-      </div>
-      <div className="form-group row">
-        <label htmlFor="opts.resourceFilter.probability" className="col-sm-2 col-form-label">Collision Probability</label>
-        <div className="col-sm-10">
-          <input
-            id="opts.resourceFilter.probability" type="text" className="form-control"
-            value={this.state.site.opts.resourceFilter.probability}
-            onChange={this.changeHandler.bind(this)}/>
-        </div>
-      </div>
-      <div className="form-group row">
-        <label className="col-sm-2 col-form-label">Site Plugins</label>
-        <div className="col-sm-10">
-          <SiteDetailPlugins
-            pluginDefinitions={this.state.site.pluginDefinitions}
-            reorderPluginDef={this.reorderPluginDef}
-            changePluginDef={this.changePluginDef}
-            removePluginDef={this.removePluginDef}
-            />
-
-            <div className="row" key="ctrl">
-              <div className="btn-group">
-                <button
-                  type="button" className="btn btn-primary dropdown-toggle"
-                  data-toggle="dropdown"
-                  aria-haspopup="true" aria-expanded="false"
-                  disabled={notUsedPluginDefs.length === 0}>
-                  Add Plugin
-                </button>
-                <div className="dropdown-menu">
-                  {
-                    notUsedPluginDefs.map(pluginDef => (
-                      <a key={pluginDef.name} className="dropdown-item" href="#" onClick={() => this.addPluginDef(pluginDef.name)}>
-                        {pluginDef.name}
-                      </a>
-                    ))
-                  }
-                </div>
+      <Page
+        title={this.state.site.name ? this.state.site.name : "New Site"}
+      >
+        <form className="form-main" onSubmit={this.submitHandler}>
+          <div className="form-group row">
+              <label htmlFor="name" className="col-sm-2 col-form-label text-right">Name</label>
+              <div className="col-sm-5">
+                <input
+                  id="name" type="text" className="form-control"
+                  value={this.state.site.name}
+                  onChange={this.changeHandler.bind(this)}/>
               </div>
             </div>
-        </div>
-      </div>
-      <button
-        id="save" type="submit"
-        className="btn btn-primary">
-        Save
-      </button>
-      <button
-        id="cancel" type="button"
-        className="btn btn-secondary"
-        onClick={() => this.props.history.push('/sites')}>
-        Cancel
-      </button>
-    </form>
+          <div className="form-group row">
+            <label htmlFor="url" className="col-sm-2 col-form-label text-right">URL</label>
+            <div className="col-sm-5">
+              <input
+                id="url" type="text" className="form-control"
+                value={this.state.site.url}
+                onChange={this.changeHandler.bind(this)}/>
+            </div>
+          </div>
+          <div className="form-group row">
+            <label htmlFor="url" className="col-sm-2 col-form-label text-right">Crawl Options</label>
+          </div>
+          <div className="form-group row">
+            <label htmlFor="opts.crawl.delay" className="col-sm-2 col-form-label text-right">Delay</label>
+            <div className="col-sm-5">
+              <input
+                id="opts.crawl.delay" type="text" className="form-control"
+                value={this.state.site.opts.crawl.delay}
+                onChange={this.changeHandler.bind(this)}/>
+            </div>
+          </div>
+          <div className="form-group row">
+            <label htmlFor="opts.crawl.maxResources" className="col-sm-2 col-form-label text-right">Max Resources</label>
+            <div className="col-sm-5">
+              <input
+                id="opts.crawl.maxResources" type="text" className="form-control"
+                value={this.state.site.opts.crawl.maxResources}
+                onChange={this.changeHandler.bind(this)}/>
+            </div>
+          </div>
+          <div className="form-group row">
+            <label htmlFor="url" className="col-sm-2 col-form-label text-right">Resource Storage Options</label>
+          </div>
+          <div className="form-group row">
+            <label htmlFor="opts.resourceFilter.maxEntries" className="col-sm-2 col-form-label text-right">Max Entries</label>
+            <div className="col-sm-5">
+              <input
+                id="opts.resourceFilter.maxEntries" type="text" className="form-control"
+                value={this.state.site.opts.resourceFilter.maxEntries}
+                onChange={this.changeHandler.bind(this)}/>
+            </div>
+          </div>
+          <div className="form-group row">
+            <label htmlFor="opts.resourceFilter.probability" className="col-sm-2 col-form-label text-right">Collision Probability</label>
+            <div className="col-sm-5">
+              <input
+                id="opts.resourceFilter.probability" type="text" className="form-control"
+                value={this.state.site.opts.resourceFilter.probability}
+                onChange={this.changeHandler.bind(this)}/>
+            </div>
+          </div>
+          <div className="form-group row">
+            <label className="col-sm-2 col-form-label text-right">Site Plugins</label>
+            <div className="col-sm-10">
+              <SiteDetailPlugins
+                pluginDefinitions={this.state.site.pluginDefinitions}
+                reorderPluginDef={this.reorderPluginDef}
+                changePluginDef={this.changePluginDef}
+                removePluginDef={this.removePluginDef}
+                />
+
+                <div className="row" key="ctrl">
+                  <div className="btn-group">
+                    <button
+                      type="button" className="btn btn-primary dropdown-toggle"
+                      data-toggle="dropdown"
+                      aria-haspopup="true" aria-expanded="false"
+                      disabled={notUsedPluginDefs.length === 0}>
+                      Add Plugin
+                    </button>
+                    <div className="dropdown-menu">
+                      {
+                        notUsedPluginDefs.map(pluginDef => (
+                          <a key={pluginDef.name} className="dropdown-item" href="#" onClick={() => this.addPluginDef(pluginDef.name)}>
+                            {pluginDef.name}
+                          </a>
+                        ))
+                      }
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+
+          <div className="form-group row">
+            <div className="col-sm-2"/>
+            <div className="col-sm-5">
+              <a id="save" className="btn btn-secondary" href="#" role="button" onClick={this.submitHandler}>Save</a>
+              <NavLink id="cancel" to="/sites" className="btn btn-light ml-4">Cancel</NavLink>
+            </div>
+          </div>
+        </form>
+      </Page>
     );
   }
 }

@@ -9,8 +9,26 @@ module.exports = {
     filename: 'admin.js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/admin/',
+    pathinfo: false,
   },
   target: 'web',
+
+  devtool: 'source-map',
+  devServer: {
+    port: 8090,
+    historyApiFallback: {
+      rewrites: [
+        { from: /^\/$/, to: '/admin/admin.html' }
+      ]
+    }
+  },
+
+  optimization: {
+    minimize: false,
+    removeAvailableModules: false,
+    removeEmptyChunks: false,
+    splitChunks: false,
+  },
 
   plugins: [
     new HtmlWebpackPlugin({
@@ -20,6 +38,7 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: '[name].css',
     }),
+    /*
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
@@ -29,6 +48,7 @@ module.exports = {
       Util: 'exports-loader?Util!bootstrap/js/dist/util',
       Dropdown: 'exports-loader?Dropdown!bootstrap/js/dist/dropdown',
     }),
+    */
   ],
 
   module: {

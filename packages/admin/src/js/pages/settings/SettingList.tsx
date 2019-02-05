@@ -2,6 +2,7 @@ import * as React from 'react';
 import { setIn } from 'immutable';
 import GsfClient, { HttpMethod } from '../../components/GsfClient';
 import Setting from './model/Setting';
+import Page from '../../layout/Page';
 
 interface IState {
   settings: Setting[];
@@ -24,14 +25,7 @@ export default class SettingList extends React.Component<{}, IState> {
   }
 
   async loadSettings() {
-    //const settings = {};
     const settings:Setting[] = (await GsfClient.fetch(HttpMethod.GET, 'settings')) as Setting[];
-    /*
-    data.forEach((row) => {
-      settings[row.key] = row.val;
-    });
-    console.log(settings);
-    */
     this.setState({ settings });
   }
 
@@ -66,27 +60,38 @@ export default class SettingList extends React.Component<{}, IState> {
     if (!this.state.settings) return null;
 
     return (
-      <form onSubmit={this.submitHandler}>
-        <div className="form-group row">
-          <label htmlFor="name" className="col-sm-2 col-form-label">Log Level</label>
-          <div className="col-sm-10">
-          <select
-            id="logLevel"
-            className="custom-select custom-select-lg mb-3"
-            data-type="int"
-            onChange={this.changeHandler}
-            value={this.state.settings.find(entry => entry.key === "logLevel").val}
-            >
-              <option value="0">TRACE</option>
-              <option value="1">DEBUG</option>
-              <option value="2">INFO</option>
-              <option value="3">WARNING</option>
-              <option value="4">ERROR</option>
-            </select>
+      <Page title="Settings">
+
+        <form className="form-main" onSubmit={this.submitHandler}>
+          <div className="form-group row">
+            <label htmlFor="name" className="col-sm-2 col-form-label text-right">Log Level</label>
+            <div className="col-sm-5">
+            <select
+              id="logLevel"
+              className="custom-select mr-sm-2"
+              data-type="int"
+              onChange={this.changeHandler}
+              value={this.state.settings.find(entry => entry.key === "logLevel").val}
+              >
+                <option value="0">TRACE</option>
+                <option value="1">DEBUG</option>
+                <option value="2">INFO</option>
+                <option value="3">WARNING</option>
+                <option value="4">ERROR</option>
+              </select>
+            </div>
           </div>
-        </div>
-        <button id="save" type="submit" className="btn btn-primary">Save</button>
-      </form>
+
+          <div className="form-group row">
+            <div className="col-sm-2"/>
+            <div className="col-sm-5">
+              <a className="btn btn-secondary" href="#" role="button">Save</a>
+            </div>
+          </div>
+         
+        </form>
+       
+      </Page>
     );
   }
 }

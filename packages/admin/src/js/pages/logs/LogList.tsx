@@ -1,11 +1,12 @@
 import * as React from 'react';
-import Table from '../../components/Table';
+import Table, { IHeaderCol } from '../../components/Table';
 import GsfClient, { HttpMethod } from '../../components/GsfClient';
-import Log from './model/Log';
+import ILog from './model/Log';
+import Page from '../../layout/Page';
 
 interface IState {
-  header: any[];
-  data: Log[];
+  header: IHeaderCol[];
+  data: ILog[];
 }
 
 export default class LogList extends React.Component<{}, IState> {
@@ -16,19 +17,19 @@ export default class LogList extends React.Component<{}, IState> {
       header: [
         {
           label: 'Level',
-          render: (log:Log) => (<td>{log.level}</td>),
+          render: (log:ILog) => log.level,
         },
         {
           label: 'Date',
-          render: (log:Log) => (<td>{log.date.toString()}</td>),
+          render: (log:ILog) => log.date.toString(),
         },
         {
           label: 'Class',
-          render: (log:Log) => (<td>{log.cls}</td>),
+          render: (log:ILog) => log.cls,
         },
         {
           label: 'Message',
-          render: (log:Log) => (<td><span style={{ textOverflow: 'ellipsis' }}>{log.msg.substr(0, 100)}</span></td>),
+          render: (log:ILog) => (<span style={{ textOverflow: 'ellipsis' }}>{log.msg.substr(0, 100)}</span>),
         },
       ],
       data: [],
@@ -42,8 +43,7 @@ export default class LogList extends React.Component<{}, IState> {
   }
 
   async loadLogs() {
-    const data:Log[] = (await GsfClient.fetch(HttpMethod.GET, 'logs')) as Log[];
-    console.log(data);
+    const data:ILog[] = (await GsfClient.fetch(HttpMethod.GET, 'logs')) as ILog[];
     this.setState({ data });
   }
 
@@ -61,10 +61,16 @@ export default class LogList extends React.Component<{}, IState> {
 
   // eslint-disable-next-line class-methods-use-this
   render() {
-    return [
-      <p key="title">Log List</p>,
-      <input key="del" id="delete" type="button" value="Delete All" onClick={this.deleteAllHandler}/>,
-      <Table key="listTable" header={this.state.header} data={this.state.data} />,
-    ];
+    return (
+      <Page
+        title="Logs"
+        actions={[]}
+        >
+        <Table
+          header={this.state.header}
+          data={this.state.data}          
+        />
+      </Page>
+    );
   }
 }

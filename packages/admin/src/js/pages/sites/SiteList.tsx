@@ -1,26 +1,38 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
-import Table from '../../components/Table';
+import Table, { IHeaderCol } from '../../components/Table';
 import GsfClient, { HttpMethod } from '../../components/GsfClient';
 import ExportHelper from '../../utils/ExportHelper';
 import DownloadHelper from '../../utils/DownloadHelper';
 import Site from './model/Site';
 import Resource from './model/Resource';
+import Page from '../../layout/Page';
 
 interface IState {
-  header: any[];
+  header: IHeaderCol[];
   data: Site[];
-  selectedRows: number[];
 }
 
 export default class SiteList extends React.Component<{}, IState> {
-  static async crawlSite(site) {
+  static async crawlSite(site:Site) {
     try {
       await GsfClient.fetch(HttpMethod.GET, `site/${site.id}/crawl`);
     }
     catch (err) {
       console.log('error crawling site');
     }
+  }
+
+  async deleteSite(site:Site) {
+    try {
+      // remove sites
+      await GsfClient.fetch(HttpMethod.DELETE, 'sites', { ids: [site.id] });
+    }
+    catch (err) {
+      console.log('error deleting site');
+    }
+
+    this.loadSites();
   }
 
   static async exportCSV(site, evt) {
@@ -75,40 +87,51 @@ export default class SiteList extends React.Component<{}, IState> {
       header: [
         {
           label: 'Name',
-          prop: 'name',
-          render: (site:Site) => (<td><NavLink to={`/site/${site.id}`} className="nav-link">{site.name}</NavLink></td>),
+          render: (site:Site) => site.name,
         },
-        { label: 'URL', prop: 'url' },
-        { label: 'Status', prop: 'status' },
+        {
+          label: 'URL',
+          render: (site:Site) => site.url,
+        },
+        {
+          label: 'Status',
+          render: (site:Site) => "-",
+        },
         {
           label: 'Actions',
-          render: (site:Site) => (
-            <td>
+          renderLink: false,
+          render: (site:Site) => ([
               <input
                 id={`crawl-${site.id}`}
                 type="button"
-                className="btn-secondary"
+                className="btn-secondary mr-2"
                 value="Crawl"
                 onClick={() => SiteList.crawlSite(site)}
-              />
+              />,
               <a
                 id={`csv-${site.id}`}
+                className="mr-2"
                 href="#"
                 target="_blank"
                 download={site.name}
                 onClick={evt => SiteList.exportCSV(site, evt)}
-              >CSV</a>
-            </td>
-          ),
+              >
+                CSV
+              </a>,
+              <input
+                id={`delete-${site.id}`}
+                type="button"
+                className="btn-secondary"
+                value="Delete"
+                onClick={evt => this.deleteSite(site)}
+              />,
+          ]),
         },
       ],
       data: [],
-      selectedRows: [],
     };
 
-    this.deleteHandler = this.deleteHandler.bind(this);
-    this.onHeaderSelectionChange = this.onHeaderSelectionChange.bind(this);
-    this.onRowSelectionChange = this.onRowSelectionChange.bind(this);
+    this.deleteSite = this.deleteSite.bind(this);
   }
 
   componentDidMount() {
@@ -120,56 +143,30 @@ export default class SiteList extends React.Component<{}, IState> {
     this.setState({ data });
   }
 
-  async deleteHandler() {
-    // no site(s) selected for deletion
-    if (this.state.selectedRows.length === 0) return;
-
-    // retrieve ids for the sites to be deleted
-    const deleteIds = this.state.selectedRows.map(selectedRow => this.state.data[selectedRow].id);
-
-    try {
-      // remove sites
-      await GsfClient.fetch(HttpMethod.DELETE, 'sites', { ids: deleteIds });
-
-      // clear row selection
-      this.setState({ selectedRows: [] });
-    }
-    catch (err) {
-      console.log('error deleting sites');
-    }
-
-    this.loadSites();
-  }
-
-  onRowSelectionChange(toggleRow) {
-    const newSelectedRows = Table.toggleSelection(this.state.selectedRows, toggleRow);
-    this.setState({ selectedRows: newSelectedRows });
-  }
-
-  onHeaderSelectionChange(evt) {
-    if (evt.target.checked) {
-      this.setState({ selectedRows: Array(this.state.data.length).fill(1).map((elm, idx) => idx) });
-    }
-    else {
-      this.setState({ selectedRows: [] });
-    }
-  }
-
   // eslint-disable-next-line class-methods-use-this
   render() {
-    return [
-      <NavLink id="newsite" key="new" to="/site/" className="nav-link">Create new site</NavLink>,
-      <p key="listHeader">Site List a22</p>,
-      <input key="del" id="delete" type="button" value="Delete" onClick={this.deleteHandler}/>,
-      <Table key="listTable"
-        header={this.state.header} data={this.state.data}
-        onRowSelectionChange={this.onRowSelectionChange} onHeaderSelectionChange={this.onHeaderSelectionChange}
-        selectedRows={this.state.selectedRows} />,
-    ];
+    return (
+      <Page
+        title="Sites"
+        actions={[
+          <NavLink id="newsite" to="/site/" className="btn btn-secondary float-right">Add New Site</NavLink>
+        ]}
+        >
+        <Table
+          header={this.state.header}
+          rowLink={this.rowLink}
+          data={this.state.data}                 
+        />
+      </Page>
+    );
   }
 
   // eslint-disable-next-line class-methods-use-this
   componentWillUnmount() {
     DownloadHelper.revokeAllObjectUrls();
+  }
+
+  rowLink(row:Site) {
+    return `/site/${row.id}`;
   }
 }
