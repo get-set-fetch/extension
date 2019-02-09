@@ -1,8 +1,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import ExtractResources from '../src/ts/ExtractResources';
+import ScenarioConfigForm from './ScenarioConfigForm';
 
 ReactDOM.render(
-    <ExtractResources/>,
+    <ScenarioConfigForm/>,
     document.getElementById('main')
 );

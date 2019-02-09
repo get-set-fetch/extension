@@ -7,7 +7,7 @@
     "jsRules": {},
     "rules": {
       "curly": [true, "ignore-same-line"],
-      "interface-name": [true, "never-prefix"],
+      "interface-name": [true, "always-prefix"],
       "max-line-length": [true, 180],
       "object-literal-sort-keys": false,
       "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
@@ -28,5 +28,8 @@
         }
       ]
     },
-    "rulesDirectory": []
+    "rulesDirectory": [],
+    "linterOptions": {
+      "exclude": ["**/*.json"]
+    }
 }

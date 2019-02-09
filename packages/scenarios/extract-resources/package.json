@@ -15,7 +15,9 @@
     "@types/react": "^16.7.20",
     "@types/react-dom": "^16.0.11",
     "bootstrap": "^4.2.1",
+    "react": "^16.7.0",
     "react-dom": "^16.7.0",
+    "react-jsonschema-form": "^1.2.0",
     "rimraf": "^2.6.2",
     "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-copy": "^0.2.3",
@@ -34,7 +36,6 @@
     "typescript": "^3.2.4"
   },
   "dependencies": {
-    "react": "^16.7.0",
-    "react-jsonschema-form": "^1.2.0"
+    "get-set-fetch-extension-admin": "^1.0.0"
   }
 }

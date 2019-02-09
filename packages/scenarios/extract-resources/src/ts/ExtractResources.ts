@@ -1,17 +1,43 @@
 import * as ConfigFormSchema from '../resources/config-form-schema.json';
-import * as ConfigFormDefaults from '../resources/config-form-defaults.json';
-import ScenarioConfigForm from './ScenarioConfigForm.js';
+import * as ConfigFormUISchema from '../resources/config-form-ui-schema.json';
 
-export default class ExtractResources extends ScenarioConfigForm {
-  get CONFIG_FORM_SCHEMA() {
+import { ScenarioInstance } from 'get-set-fetch-extension-admin';
+
+export default class ExtractResources implements ScenarioInstance {
+  getConfigFormSchema() {
     return ConfigFormSchema;
   }
 
-  get CONFIG_FORM_DEFAULTS() {
-    return ConfigFormDefaults;
+  getConfigFormUISchema() {
+    return ConfigFormUISchema;
   }
 
-  configSaveHandler(data) {
-    console.log('extract-resources: configSaveHandler invoked');
+  getPluginDefinitions(scenarioProps) {
+    const pluginDefinitions = [
+        {
+          name: 'SelectResourcePlugin'
+        },
+        {
+          name: 'ExtensionFetchPlugin'
+        },
+        {
+          name: 'ExtractUrlPlugin'
+        },
+        {
+          name: 'ExtractTitlePlugin',
+          opts: {
+            extensions: scenarioProps.extensions,
+            maxDepth: scenarioProps.maxDepth
+          }
+        },
+        {
+          name: 'UpdateResourcePlugin'
+        },
+        {
+          name: 'InsertResourcePlugin'
+        }
+      ];
+
+    return pluginDefinitions;
   }
 }
