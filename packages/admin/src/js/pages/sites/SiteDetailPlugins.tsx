@@ -66,7 +66,7 @@ export default class SiteDetailPlugins extends React.Component<IProps, {}> {
                           {
                             //! snapshot.isDragging &&
                             (
-                              Object.keys(pluginDef.opts).length > 0 ?
+                              pluginDef.opts && Object.keys(pluginDef.opts).length > 0 ?
                                 Object.keys(pluginDef.opts).map(optKey => (
                                   <div className="form-group row" key={optKey}>
                                     <label htmlFor={optKey} className="col-sm-2 col-form-label">{optKey}</label>
