@@ -10,6 +10,7 @@ describe('Test PluginManager', () => {
     // 1. storage init, populate GsfProvider used by some plugin related classes
     const { UserPlugin } = await IdbStorage.init();
     GsfProvider.UserPlugin = UserPlugin;
+    window.GsfProvider = GsfProvider;
 
     // discover, register builtin plugins
     await ModuleHelper.init();

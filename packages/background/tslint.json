@@ -7,8 +7,8 @@
     "jsRules": {},
     "rules": {
       "curly": [true, "ignore-same-line"],
-      "interface-name": [true, "never-prefix"],
       "max-line-length": [true, 180],
+      "interface-name": true,
       "object-literal-sort-keys": false,
       "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
       "arrow-parens": false,
@@ -26,7 +26,8 @@
         {
           "allowSingleLine": false
         }
-      ]
+      ],
+      "forin": false
     },
     "rulesDirectory": []
 }

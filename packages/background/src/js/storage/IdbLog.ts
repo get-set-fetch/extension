@@ -1,6 +1,14 @@
 import { BaseEntity } from 'get-set-fetch';
 
 /* eslint-disable class-methods-use-this */
+
+interface ILog {
+  date: Date;
+  level: number;
+  cls: string;
+  msg: string;
+  id: number;
+}
 export default class IdbLog extends BaseEntity {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
@@ -30,7 +38,7 @@ export default class IdbLog extends BaseEntity {
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            result[i] = Object.assign(new IdbLog(null, null, null), result[i], { date: result[i].date.toISOString() });
+            result[i] = Object.assign(new IdbLog(result[i]), { date: result[i].date.toISOString() });
           }
           resolve(result);
         }
@@ -54,12 +62,13 @@ export default class IdbLog extends BaseEntity {
   msg: string;
   id: number;
 
-  constructor(level: number, cls: string, msg: string) {
+  constructor(kwArgs: Partial<ILog> = {}) {
     super();
-    this.date = new Date();
-    this.level = level;
-    this.cls = cls;
-    this.msg = msg;
+    for (const key in kwArgs) {
+      this[key] = kwArgs[key];
+    }
+
+    this.date = kwArgs.date ? kwArgs.date : new Date();
   }
 
   save(): Promise<number> {

@@ -105,7 +105,7 @@ export default class GsfProvider {
         switch (true) {
           // site
           case /^site$/.test(request.resource):
-            const site = new GsfProvider.Site(request.body.name, request.body.url, request.body.opts, request.body.pluginDefinitions);
+            const site = new GsfProvider.Site(request.body);
             reqPromise = site.save();
             break;
           default:
@@ -116,7 +116,7 @@ export default class GsfProvider {
         switch (true) {
           // site
           case /^site$/.test(request.resource):
-            const site = Object.assign(new GsfProvider.Site(null, null, null, null), request.body);
+            const site = new GsfProvider.Site(request.body);
             reqPromise = site.update();
             break;
           default:
@@ -171,7 +171,7 @@ export default class GsfProvider {
         switch (true) {
           // project
           case /^project$/.test(request.resource):
-            const project = new GsfProvider.Project(request.body.name, request.body.description, request.body.scenarioId);
+            const project = new GsfProvider.Project(request.body);
             reqPromise = project.save();
             break;
           default:
@@ -182,7 +182,7 @@ export default class GsfProvider {
         switch (true) {
           // project
           case /^project$/.test(request.resource):
-            const project = Object.assign(new GsfProvider.Project(null, null, null), request.body);
+            const project = new GsfProvider.Project(request.body);
             reqPromise = project.update();
             break;
           default:
@@ -281,7 +281,7 @@ export default class GsfProvider {
         switch (true) {
           // plugin
           case /^plugin$/.test(request.resource):
-            const plugin = new GsfProvider.UserPlugin(request.body.name, request.body.code);
+            const plugin = new GsfProvider.UserPlugin(request.body);
             reqPromise = plugin.save();
             break;
           default:
@@ -292,7 +292,7 @@ export default class GsfProvider {
         switch (true) {
           // plugin
           case /^plugin$/.test(request.resource):
-            const plugin = Object.assign(new GsfProvider.UserPlugin(null, null), request.body);
+            const plugin = new GsfProvider.UserPlugin(request.body);
             reqPromise = plugin.update();
             break;
           default:
@@ -409,7 +409,7 @@ export default class GsfProvider {
         switch (true) {
           // settings
           case /^setting$/.test(request.resource):
-            const setting = Object.assign(new GsfProvider.Setting(null, null), request.body);
+            const setting = new GsfProvider.Setting(request.body);
             reqPromise = setting.update();
             break;
           default:

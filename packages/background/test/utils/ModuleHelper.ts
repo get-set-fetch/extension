@@ -10,7 +10,7 @@ declare global {
   namespace NodeJS {
     interface Global {
       SystemJS: System;
-      // GsfProvider: any;
+      GsfProvider: any;
     }
   }
 }

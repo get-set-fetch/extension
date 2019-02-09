@@ -1,6 +1,16 @@
 import { BaseResource } from 'get-set-fetch';
 
 /* eslint-disable class-methods-use-this */
+
+interface IResource {
+  crawledAt: any;
+  id: number;
+  url: string;
+  crawlInProgress: boolean;
+  depth: number;
+  siteId: number;
+}
+
 export default class IdbResource extends BaseResource {
   // get a read transaction
   static rTx() {
@@ -30,7 +40,7 @@ export default class IdbResource extends BaseResource {
         }
         else {
           Object.assign(result, this.parseResult(result));
-          resolve(Object.assign(new IdbResource(null, null, null), result));
+          resolve(new IdbResource(result));
         }
       };
       readReq.onerror = () => {
@@ -67,7 +77,7 @@ export default class IdbResource extends BaseResource {
           if (instantiate) {
             for (let i = 0; i < result.length; i += 1) {
               Object.assign(result[i], this.parseResult(result[i]));
-              result[i] = Object.assign(new IdbResource(null, null, null), result[i]);
+              result[i] = new IdbResource(result[i]);
             }
           }
           resolve(result);
@@ -89,7 +99,7 @@ export default class IdbResource extends BaseResource {
           resolve(null);
         }
         else {
-          const resource = Object.assign(new IdbResource(null, null, null), result);
+          const resource = new IdbResource(result);
           resource.crawlInProgress = true;
           const reqUpdateResource = rwTx.put(resource.serialize());
           reqUpdateResource.onsuccess = () => resolve(resource);
@@ -130,10 +140,15 @@ export default class IdbResource extends BaseResource {
   id: number;
   url: string;
   crawlInProgress: boolean;
+  depth: number;
+  siteId: number;
 
-  constructor(siteId, url, depth) {
-    super(siteId, url, depth);
-    this.crawledAt = new Date(0);
+  constructor(kwArgs: Partial<IResource> = {}) {
+    super(kwArgs.siteId, kwArgs.url, kwArgs.depth);
+    for (const key in kwArgs) {
+      this[key] = kwArgs[key];
+    }
+    this.crawledAt = kwArgs.crawledAt ? kwArgs.crawledAt : new Date(0);
   }
 
   save(): Promise<number> {

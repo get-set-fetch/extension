@@ -7,11 +7,40 @@ import Logger from '../logger/Logger';
 const Log = Logger.getLogger('IdbSite');
 
 /* eslint-disable class-methods-use-this */
+
+export interface IPluginDefinition {
+  name: string;
+  opts: object;
+}
+
+interface ISite {
+  id: number;
+  projectId: number;
+  name: string;
+  url: string;
+  tabId: any;
+
+  pluginDefinitions: IPluginDefinition[];
+  plugins: any;
+
+  opts: {
+    crawl: {
+      maxConnections: number,
+      maxResources: number,
+      delay: number
+    },
+    resourceFilter: {
+      maxEntries: number,
+      probability: number
+    }
+  };
+}
+
 export default class IdbSite extends BaseSite {
 
   // IndexedDB can't do partial update, define all site properties to be stored
   get props() {
-    return ['id', 'name', 'url', 'opts', 'robotsTxt', 'pluginDefinitions', 'resourceFilter'];
+    return ['id', 'projectId', 'name', 'url', 'opts', 'robotsTxt', 'pluginDefinitions', 'resourceFilter'];
   }
 
   // get a read transaction
@@ -41,7 +70,7 @@ export default class IdbSite extends BaseSite {
         }
         else {
           Object.assign(result, (await this.parseResult(result)));
-          resolve(Object.assign(new IdbSite(null, null, null, false), result));
+          resolve(new IdbSite(result));
         }
       };
       readReq.onerror = () => reject(new Error(`could not read site: ${nameOrId}`));
@@ -61,7 +90,7 @@ export default class IdbSite extends BaseSite {
         else {
           for (let i = 0; i < result.length; i += 1) {
             Object.assign(result[i], (await this.parseResult(result[i])));
-            result[i] = Object.assign(new IdbSite(null, null, null, false), result[i]);
+            result[i] = new IdbSite(result[i]);
           }
           resolve(result);
         }
@@ -104,6 +133,15 @@ export default class IdbSite extends BaseSite {
     });
   }
 
+  id: number;
+  projectId: number;
+  name: string;
+  url: string;
+  tabId: any;
+
+  pluginDefinitions: IPluginDefinition[];
+  plugins: any;
+
   opts: {
     crawl: {
       maxConnections: number,
@@ -116,17 +154,15 @@ export default class IdbSite extends BaseSite {
     }
   };
 
-  pluginDefinitions: any;
-  plugins: any;
-  tabId: any;
-  name: string;
-  id: number;
-  url: string;
+  constructor(kwArgs: Partial<ISite> = {}) {
+  // constructor(name, url, opts, pluginDefinitions) {
+    super(kwArgs.name, kwArgs.url, kwArgs.opts, false);
 
-  constructor(name, url, opts, pluginDefinitions) {
-    super(name, url, opts, false);
+    for (const key in kwArgs) {
+      this[key] = kwArgs[key];
+    }
 
-    if (!opts || !opts.crawl) {
+    if (!kwArgs.opts || !kwArgs.opts.crawl) {
       this.opts.crawl = {
         maxConnections: 1,
         maxResources: 10,
@@ -134,7 +170,7 @@ export default class IdbSite extends BaseSite {
       };
     }
 
-    if (!opts || !opts.resourceFilter) {
+    if (!kwArgs.opts || !kwArgs.opts.resourceFilter) {
       this.opts.resourceFilter = {
         maxEntries: 5000,
         probability: 0.01
@@ -142,7 +178,7 @@ export default class IdbSite extends BaseSite {
     }
 
     // if no plugin definitions provided use the default ones
-    this.pluginDefinitions = !pluginDefinitions ? PluginManager.getDefaultPluginDefs() : pluginDefinitions;
+    this.pluginDefinitions = !kwArgs.pluginDefinitions ? PluginManager.getDefaultPluginDefs() : kwArgs.pluginDefinitions;
     this.plugins = PluginManager.instantiate(this.pluginDefinitions);
 
     // resources from the same site are always crawled in the same tab
@@ -260,7 +296,7 @@ export default class IdbSite extends BaseSite {
         const resources = [];
         urls.forEach((url) => {
           if (bloomFilter.test(url) === false) {
-            resources.push(new IdbResource(this.id, url, depth).serializeWithoutId());
+            resources.push(new IdbResource({ siteId: this.id, url, depth }).serializeWithoutId());
             bloomFilter.add(url);
           }
         });

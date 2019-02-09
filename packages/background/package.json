@@ -10,15 +10,15 @@
   "scripts": {
     "postinstall": "patch-package",
     "clean": "rimraf dist",
-    "lint": "tslint -c tslint.json \"src/**/*.ts\"",
-    "build": "npm run clean && npm run build:dist && npm run copy:resources",
+    "lint": "tslint -c tslint.json src/**/*.ts",
+    "build": "npm run clean && npm run lint && npm run build:dist && npm run copy:resources",
     "build:dist": "rollup --config rollup.config.js",
     "copy:resources": "npm run copy:resources:html && npm run copy:resources:systemjs",
     "copy:resources:html": "copyfiles -u 2 src/html/*.html dist",
     "copy:resources:systemjs": "copyfiles -f node_modules/systemjs/dist/system.js dist/plugins/systemjs && copyfiles -f node_modules/systemjs-plugin-babel/plugin-babel.js node_modules/systemjs-plugin-babel/systemjs-babel-browser.js dist/plugins/systemjs",
     "test": "nyc --reporter=lcov mocha test",
     "test:report": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "test:single": "mocha test --grep \"Test Site Crawl\""
+    "test:single": "mocha test --grep \"Test Storage Resource - Crawl\""
   },
   "keywords": [
     "scraper",

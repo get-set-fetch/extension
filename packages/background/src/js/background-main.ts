@@ -1,6 +1,5 @@
 import { GsfProvider, PluginManager } from './background-bundle';
 import Logger, { LogLevel } from './logger/Logger';
-import IdbSetting from './storage/IdbSetting';
 import ScenarioManager from './scenarios/ScenarioManager';
 
 // const Log = Logger.getLogger('background-main');
@@ -40,7 +39,7 @@ SystemJS.config({
   const storedSettings = await GsfProvider.Setting.getAll();
   let logLevel = storedSettings.find(setting => setting.key === 'logLevel');
   if (!logLevel) {
-    logLevel = new GsfProvider.Setting('logLevel', LogLevel.WARN);
+    logLevel = new GsfProvider.Setting({ key: 'logLevel', val: LogLevel.WARN.toString() });
     await logLevel.save();
   }
   Logger.setLogLevel(parseInt(logLevel.val, 10));

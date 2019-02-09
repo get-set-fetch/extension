@@ -1,4 +1,4 @@
-exports.fetch = function (url) {
+exports.fetch = function(url) {
   const pluginName = url.address.substring(url.address.lastIndexOf('/') + 1);
 
   return new Promise(async (resolve) => {

@@ -22,7 +22,7 @@ describe(`Test Storage UserPlugin - CRUD, using connection ${conn.info}`, () => 
     await UserPlugin.delAll();
 
     // save plugin
-    const plugin = new UserPlugin(expectedPlugin.name, expectedPlugin.code);
+    const plugin = new UserPlugin({name: expectedPlugin.name, code: expectedPlugin.code});
     await plugin.save();
     assert.isNotNull(plugin.id);
     expectedPlugin.id = plugin.id;
@@ -71,10 +71,10 @@ describe(`Test Storage UserPlugin - CRUD, using connection ${conn.info}`, () => 
 
   it('delete some', async () => {
     // create pluginB and pluginC
-    const pluginB = new UserPlugin('pluginB', 'codeB');
+    const pluginB = new UserPlugin({name: 'pluginB', code: 'codeB'});
     await pluginB.save();
 
-    const pluginC = new UserPlugin('pluginC', 'codeC');
+    const pluginC = new UserPlugin({name: 'pluginC', code: 'codeC'});
     await pluginC.save();
 
     // remove pluginA, pluginB

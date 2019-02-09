@@ -1,6 +1,13 @@
 import { BaseEntity } from 'get-set-fetch';
 
 /* eslint-disable class-methods-use-this */
+
+interface IPlugin {
+  name: string;
+  id: any;
+  code: string;
+}
+
 export default class IdbUserPlugin extends BaseEntity {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
@@ -31,7 +38,7 @@ export default class IdbUserPlugin extends BaseEntity {
           resolve(null);
         }
         else {
-          resolve(Object.assign(new IdbUserPlugin(null, null), result));
+          resolve(new IdbUserPlugin(result));
         }
       };
       readReq.onerror = () => {
@@ -52,7 +59,7 @@ export default class IdbUserPlugin extends BaseEntity {
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            result[i] = Object.assign(new IdbUserPlugin(null, null), result[i]);
+            result[i] = new IdbUserPlugin(result[i]);
           }
           resolve(result);
         }
@@ -95,14 +102,15 @@ export default class IdbUserPlugin extends BaseEntity {
     });
   }
 
-  name: string;
   id: any;
+  name: string;
   code: string;
 
-  constructor(name, code) {
+  constructor(kwArgs: Partial<IPlugin> = {}) {
     super();
-    this.name = name;
-    this.code = code;
+    for (const key in kwArgs) {
+      this[key] = kwArgs[key];
+    }
   }
 
   save(): Promise<number> {

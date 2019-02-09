@@ -1,6 +1,12 @@
 import { BaseEntity } from 'get-set-fetch';
 
 /* eslint-disable class-methods-use-this */
+interface ISetting {
+  id: number;
+  key: string;
+  val: string;
+}
+
 export default class IdbSetting extends BaseEntity {
   // get a read transaction
   static rTx() {
@@ -23,7 +29,7 @@ export default class IdbSetting extends BaseEntity {
           resolve(null);
         }
         else {
-          resolve(Object.assign(new IdbSetting(null, null), result));
+          resolve(new IdbSetting(result));
         }
       };
       readReq.onerror = () => {
@@ -44,7 +50,7 @@ export default class IdbSetting extends BaseEntity {
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            result[i] = Object.assign(new IdbSetting(null, null), result[i]);
+            result[i] = new IdbSetting(result[i]);
           }
           resolve(result);
         }
@@ -57,10 +63,11 @@ export default class IdbSetting extends BaseEntity {
   key: string;
   val: string;
 
-  constructor(key, val) {
+  constructor(kwArgs: Partial<ISetting> = {}) {
     super();
-    this.key = key;
-    this.val = val;
+    for (const key in kwArgs) {
+      this[key] = kwArgs[key];
+    }
   }
 
   save(): Promise<number> {

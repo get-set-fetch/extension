@@ -19,7 +19,7 @@ class PluginManager extends AbstractModuleManager {
   }
 
   static instantiateModule(data): BaseNamedEntity {
-    return new GsfProvider.UserPlugin(data.name,  data.content);
+    return new GsfProvider.UserPlugin({ name: data.name,  code: data.content });
   }
 
   static async importPlugins() {

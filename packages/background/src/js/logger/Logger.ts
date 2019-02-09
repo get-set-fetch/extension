@@ -42,31 +42,31 @@ export default class Logger {
 
   trace(...args) {
     if (Logger.logLevel > 0) return;
-    const logEntry = new IdbLog(LogLevel.TRACE, this.cls, Logger.stringifyArgs(args));
+    const logEntry = new IdbLog({ level: LogLevel.TRACE, cls: this.cls, msg: Logger.stringifyArgs(args) });
     logEntry.save();
   }
 
   debug(...args) {
     if (Logger.logLevel > 1) return;
-    const logEntry = new IdbLog(LogLevel.DEBUG, this.cls, Logger.stringifyArgs(args));
+    const logEntry = new IdbLog({ level: LogLevel.DEBUG, cls: this.cls, msg: Logger.stringifyArgs(args) });
     logEntry.save();
   }
 
   info(...args) {
     if (Logger.logLevel > 2) return;
-    const logEntry = new IdbLog(LogLevel.INFO, this.cls, Logger.stringifyArgs(args));
+    const logEntry = new IdbLog({ level: LogLevel.INFO, cls: this.cls, msg: Logger.stringifyArgs(args) });
     logEntry.save();
   }
 
   warn(...args) {
     if (Logger.logLevel > 3) return;
-    const logEntry = new IdbLog(LogLevel.WARN, this.cls, Logger.stringifyArgs(args));
+    const logEntry = new IdbLog({ level: LogLevel.WARN, cls: this.cls, msg: Logger.stringifyArgs(args) });
     logEntry.save();
   }
 
   error(...args) {
     if (Logger.logLevel > 4) return;
-    const logEntry = new IdbLog(LogLevel.ERROR, this.cls, Logger.stringifyArgs(args));
+    const logEntry = new IdbLog({ level: LogLevel.ERROR, cls: this.cls, msg: Logger.stringifyArgs(args) });
     logEntry.save();
   }
 }
