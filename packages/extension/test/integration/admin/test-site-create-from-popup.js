@@ -13,6 +13,8 @@ describe('Site Pages', () => {
     waitUntil: ['load', 'domcontentloaded', 'networkidle0'],
   };
 
+  const queryParams = queryString.stringify({ redirectPath: '/sites' });
+
   const actualSite = {
     name: 'siteA',
     url: 'http://www.sitea.com/index.html',
@@ -23,11 +25,15 @@ describe('Site Pages', () => {
       actualSite.url,
       path.join('test', 'resources', actualSite.name),
     );
+
+    sitePage = await browser.newPage();
+
+    // await BrowserHelper.waitForDBInitialization(sitePage);
   });
+
 
   afterEach(async () => {
     // move to admin page
-    const queryParams = queryString.stringify({ redirectPath: '/sites' });
     await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
     // delete existing sites
@@ -43,7 +49,6 @@ describe('Site Pages', () => {
 
   it('Test Create New Site', async () => {
     // open stubbed site
-    sitePage = await browser.newPage();
     await sitePage.goto(actualSite.url, gotoOpts);
 
     // open popup page
@@ -73,8 +78,10 @@ describe('Site Pages', () => {
     assert.strictEqual(actualSite.url, inputUrl);
 
     // save site
-    await adminPage.click('#save');
-    await adminPage.waitForNavigation(gotoOpts);
+    await Promise.all([
+      adminPage.click('#save'),
+      adminPage.waitForNavigation(gotoOpts)
+    ]);
 
     // check redirection to site list
     const sitesUrl = `chrome-extension://${extension.id}/sites`;

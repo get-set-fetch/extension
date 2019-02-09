@@ -14,6 +14,8 @@ describe('Settings Update Page', () => {
     waitUntil: 'load',
   };
 
+  const queryParams = queryString.stringify({ redirectPath: '/settings' });
+
 
   before(async () => {
     browser = await BrowserHelper.launch();
@@ -21,28 +23,20 @@ describe('Settings Update Page', () => {
     // open settings page
     settingsPage = await browser.newPage();
     settingsFrame = settingsPage.mainFrame();
-    const queryParams = queryString.stringify({ redirectPath: '/settings' });
-    await settingsPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    
+    await BrowserHelper.waitForDBInitialization(settingsPage);
   });
+
+  beforeEach(async () => {
+    // load settings list
+    await settingsPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+  })
 
   after(async () => {
     await browser.close();
   });
 
   it('Test Default Settings', async () => {
-    // load settings
-    const queryParams = queryString.stringify({ redirectPath: '/settings' });
-    await settingsPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-
-    // wait for settings to be rendered, refresh page on 1st timeout
-    try {
-      await settingsPage.waitFor('select#logLevel', {timeout: 3 * 1000});
-    }
-    catch (err) {
-      await settingsPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-      await settingsPage.waitFor('select#logLevel', {timeout: 1 * 1000});
-    }
-
     // retrieve logLevel setting
     const logLevel = await settingsPage.evaluate(
       () => {
@@ -64,10 +58,6 @@ describe('Settings Update Page', () => {
   });
 
   it('Test Update Settings', async () => {
-    // load settings
-    const queryParams = queryString.stringify({ redirectPath: '/settings' });
-    await settingsPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-
     // change logLevel setting
     await settingsPage.waitFor('select#logLevel');
     await settingsPage.select('#logLevel', '0')

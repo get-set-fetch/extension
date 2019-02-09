@@ -19,6 +19,8 @@ describe('Site Crawl', () => {
     waitUntil: 'load',
   };
 
+  const queryParams = queryString.stringify({ redirectPath: '/sites' });
+
   const actualSite = {
     name: 'siteA',
     url: 'http://www.sitea.com/index.html',
@@ -47,6 +49,8 @@ describe('Site Crawl', () => {
 
   before(async () => {
     browser = await BrowserHelper.launchAndStubRequests(actualSite.url, path.join('test', 'resources', actualSite.name));
+    adminPage = await browser.newPage(); 
+    await BrowserHelper.waitForDBInitialization(adminPage);
   });
 
   afterEach(async () => {
@@ -95,9 +99,7 @@ describe('Site Crawl', () => {
     // initializing the systemjs plugins
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // open site list
-    adminPage = await browser.newPage();
-    const queryParams = queryString.stringify({ redirectPath: '/sites' });
+    // open site list       
     await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
     // create site to crawl

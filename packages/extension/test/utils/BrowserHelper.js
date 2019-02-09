@@ -1,3 +1,4 @@
+import queryString from 'query-string';
 import NodeFetchPlugin from 'get-set-fetch/lib/plugins/fetch/NodeFetchPlugin';
 import TestUtils from 'get-set-fetch/test/utils/TestUtils';
 
@@ -100,5 +101,27 @@ export default class BrowserHelper {
         resolve(page);
       });
     });
+  }
+
+  /*
+  scenario plugins are the last to be discovered and imported,
+  once scenarios are present it means all db initial operations are complete
+  */
+  static async waitForDBInitialization(browserPage) {
+    const queryParams = queryString.stringify({ redirectPath: '/scenarios' });
+    const gotoOpts =  {
+      timeout: 10 * 1000,
+      waitUntil: 'load'
+    }
+
+    // wait for main table to load, refresh page on 1st timeout
+    try {
+      await browserPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);      
+      await browserPage.waitFor('table.table-main', {timeout: 1 * 1000});
+    }
+    catch (err) {
+      await browserPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+      await browserPage.waitFor('table.table-main', {timeout: 1 * 1000});
+    }
   }
 }

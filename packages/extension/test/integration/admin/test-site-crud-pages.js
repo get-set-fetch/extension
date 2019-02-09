@@ -14,6 +14,8 @@ describe('Site CRUD Pages', () => {
     waitUntil: 'load',
   };
 
+  const queryParams = queryString.stringify({ redirectPath: '/sites' });
+
   const actualSite = {
     name: 'siteA',
     url: 'http://siteA.com',
@@ -21,13 +23,16 @@ describe('Site CRUD Pages', () => {
 
   before(async () => {
     browser = await BrowserHelper.launch();
-
-    // open site list page
     sitePage = await browser.newPage();
     siteFrame = sitePage.mainFrame();
-    const queryParams = queryString.stringify({ redirectPath: '/sites' });
-    await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+
+    await BrowserHelper.waitForDBInitialization(sitePage);
   });
+
+  beforeEach(async () => {
+    // load site list
+    await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+  })
 
   afterEach(async () => {
     // delete existing sites
@@ -80,7 +85,6 @@ describe('Site CRUD Pages', () => {
     const siteId = await sitePage.evaluate(actualSite => GsfClient.fetch('POST', 'site', actualSite), actualSite);
 
     // reload site list
-    const queryParams = queryString.stringify({ redirectPath: '/sites' });
     await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
     // open the newly created site
@@ -120,7 +124,6 @@ describe('Site CRUD Pages', () => {
     const siteId = await sitePage.evaluate(actualSite => GsfClient.fetch('POST', 'site', actualSite), actualSite);
 
     // reload site list
-    const queryParams = queryString.stringify({ redirectPath: '/sites' });
     await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
     // open the newly created site
@@ -158,7 +161,6 @@ describe('Site CRUD Pages', () => {
     const siteId = await sitePage.evaluate(actualSite => GsfClient.fetch('POST', 'site', actualSite), actualSite);
 
     // reload site list
-    const queryParams = queryString.stringify({ redirectPath: '/sites' });
     await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
     // wait for delete button to show up
