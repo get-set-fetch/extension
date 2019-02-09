@@ -27,6 +27,7 @@ describe('Settings Update Page', () => {
   beforeEach(async () => {
     // load settings list
     await settingsPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await settingsPage.waitFor('select#logLevel');
   });
 
   after(async () => {
@@ -56,7 +57,6 @@ describe('Settings Update Page', () => {
 
   it('Test Update Settings', async () => {
     // change logLevel setting
-    await settingsPage.waitFor('select#logLevel');
     await settingsPage.select('#logLevel', '0');
 
     // save
