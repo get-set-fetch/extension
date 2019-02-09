@@ -26,7 +26,7 @@ describe('Settings Update Page', () => {
   });
 
   after(async () => {
-    // await browser.close();
+    await browser.close();
   });
 
   it('Test Default Settings', async () => {
