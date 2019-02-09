@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/admin.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist/"
   ],
@@ -27,6 +28,7 @@
     "@types/query-string": "^6.2.0",
     "@types/react": "^16.7.19",
     "@types/react-beautiful-dnd": "^10.0.1",
+    "@types/react-jsonschema-form": "^1.0.13",
     "@types/react-router-dom": "^4.3.1",
     "copy-webpack-plugin": "^4.5.1",
     "css-loader": "^0.28.11",
