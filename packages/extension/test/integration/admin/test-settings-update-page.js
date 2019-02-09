@@ -34,8 +34,16 @@ describe('Settings Update Page', () => {
     const queryParams = queryString.stringify({ redirectPath: '/settings' });
     await settingsPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
+    // wait for settings to be rendered, refresh page on 1st timeout
+    try {
+      await settingsPage.waitFor('select#logLevel', {timeout: 3 * 1000});
+    }
+    catch (err) {
+      await settingsPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+      await settingsPage.waitFor('select#logLevel', {timeout: 1 * 1000});
+    }
+
     // retrieve logLevel setting
-    await settingsPage.waitFor('select#logLevel');
     const logLevel = await settingsPage.evaluate(
       () => {
         const selectLogLevel = document.querySelector('select#logLevel');
