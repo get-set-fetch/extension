@@ -1,11 +1,5 @@
-import SystemJS from 'systemjs';
-import ExternalStorageTests from 'get-set-fetch/test/external/external-storage-tests';
-import IdbStorage from '../../src/js/storage/IdbStorage.ts';
-import ModuleHelper from '../utils/ModuleHelper.ts';
-import PluginManager from '../../src/js/plugins/PluginManager.ts';
-import GsfProvider from '../../src/js/storage/GsfProvider.ts';
-
-const { assert } = require('chai');
+import { assert } from 'chai';
+import IdbStorage from '../../src/js/storage/IdbStorage';
 
 const conn = { info: 'IndexedDB' };
 
@@ -20,7 +14,7 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
   };
 
   before(async () => {
-    ({ Site, Project } = await IdbStorage.init(conn));
+    ({ Site, Project } = await IdbStorage.init());
   });
 
   beforeEach(async () => {
@@ -29,7 +23,7 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     await Project.delAll();
 
     // save project
-    const project = new Project({name: expectedProject.name, url: expectedProject.url});
+    const project = new Project({ name: expectedProject.name, url: expectedProject.url });
     await project.save();
     assert.isNotNull(project.id);
     expectedProject.id = project.id;

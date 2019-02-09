@@ -1,16 +1,15 @@
-import ModuleHelper from '../utils/ModuleHelper.ts';
-import PluginManager from '../../src/js/plugins/PluginManager.ts';
-import GsfProvider from '../../src/js/storage/GsfProvider.ts';
-import IdbStorage from '../../src/js/storage/IdbStorage.ts';
-
-const { assert } = require('chai');
+import { assert } from 'chai';
+import ModuleHelper from '../utils/ModuleHelper';
+import PluginManager from '../../src/js/plugins/PluginManager';
+import GsfProvider from '../../src/js/storage/GsfProvider';
+import IdbStorage from '../../src/js/storage/IdbStorage';
 
 describe('Test PluginManager', () => {
   before(async () => {
     // 1. storage init, populate GsfProvider used by some plugin related classes
     const { UserPlugin } = await IdbStorage.init();
     GsfProvider.UserPlugin = UserPlugin;
-    window.GsfProvider = GsfProvider;
+    global.GsfProvider = { UserPlugin };
 
     // discover, register builtin plugins
     await ModuleHelper.init();
@@ -22,7 +21,7 @@ describe('Test PluginManager', () => {
       { name: 'ExtensionFetchPlugin', opts: {} },
       { name: 'ExtractUrlPlugin', opts: {} },
       { name: 'UpdateResourcePlugin', opts: {} },
-      { name: 'InsertResourcePlugin', opts: {} },
+      { name: 'InsertResourcePlugin', opts: {} }
     ];
     const actualPlugins = PluginManager.instantiate(PluginManager.getDefaultPluginDefs());
 

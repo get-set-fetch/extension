@@ -5,11 +5,11 @@ import ScenarioManager from './scenarios/ScenarioManager';
 // const Log = Logger.getLogger('background-main');
 
 /*
-register GsfProvider at window level, required for:
+register GsfProvider at global level, required for:
   - accessing IndexedDB from SystemJS IdbFetchPlugin
   - accessing plugin module content from GsfProvider.UserPlugins.availablePlugins
 */
-window.GsfProvider = GsfProvider;
+global.GsfProvider = GsfProvider;
 declare const SystemJS;
 
 SystemJS.config({

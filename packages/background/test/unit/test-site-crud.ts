@@ -1,16 +1,13 @@
-import SystemJS from 'systemjs';
-import ExternalStorageTests from 'get-set-fetch/test/external/external-storage-tests';
-import IdbStorage from '../../src/js/storage/IdbStorage.ts';
-import ModuleHelper from '../utils/ModuleHelper.ts';
-import PluginManager from '../../src/js/plugins/PluginManager.ts';
-import GsfProvider from '../../src/js/storage/GsfProvider.ts';
-
-const { assert } = require('chai');
+import { assert } from 'chai';
+import ModuleHelper from '../utils/ModuleHelper';
+import IdbStorage from '../../src/js/storage/IdbStorage';
+import GsfProvider from '../../src/js/storage/GsfProvider';
 
 const conn = { info: 'IndexedDB' };
 
 describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
   let Site = null;
+  let UserPlugin = null;
   const expectedSite = {
     id: null,
     name: 'siteA',
@@ -18,18 +15,18 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
     opts: {
       resourceFilter: {
         maxEntries: 5000,
-        probability: 0.01,
-      },
-    },
+        probability: 0.01
+      }
+    }
   };
 
   before(async () => {
-    ({ Site } = await IdbStorage.init(conn));
-    // 1. storage init, populate GsfProvider used by some plugin related classes
-    const { UserPlugin } = await IdbStorage.init();
+     // 1. storage init, populate GsfProvider used by some plugin related classes
+    ({ Site, UserPlugin } = await IdbStorage.init());
     GsfProvider.UserPlugin = UserPlugin;
     global.GsfProvider = { UserPlugin };
 
+       // discover, register builtin plugins
     await ModuleHelper.init();
   });
 
@@ -38,7 +35,7 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
     await Site.delAll();
 
     // save site
-    const site = new Site({name: expectedSite.name, url: expectedSite.url});
+    const site = new Site({ name: expectedSite.name, url: expectedSite.url });
     await site.save();
     assert.isNotNull(site.id);
     expectedSite.id = site.id;

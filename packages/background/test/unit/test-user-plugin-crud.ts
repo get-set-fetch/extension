@@ -1,6 +1,5 @@
+import { assert } from 'chai';
 import IdbStorage from '../../src/js/storage/IdbStorage';
-
-const { assert } = require('chai');
 
 const conn = { info: 'IndexedDB' };
 
@@ -9,20 +8,19 @@ describe(`Test Storage UserPlugin - CRUD, using connection ${conn.info}`, () => 
   const expectedPlugin = {
     id: null,
     name: 'pluginA',
-    code: 'codeA',
+    code: 'codeA'
   };
 
   before(async () => {
     ({ UserPlugin } = await IdbStorage.init());
   });
 
-
   beforeEach(async () => {
     // cleanup
     await UserPlugin.delAll();
 
     // save plugin
-    const plugin = new UserPlugin({name: expectedPlugin.name, code: expectedPlugin.code});
+    const plugin = new UserPlugin({ name: expectedPlugin.name, code: expectedPlugin.code });
     await plugin.save();
     assert.isNotNull(plugin.id);
     expectedPlugin.id = plugin.id;
@@ -71,10 +69,10 @@ describe(`Test Storage UserPlugin - CRUD, using connection ${conn.info}`, () => 
 
   it('delete some', async () => {
     // create pluginB and pluginC
-    const pluginB = new UserPlugin({name: 'pluginB', code: 'codeB'});
+    const pluginB = new UserPlugin({ name: 'pluginB', code: 'codeB' });
     await pluginB.save();
 
-    const pluginC = new UserPlugin({name: 'pluginC', code: 'codeC'});
+    const pluginC = new UserPlugin({ name: 'pluginC', code: 'codeC' });
     await pluginC.save();
 
     // remove pluginA, pluginB

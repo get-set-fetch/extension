@@ -1,11 +1,10 @@
 import GsfProvider from './../storage/GsfProvider';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
-import { System } from 'systemjs';
+const SystemJS = require('systemjs');
 import Logger from '../logger/Logger';
 import AbstractModuleManager from '../systemjs/AbstractModuleManager';
 import { BaseNamedEntity } from 'get-set-fetch';
 
-declare const SystemJS: System;
 const Log = Logger.getLogger('PluginManager');
 
 class PluginManager extends AbstractModuleManager {

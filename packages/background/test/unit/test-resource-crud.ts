@@ -1,37 +1,35 @@
+import { assert } from 'chai';
 import IdbStorage from '../../src/js/storage/IdbStorage';
-
-const { assert } = require('chai');
 
 const conn = { info: 'IndexedDB' };
 
 describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
   let Site = null;
-    let Resource = null;
-    const expectedResource = {
+  let Resource = null;
+  const expectedResource = {
       id: null,
       siteId: null,
       url: 'http://siteA/resourceA',
       info: { propA: 'valA' },
       content: Buffer.from('contentA'),
-      contentType: 'text/plain',
+      contentType: 'text/plain'
     };
 
-    before(async () => {
-      ({ Site, Resource } = await IdbStorage.init(conn));
+  before(async () => {
+      ({ Site, Resource } = await IdbStorage.init());
 
       await Site.delAll();
-      const site = new Site({name: 'siteA', url: 'http://siteA'});
+      const site = new Site({ name: 'siteA', url: 'http://siteA' });
       await site.save();
       expectedResource.siteId = site.id;
     });
 
-
-    beforeEach(async () => {
+  beforeEach(async () => {
       // cleanup
       await Resource.delAll();
 
       // save resource
-      const resource = new Resource({siteId: expectedResource.siteId, url: expectedResource.url});
+      const resource = new Resource({ siteId: expectedResource.siteId, url: expectedResource.url });
       resource.info = expectedResource.info;
       resource.content = expectedResource.content;
       resource.contentType = expectedResource.contentType;
@@ -40,11 +38,11 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
       expectedResource.id = resource.id;
     });
 
-    after(async () => {
+  after(async () => {
       await IdbStorage.close();
     });
 
-    it('get', async () => {
+  it('get', async () => {
       // get resource by id
       const resourceById = await Resource.get(expectedResource.id);
       assert.instanceOf(resourceById, Resource);
@@ -64,7 +62,7 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
       assert.strictEqual(expectedResource.contentType, resourceById.contentType);
     });
 
-    it('update', async () => {
+  it('update', async () => {
       // update resource
       const updateResource = await Resource.get(expectedResource.id);
       updateResource.url = 'http://siteA/resourceA_updated';
@@ -81,7 +79,7 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
       assert.strictEqual(updateResource.contentType, getResource.contentType);
     });
 
-    it('update binary content', async () => {
+  it('update binary content', async () => {
       // update resource
       const updateResource = await Resource.get(expectedResource.id);
       updateResource.content = Buffer.alloc(2, 1);
@@ -94,7 +92,7 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
       assert.strictEqual(updateResource.contentType, getResource.contentType);
     });
 
-    it('delete', async () => {
+  it('delete', async () => {
       // delete site
       const delResource = await Resource.get(expectedResource.id);
       await delResource.del();

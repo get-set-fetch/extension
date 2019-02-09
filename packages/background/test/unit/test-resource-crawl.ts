@@ -1,4 +1,5 @@
-import IdbStorage from '../../src/js/storage/IdbStorage.ts';
+import { assert } from 'chai';
+import IdbStorage from '../../src/js/storage/IdbStorage';
 const conn = { info: 'IndexedDB' };
 
 async function updateCrawledAt(IdbResource, resourceId, deltaHours) {
@@ -33,9 +34,9 @@ describe(`Test Storage Resource - Crawl, using connection ${conn.info}`, () => {
   let site = null;
 
   before(async () => {
-    ({ Site, Resource } = await IdbStorage.init(conn));
+    ({ Site, Resource } = await IdbStorage.init());
     await Site.delAll();
-    site = new Site({name: 'siteA', url: 'http://siteA'});
+    site = new Site({ name: 'siteA', url: 'http://siteA' });
     await site.save();
   });
 
@@ -48,12 +49,11 @@ describe(`Test Storage Resource - Crawl, using connection ${conn.info}`, () => {
     await IdbStorage.close();
   });
 
-
   it('getResourceToCrawl without crawlFrequency', async () => {
     const resourceUrl = 'http://siteA/resourceA';
 
     // save a not crawled resource
-    const resource = new Resource({siteId: site.id, url: resourceUrl});
+    const resource = new Resource({ siteId: site.id, url: resourceUrl });
     await resource.save();
 
     // getResourceToCrawl returns a resource with a crawledAt value of null
@@ -76,7 +76,7 @@ describe(`Test Storage Resource - Crawl, using connection ${conn.info}`, () => {
     const resourceUrl = 'http://siteA/resourceA';
 
     // save a not crawled resource
-    let resource = new Resource({siteId: site.id, url: resourceUrl});
+    let resource = new Resource({ siteId: site.id, url: resourceUrl });
     await resource.save();
 
     // getResourceToCrawl returns resource with a crawledAt value of null

@@ -1,12 +1,11 @@
-import SchemaHelper from '../../src/js/schema/SchemaHelper.ts';
-
-const { assert } = require('chai');
+import { assert } from 'chai';
+import SchemaHelper from '../../src/js/schema/SchemaHelper';
 
 describe('Test Schema Helper', () => {
   it('parse normal string', async () => {
     const schema = {
       type: 'string',
-      default: 'valA',
+      default: 'valA'
     };
 
     let inst = SchemaHelper.instantiate(schema, undefined);
@@ -20,7 +19,7 @@ describe('Test Schema Helper', () => {
     const schema = {
       type: 'string',
       subType: 'regexp',
-      default: '/valA/i',
+      default: '/valA/i'
     };
 
     let inst = SchemaHelper.instantiate(schema, undefined);
@@ -33,7 +32,7 @@ describe('Test Schema Helper', () => {
   it('parse number', async () => {
     const schema = {
       type: 'number',
-      default: '2',
+      default: '2'
     };
 
     let inst = SchemaHelper.instantiate(schema, undefined);
@@ -46,7 +45,7 @@ describe('Test Schema Helper', () => {
   it('parse boolean', async () => {
     const schema = {
       type: 'boolean',
-      default: true,
+      default: true
     };
 
     let inst = SchemaHelper.instantiate(schema, undefined);
@@ -61,12 +60,12 @@ describe('Test Schema Helper', () => {
       type: 'object',
       properties: {
         propA: {
-          type: 'string',
+          type: 'string'
         },
         propB: {
-          type: 'string',
-        },
-      },
+          type: 'string'
+        }
+      }
     };
 
     const data = { propA: 'valA', propB: 'valB' };

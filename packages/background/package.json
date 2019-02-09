@@ -16,9 +16,9 @@
     "copy:resources": "npm run copy:resources:html && npm run copy:resources:systemjs",
     "copy:resources:html": "copyfiles -u 2 src/html/*.html dist",
     "copy:resources:systemjs": "copyfiles -f node_modules/systemjs/dist/system.js dist/plugins/systemjs && copyfiles -f node_modules/systemjs-plugin-babel/plugin-babel.js node_modules/systemjs-plugin-babel/systemjs-babel-browser.js dist/plugins/systemjs",
-    "test": "nyc --reporter=lcov mocha test",
+    "test": "nyc --reporter=lcov mocha test ./test/**/*.ts",
     "test:report": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "test:single": "mocha test --grep \"Test Storage Resource - Crawl\""
+    "test:single": "mocha test ./test/**/*.ts --grep \"Test Storage Site - CRUD\""
   },
   "keywords": [
     "scraper",
@@ -31,23 +31,20 @@
   },
   "homepage": "https://github.com/get-set-fetch/extension#readme",
   "devDependencies": {
+    "@types/chai": "^4.1.7",
     "@types/chrome": "0.0.76",
+    "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.18",
     "@types/systemjs": "^0.20.6",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.4",
-    "babel-plugin-module-resolver": "^3.1.1",
-    "babel-preset-env": "^1.7.0",
     "chai": "^4.1.2",
     "copyfiles": "^2.0.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-import-resolver-babel-module": "^4.0.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-react": "^7.11.1",
+    "coveralls": "^3.0.2",
     "indexeddbshim": "^3.8.0",
     "jsdom": "^13.1.0",
     "mocha": "^5.2.0",
     "nock": "^10.0.4",
+    "nyc": "^13.1.0",
+    "patch-package": "^5.1.1",
     "puppeteer": "^1.11.0",
     "rimraf": "^2.6.2",
     "rollup-plugin-commonjs": "^9.1.0",
@@ -68,10 +65,7 @@
     "typescript": "^3.2.2"
   },
   "dependencies": {
-    "coveralls": "^3.0.2",
     "get-set-fetch": "^0.3.8",
-    "nyc": "^13.1.0",
-    "patch-package": "^5.1.1",
     "systemjs": "^0.21.4",
     "systemjs-plugin-babel": "0.0.25",
     "url-parse": "^1.4.3"

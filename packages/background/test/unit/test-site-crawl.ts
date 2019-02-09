@@ -1,9 +1,8 @@
-import IdbStorage from '../../src/js/storage/IdbStorage.ts';
-import PluginManager from '../../src/js/plugins/PluginManager.ts';
-import ModuleHelper from '../utils/ModuleHelper.ts';
-import GsfProvider from '../../src/js/storage/GsfProvider.ts';
-
-const sinon = require('sinon');
+import * as sinon from 'sinon';
+import IdbStorage from '../../src/js/storage/IdbStorage';
+import PluginManager from '../../src/js/plugins/PluginManager';
+import ModuleHelper from '../utils/ModuleHelper';
+import GsfProvider from '../../src/js/storage/GsfProvider';
 
 const conn = { info: 'IndexedDB' };
 
@@ -13,12 +12,13 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
   let UserPlugin = null;
 
   before(async () => {
+    // 1. storage init, populate GsfProvider used by some plugin related classes
     ({ Site, Resource, UserPlugin } = await IdbStorage.init());
+
     GsfProvider.UserPlugin = UserPlugin;
-    window.GsfProvider = GsfProvider;
+    global.GsfProvider = { UserPlugin };
 
-    global.document = { contentType: 'html' };
-
+    // discover, register builtin plugins
     await ModuleHelper.init();
   });
 
@@ -28,10 +28,10 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // save site
     const pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
-      pluginDef => ['SelectResourcePlugin', 'UpdateResourcePlugin'].indexOf(pluginDef.name) !== -1,
+      pluginDef => ['SelectResourcePlugin', 'UpdateResourcePlugin'].indexOf(pluginDef.name) !== -1
     );
 
-    const site = new Site({name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions});
+    const site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions });
     await site.save();
   });
 
@@ -44,7 +44,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // save 4 additional resources, an initial resource is created when the site is created
     for (let i = 1; i <= 4; i += 1) {
-      const resource = new Resource({siteId: site.id, url: `url-${i}`});
+      const resource = new Resource({ siteId: site.id, url: `url-${i}` });
       await resource.save();
     }
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
@@ -72,7 +72,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // save 4 additional resources, an initial resource is created when the site is created
     for (let i = 1; i <= 4; i += 1) {
-      const resource = new Resource({siteId: site.id, url: `url-${i}`});
+      const resource = new Resource({ siteId: site.id, url: `url-${i}` });
       await resource.save();
     }
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
@@ -100,7 +100,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // save 4 additional resources, an initial resource is created when the site is created
     for (let i = 1; i <= 4; i += 1) {
-      const resource = new Resource({siteId: site.id, url: `url-${i}`});
+      const resource = new Resource({ siteId: site.id, url: `url-${i}` });
       await resource.save();
     }
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
@@ -132,7 +132,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // save 4 additional resources, an initial resource is created when the site is created
     for (let i = 1; i < 4; i += 1) {
-      const resource = new Resource({siteId: site.id, url: `url-${i}`});
+      const resource = new Resource({ siteId: site.id, url: `url-${i}` });
       await resource.save();
     }
 
@@ -170,7 +170,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // save 4 additional resources, an initial resource is created when the site is created
     for (let i = 1; i < 4; i += 1) {
-      const resource = new Resource({siteId: site.id, url: `url-${i}`});
+      const resource = new Resource({ siteId: site.id, url: `url-${i}` });
       await resource.save();
     }
 
@@ -218,7 +218,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     const pluginDefinitions = [selectPlugDef, extractUrlPlugDef, updatePlugDef, insertPlugDef];
 
-    const site = new Site({name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions});
+    const site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions });
     await site.save();
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
