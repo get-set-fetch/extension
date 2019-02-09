@@ -38,6 +38,15 @@ describe('UserPlugin CRUD Pages', () => {
     const queryParams = queryString.stringify({ redirectPath: '/plugins' });
     await pluginPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
+    // wait for main table to load, refresh page on 1st timeout
+    try {
+      await pluginPage.waitFor('table.table-main', {timeout: 3 * 1000});
+    }
+    catch (err) {
+      await pluginPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+      await pluginPage.waitFor('table.table-main', {timeout: 1 * 1000});
+    }
+
     // retrieve plugin names
     const pluginNames = await pluginPage.evaluate(
       () => {
@@ -52,8 +61,7 @@ describe('UserPlugin CRUD Pages', () => {
 
     // compare
     const expectedPluginNames = ['ExtensionFetchPlugin', 'ExtractTitlePlugin', 'ExtractUrlPlugin', 'InsertResourcePlugin', 'SelectResourcePlugin', 'UpdateResourcePlugin'];
-    assert.strictEqual(pluginNames.length, expectedPluginNames.length);
-    assert.deepEqual(pluginNames, expectedPluginNames);
+    assert.sameMembers(pluginNames, expectedPluginNames);
   });
 
   it('Test Create New Plugin', async () => {
