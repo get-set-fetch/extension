@@ -1,18 +1,18 @@
 import * as React from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import * as queryString from 'query-string';
-import SiteList from './pages/sites/SiteList';
-import SiteDetail from './pages/sites/SiteDetail';
-import PluginList from './pages/plugins/PluginList';
-import PluginDetail from './pages/plugins/PluginDetail';
-import LogList from './pages/logs/LogList';
-import SettingList from './pages/settings/SettingList';
-import Help from './pages/help/Help';
-import ProjectList from './pages/projects/ProjectList';
-import ScenarioList from './pages/scenarios/ScenarioList';
-import ProjectDetail from './pages/projects/ProjectDetail';
+import SiteList from './sites/SiteList';
+import SiteDetail from './sites/SiteDetail';
+import PluginList from './plugins/PluginList';
+import PluginDetail from './plugins/PluginDetail';
+import LogList from './logs/LogList';
+import SettingList from './settings/SettingList';
+import Help from './help/Help';
+import ProjectList from './projects/ProjectList';
+import ScenarioList from './scenarios/ScenarioList';
+import ProjectDetail from './projects/ProjectDetail';
 
-import Navigation from './layout/Navigation';
+import Navigation from '../layout/Navigation';
 
 export default class Admin extends React.Component {
   render() {

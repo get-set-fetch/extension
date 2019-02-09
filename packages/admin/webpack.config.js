@@ -4,13 +4,17 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  entry: './src/js/index.ts',
+  entry: {
+    "index": './src/js/index.ts',
+    "admin": './src/js/admin.ts'
+  },
   output: {
-    filename: 'admin.js',
+    filename: '[id].js',
     path: path.resolve(__dirname, 'dist'),
     publicPath: '/admin/',
   },
   target: 'web',
+  devtool: 'source-map',
 
   plugins: [
     new HtmlWebpackPlugin({
@@ -46,6 +50,9 @@ module.exports = {
           options: {
             transpileOnly: true,
             experimentalWatchApi: true,
+            compilerOptions: {
+              outDir: './dist'
+            }
           }
         },
       },
