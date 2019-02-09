@@ -1,36 +1,35 @@
 import queryString from 'query-string';
+import { assert } from 'chai';
+import { join } from 'path';
+import { NavigationOptions } from 'puppeteer';
 import BrowserHelper from '../../utils/BrowserHelper';
-
-const path = require('path');
-const { assert } = require('chai');
 
 describe('Site Pages', () => {
   let browser = null;
   let sitePage = null;
 
-  const gotoOpts = {
+  const gotoOpts: NavigationOptions = {
     timeout: 10 * 1000,
-    waitUntil: ['load', 'domcontentloaded', 'networkidle0'],
+    waitUntil: ['load', 'domcontentloaded', 'networkidle0']
   };
 
   const queryParams = queryString.stringify({ redirectPath: '/sites' });
 
   const actualSite = {
     name: 'siteA',
-    url: 'http://www.sitea.com/index.html',
+    url: 'http://www.sitea.com/index.html'
   };
 
   before(async () => {
     browser = await BrowserHelper.launchAndStubRequests(
       actualSite.url,
-      path.join('test', 'resources', actualSite.name),
+      join('test', 'resources', actualSite.name)
     );
 
     sitePage = await browser.newPage();
 
     // await BrowserHelper.waitForDBInitialization(sitePage);
   });
-
 
   afterEach(async () => {
     // move to admin page

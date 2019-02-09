@@ -2,19 +2,19 @@ import queryString from 'query-string';
 import NodeFetchPlugin from 'get-set-fetch/lib/plugins/fetch/NodeFetchPlugin';
 import TestUtils from 'get-set-fetch/test/utils/TestUtils';
 
-const URL = require('url-parse');
-const puppeteer = require('puppeteer');
+import URL from 'url-parse';
+import { launch, Request, Page } from 'puppeteer';
 
 export default class BrowserHelper {
   // launches a browser instance
   static async launch() {
-    const browser = await puppeteer.launch({
+    const browser = await launch({
       headless: false,
       args: [
         `--disable-extensions-except=${extension.path}`,
         `--load-extension=${extension.path}`,
-        '--no-sandbox',
-      ],
+        '--no-sandbox'
+      ]
     });
 
     return browser;
@@ -23,13 +23,13 @@ export default class BrowserHelper {
   // launches a browser instance stubbing siteUrl requests from siteFilePath static files
   static async launchAndStubRequests(siteUrl, siteFilePath) {
     // launch browser
-    const browser = await puppeteer.launch({
+    const browser = await launch({
       headless: false,
       args: [
         `--disable-extensions-except=${extension.path}`,
         `--load-extension=${extension.path}`,
-        '--no-sandbox',
-      ],
+        '--no-sandbox'
+      ]
     });
 
     // configure nock to serve fs files
@@ -55,7 +55,7 @@ export default class BrowserHelper {
   static async interceptAndStubRequests(page, siteUrl) {
     // intercept request
     await page.setRequestInterception(true);
-    page.on('request', async (request) => {
+    page.on('request', async (request: Request) => {
       if (request.url().indexOf(siteUrl) === -1) {
         request.continue();
         return;
@@ -68,6 +68,7 @@ export default class BrowserHelper {
         host: urlObj.host,
         port: urlObj.port,
         path: urlObj.pathname,
+        headers: null
       };
 
       reqOpts.headers = request.headers();
@@ -86,7 +87,7 @@ export default class BrowserHelper {
         request.respond({
           status: response.statusCode,
           headers: response.headers,
-          body,
+          body
         });
       });
     });
@@ -94,7 +95,7 @@ export default class BrowserHelper {
     return page;
   }
 
-  static waitForPageCreation(browser) {
+  static waitForPageCreation(browser): Promise<Page> {
     return new Promise((resolve) => {
       browser.once('targetcreated', async (target) => {
         const page = await target.page();
@@ -112,16 +113,16 @@ export default class BrowserHelper {
     const gotoOpts =  {
       timeout: 10 * 1000,
       waitUntil: 'load'
-    }
+    };
 
     // wait for main table to load, refresh page on 1st timeout
     try {
-      await browserPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);      
-      await browserPage.waitFor('table.table-main', {timeout: 1 * 1000});
+      await browserPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+      await browserPage.waitFor('table.table-main', { timeout: 2 * 1000 });
     }
     catch (err) {
       await browserPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-      await browserPage.waitFor('table.table-main', {timeout: 1 * 1000});
+      await browserPage.waitFor('table.table-main', { timeout: 1 * 1000 });
     }
   }
 }

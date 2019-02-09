@@ -1,7 +1,6 @@
 import queryString from 'query-string';
+import { assert } from 'chai';
 import BrowserHelper from '../../utils/BrowserHelper';
-
-const { assert } = require('chai');
 
 /* eslint-disable no-shadow, max-len */
 describe('UserPlugin CRUD Pages', () => {
@@ -13,12 +12,12 @@ describe('UserPlugin CRUD Pages', () => {
 
   const gotoOpts = {
     timeout: 10 * 1000,
-    waitUntil: 'load',
+    waitUntil: 'load'
   };
 
   const actualPlugin = {
     name: 'pluginA',
-    code: 'codeA',
+    code: 'codeA'
   };
 
   before(async () => {
@@ -27,15 +26,15 @@ describe('UserPlugin CRUD Pages', () => {
     // open plugin list page
     pluginPage = await browser.newPage();
     pluginFrame = pluginPage.mainFrame();
-    
+
     await BrowserHelper.waitForDBInitialization(pluginPage);
   });
 
   beforeEach(async () => {
     // load plugin list
     await pluginPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-    await pluginPage.waitFor('table.table-main', {timeout: 1 * 1000});
-  })
+    await pluginPage.waitFor('table.table-main', { timeout: 1 * 1000 });
+  });
 
   after(async () => {
     await browser.close();
@@ -48,7 +47,7 @@ describe('UserPlugin CRUD Pages', () => {
         const pluginLinks = document.querySelectorAll('tbody th a');
         const pluginNames = [];
         for (let i = 0; i < pluginLinks.length; i++) {
-          pluginNames.push(pluginLinks[i].innerHTML)
+          pluginNames.push(pluginLinks[i].innerHTML);
         }
         return pluginNames;
       }
@@ -85,7 +84,7 @@ describe('UserPlugin CRUD Pages', () => {
     await pluginPage.waitFor(`a[href=\\/plugin\\/${savedPlugin.id}`);
     const pluginNameInList = await pluginPage.evaluate(
       id => document.querySelector(`a[href=\\/plugin\\/${id}`).innerHTML,
-      savedPlugin.id,
+      savedPlugin.id
     );
     assert.strictEqual(actualPlugin.name, pluginNameInList);
 
@@ -127,7 +126,7 @@ describe('UserPlugin CRUD Pages', () => {
     await pluginPage.waitFor(`a[href=\\/plugin\\/${updatedPlugin.id}`);
     const pluginNameInList = await pluginPage.evaluate(
       id => document.querySelector(`a[href=\\/plugin\\/${id}`).innerHTML,
-      updatedPlugin.id,
+      updatedPlugin.id
     );
     assert.strictEqual(`${actualPlugin.name}${changedSuffix}`, pluginNameInList);
 
@@ -169,7 +168,7 @@ describe('UserPlugin CRUD Pages', () => {
     await pluginPage.waitFor(`a[href=\\/plugin\\/${updatedPlugin.id}`);
     const pluginNameInList = await pluginPage.evaluate(
       id => document.querySelector(`a[href=\\/plugin\\/${id}`).innerHTML,
-      updatedPlugin.id,
+      updatedPlugin.id
     );
     assert.strictEqual(actualPlugin.name, pluginNameInList);
 

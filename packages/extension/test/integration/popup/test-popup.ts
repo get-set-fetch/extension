@@ -1,5 +1,5 @@
-const puppeteer = require('puppeteer');
-const { assert } = require('chai');
+import { launch } from 'puppeteer';
+import { assert } from 'chai';
 
 describe('Test Extension Popup, ', () => {
   let browser = null;
@@ -7,18 +7,18 @@ describe('Test Extension Popup, ', () => {
 
   const gotoOpts = {
     timeout: 10 * 1000,
-    waitUntil: 'load',
+    waitUntil: 'load'
   };
 
   before(async () => {
     // launch chromium
-    browser = await puppeteer.launch({
+    browser = await launch({
       headless: false,
       args: [
         `--disable-extensions-except=${extension.path}`,
         `--load-extension=${extension.path}`,
-        '--no-sandbox',
-      ],
+        '--no-sandbox'
+      ]
     });
 
     // open new page
@@ -43,7 +43,7 @@ describe('Test Extension Popup, ', () => {
       aElms.forEach((aElm) => {
         links.push({
           text: aElm.innerHTML,
-          href: aElm.href,
+          href: aElm.href
         });
       });
 
@@ -53,7 +53,7 @@ describe('Test Extension Popup, ', () => {
     // check if links are rendered correctly
     const expectedLinks = [
       { text: 'New Site', href: `chrome-extension://${extension.id}/popup/popup.html#` },
-      { text: 'Admin Area', href: `chrome-extension://${extension.id}/admin/admin.html` },
+      { text: 'Admin Area', href: `chrome-extension://${extension.id}/admin/admin.html` }
     ];
     assert.sameDeepMembers(detectedlinks, expectedLinks);
   });

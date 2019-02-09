@@ -1,7 +1,7 @@
 import queryString from 'query-string';
+import { assert } from 'chai';
+import { NavigationOptions } from 'puppeteer';
 import BrowserHelper from '../../utils/BrowserHelper';
-
-const { assert } = require('chai');
 
 /* eslint-disable no-shadow, max-len */
 describe('Site CRUD Pages', () => {
@@ -9,16 +9,16 @@ describe('Site CRUD Pages', () => {
   let sitePage = null;
   let siteFrame = null;
 
-  const gotoOpts = {
+  const gotoOpts: NavigationOptions = {
     timeout: 10 * 1000,
-    waitUntil: 'load',
+    waitUntil: ['load']
   };
 
   const queryParams = queryString.stringify({ redirectPath: '/sites' });
 
   const actualSite = {
     name: 'siteA',
-    url: 'http://siteA.com',
+    url: 'http://siteA.com'
   };
 
   before(async () => {
@@ -32,7 +32,7 @@ describe('Site CRUD Pages', () => {
   beforeEach(async () => {
     // load site list
     await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-  })
+  });
 
   afterEach(async () => {
     // delete existing sites
@@ -41,7 +41,6 @@ describe('Site CRUD Pages', () => {
     const siteIds = existingSites.map(existingSite => existingSite.id);
     await sitePage.evaluate(siteIds => GsfClient.fetch('DELETE', 'sites', { ids: siteIds }), siteIds);
   });
-
 
   after(async () => {
     await browser.close();
@@ -73,7 +72,7 @@ describe('Site CRUD Pages', () => {
     await sitePage.waitFor(`a[href=\\/site\\/${savedSite.id}`);
     const siteNameInList = await sitePage.evaluate(
       id => document.querySelector(`a[href=\\/site\\/${id}`).innerHTML,
-      savedSite.id,
+      savedSite.id
     );
     assert.strictEqual(actualSite.name, siteNameInList);
   });
@@ -112,7 +111,7 @@ describe('Site CRUD Pages', () => {
     await sitePage.waitFor(`a[href=\\/site\\/${updatedSite.id}`);
     const siteNameInList = await sitePage.evaluate(
       id => document.querySelector(`a[href=\\/site\\/${id}`).innerHTML,
-      updatedSite.id,
+      updatedSite.id
     );
     assert.strictEqual(`${actualSite.name}${changedSuffix}`, siteNameInList);
   });
@@ -151,7 +150,7 @@ describe('Site CRUD Pages', () => {
     await sitePage.waitFor(`a[href=\\/site\\/${updatedSite.id}`);
     const siteNameInList = await sitePage.evaluate(
       id => document.querySelector(`a[href=\\/site\\/${id}`).innerHTML,
-      updatedSite.id,
+      updatedSite.id
     );
     assert.strictEqual(actualSite.name, siteNameInList);
   });

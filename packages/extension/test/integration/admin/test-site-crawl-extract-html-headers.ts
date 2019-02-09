@@ -1,22 +1,20 @@
 import queryString from 'query-string';
-import TestUtils from 'get-set-fetch/test/utils/TestUtils';
+import { assert } from 'chai';
+import { readFileSync } from 'fs';
+import { join, resolve } from 'path';
 import BrowserHelper from '../../utils/BrowserHelper';
-
-const { assert } = require('chai');
-
-const fs = require('fs');
-const path = require('path');
+import TestUtils from 'get-set-fetch/test/utils/TestUtils';
 
 /* eslint-disable no-shadow */
 describe('Site Crawl', () => {
   let browser = null;
   let adminPage = null;
 
-  const targetDir = path.join('test', 'tmp'); //../../test/tmp';
+  const targetDir = join('test', 'tmp'); // ../../test/tmp';
 
   const gotoOpts = {
     timeout: 10 * 1000,
-    waitUntil: 'load',
+    waitUntil: 'load'
   };
 
   const queryParams = queryString.stringify({ redirectPath: '/sites' });
@@ -27,29 +25,29 @@ describe('Site Crawl', () => {
     opts: {},
     pluginDefinitions: [
       {
-        name: 'SelectResourcePlugin',
+        name: 'SelectResourcePlugin'
       },
       {
-        name: 'ExtensionFetchPlugin',
+        name: 'ExtensionFetchPlugin'
       },
       {
-        name: 'ExtractUrlPlugin',
+        name: 'ExtractUrlPlugin'
       },
       {
-        name: 'ExtractTitlePlugin',
+        name: 'ExtractTitlePlugin'
       },
       {
-        name: 'UpdateResourcePlugin',
+        name: 'UpdateResourcePlugin'
       },
       {
-        name: 'InsertResourcePlugin',
-      },
-    ],
+        name: 'InsertResourcePlugin'
+      }
+    ]
   };
 
   before(async () => {
-    browser = await BrowserHelper.launchAndStubRequests(actualSite.url, path.join('test', 'resources', actualSite.name));
-    adminPage = await browser.newPage(); 
+    browser = await BrowserHelper.launchAndStubRequests(actualSite.url, join('test', 'resources', actualSite.name));
+    adminPage = await browser.newPage();
     await BrowserHelper.waitForDBInitialization(adminPage);
   });
 
@@ -99,7 +97,7 @@ describe('Site Crawl', () => {
     // initializing the systemjs plugins
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // open site list       
+    // open site list
     await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
     // create site to crawl
@@ -127,7 +125,7 @@ describe('Site Crawl', () => {
     const titles = {
       'http://www.sitea.com/index.html': 'siteA',
       'http://www.sitea.com/pageA.html': 'pageA',
-      'http://www.sitea.com/pageB.html': 'pageB',
+      'http://www.sitea.com/pageB.html': 'pageB'
     };
     for (let i = 0; i < crawledResources.length; i += 1) {
       const crawledResource = crawledResources[i];
@@ -141,7 +139,7 @@ describe('Site Crawl', () => {
       .createCDPSession();
     await client.send('Page.setDownloadBehavior', {
       behavior: 'allow',
-      downloadPath: path.resolve(targetDir),
+      downloadPath: resolve(targetDir)
     });
 
     // download csv
@@ -157,7 +155,7 @@ describe('Site Crawl', () => {
       .values(titles)
       .join('\n');
     const expectedCsv = `${expectedHeader}\n${expectedBody}`;
-    const generatedCsv = fs.readFileSync(path.resolve('./', 'test', 'tmp', `${loadedSite.name}.txt`), 'utf8');
+    const generatedCsv = readFileSync(resolve('./', 'test', 'tmp', `${loadedSite.name}.txt`), 'utf8');
     assert.strictEqual(expectedCsv, generatedCsv);
   });
 });
