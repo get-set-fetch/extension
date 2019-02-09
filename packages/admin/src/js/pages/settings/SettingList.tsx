@@ -39,7 +39,7 @@ export default class SettingList extends React.Component<{}, IState> {
     }
 
     const idx = this.state.settings.findIndex(entry => entry.key === key)
-    this.setState({ settings: setIn(this.state.settings, [idx], val) });
+    this.setState({ settings: setIn(this.state.settings, [idx], {key, val}) });
   }
 
   async submitHandler(evt) {
@@ -62,7 +62,7 @@ export default class SettingList extends React.Component<{}, IState> {
     return (
       <Page title="Settings">
 
-        <form className="form-main" onSubmit={this.submitHandler}>
+        <form className="form-main">
           <div className="form-group row">
             <label htmlFor="name" className="col-sm-2 col-form-label text-right">Log Level</label>
             <div className="col-sm-5">
@@ -85,7 +85,7 @@ export default class SettingList extends React.Component<{}, IState> {
           <div className="form-group row">
             <div className="col-sm-2"/>
             <div className="col-sm-5">
-              <a className="btn btn-secondary" href="#" role="button">Save</a>
+              <a id="save" className="btn btn-secondary" href="#" role="button" onClick={this.submitHandler}>Save</a>
             </div>
           </div>
          
