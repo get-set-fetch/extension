@@ -95,9 +95,10 @@ describe('Site Crawl', () => {
     // initializing the systemjs plugins
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // open site list, the default admin page
+    // open site list
     adminPage = await browser.newPage();
-    await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html`, gotoOpts);
+    const queryParams = queryString.stringify({ redirectPath: '/sites' });
+    await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
     // create site to crawl
     await adminPage.evaluate(site => GsfClient.fetch('POST', 'site', site), actualSite);
@@ -106,8 +107,8 @@ describe('Site Crawl', () => {
     const loadedSite = sites[0];
 
     // reload site list
+    await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
     const crawlInputId = `input#crawl-${loadedSite.id}[type=button]`;
-    await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html`, gotoOpts);
     await adminPage.waitFor(crawlInputId);
 
     // start crawling site

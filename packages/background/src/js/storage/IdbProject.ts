@@ -1,14 +1,26 @@
 import { BaseEntity } from 'get-set-fetch';
 import Logger from '../logger/Logger';
+import IdbSite, { IPluginDefinition } from './IdbSite';
 
 const Log = Logger.getLogger('IdbProject');
 
 /* eslint-disable class-methods-use-this */
+
+interface IProject {
+  id: number;
+  name: string;
+  description: string;
+  url: string;
+  scenarioId: string;
+  scenarioProps: object;
+  pluginDefinitions: IPluginDefinition[];
+}
+
 export default class IdbProject extends BaseEntity {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'name', 'description', 'scenarioId'];
+    return ['id', 'name', 'description', 'url', 'scenarioId', 'scenarioProps', 'pluginDefinitions'];
   }
 
   // get a read transaction
@@ -32,7 +44,7 @@ export default class IdbProject extends BaseEntity {
           resolve(null);
         }
         else {
-          resolve(Object.assign(new IdbProject(null, null, null), result));
+          resolve(new IdbProject(result));
         }
       };
       readReq.onerror = () => {
@@ -53,7 +65,7 @@ export default class IdbProject extends BaseEntity {
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            result[i] = Object.assign(new IdbProject(null, null, null), result[i]);
+            result[i] = new IdbProject(result[i]);
           }
           resolve(result);
         }
@@ -99,22 +111,34 @@ export default class IdbProject extends BaseEntity {
   id: number;
   name: string;
   description: string;
+  url: string;
   scenarioId: string;
+  scenarioProps: object;
+  pluginDefinitions: IPluginDefinition[];
 
-  constructor(name, description, scenarioId) {
+  constructor(kwArgs: Partial<IProject> = {}) {
     super();
-    this.name = name;
-    this.description = description;
-    this.scenarioId = scenarioId;
+    for (const key in kwArgs) {
+      this[key] = kwArgs[key];
+    }
   }
 
   save(): Promise<number> {
     return new Promise((resolve, reject) => {
       const rwTx = IdbProject.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());
-      reqAddResource.onsuccess = (e) => {
+      reqAddResource.onsuccess = async (e) => {
         this.id = e.target.result;
-        resolve(this.id);
+
+        // also save the project url as a new site
+        try {
+          const site = new IdbSite({ name: `${this.name}-1`, url: this.url, projectId: this.id, pluginDefinitions: this.pluginDefinitions });
+          await site.save();
+          resolve(this.id);
+        }
+        catch (err) {
+          reject(err);
+        }
       };
       reqAddResource.onerror = () => reject(new Error(`could not add project: ${this.name}`));
     });

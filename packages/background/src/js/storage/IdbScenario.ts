@@ -4,6 +4,14 @@ import Logger from '../logger/Logger';
 const Log = Logger.getLogger('IdbScenario');
 
 /* eslint-disable class-methods-use-this */
+
+interface IScenario {
+  id: number;
+  name: string;
+  description: string;
+  code: string;
+}
+
 export default class IdbScenario extends BaseEntity {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
@@ -32,7 +40,7 @@ export default class IdbScenario extends BaseEntity {
           resolve(null);
         }
         else {
-          resolve(Object.assign(new IdbScenario(null, null, null), result));
+          resolve(new IdbScenario(result));
         }
       };
       readReq.onerror = () => {
@@ -53,7 +61,7 @@ export default class IdbScenario extends BaseEntity {
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            result[i] = Object.assign(new IdbScenario(null, null, null), result[i]);
+            result[i] = new IdbScenario(result[i]);
           }
           resolve(result);
         }
@@ -101,11 +109,11 @@ export default class IdbScenario extends BaseEntity {
   description: string;
   code: string;
 
-  constructor(name, description, code) {
+  constructor(kwArgs: Partial<IScenario> = {}) {
     super();
-    this.name = name;
-    this.description = description;
-    this.code = code;
+    for (const key in kwArgs) {
+      this[key] = kwArgs[key];
+    }
   }
 
   save(): Promise<number> {

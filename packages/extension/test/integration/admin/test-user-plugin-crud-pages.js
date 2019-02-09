@@ -29,17 +29,31 @@ describe('UserPlugin CRUD Pages', () => {
     await pluginPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
   });
 
-  afterEach(async () => {
-    // delete existing plugins
-    const existingPlugins = await pluginPage.evaluate(() => GsfClient.fetch('GET', 'plugins'));
-    if (!existingPlugins) return;
-    const pluginIds = existingPlugins.map(existingPlugin => existingPlugin.id);
-    await pluginPage.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), pluginIds);
-  });
-
-
   after(async () => {
     await browser.close();
+  });
+
+  it('Test Check Default Plugins', async () => {
+    // load plugin list
+    const queryParams = queryString.stringify({ redirectPath: '/plugins' });
+    await pluginPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+
+    // retrieve plugin names
+    const pluginNames = await pluginPage.evaluate(
+      () => {
+        const pluginLinks = document.querySelectorAll('tbody th a');
+        const pluginNames = [];
+        for (let i = 0; i < pluginLinks.length; i++) {
+          pluginNames.push(pluginLinks[i].innerHTML)
+        }
+        return pluginNames;
+      }
+    );
+
+    // compare
+    const expectedPluginNames = ['ExtensionFetchPlugin', 'ExtractTitlePlugin', 'ExtractUrlPlugin', 'InsertResourcePlugin', 'SelectResourcePlugin', 'UpdateResourcePlugin'];
+    assert.strictEqual(pluginNames.length, expectedPluginNames.length);
+    assert.deepEqual(pluginNames, expectedPluginNames);
   });
 
   it('Test Create New Plugin', async () => {
@@ -71,6 +85,9 @@ describe('UserPlugin CRUD Pages', () => {
       savedPlugin.id,
     );
     assert.strictEqual(actualPlugin.name, pluginNameInList);
+
+    // cleanup
+    await pluginPage.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [savedPlugin.id]);
   });
 
   it('Test Update Existing Plugin', async () => {
@@ -111,6 +128,9 @@ describe('UserPlugin CRUD Pages', () => {
       updatedPlugin.id,
     );
     assert.strictEqual(`${actualPlugin.name}${changedSuffix}`, pluginNameInList);
+
+    // cleanup
+    await pluginPage.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [updatedPlugin.id]);
   });
 
   it('Test Start Update Existing Plugin And Cancel', async () => {
@@ -151,6 +171,9 @@ describe('UserPlugin CRUD Pages', () => {
       updatedPlugin.id,
     );
     assert.strictEqual(actualPlugin.name, pluginNameInList);
+
+    // cleanup
+    await pluginPage.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [updatedPlugin.id]);
   });
 
   it('Test Delete Existing Plugin', async () => {
@@ -161,22 +184,21 @@ describe('UserPlugin CRUD Pages', () => {
     const queryParams = queryString.stringify({ redirectPath: '/plugins' });
     await pluginPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
-    // wait for delete button to show up
+    // wait for delete button to show up for the targeted plugin
     await pluginPage.waitFor(`input#delete-${pluginId}`);
 
     // delete it
     await pluginPage.click(`input#delete-${pluginId}`);
 
-    // reload plugin list
+    // reload plugin list, wait for the others plugins to render
     await pluginPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-    await pluginPage.waitFor('p#no-entries');
+    await pluginPage.waitFor('input#delete-1');
 
     // check plugin is no longer present
-    const pluginLinksCount = await pluginPage.evaluate(() => document.querySelectorAll('a[href=\\/plugin\\/]:not(.nav-link)').length);
+    const pluginLinksCount = await pluginPage.evaluate(
+      pluginId => document.querySelectorAll(`input#delete-${pluginId}`).length,
+      pluginId
+    );
     assert.strictEqual(pluginLinksCount, 0);
-
-    // check table is no longer present since there are no plugins to display
-    const tableCount = await pluginPage.evaluate(() => document.querySelectorAll('table').length);
-    assert.strictEqual(tableCount, 0);
   });
 });
