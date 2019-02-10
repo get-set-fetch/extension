@@ -7,7 +7,7 @@ const conn = { info: 'IndexedDB' };
 
 describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
   let Site = null;
-  let UserPlugin = null;
+  let Plugin = null;
   const expectedSite = {
     id: null,
     name: 'siteA',
@@ -22,9 +22,9 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
 
   before(async () => {
      // 1. storage init, populate GsfProvider used by some plugin related classes
-    ({ Site, UserPlugin } = await IdbStorage.init());
-    GsfProvider.UserPlugin = UserPlugin;
-    global.GsfProvider = { UserPlugin };
+    ({ Site, Plugin } = await IdbStorage.init());
+    GsfProvider.Plugin = Plugin;
+    global.GsfProvider = { Plugin };
 
        // discover, register builtin plugins
     await ModuleHelper.init();

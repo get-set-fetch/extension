@@ -7,7 +7,7 @@ import ScenarioManager from './scenarios/ScenarioManager';
 /*
 register GsfProvider at global level, required for:
   - accessing IndexedDB from SystemJS IdbFetchPlugin
-  - accessing plugin module content from GsfProvider.UserPlugins.availablePlugins
+  - accessing plugin module content from GsfProvider.Plugins.availablePlugins
 */
 global.GsfProvider = GsfProvider;
 declare const SystemJS;
@@ -44,7 +44,7 @@ SystemJS.config({
   }
   Logger.setLogLevel(parseInt(logLevel.val, 10));
 
-  // 2. read all builtin plugins, persist them as UserPlugin, import them in SystemJS
+  // 2. read all builtin plugins, persist them as Plugin, import them in SystemJS
   await PluginManager.discoverPlugins();
 
   // 3. read all builtin scenarios, persist them as Scenario

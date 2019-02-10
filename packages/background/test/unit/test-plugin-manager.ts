@@ -7,9 +7,9 @@ import IdbStorage from '../../src/js/storage/IdbStorage';
 describe('Test PluginManager', () => {
   before(async () => {
     // 1. storage init, populate GsfProvider used by some plugin related classes
-    const { UserPlugin } = await IdbStorage.init();
-    GsfProvider.UserPlugin = UserPlugin;
-    global.GsfProvider = { UserPlugin };
+    const { Plugin } = await IdbStorage.init();
+    GsfProvider.Plugin = Plugin;
+    global.GsfProvider = { Plugin };
 
     // discover, register builtin plugins
     await ModuleHelper.init();

@@ -11,6 +11,7 @@ declare global {
     interface Global {
       SystemJS: System;
       GsfProvider: any;
+      window: any;
     }
   }
 }

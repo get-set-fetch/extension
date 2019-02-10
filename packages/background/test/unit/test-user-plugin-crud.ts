@@ -3,8 +3,8 @@ import IdbStorage from '../../src/js/storage/IdbStorage';
 
 const conn = { info: 'IndexedDB' };
 
-describe(`Test Storage UserPlugin - CRUD, using connection ${conn.info}`, () => {
-  let UserPlugin = null;
+describe(`Test Storage Plugin - CRUD, using connection ${conn.info}`, () => {
+  let Plugin = null;
   const expectedPlugin = {
     id: null,
     name: 'pluginA',
@@ -12,15 +12,15 @@ describe(`Test Storage UserPlugin - CRUD, using connection ${conn.info}`, () => 
   };
 
   before(async () => {
-    ({ UserPlugin } = await IdbStorage.init());
+    ({ Plugin } = await IdbStorage.init());
   });
 
   beforeEach(async () => {
     // cleanup
-    await UserPlugin.delAll();
+    await Plugin.delAll();
 
     // save plugin
-    const plugin = new UserPlugin({ name: expectedPlugin.name, code: expectedPlugin.code });
+    const plugin = new Plugin({ name: expectedPlugin.name, code: expectedPlugin.code });
     await plugin.save();
     assert.isNotNull(plugin.id);
     expectedPlugin.id = plugin.id;
@@ -32,54 +32,54 @@ describe(`Test Storage UserPlugin - CRUD, using connection ${conn.info}`, () => 
 
   it('get', async () => {
     // get plugin by id
-    const pluginById = await UserPlugin.get(expectedPlugin.id);
-    assert.instanceOf(pluginById, UserPlugin);
+    const pluginById = await Plugin.get(expectedPlugin.id);
+    assert.instanceOf(pluginById, Plugin);
     assert.strictEqual(expectedPlugin.name, pluginById.name);
     assert.strictEqual(expectedPlugin.code, pluginById.code);
 
     // get plugin by url
-    const pluginByName = await UserPlugin.get(expectedPlugin.name);
-    assert.instanceOf(pluginByName, UserPlugin);
+    const pluginByName = await Plugin.get(expectedPlugin.name);
+    assert.instanceOf(pluginByName, Plugin);
     assert.strictEqual(expectedPlugin.name, pluginByName.name);
     assert.strictEqual(expectedPlugin.code, pluginByName.code);
   });
 
   it('update', async () => {
     // update plugin
-    const updatePlugin = await UserPlugin.get(expectedPlugin.id);
+    const updatePlugin = await Plugin.get(expectedPlugin.id);
     updatePlugin.name = 'pluginA_updated';
     updatePlugin.code = 'codeA_updated';
     await updatePlugin.update();
 
     // get and compare
-    const getPlugin = await UserPlugin.get(expectedPlugin.id);
+    const getPlugin = await Plugin.get(expectedPlugin.id);
     assert.strictEqual(updatePlugin.name, getPlugin.name);
     assert.strictEqual(updatePlugin.code, getPlugin.code);
   });
 
   it('delete single', async () => {
     // delete site
-    const delPlugin = await UserPlugin.get(expectedPlugin.id);
+    const delPlugin = await Plugin.get(expectedPlugin.id);
     await delPlugin.del();
 
     // get and compare
-    const getPlugin = await UserPlugin.get(expectedPlugin.id);
+    const getPlugin = await Plugin.get(expectedPlugin.id);
     assert.isNull(getPlugin);
   });
 
   it('delete some', async () => {
     // create pluginB and pluginC
-    const pluginB = new UserPlugin({ name: 'pluginB', code: 'codeB' });
+    const pluginB = new Plugin({ name: 'pluginB', code: 'codeB' });
     await pluginB.save();
 
-    const pluginC = new UserPlugin({ name: 'pluginC', code: 'codeC' });
+    const pluginC = new Plugin({ name: 'pluginC', code: 'codeC' });
     await pluginC.save();
 
     // remove pluginA, pluginB
-    await UserPlugin.delSome([expectedPlugin.id, pluginB.id]);
+    await Plugin.delSome([expectedPlugin.id, pluginB.id]);
 
     // retrieve and compare remaining plugin
-    const remainingPlugins = await UserPlugin.getAll();
+    const remainingPlugins = await Plugin.getAll();
     assert.strictEqual(remainingPlugins.length, 1);
 
     const remainingPlugin = remainingPlugins[0];

@@ -9,14 +9,14 @@ const conn = { info: 'IndexedDB' };
 describe(`Test Site Crawl, using connection ${conn.info}`, () => {
   let Site = null;
   let Resource = null;
-  let UserPlugin = null;
+  let Plugin = null;
 
   before(async () => {
     // 1. storage init, populate GsfProvider used by some plugin related classes
-    ({ Site, Resource, UserPlugin } = await IdbStorage.init());
+    ({ Site, Resource, Plugin } = await IdbStorage.init());
 
-    GsfProvider.UserPlugin = UserPlugin;
-    global.GsfProvider = { UserPlugin };
+    GsfProvider.Plugin = Plugin;
+    global.GsfProvider = { Plugin };
 
     // discover, register builtin plugins
     await ModuleHelper.init();

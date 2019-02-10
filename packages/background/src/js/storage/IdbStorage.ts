@@ -1,7 +1,7 @@
 import { BaseEntity } from 'get-set-fetch';
 import IdbSite from './IdbSite';
 import IdbResource from './IdbResource';
-import IdbUserPlugin from './IdbUserPlugin';
+import IdbPlugin from './IdbPlugin';
 import IdbLog from './IdbLog';
 import IdbSetting from './IdbSetting';
 import IdbProject from './IdbProject';
@@ -13,7 +13,7 @@ export default class IdbStorage {
     Project: typeof IdbProject,
     Scenario: typeof IdbScenario,
     Resource: typeof IdbResource,
-    UserPlugin: typeof IdbUserPlugin,
+    Plugin: typeof IdbPlugin,
     Log: typeof IdbLog,
     Setting: typeof IdbSetting
   }> {
@@ -46,9 +46,9 @@ export default class IdbStorage {
           resourceStore.createIndex('getResourceToCrawl', ['siteId', 'crawlInProgress', 'crawledAt'], { unique: false });
         }
 
-        if (!db.objectStoreNames.contains('UserPlugins')) {
-          const userPluginStore = db.createObjectStore('UserPlugins', { keyPath: 'id', autoIncrement: true });
-          userPluginStore.createIndex('name', 'name', { unique: true });
+        if (!db.objectStoreNames.contains('Plugins')) {
+          const pluginStore = db.createObjectStore('Plugins', { keyPath: 'id', autoIncrement: true });
+          pluginStore.createIndex('name', 'name', { unique: true });
         }
 
         if (!db.objectStoreNames.contains('Logs')) {
@@ -69,7 +69,7 @@ export default class IdbStorage {
           Project: IdbProject,
           Scenario: IdbScenario,
           Resource: IdbResource,
-          UserPlugin: IdbUserPlugin,
+          Plugin: IdbPlugin,
           Log: IdbLog,
           Setting: IdbSetting
         });

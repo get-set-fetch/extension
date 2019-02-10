@@ -8,7 +8,7 @@ interface IPlugin {
   code: string;
 }
 
-export default class IdbUserPlugin extends BaseEntity {
+export default class IdbPlugin extends BaseEntity {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
@@ -19,17 +19,17 @@ export default class IdbUserPlugin extends BaseEntity {
 
   // get a read transaction
   static rTx() {
-    return IdbUserPlugin.db.transaction('UserPlugins').objectStore('UserPlugins');
+    return IdbPlugin.db.transaction('Plugins').objectStore('Plugins');
   }
 
   // get a read-write transaction
   static rwTx() {
-    return IdbUserPlugin.db.transaction('UserPlugins', 'readwrite').objectStore('UserPlugins');
+    return IdbPlugin.db.transaction('Plugins', 'readwrite').objectStore('Plugins');
   }
 
-  static get(nameOrId: string|number): Promise<IdbUserPlugin> {
+  static get(nameOrId: string|number): Promise<IdbPlugin> {
     return new Promise((resolve, reject) => {
-      const rTx = IdbUserPlugin.rTx();
+      const rTx = IdbPlugin.rTx();
       const readReq = (Number.isInteger(nameOrId as number) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
       readReq.onsuccess = (e) => {
@@ -38,7 +38,7 @@ export default class IdbUserPlugin extends BaseEntity {
           resolve(null);
         }
         else {
-          resolve(new IdbUserPlugin(result));
+          resolve(new IdbPlugin(result));
         }
       };
       readReq.onerror = () => {
@@ -47,9 +47,9 @@ export default class IdbUserPlugin extends BaseEntity {
     });
   }
 
-  static getAll(): Promise<IdbUserPlugin[]> {
+  static getAll(): Promise<IdbPlugin[]> {
     return new Promise((resolve, reject) => {
-      const rTx = IdbUserPlugin.rTx();
+      const rTx = IdbPlugin.rTx();
       const readReq = rTx.getAll();
 
       readReq.onsuccess = (e) => {
@@ -59,27 +59,27 @@ export default class IdbUserPlugin extends BaseEntity {
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            result[i] = new IdbUserPlugin(result[i]);
+            result[i] = new IdbPlugin(result[i]);
           }
           resolve(result);
         }
       };
-      readReq.onerror = () => reject(new Error('could not read UserPlugins'));
+      readReq.onerror = () => reject(new Error('could not read Plugins'));
     });
   }
 
   static delAll() {
     return new Promise((resolve, reject) => {
-      const rwTx = IdbUserPlugin.rwTx();
+      const rwTx = IdbPlugin.rwTx();
       const req = rwTx.clear();
       req.onsuccess = () => resolve();
-      req.onerror = () => reject(new Error('could not clear UserPlugins'));
+      req.onerror = () => reject(new Error('could not clear Plugins'));
     });
   }
 
   static delSome(ids, resolve = null, reject = null) {
     if (resolve && reject) {
-      const rwTx = IdbUserPlugin.rwTx();
+      const rwTx = IdbPlugin.rwTx();
       const req = rwTx.delete(ids.pop());
       req.onsuccess = () => {
         if (ids.length === 0) {
@@ -87,7 +87,7 @@ export default class IdbUserPlugin extends BaseEntity {
         }
         else this.delSome(ids, resolve, reject);
       };
-      req.onerror = () => reject(new Error('could not delSome UserPlugins'));
+      req.onerror = () => reject(new Error('could not delSome Plugins'));
       return null;
     }
 
@@ -115,31 +115,31 @@ export default class IdbUserPlugin extends BaseEntity {
 
   save(): Promise<number> {
     return new Promise((resolve, reject) => {
-      const rwTx = IdbUserPlugin.rwTx();
+      const rwTx = IdbPlugin.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());
       reqAddResource.onsuccess = (e) => {
         this.id = e.target.result;
         resolve(this.id);
       };
-      reqAddResource.onerror = () => reject(new Error(`could not add userPlugin: ${this.name}`));
+      reqAddResource.onerror = () => reject(new Error(`could not add plugin: ${this.name}`));
     });
   }
 
   update() {
     return new Promise((resolve, reject) => {
-      const rwTx = IdbUserPlugin.rwTx();
+      const rwTx = IdbPlugin.rwTx();
       const reqUpdateResource = rwTx.put(this.serialize());
       reqUpdateResource.onsuccess = () => resolve();
-      reqUpdateResource.onerror = () => reject(new Error(`could not update userPlugin: ${this.name}`));
+      reqUpdateResource.onerror = () => reject(new Error(`could not update plugin: ${this.name}`));
     });
   }
 
   del() {
     return new Promise((resolve, reject) => {
-      const rwTx = IdbUserPlugin.rwTx();
+      const rwTx = IdbPlugin.rwTx();
       const reqUpdateResource = rwTx.delete(this.id);
       reqUpdateResource.onsuccess = () => resolve();
-      reqUpdateResource.onerror = () => reject(new Error(`could not delete userPlugin: ${this.name}`));
+      reqUpdateResource.onerror = () => reject(new Error(`could not delete plugin: ${this.name}`));
     });
   }
 

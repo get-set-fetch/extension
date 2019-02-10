@@ -10,19 +10,19 @@ const Log = Logger.getLogger('PluginManager');
 class PluginManager extends AbstractModuleManager {
 
   static getStoredModule(moduleName): Promise<BaseNamedEntity> {
-    return GsfProvider.UserPlugin.get(moduleName);
+    return GsfProvider.Plugin.get(moduleName);
   }
 
   static getStoredModules(): Promise<BaseNamedEntity[]> {
-    return GsfProvider.UserPlugin.getAll();
+    return GsfProvider.Plugin.getAll();
   }
 
   static instantiateModule(data): BaseNamedEntity {
-    return new GsfProvider.UserPlugin({ name: data.name,  code: data.content });
+    return new GsfProvider.Plugin({ name: data.name,  code: data.content });
   }
 
   static async importPlugins() {
-    const availablePlugins = await GsfProvider.UserPlugin.getAll();
+    const availablePlugins = await GsfProvider.Plugin.getAll();
     for (let i = 0; i < availablePlugins.length; i += 1) {
       Log.info(`SystemJS importing plugin ${availablePlugins[i].name}`);
       await SystemJS.import(`${availablePlugins[i].name}!idb`);
@@ -90,7 +90,7 @@ class PluginManager extends AbstractModuleManager {
       "Uncaught SyntaxError: Identifier 'ClassName' has already been declared at "
       but the other classes present in module will still load
       */
-      const moduleContent: string = GsfProvider.UserPlugin.modules[plugin.constructor.name];
+      const moduleContent: string = GsfProvider.Plugin.modules[plugin.constructor.name];
       // use negative lookahead (?!) to match anyting starting with a class definition but not containing another class definition
       const moduleClasses = moduleContent.match(/(class \w+ {([\s\S](?!(class \w+ {)))+)/gm);
       for (let i = 0; i < moduleClasses.length; i += 1) {

@@ -1,7 +1,7 @@
 import IdbStorage from './IdbStorage';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 import PluginManager from '../plugins/PluginManager';
-import IdbUserPlugin from './IdbUserPlugin';
+import IdbPlugin from './IdbPlugin';
 import IdbSite from './IdbSite';
 import IdbResource from './IdbResource';
 import IdbLog from './IdbLog';
@@ -15,20 +15,20 @@ export default class GsfProvider {
   static Project: typeof IdbProject;
   static Scenario: typeof IdbScenario;
   static Resource: typeof IdbResource;
-  static UserPlugin: typeof IdbUserPlugin;
+  static Plugin: typeof IdbPlugin;
   static Log: typeof IdbLog;
   static Setting: typeof IdbSetting;
 
   static async init() {
     // init extension storage
     const {
-      Site, Project, Scenario, Resource, UserPlugin, Log, Setting
+      Site, Project, Scenario, Resource, Plugin, Log, Setting
     } = await IdbStorage.init();
     GsfProvider.Site = Site;
     GsfProvider.Project = Project;
     GsfProvider.Scenario = Scenario;
     GsfProvider.Resource = Resource;
-    GsfProvider.UserPlugin = UserPlugin;
+    GsfProvider.Plugin = Plugin;
     GsfProvider.Log = Log;
     GsfProvider.Setting = Setting;
 
@@ -261,17 +261,17 @@ export default class GsfProvider {
             break;
           // plugins
           case /^plugins$/.test(request.resource):
-            reqPromise = GsfProvider.UserPlugin.getAll();
+            reqPromise = GsfProvider.Plugin.getAll();
             break;
           // plugin/:pluginId
           case /^plugin\/[0-9]+$/.test(request.resource):
             const getPluginId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            reqPromise = GsfProvider.UserPlugin.get(getPluginId);
+            reqPromise = GsfProvider.Plugin.get(getPluginId);
             break;
           // plugin/:pluginName
           case /^plugin\/.+$/.test(request.resource):
             const getPluginName = /^plugin\/(.+)$/.exec(request.resource)[1];
-            reqPromise = GsfProvider.UserPlugin.get(getPluginName);
+            reqPromise = GsfProvider.Plugin.get(getPluginName);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -281,7 +281,7 @@ export default class GsfProvider {
         switch (true) {
           // plugin
           case /^plugin$/.test(request.resource):
-            const plugin = new GsfProvider.UserPlugin(request.body);
+            const plugin = new GsfProvider.Plugin(request.body);
             reqPromise = plugin.save();
             break;
           default:
@@ -292,7 +292,7 @@ export default class GsfProvider {
         switch (true) {
           // plugin
           case /^plugin$/.test(request.resource):
-            const plugin = new GsfProvider.UserPlugin(request.body);
+            const plugin = new GsfProvider.Plugin(request.body);
             reqPromise = plugin.update();
             break;
           default:
@@ -303,7 +303,7 @@ export default class GsfProvider {
         switch (true) {
           // plugins
           case /^plugins$/.test(request.resource):
-            reqPromise = GsfProvider.UserPlugin.delSome(request.body.ids);
+            reqPromise = GsfProvider.Plugin.delSome(request.body.ids);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());

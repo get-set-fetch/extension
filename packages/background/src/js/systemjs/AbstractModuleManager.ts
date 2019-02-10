@@ -62,15 +62,15 @@ export default abstract class AbstractModuleManager {
   }
 
   static getStoredModule(moduleName): Promise<BaseNamedEntity> {
-    return GsfProvider.UserPlugin.get(moduleName);
+    return GsfProvider.Plugin.get(moduleName);
   }
 
   static getStoredModules(): Promise<BaseNamedEntity[]> {
-    return GsfProvider.UserPlugin.getAll();
+    return GsfProvider.Plugin.getAll();
   }
 
   static instantiateModule(data): BaseNamedEntity {
-    return new GsfProvider.UserPlugin({ name: data.name,  code: data.content });
+    return new GsfProvider.Plugin({ name: data.name,  code: data.content });
   }
 
   static async importModules() {
