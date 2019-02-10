@@ -122,7 +122,7 @@ export default class BrowserHelper {
     }
     catch (err) {
       await browserPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-      await browserPage.waitFor('table.table-main', { timeout: 1 * 1000 });
+      await browserPage.waitFor('table.table-main', { timeout: 4 * 1000 });
     }
   }
 }
