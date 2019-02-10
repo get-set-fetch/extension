@@ -28,7 +28,7 @@ describe('Site Pages', () => {
 
     sitePage = await browser.newPage();
 
-    // await BrowserHelper.waitForDBInitialization(sitePage);
+    await BrowserHelper.waitForDBInitialization(sitePage);
   });
 
   afterEach(async () => {
