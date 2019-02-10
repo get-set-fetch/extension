@@ -157,7 +157,7 @@ export default class SiteDetail extends React.Component<IProps, IState> {
       <Page
         title={this.state.site.name ? this.state.site.name : "New Site"}
       >
-        <form className="form-main" onSubmit={this.submitHandler}>
+        <form className="form-main">
           <div className="form-group row">
               <label htmlFor="name" className="col-sm-2 col-form-label text-right">Name</label>
               <div className="col-sm-5">
