@@ -14,6 +14,7 @@ import BaseInput from "../../components/react-jsonschema-form/widgets/BaseInput"
 import ScenarioDescription from "../../components/react-jsonschema-form/widgets/ScenarioDescription";
 import ScenarioLink from "../../components/react-jsonschema-form/widgets/ScenarioLink";
 import { NavLink } from 'react-router-dom';
+import Page from '../../layout/Page';
 
 interface IProps {
   projectId: string;
@@ -193,33 +194,38 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
     if (!this.state.project) return null;
 
     return (
-      <Form
-        ref={(form) => {
-          if (!this.state.formRef) {
-            this.setState({formRef: form})
-          }
-        }}
-        fields={{ SchemaField }}
-        widgets={{ BaseInput, ScenarioDescription, ScenarioLink }}
-
-        schema={this.state.mergedSchema}
-        uiSchema={this.state.mergedUISchema}
-
-        liveValidate={true}
-        validate={this.validate}
-        showErrorList={false}
-
-        formData={this.state.project.toJS()}
-        onChange={this.changeHandler}
+      <Page
+        title={this.state.project.name ? this.state.project.name : "New Project"}
       >
-        <div className="form-group row">
-          <div className="col-sm-2"/>
-          <div className="col-sm-5">
-            <a id="save" className="btn btn-secondary" href="#" role="button" onClick={this.submitHandler}>Save</a>
-            <NavLink id="cancel" to="/projects" className="btn btn-light ml-4">Cancel</NavLink>
+        <Form
+          className="form-main"
+          ref={(form) => {
+            if (!this.state.formRef) {
+              this.setState({formRef: form})
+            }
+          }}
+          fields={{ SchemaField }}
+          widgets={{ BaseInput, ScenarioDescription, ScenarioLink }}
+
+          schema={this.state.mergedSchema}
+          uiSchema={this.state.mergedUISchema}
+
+          liveValidate={true}
+          validate={this.validate}
+          showErrorList={false}
+
+          formData={this.state.project.toJS()}
+          onChange={this.changeHandler}
+        >
+          <div className="form-group row">
+            <div className="col-sm-2"/>
+            <div className="col-sm-5">
+              <a id="save" className="btn btn-secondary" href="#" role="button" onClick={this.submitHandler}>Save</a>
+              <NavLink id="cancel" to="/projects" className="btn btn-light ml-4">Cancel</NavLink>
+            </div>
           </div>
-        </div>
-      </Form>
+        </Form>
+      </Page>
     )
   }
 }
