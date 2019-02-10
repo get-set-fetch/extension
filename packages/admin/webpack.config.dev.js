@@ -4,7 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-  entry: './src/js/index.ts',
+  entry: './src/ts/index.ts',
   output: {
     filename: 'admin.js',
     path: path.resolve(__dirname, 'dist'),
