@@ -1,45 +1,29 @@
 // tslint:disable:no-var-requires
 const fs = require('fs');
 const path = require('path');
-const SystemJS = require('systemjs');
 
 import PluginManager from '../../src/ts/plugins/PluginManager';
-import { System } from 'systemjs';
 
 declare global {
   namespace NodeJS {
     interface Global {
-      SystemJS: System;
       GsfProvider: any;
       window: any;
     }
   }
 }
 
-global.SystemJS = SystemJS;
-
 export default class ModuleHelper {
   static async init() {
-    // 1. configure systemjs
-    SystemJS.config({
-      map: {
-        'idb': './dist/plugins/systemjs/IdbFetchPlugin.js',
-        'plugin-babel': './dist/plugins/systemjs/plugin-babel.js',
-        'systemjs-babel-build': './dist/plugins/systemjs/systemjs-babel-browser.js'
-      },
-      transpiler: 'plugin-babel',
-      meta: {
-        '*.js': {
-          babelOptions: {
-            // extension run in browsers having ES2015 and stage 1-3 support, disable ES2015, stage 1-3 feature transpilation
-            es2015: false,
-            stage1: false,
-            stage2: false,
-            stage3: false
-          }
-        }
-      }
-    });
+    // make use of systemjs fetch (custom) hook in order to load plugins from IndexedDB
+    System.constructor.prototype.fetch = (url: string, init: RequestInit) => {
+      const pluginName = url;
+
+      return new Promise(async (resolve) => {
+        const plugin = await global.GsfProvider.Plugin.get(pluginName);
+        resolve(plugin.code);
+      });
+    };
 
     // 2. read and import in systemjs the builtin plugins
     const plugins: Map<string, string> = await this.getModulesContent(path.join(__dirname, '..', '..', 'dist', 'plugins'));

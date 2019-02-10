@@ -1,6 +1,5 @@
 import GsfProvider from './../storage/GsfProvider';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
-const SystemJS = require('systemjs');
 import Logger from '../logger/Logger';
 import AbstractModuleManager from '../systemjs/AbstractModuleManager';
 import { BaseNamedEntity } from 'get-set-fetch';
@@ -25,14 +24,12 @@ class PluginManager extends AbstractModuleManager {
     const availablePlugins = await GsfProvider.Plugin.getAll();
     for (let i = 0; i < availablePlugins.length; i += 1) {
       Log.info(`SystemJS importing plugin ${availablePlugins[i].name}`);
-      await SystemJS.import(`${availablePlugins[i].name}!idb`);
+      // without specifying a parent url, System.getMatch enters an infinite loop
+      await System.import(`./${availablePlugins[i].name}`, 'a');
       Log.info(`SystemJS importing plugin ${availablePlugins[i].name} DONE`);
     }
   }
 
-  /*
-    import via SystemJS all available plugins: builtin and user defined ones
-  */
  static async discoverPlugins() {
   const plugins = await this.getModulesContent('background/plugins');
   await this.persistModules(plugins);
@@ -49,10 +46,10 @@ class PluginManager extends AbstractModuleManager {
   }
 
   static getAvailablePluginDefs() {
-    // filter plugins so only those loaded from the db via IdbFetchPlugin qualify
-    const pluginKeys = Array.from(SystemJS.registry.keys()).filter((key: any) => key.toString().match(/^.+!.+IdbFetchPlugin.js$/));
+    const pluginKeys = Array.from(Object.keys(System.getRegistry()));
+
     return pluginKeys.map((pluginKey) => {
-      const classDef = SystemJS.registry.get(pluginKey).default;
+      const classDef = System.get(pluginKey).default;
 
       const pluginInstance = new (classDef)();
 
@@ -67,17 +64,17 @@ class PluginManager extends AbstractModuleManager {
 
   static instantiate(pluginDefinitions) {
     return pluginDefinitions.map((pluginDefinition) => {
-      const pluginKey = Array.from(SystemJS.registry.keys()).find((key: any) => key.toString().indexOf(`/${pluginDefinition.name}!`) !== -1);
       Log.info(`Instantiating plugin ${pluginDefinition.name}`);
-      if (pluginKey) {
-        const classDef = SystemJS.registry.get(pluginKey).default;
+      const classDef = System.get(pluginDefinition.name).default;
 
+      if (classDef) {
         return new (classDef)(pluginDefinition.opts);
       }
-
-      // could not found corresponding plugin definition
-      Log.warn(`pluginDefinition for ${pluginDefinition.name} not found`);
-      return null;
+      else {
+        // could not found corresponding plugin definition
+        Log.warn(`pluginDefinition for ${pluginDefinition.name} not found`);
+        return null;
+      }
     });
   }
 

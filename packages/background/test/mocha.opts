@@ -1,4 +1,5 @@
 --recursive
 --require test/utils/ts-node-config.js
+--require test/utils/systemjs-init.js
 --require test/utils/shims.ts
 --timeout 1500

@@ -18,7 +18,7 @@
     "copy:resources:systemjs": "copyfiles -f node_modules/systemjs/dist/system.js dist/plugins/systemjs && copyfiles -f node_modules/systemjs-plugin-babel/plugin-babel.js node_modules/systemjs-plugin-babel/systemjs-babel-browser.js dist/plugins/systemjs",
     "test": "nyc --reporter=lcov mocha test ./test/**/*.ts",
     "test:report": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "test:single": "mocha test ./test/**/*.ts --grep \"Test Storage Site - CRUD\""
+    "test:single": "mocha test ./test/**/*.ts --grep \"Test PluginManager\""
   },
   "keywords": [
     "scraper",
@@ -35,7 +35,6 @@
     "@types/chrome": "0.0.76",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.18",
-    "@types/systemjs": "^0.20.6",
     "chai": "^4.1.2",
     "copyfiles": "^2.0.0",
     "coveralls": "^3.0.2",
@@ -66,8 +65,7 @@
   },
   "dependencies": {
     "get-set-fetch": "^0.3.8",
-    "systemjs": "^0.21.4",
-    "systemjs-plugin-babel": "0.0.25",
+    "systemjs": "^3.0.0",
     "url-parse": "^1.4.3"
   }
 }

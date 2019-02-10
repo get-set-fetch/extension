@@ -1,9 +1,7 @@
 import GsfProvider from '../storage/GsfProvider';
-import { System } from 'systemjs';
 import Logger from '../logger/Logger';
 import { BaseNamedEntity } from 'get-set-fetch';
 
-declare const SystemJS: System;
 const Log = Logger.getLogger('PluginManager');
 
 export default abstract class AbstractModuleManager {
@@ -77,7 +75,7 @@ export default abstract class AbstractModuleManager {
     const availableModules: BaseNamedEntity[] = await this.getStoredModules();
     for (let i = 0; i < availableModules.length; i += 1) {
       Log.info(`SystemJS importing module ${availableModules[i].name}`);
-      await SystemJS.import(`${availableModules[i].name}!idb`);
+      await System.import(`${availableModules[i].name}!idb`);
       Log.info(`SystemJS importing module ${availableModules[i].name} DONE`);
     }
   }

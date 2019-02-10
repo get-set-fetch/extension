@@ -1,36 +1,23 @@
+// import SystemJS + fetch hook + getRegistry() implementation
+import 'systemjs/dist/system';
+import '../../src/ts/systemjs/systemjs-fetch-plugin';
+import '../../src/ts/systemjs/systemjs-registry';
+
 import { GsfProvider, PluginManager } from './background-bundle';
 import Logger, { LogLevel } from './logger/Logger';
 import ScenarioManager from './scenarios/ScenarioManager';
 
 // const Log = Logger.getLogger('background-main');
 
-/*
-register GsfProvider at global level, required for:
-  - accessing IndexedDB from SystemJS IdbFetchPlugin
-  - accessing plugin module content from GsfProvider.Plugins.availablePlugins
-*/
-global.GsfProvider = GsfProvider;
-declare const SystemJS;
+// make use of systemjs fetch (custom) hook in order to load plugins from IndexedDB
+System.constructor.prototype.fetch = (url: string, init: RequestInit) => {
+  const pluginName = url;
 
-SystemJS.config({
-  map: {
-    'idb': './plugins/systemjs/IdbFetchPlugin.js',
-    'plugin-babel': './plugins/systemjs/plugin-babel.js',
-    'systemjs-babel-build': './plugins/systemjs/systemjs-babel-browser.js'
-  },
-  transpiler: 'plugin-babel',
-  meta: {
-    '*.js': {
-      babelOptions: {
-        // extension run in browsers having ES2015 and stage 1-3 support, disable ES2015, stage 1-3 feature transpilation
-        es2015: false,
-        stage1: false,
-        stage2: false,
-        stage3: false
-      }
-    }
-  }
-});
+  return new Promise(async (resolve) => {
+    const plugin = await GsfProvider.Plugin.get(pluginName);
+    resolve(plugin.code);
+  });
+};
 
 (async () => {
   await GsfProvider.init();

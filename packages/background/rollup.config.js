@@ -76,7 +76,7 @@ const crawlPluginConfig = crawlPlugins.map(plugin => ({
   input: plugin.src,
   output: {
     file: `dist/plugins/${plugin.name}.js`,
-    format: 'esm',
+    format: 'system',
   },
   plugins: [
     typescript(),
