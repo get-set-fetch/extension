@@ -10,8 +10,8 @@ import tslint from 'rollup-plugin-tslint';
 
 const mainConfig = {
   input: [
-    'src/js/background-bundle.ts',
-    'src/js/background-main.ts',
+    'src/ts/background-bundle.ts',
+    'src/ts/background-main.ts',
   ],
   output: {
     dir: 'dist',
@@ -43,7 +43,7 @@ const mainConfig = {
 };
 
 const systemjsPlugins = [
-  { name: 'IdbFetchPlugin', src: 'src/js/plugins/systemjs/IdbFetchPlugin.ts' },
+  { name: 'IdbFetchPlugin', src: 'src/ts/plugins/systemjs/IdbFetchPlugin.ts' },
 ];
 const systemjsPluginConfig = systemjsPlugins.map(plugin => ({
   input: plugin.src,
@@ -65,12 +65,12 @@ const systemjsPluginConfig = systemjsPlugins.map(plugin => ({
 }));
 
 const crawlPlugins = [
-  { name: 'SelectResourcePlugin', src: 'src/js/plugins/builtin/SelectResourcePlugin.ts' },
-  { name: 'UpdateResourcePlugin', src: 'src/js/plugins/builtin/UpdateResourcePlugin.ts' },
-  { name: 'InsertResourcePlugin', src: 'src/js/plugins/builtin/InsertResourcePlugin.ts' },
-  { name: 'ExtensionFetchPlugin', src: 'src/js/plugins/builtin/ExtensionFetchPlugin.ts' },
-  { name: 'ExtractUrlPlugin', src: 'src/js/plugins/builtin/ExtractUrlPlugin.ts' },
-  { name: 'ExtractTitlePlugin', src: 'src/js/plugins/builtin/ExtractTitlePlugin.ts' },
+  { name: 'SelectResourcePlugin', src: 'src/ts/plugins/builtin/SelectResourcePlugin.ts' },
+  { name: 'UpdateResourcePlugin', src: 'src/ts/plugins/builtin/UpdateResourcePlugin.ts' },
+  { name: 'InsertResourcePlugin', src: 'src/ts/plugins/builtin/InsertResourcePlugin.ts' },
+  { name: 'ExtensionFetchPlugin', src: 'src/ts/plugins/builtin/ExtensionFetchPlugin.ts' },
+  { name: 'ExtractUrlPlugin', src: 'src/ts/plugins/builtin/ExtractUrlPlugin.ts' },
+  { name: 'ExtractTitlePlugin', src: 'src/ts/plugins/builtin/ExtractTitlePlugin.ts' },
 ];
 const crawlPluginConfig = crawlPlugins.map(plugin => ({
   input: plugin.src,

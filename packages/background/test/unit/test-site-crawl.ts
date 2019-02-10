@@ -1,8 +1,8 @@
 import * as sinon from 'sinon';
-import IdbStorage from '../../src/js/storage/IdbStorage';
-import PluginManager from '../../src/js/plugins/PluginManager';
+import IdbStorage from '../../src/ts/storage/IdbStorage';
+import PluginManager from '../../src/ts/plugins/PluginManager';
 import ModuleHelper from '../utils/ModuleHelper';
-import GsfProvider from '../../src/js/storage/GsfProvider';
+import GsfProvider from '../../src/ts/storage/GsfProvider';
 
 const conn = { info: 'IndexedDB' };
 

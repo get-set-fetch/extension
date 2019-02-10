@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import ModuleHelper from '../utils/ModuleHelper';
-import IdbStorage from '../../src/js/storage/IdbStorage';
-import GsfProvider from '../../src/js/storage/GsfProvider';
+import IdbStorage from '../../src/ts/storage/IdbStorage';
+import GsfProvider from '../../src/ts/storage/GsfProvider';
 
 const conn = { info: 'IndexedDB' };
 

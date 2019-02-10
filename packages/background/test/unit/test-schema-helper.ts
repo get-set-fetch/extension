@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import SchemaHelper from '../../src/js/schema/SchemaHelper';
+import SchemaHelper from '../../src/ts/schema/SchemaHelper';
 
 describe('Test Schema Helper', () => {
   it('parse normal string', async () => {

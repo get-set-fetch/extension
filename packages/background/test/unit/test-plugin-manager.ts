@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import ModuleHelper from '../utils/ModuleHelper';
-import PluginManager from '../../src/js/plugins/PluginManager';
-import GsfProvider from '../../src/js/storage/GsfProvider';
-import IdbStorage from '../../src/js/storage/IdbStorage';
+import PluginManager from '../../src/ts/plugins/PluginManager';
+import GsfProvider from '../../src/ts/storage/GsfProvider';
+import IdbStorage from '../../src/ts/storage/IdbStorage';
 
 describe('Test PluginManager', () => {
   before(async () => {

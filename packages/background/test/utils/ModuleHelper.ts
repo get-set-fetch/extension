@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const SystemJS = require('systemjs');
 
-import PluginManager from '../../src/js/plugins/PluginManager';
+import PluginManager from '../../src/ts/plugins/PluginManager';
 import { System } from 'systemjs';
 
 declare global {
