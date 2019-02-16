@@ -42,6 +42,22 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
       await IdbStorage.close();
     });
 
+  it('getAll', async () => {
+    // add a 2nd site
+    const siteB = new Site({ name: 'siteB', url: 'http://siteB' });
+    await siteB.save();
+
+    // retrieve all resources of the 1st site
+    const resourcesA = await Resource.getAll(expectedResource.siteId);
+    assert.strictEqual(resourcesA.length, 1);
+    assert.strictEqual(resourcesA[0].url, expectedResource.url);
+
+    // retrieve all resources of the 2nd site
+    const resourcesB = await Resource.getAll(siteB.id);
+    assert.strictEqual(resourcesB.length, 1);
+    assert.strictEqual(resourcesB[0].url, siteB.url);
+  });
+
   it('get', async () => {
       // get resource by id
       const resourceById = await Resource.get(expectedResource.id);

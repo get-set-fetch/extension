@@ -1,6 +1,7 @@
 import { BaseEntity } from 'get-set-fetch';
 import Logger from '../logger/Logger';
 import IdbSite, { IPluginDefinition } from './IdbSite';
+import ActiveTabHelper from '../helpers/ActiveTabHelper';
 
 const Log = Logger.getLogger('IdbProject');
 
@@ -160,6 +161,20 @@ export default class IdbProject extends BaseEntity {
       reqUpdateResource.onsuccess = () => resolve();
       reqUpdateResource.onerror = () => reject(new Error(`could not delete project: ${this.name}`));
     });
+  }
+
+  async crawl() {
+    const sites = await IdbSite.getAll(this.id);
+
+    // tslint:disable-next-line:prefer-for-of
+    for (let i: number = 0; i < sites.length; i++) {
+      // open a new tab for the current site to be crawled into
+      const tab = await ActiveTabHelper.create();
+      sites[i].tabId = tab.id;
+
+      // start crawling
+      sites[i].crawl(sites[i].opts.crawl);
+    }
   }
 
   serializeWithoutId() {

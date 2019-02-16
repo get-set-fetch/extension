@@ -25,6 +25,9 @@ export default class IdbStorage {
         if (!db.objectStoreNames.contains('Sites')) {
           const siteStore = db.createObjectStore('Sites', { keyPath: 'id', autoIncrement: true });
           siteStore.createIndex('name', 'name', { unique: true });
+
+          /* create an index for retrieving all sites by projectId */
+          siteStore.createIndex('projectId', 'projectId', { unique: false });
         }
 
         if (!db.objectStoreNames.contains('Projects')) {
@@ -41,6 +44,9 @@ export default class IdbStorage {
           const resourceStore = db.createObjectStore('Resources', { keyPath: 'id', autoIncrement: true });
           /* don't enforce url as unique, same site may be scrapped using multiple scenarios */
           resourceStore.createIndex('url', 'url', { unique: false });
+
+          /* create an index for retrieving all resources by siteId */
+          resourceStore.createIndex('siteId', 'siteId', { unique: false });
 
           /* create a compound index for getResourceToCrawl */
           resourceStore.createIndex('getResourceToCrawl', ['siteId', 'crawlInProgress', 'crawledAt'], { unique: false });

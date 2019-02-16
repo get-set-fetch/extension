@@ -49,7 +49,7 @@ export default class IdbResource extends BaseResource {
     });
   }
 
-  static getAllCrawled(siteId) {
+  static getAllCrawled(siteId: number) {
     const idbKey = IDBKeyRange.bound(
       [siteId, 0, new Date(1)],
       [siteId, 0, new Date(Date.now())]
@@ -58,15 +58,15 @@ export default class IdbResource extends BaseResource {
     return this.getAll(siteId, idbKey);
   }
 
-  static getAllNotCrawled(siteId) {
+  static getAllNotCrawled(siteId: number) {
     const idbKey = IDBKeyRange.only([siteId, 0, new Date(0)]);
     return this.getAll(siteId, idbKey);
   }
 
-  static getAll(siteId, idbKey, instantiate: boolean = true): Promise<IdbResource[]> {
+  static getAll(siteId: number, idbKey, instantiate: boolean = true): Promise<IdbResource[]> {
     return new Promise((resolve, reject) => {
       const rTx = IdbResource.rTx();
-      const readReq = idbKey ? rTx.index('getResourceToCrawl').getAll(idbKey) : rTx.getAll();
+      const readReq = idbKey ? rTx.index('getResourceToCrawl').getAll(idbKey) : rTx.index('siteId').getAll(siteId);
 
       readReq.onsuccess = (e) => {
         const { result } = e.target;

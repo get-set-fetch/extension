@@ -77,10 +77,10 @@ export default class IdbSite extends BaseSite {
     });
   }
 
-  static getAll(): Promise<IdbSite[]> {
+  static getAll(projectId?: number): Promise<IdbSite[]> {
     return new Promise((resolve, reject) => {
       const rTx = IdbSite.rTx();
-      const readReq = rTx.getAll();
+      const readReq = projectId ? rTx.index('projectId').getAll(projectId) : rTx.getAll();
 
       readReq.onsuccess = async (e) => {
         const { result } = e.target;
