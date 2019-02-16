@@ -1,12 +1,18 @@
 import GsfProvider from './../storage/GsfProvider';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 import Logger from '../logger/Logger';
-import AbstractModuleManager from '../systemjs/AbstractModuleManager';
+import AbstractModuleManager from './AbstractModuleManager';
 import { BaseNamedEntity } from 'get-set-fetch';
 
 const Log = Logger.getLogger('PluginManager');
 
+// used for allowing external defined GSF_PLUGINS in systemjsFetch function
+declare var GSF_PLUGINS;
 class PluginManager extends AbstractModuleManager {
+
+  static get DEFAULT_PLUGINS(): string[] {
+    return ['SelectResourcePlugin', 'ExtensionFetchPlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin'];
+  }
 
   static getStoredModule(moduleName): Promise<BaseNamedEntity> {
     return GsfProvider.Plugin.get(moduleName);
@@ -35,10 +41,6 @@ class PluginManager extends AbstractModuleManager {
   await this.persistModules(plugins);
   await this.importPlugins();
 }
-
-  static get DEFAULT_PLUGINS(): string[] {
-    return ['SelectResourcePlugin', 'ExtensionFetchPlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin'];
-  }
 
   static getDefaultPluginDefs() {
     const availablePluginDefs = this.getAvailablePluginDefs();
@@ -78,43 +80,70 @@ class PluginManager extends AbstractModuleManager {
     });
   }
 
+  static async injectSystemJS(tabId) {
+    const systemJSPresent = await ActiveTabHelper.executeScript(
+      tabId,
+      { code: `System !== undefined` }
+    );
+
+    // SystemJS already injected in current tab, nothing to do
+    if (systemJSPresent) return null;
+
+    // inject systemjs
+    await ActiveTabHelper.executeScript(tabId, { file: 'background/plugins/systemjs/system.js' });
+
+    // inject systemjs custom fetch
+    await ActiveTabHelper.executeScript(tabId, { file: 'background/plugins/systemjs/systemjs-fetch-plugin.ts' });
+
+    // define module registry containing source code
+    await ActiveTabHelper.executeScript(tabId, { code: 'let GSF_PLUGINS = {}' });
+
+    // define custom fetch and hook it into systemjs
+    const systemjsFetch = function() {
+      System.constructor.prototype.fetch = (url) => {
+        const pluginName = url;
+        return new Promise((resolve) => {
+          resolve(GSF_PLUGINS[pluginName]);
+        });
+      };
+    };
+    await ActiveTabHelper.executeScript(tabId, { code: `(${systemjsFetch.toString()}())` });
+  }
+
   static async runInTab(tabId, plugin, site, resource) {
+    await PluginManager.injectSystemJS(tabId);
+    const pluginName = plugin.constructor.name;
+
     let result = {};
     try {
-      /*
-      load each class separately, some utility classes may have already been loaded by other already loaded modules
-      if a class is already declared in the current tab, re-loading it fails with
-      "Uncaught SyntaxError: Identifier 'ClassName' has already been declared at "
-      but the other classes present in module will still load
-      */
-      const moduleContent: string = GsfProvider.Plugin.modules[plugin.constructor.name];
-      // use negative lookahead (?!) to match anyting starting with a class definition but not containing another class definition
-      const moduleClasses = moduleContent.match(/(class \w+ {([\s\S](?!(class \w+ {)))+)/gm);
-      for (let i = 0; i < moduleClasses.length; i += 1) {
-        await ActiveTabHelper.executeScript(tabId, { code: moduleClasses[i] });
-      }
+      const pluginDeff = `Cls${pluginName}`;
+      const pluginInstanceName = `inst${pluginName}`;
 
-      // instantiate module with opts
-      const pluginInstanceName = `inst${plugin.constructor.name}`;
-      await ActiveTabHelper.executeScript(
-        tabId,
-        { code: `const ${pluginInstanceName} = new ${plugin.constructor.name}(${JSON.stringify(plugin.opts)})` }
-      );
+      // define module content and import plugin
+      const moduleContent: string = GsfProvider.Plugin.cache[pluginName];
+      await ActiveTabHelper.executeScript(tabId, { code: `GSF_PLUGINS['${pluginName}']=String.raw\`${moduleContent}\`` });
+      await ActiveTabHelper.executeScript(tabId, { code: `System.import('./${pluginName}', 'a')` });
 
-      // test if plugin is aplicable
-      const isAplicable = await ActiveTabHelper.executeScript(
-        tabId,
-        { code: `${pluginInstanceName}.test(${JSON.stringify(site)}, ${JSON.stringify(resource)})` }
-      );
-      if (!isAplicable) return null;
+      // run the plugin
+      result = await ActiveTabHelper.executeScript(tabId, { code: `
+        (function() {
+          // get plugin class definition
+          const ${pluginDeff} = System.get('${pluginName}').default;
 
-      // apply plugin, the result will be merged at a higher level into the current resource
-      result = await ActiveTabHelper.executeScript(
-        tabId,
-        { code: `${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)})` }
-      );
+          // instantiate plugin instance
+          const ${pluginInstanceName} = new ${pluginDeff}(${JSON.stringify(plugin.opts)})
+
+          // execute plugin
+          let result = null;
+          const isApplicable = ${pluginInstanceName}.test(${JSON.stringify(site)}, ${JSON.stringify(resource)});
+          if (isApplicable) {
+            result = ${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)});
+          }
+          return result;
+        })();
+      `});
     }
-    catch (err) {
+    catch(err) {
       Log.error(err);
       throw err;
     }

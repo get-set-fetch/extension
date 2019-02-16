@@ -15,6 +15,12 @@ System.constructor.prototype.fetch = (url: string, init: RequestInit) => {
 
   return new Promise(async (resolve) => {
     const plugin = await GsfProvider.Plugin.get(pluginName);
+
+    /*
+    cache module content
+    this is used for the plugins running in the target page and not inside the browser extension
+    */
+    GsfProvider.Plugin.cache[pluginName] = plugin.code;
     resolve(plugin.code);
   });
 };

@@ -15,7 +15,7 @@ export default class IdbPlugin extends BaseEntity {
     return ['id', 'name', 'code'];
   }
 
-  static modules: Map<string,string> = new Map<string, string>();
+  static cache: Map<string,string> = new Map<string, string>();
 
   // get a read transaction
   static rTx() {
