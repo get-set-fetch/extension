@@ -15,10 +15,10 @@
     "build:dist": "rollup --config rollup.config.js",
     "copy:resources": "npm run copy:resources:html && npm run copy:resources:systemjs",
     "copy:resources:html": "copyfiles -u 2 src/html/*.html dist",
-    "copy:resources:systemjs": "copyfiles -f node_modules/systemjs/dist/system.js dist/plugins/systemjs && copyfiles -f node_modules/systemjs-plugin-babel/plugin-babel.js node_modules/systemjs-plugin-babel/systemjs-babel-browser.js dist/plugins/systemjs",
+    "copy:resources:systemjs": "copyfiles -f node_modules/systemjs/dist/system.js dist/plugins/systemjs && copyfiles -f src/ts/systemjs/systemjs-fetch-plugin.ts dist/plugins/systemjs",
     "test": "nyc --reporter=lcov mocha test ./test/**/*.ts",
     "test:report": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "test:single": "mocha test ./test/**/*.ts --grep \"Test PluginManager\""
+    "test:single": "mocha test ./test/**/*.ts --grep \"Test Storage Site - CRUD\""
   },
   "keywords": [
     "scraper",

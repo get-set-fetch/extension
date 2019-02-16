@@ -42,28 +42,6 @@ const mainConfig = {
   ],
 };
 
-const systemjsPlugins = [
-  { name: 'IdbFetchPlugin', src: 'src/ts/plugins/systemjs/IdbFetchPlugin.ts' },
-];
-const systemjsPluginConfig = systemjsPlugins.map(plugin => ({
-  input: plugin.src,
-  output: {
-    file: `dist/plugins/systemjs/${plugin.name}.js`,
-    format: 'esm',
-  },
-  plugins: [
-    typescript(),
-    commonjs(),
-    resolve({
-      browser: true,
-      preferBuiltins: true,
-      extensions: ['.js', '.json'],
-      jsnext: true,
-    }),
-    tslint(),
-  ],
-}));
-
 const crawlPlugins = [
   { name: 'SelectResourcePlugin', src: 'src/ts/plugins/builtin/SelectResourcePlugin.ts' },
   { name: 'UpdateResourcePlugin', src: 'src/ts/plugins/builtin/UpdateResourcePlugin.ts' },
@@ -91,4 +69,4 @@ const crawlPluginConfig = crawlPlugins.map(plugin => ({
   ],
 }));
 
-export default [mainConfig, ...systemjsPluginConfig, ...crawlPluginConfig];
+export default [mainConfig, ...crawlPluginConfig];

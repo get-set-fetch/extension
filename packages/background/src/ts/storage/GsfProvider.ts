@@ -74,6 +74,11 @@ export default class GsfProvider {
           case /^sites$/.test(request.resource):
             reqPromise = GsfProvider.Site.getAll();
             break;
+          // sites/:projectId
+          case /^sites\/[0-9]+$/.test(request.resource):
+            const projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            reqPromise = GsfProvider.Site.getAll(projectId);
+            break;
           // site/:siteId
           case /^site\/[0-9]+$/.test(request.resource):
             const getSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);
@@ -161,6 +166,9 @@ export default class GsfProvider {
           case /^project\/[0-9]+\/crawl$/.test(request.resource):
             const crawlProjectId = parseInt(/\d+/.exec(request.resource)[0], 10);
             const crawlProject = await GsfProvider.Project.get(crawlProjectId);
+
+            // start crawling
+            crawlProject.crawl();
             reqPromise = new Promise(resolve => resolve());
             break;
           default:
