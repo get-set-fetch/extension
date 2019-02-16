@@ -15,13 +15,13 @@ declare module 'get-set-fetch' {
 
   export class BaseSite extends BaseEntity {
     constructor(name:string, url:any, opts:any, createDefaultPlugins:boolean);
-    static getAll():Promise<BaseSite[]>;
+    static getAll(projectId:number):Promise<BaseSite[]>;
     crawl(opts:any):Promise<any>;
   }
 
   export class BaseResource extends BaseEntity {
     constructor(siteId:number|string, url:string, depth:number);
-    static getAll(siteId, idbKey, instantiate?:boolean):Promise<BaseResource[]>;
+    static getAll(siteId:number, idbKey, instantiate?:boolean):Promise<BaseResource[]>;
   }
 
   export class BloomFilter {

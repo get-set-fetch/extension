@@ -64,7 +64,6 @@ export default class LogList extends React.Component<{}, IState> {
     return (
       <Page
         title="Logs"
-        actions={[]}
         >
         <Table
           header={this.state.header}
