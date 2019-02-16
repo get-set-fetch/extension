@@ -40,4 +40,21 @@ export default class ExtractResources implements ScenarioInstance {
 
     return pluginDefinitions;
   }
+
+  getResultDefinition() {
+    return [
+      {
+        label: 'Name',
+        render: (row) => (row.name)
+      },
+      {
+        label: 'Title',
+        render: (row) => (row.title)
+      },
+      {
+        label: 'Link',
+        render: (row) => (row.url)
+      }
+    ];
+  }
 }
