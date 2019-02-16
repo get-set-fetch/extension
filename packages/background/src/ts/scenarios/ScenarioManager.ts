@@ -1,4 +1,4 @@
-import AbstractModuleManager from '../systemjs/AbstractModuleManager';
+import AbstractModuleManager from '../plugins/AbstractModuleManager';
 import GsfProvider from '../storage/GsfProvider';
 import { BaseNamedEntity } from 'get-set-fetch';
 

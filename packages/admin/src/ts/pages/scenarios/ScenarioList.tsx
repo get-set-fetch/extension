@@ -44,7 +44,6 @@ export default class ScenarioList extends React.Component<{}, IState> {
     return (
       <Page
         title="Available Scenarios"
-        actions={[]}
         >
         <Table
           header={this.state.header}
