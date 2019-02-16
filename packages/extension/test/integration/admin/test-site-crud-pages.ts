@@ -47,6 +47,8 @@ describe('Site CRUD Pages', () => {
   });
 
   it('Test Create New Site', async () => {
+    await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+
     // open site detail page
     await sitePage.waitFor('#newsite');
     await sitePage.click('#newsite');

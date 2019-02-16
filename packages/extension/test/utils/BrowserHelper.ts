@@ -118,7 +118,7 @@ export default class BrowserHelper {
     // wait for main table to load, refresh page on 1st timeout
     try {
       await browserPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-      await browserPage.waitFor('table.table-main', { timeout: 1 * 1000 });
+      await browserPage.waitFor('table.table-main', { timeout: 2 * 1000 });
     }
     catch (err) {
       await browserPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
