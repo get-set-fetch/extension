@@ -15,9 +15,9 @@ import ScenarioDescription from "../../components/react-jsonschema-form/widgets/
 import ScenarioLink from "../../components/react-jsonschema-form/widgets/ScenarioLink";
 import { NavLink } from 'react-router-dom';
 import Page from '../../layout/Page';
+import IScenario from '../scenarios/model/Scenario';
 
 interface IProps {
-  projectId: string;
   history: History;
   match: match<{
     projectId: string;
@@ -27,7 +27,7 @@ interface IProps {
 interface IState {
   project: Project;
 
-  scenarios: Scenario[];
+  scenarios: IScenario[];
   scenarioInstance: ScenarioInstance;
 
   // schemas defining project props without plugable scenario props
@@ -42,7 +42,7 @@ interface IState {
   formRef: any;
 }
 
-declare var System: any;
+declare const System: any;
 
 export default class ProjectDetail extends React.Component<IProps, IState> {
   static defaultProps = {
@@ -67,14 +67,13 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
     };
 
     this.changeHandler = this.changeHandler.bind(this);
-    //this.scenarioFormChangeHandler = this.scenarioFormChangeHandler.bind(this);
     this.submitHandler = this.submitHandler.bind(this);
 
-    // using SystemJS fetch scenarios from IndexedDB
+    // using SystemJS, fetch scenarios from IndexedDB
     System.constructor.prototype.fetch = (url:string, init:RequestInit) => {
       const scenarioId = parseInt(/.+(\d+)$/.exec(url)[1], 10);
       return new Promise(resolve => {
-        const scenario = this.state.scenarios.find((scenario:Scenario) => scenario.id === scenarioId)
+        const scenario = this.state.scenarios.find((scenario:IScenario) => scenario.id === scenarioId)
         resolve(scenario.code);
       })
     }
@@ -86,8 +85,11 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
     const data:object = projectId ? await GsfClient.fetch(HttpMethod.GET, `project/${projectId}`) : {};
     const project:Project = new Project(data);
 
-    // load available scenarios
-    const scenarios:Scenario[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as Scenario[];
+    // load available scenarios, wait for state to be updated as systemjs import is based on it
+    const scenarios:IScenario[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenario[];
+    await new Promise(resolve => {
+      this.setState({scenarios}, () => resolve())
+    })
 
     // compute new baseProjectSchema for scenario dropdown
     const scenarioIdProp = Object.assign({}, this.state.baseProjectSchema.properties.scenarioId);
@@ -107,7 +109,7 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
     }
 
     // update state
-    this.setState({ project, baseProjectSchema, mergedSchema, mergedUISchema, scenarios });
+    this.setState({ project, baseProjectSchema, mergedSchema, mergedUISchema });
   }
 
   async loadScenario(scenarioId: string) {
@@ -167,9 +169,6 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
     const pluginDefinitions = this.state.scenarioInstance.getPluginDefinitions(this.state.project.scenarioProps);
 
     const finalProject = setIn(this.state.project, ["pluginDefinitions"], pluginDefinitions);
-
-    console.log("sending:");
-    console.log(finalProject);
 
     try {
       if (this.state.project.id) {

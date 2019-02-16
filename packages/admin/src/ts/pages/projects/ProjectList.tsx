@@ -1,9 +1,14 @@
 import * as React from 'react';
+import { History } from 'history';
+import { NavLink } from 'react-router-dom';
 import Table, { IHeaderCol } from '../../components/Table';
 import GsfClient, { HttpMethod } from '../../components/GsfClient';
 import Project from './model/Project';
 import Page from '../../layout/Page';
-import { NavLink } from 'react-router-dom';
+
+interface IProps {
+  history: History;
+}
 
 interface IState {
   header: IHeaderCol[];
@@ -11,7 +16,31 @@ interface IState {
   selectedRows: number[];
 }
 
-export default class ProjectList extends React.Component<{}, IState> {
+export default class ProjectList extends React.Component<IProps, IState> {
+  async crawlProject(project:Project) {
+    try {
+      await GsfClient.fetch(HttpMethod.GET, `project/${project.id}/crawl`);
+    }
+    catch (err) {
+      console.log('error crawling project');
+    }
+  }
+
+  async deleteProject(project:Project) {
+    try {
+      await GsfClient.fetch(HttpMethod.DELETE, 'projects', { ids: [project.id] });
+    }
+    catch (err) {
+      console.log('error deleting site');
+    }
+
+    this.loadProjects();
+  }
+
+  viewResults(project:Project) {
+    this.props.history.push(`/project/${project.id}/results`);
+  }
+
   constructor(props) {
     super(props);
 
@@ -25,6 +54,37 @@ export default class ProjectList extends React.Component<{}, IState> {
           label: 'Description',
           render: (project:Project) => (<span style={{ textOverflow: 'ellipsis' }}>{project.description ? project.description.substr(0, 100) : ""}</span>),
         },
+        {
+          label: 'Status',
+          render: (project:Project) => "-",
+        },
+        {
+          label: 'Actions',
+          renderLink: false,
+          render: (project:Project) => ([
+              <input
+                id={`crawl-${project.id}`}
+                type="button"
+                className="btn-secondary mr-2"
+                value="Crawl"
+                onClick={() => this.crawlProject(project)}
+              />,
+              <input
+                id={`results-${project.id}`}
+                type="button"
+                className="btn-secondary mr-2"
+                value="Results"
+                onClick={() => this.viewResults(project)}
+              />,
+              <input
+                id={`delete-${project.id}`}
+                type="button"
+                className="btn-secondary"
+                value="Delete"
+                onClick={evt => this.deleteProject(project)}
+              />,
+          ]),
+        }
       ],
       data: [],
       selectedRows: [],

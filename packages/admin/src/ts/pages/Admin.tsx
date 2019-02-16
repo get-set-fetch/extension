@@ -13,6 +13,7 @@ import ScenarioList from './scenarios/ScenarioList';
 import ProjectDetail from './projects/ProjectDetail';
 
 import Navigation from '../layout/Navigation';
+import ProjectResults from './projects/ProjectResults';
 
 export default class Admin extends React.Component {
   render() {
@@ -31,7 +32,8 @@ export default class Admin extends React.Component {
 
               <Switch>
                 <Route path="/projects" component={ProjectList} />
-                <Route path="/project/:projectId?" component={ProjectDetail} />
+                <Route path="/project/:projectId?" exact={true} component={ProjectDetail} />
+                <Route path="/project/:projectId?/results" exact={true} component={ProjectResults} />
 
                 <Route path="/site/:siteId?" component={SiteDetail} />
                 <Route path="/sites" component={SiteList} />

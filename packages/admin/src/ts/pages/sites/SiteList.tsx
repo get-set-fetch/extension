@@ -14,7 +14,7 @@ interface IState {
 }
 
 export default class SiteList extends React.Component<{}, IState> {
-  static async crawlSite(site:Site) {
+  async crawlSite(site:Site) {
     try {
       await GsfClient.fetch(HttpMethod.GET, `site/${site.id}/crawl`);
     }
@@ -25,7 +25,6 @@ export default class SiteList extends React.Component<{}, IState> {
 
   async deleteSite(site:Site) {
     try {
-      // remove sites
       await GsfClient.fetch(HttpMethod.DELETE, 'sites', { ids: [site.id] });
     }
     catch (err) {
@@ -33,51 +32,6 @@ export default class SiteList extends React.Component<{}, IState> {
     }
 
     this.loadSites();
-  }
-
-  static async exportCSV(site, evt) {
-    // store dom target for this synthetic event
-    const { target } = evt;
-
-    // download href has just been set don't recreate it again, allow the browser to naturally follow the download link
-    if (target.hasAttribute('downloadready')) {
-      target.removeAttribute('downloadready');
-      return;
-    }
-
-    // download href is obsolete or missing, prevent browser from downloading the content
-    evt.preventDefault();
-
-    // load just the crawled resources for the current site
-    let crawledResources:Resource[] = [];
-    try {
-      crawledResources = (await GsfClient.fetch(HttpMethod.GET, `resources/${site.id}/crawled`)) as Resource[];
-    }
-    catch (err) {
-      console.log(err);
-      console.log('error exporting site resources as csv');
-    }
-
-    // some of the crawled resources may not contain the info obj depending on the plugin used, filter those out
-    const contentResources = crawledResources.filter(resource => (
-      typeof resource.info === 'object' && Object.keys(resource.info).length > 0
-    ));
-
-    // no crawled resources with valid info content found
-    if (contentResources.length === 0) {
-      alert('Nothing to export. No resources crawled or with valid content');
-      return;
-    }
-
-    // transform resources into csv
-    const info = crawledResources.map(resource => resource.info || {});
-    const csv = ExportHelper.csv(info);
-
-    // (re)create blob and anchor href for download
-    DownloadHelper.revokeObjectUrl(target.href);
-    DownloadHelper.createBlobURL(target, csv, 'text/plain');
-    target.setAttribute('downloadready', true);
-    target.click();
   }
 
   constructor(props) {
@@ -106,15 +60,16 @@ export default class SiteList extends React.Component<{}, IState> {
                 type="button"
                 className="btn-secondary mr-2"
                 value="Crawl"
-                onClick={() => SiteList.crawlSite(site)}
+                onClick={() => this.crawlSite(site)}
               />,
               <a
                 id={`csv-${site.id}`}
+                data-id={site.id}
                 className="mr-2"
                 href="#"
                 target="_blank"
                 download={site.name}
-                onClick={evt => SiteList.exportCSV(site, evt)}
+                onClick={this.exportCSV}
               >
                 CSV
               </a>,
@@ -132,6 +87,7 @@ export default class SiteList extends React.Component<{}, IState> {
     };
 
     this.deleteSite = this.deleteSite.bind(this);
+    this.exportCSV = this.exportCSV.bind(this);
   }
 
   componentDidMount() {
@@ -141,6 +97,30 @@ export default class SiteList extends React.Component<{}, IState> {
   async loadSites() {
     const data:Site[] = (await GsfClient.fetch(HttpMethod.GET, 'sites')) as Site[];
     this.setState({ data });
+  }
+
+  async loadResourcesInfo(siteId:string):Promise<object[]> {
+     // load just the crawled resources for the current site
+     let crawledResources:Resource[] = [];
+     try {
+       crawledResources = (await GsfClient.fetch(HttpMethod.GET, `resources/${siteId}/crawled`)) as Resource[];
+     }
+     catch (err) {
+       console.log(err);
+       console.log('error loading site resources');
+     }
+
+     // some of the crawled resources may not contain the info obj depending on the plugin used, filter those out
+     crawledResources = crawledResources.filter(resource => (
+       typeof resource.info === 'object' && Object.keys(resource.info).length > 0
+     ));
+
+     return crawledResources.map(resource => resource.info || {});
+  }
+
+  exportCSV(evt:React.MouseEvent<HTMLAnchorElement>) {
+    const siteId = evt.currentTarget.dataset.id;
+    DownloadHelper.exportCSV(this.loadResourcesInfo(siteId), evt);
   }
 
   // eslint-disable-next-line class-methods-use-this
