@@ -49,6 +49,7 @@ const crawlPlugins = [
   { name: 'ExtensionFetchPlugin', src: 'src/ts/plugins/builtin/ExtensionFetchPlugin.ts' },
   { name: 'ExtractUrlPlugin', src: 'src/ts/plugins/builtin/ExtractUrlPlugin.ts' },
   { name: 'ExtractTitlePlugin', src: 'src/ts/plugins/builtin/ExtractTitlePlugin.ts' },
+  { name: 'ImageFilterPlugin', src: 'src/ts/plugins/builtin/ImageFilterPlugin.ts' },
 ];
 const crawlPluginConfig = crawlPlugins.map(plugin => ({
   input: plugin.src,
