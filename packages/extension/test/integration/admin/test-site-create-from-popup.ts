@@ -1,6 +1,5 @@
 import queryString from 'query-string';
 import { assert } from 'chai';
-import { join } from 'path';
 import { NavigationOptions } from 'puppeteer';
 import BrowserHelper from '../../utils/BrowserHelper';
 
@@ -21,13 +20,8 @@ describe('Site Pages', () => {
   };
 
   before(async () => {
-    browser = await BrowserHelper.launchAndStubRequests(
-      actualSite.url,
-      join('test', 'resources', actualSite.name)
-    );
-
+    browser = await BrowserHelper.launch();
     sitePage = await browser.newPage();
-
     await BrowserHelper.waitForDBInitialization(sitePage);
   });
 

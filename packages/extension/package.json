@@ -21,8 +21,8 @@
     "copy:bkg:watch": "cpx  \"node_modules/get-set-fetch-extension-background/dist/**/*\" dist/background --watch",
     "copy:popup:watch": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup --watch",
     "copy:admin:watch": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin --watch",
-    "test": "mocha test ./test/integration/**/*.ts",
-    "test:single": "mocha test ./test/integration/**/*.ts --grep \"Project Crawl Extract HTML Headers\""
+    "test": "mocha test ./test/integration/**/*.ts --exit",
+    "test:single": "mocha test ./test/integration/**/*.ts --grep \"Test Crawl Site Images\""
   },
   "author": "",
   "license": "ISC",
@@ -35,21 +35,26 @@
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
+    "@types/connect": "^3.4.32",
     "@types/mocha": "^5.2.5",
     "@types/puppeteer": "^1.12.1",
+    "@types/serve-static": "^1.13.2",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.7.0",
     "chai": "^4.1.2",
+    "connect": "^3.6.6",
     "cpx": "^1.5.0",
     "mocha": "^5.2.0",
     "nock": "^10.0.4",
     "puppeteer": "^1.6.1",
     "query-string": "^6.1.0",
+    "serve-static": "^1.13.2",
     "ts-node": "^8.0.2",
     "tslint": "^5.12.1",
     "tslint-config-airbnb": "^5.11.1",
     "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.3.3"
+    "typescript": "^3.3.3",
+    "vhost": "^3.0.2"
   }
 }

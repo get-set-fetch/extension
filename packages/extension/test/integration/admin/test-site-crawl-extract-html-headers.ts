@@ -46,7 +46,7 @@ describe('Site Crawl Extract HTML Headers', () => {
   };
 
   before(async () => {
-    browser = await BrowserHelper.launchAndStubRequests(actualSite.url, join('test', 'resources', actualSite.name));
+    browser = await BrowserHelper.launch();
     adminPage = await browser.newPage();
     await BrowserHelper.waitForDBInitialization(adminPage);
   });
@@ -90,7 +90,7 @@ describe('Site Crawl Extract HTML Headers', () => {
     return null;
   }
 
-  it('Test Crawl Site', async () => {
+  it('Test Crawl Site Html Headers', async () => {
     // open site list
     await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
 
@@ -123,7 +123,7 @@ describe('Site Crawl Extract HTML Headers', () => {
     };
     for (let i = 0; i < crawledResources.length; i += 1) {
       const crawledResource = crawledResources[i];
-      assert.strictEqual('text/html', crawledResource.contentType);
+      assert.strictEqual('text/html', crawledResource.mediaType);
       assert.strictEqual(titles[crawledResource.url], crawledResource.info.title);
     }
 

@@ -1,5 +1,5 @@
-import { launch } from 'puppeteer';
 import { assert } from 'chai';
+import BrowserHelper from '../../utils/BrowserHelper';
 
 describe('Test Extension Popup, ', () => {
   let browser = null;
@@ -12,14 +12,7 @@ describe('Test Extension Popup, ', () => {
 
   before(async () => {
     // launch chromium
-    browser = await launch({
-      headless: false,
-      args: [
-        `--disable-extensions-except=${extension.path}`,
-        `--load-extension=${extension.path}`,
-        '--no-sandbox'
-      ]
-    });
+    browser = await BrowserHelper.launch();
 
     // open new page
     page = await browser.newPage();
