@@ -198,7 +198,14 @@ export default class IdbSite extends BaseSite {
       for (let i = 0; i < this.plugins.length; i += 1) {
         try {
           const result = await this.executePlugin(this.plugins[i], resource);
-          resource = resource === null ? result : Object.assign(resource, result);
+          if (resource === null) {
+            resource = result;
+          }
+          else {
+            // plugin apply returns an info object, shallow merge it in order to avoid implementing a deep merge at resource level
+            const info = Object.assign({}, resource.info, result ? result.info : null);
+            resource = Object.assign(resource, result, { info });
+          }
 
           // no resource present
           if (resource === null) {

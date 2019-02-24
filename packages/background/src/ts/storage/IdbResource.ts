@@ -185,7 +185,7 @@ export default class IdbResource extends BaseResource {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'siteId', 'url', 'depth', 'info', 'crawledAt', 'crawlInProgress', 'content', 'contentType'];
+    return ['id', 'siteId', 'url', 'depth', 'info', 'crawledAt', 'crawlInProgress', 'blob', 'mediaType'];
   }
 
   serialize(): any {

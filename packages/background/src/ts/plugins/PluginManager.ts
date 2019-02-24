@@ -124,24 +124,51 @@ class PluginManager extends AbstractModuleManager {
       await ActiveTabHelper.executeScript(tabId, { code: `GSF_PLUGINS['${pluginName}']=String.raw\`${moduleContent}\`` });
       await ActiveTabHelper.executeScript(tabId, { code: `System.import('./${pluginName}', 'a')` });
 
-      // run the plugin
-      result = await ActiveTabHelper.executeScript(tabId, { code: `
-        (function() {
-          // get plugin class definition
-          const ${pluginDeff} = System.get('${pluginName}').default;
+      // listen for incoming message
+      const message = new Promise((resolve, reject) => {
+        const listener = msg => {
+            chrome.runtime.onMessage.removeListener(listener);
+            if (msg.resolved) {
+              resolve(msg.result);
+            }
+            else {
+              reject(msg.err);
+            }
+        };
+        chrome.runtime.onMessage.addListener(listener);
+      });
 
-          // instantiate plugin instance
-          const ${pluginInstanceName} = new ${pluginDeff}(${JSON.stringify(plugin.opts)})
+      // async run the plugin and sends the result as message once completed
+      await ActiveTabHelper.executeScript(tabId, { code: `
+        (async function() {
+          try {
+            // get plugin class definition
+            const ${pluginDeff} = System.get('${pluginName}').default;
+            // console.log(GSF_PLUGINS['${pluginName}'])
+            console.log(GSF_PLUGINS)
+            // console.log(${pluginDeff});
 
-          // execute plugin
-          let result = null;
-          const isApplicable = ${pluginInstanceName}.test(${JSON.stringify(site)}, ${JSON.stringify(resource)});
-          if (isApplicable) {
-            result = ${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)});
+            // instantiate plugin instance
+            const ${pluginInstanceName} = new ${pluginDeff}(${JSON.stringify(plugin.opts)})
+
+            // execute plugin
+            let result = null;
+            const isApplicable = ${pluginInstanceName}.test(${JSON.stringify(resource)});
+            if (isApplicable) {
+              result = await ${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)});
+            }
+
+            // send the result back via messaging as the promise content will just be serialized to {}
+            console.log(result);
+            chrome.runtime.sendMessage({resolved: true, result});
           }
-          return result;
+          catch(err) {
+            chrome.runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
+          }
         })();
       `});
+
+      result = await message;
     }
     catch(err) {
       Log.error(err);
