@@ -109,12 +109,10 @@ export default class SiteList extends React.Component<{}, IState> {
        console.log(err);
        console.log('error loading site resources');
      }
-
      // some of the crawled resources may not contain the info obj depending on the plugin used, filter those out
      crawledResources = crawledResources.filter(resource => (
        typeof resource.info === 'object' && Object.keys(resource.info).length > 0
      ));
-
      return crawledResources.map(resource => resource.info || {});
   }
 
