@@ -1,4 +1,5 @@
 --recursive
 --require test/utils/ts-node-config.js
 --require test/utils/init.js
+--require test/utils/init-proxy.ts
 --timeout 15000
