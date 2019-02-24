@@ -1,6 +1,6 @@
-import { BaseEntity } from 'get-set-fetch';
+import { BaseEntity, IPluginDefinition } from 'get-set-fetch';
 import Logger from '../logger/Logger';
-import IdbSite, { IPluginDefinition } from './IdbSite';
+import IdbSite from './IdbSite';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 
 const Log = Logger.getLogger('IdbProject');

@@ -1,4 +1,4 @@
-import { BaseSite, BloomFilter } from 'get-set-fetch';
+import { BaseSite, BloomFilter, IPluginDefinition, ISite } from 'get-set-fetch';
 import IdbResource from './IdbResource';
 import PluginManager from '../plugins/PluginManager';
 
@@ -7,35 +7,6 @@ import Logger from '../logger/Logger';
 const Log = Logger.getLogger('IdbSite');
 
 /* eslint-disable class-methods-use-this */
-
-export interface IPluginDefinition {
-  name: string;
-  opts: object;
-}
-
-interface ISite {
-  id: number;
-  projectId: number;
-  name: string;
-  url: string;
-  tabId: any;
-
-  pluginDefinitions: IPluginDefinition[];
-  plugins: any;
-
-  opts: {
-    crawl: {
-      maxConnections: number,
-      maxResources: number,
-      delay: number
-    },
-    resourceFilter: {
-      maxEntries: number,
-      probability: number
-    }
-  };
-}
-
 export default class IdbSite extends BaseSite {
 
   // IndexedDB can't do partial update, define all site properties to be stored

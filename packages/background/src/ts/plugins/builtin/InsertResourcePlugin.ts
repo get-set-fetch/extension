@@ -1,7 +1,9 @@
+import { IPlugin } from 'get-set-fetch';
+
 /**
  * Plugin responsible for saving new resources within the current site.
  */
-export default class InsertResourcePlugin {
+export default class InsertResourcePlugin implements IPlugin {
   test() {
     return true;
   }

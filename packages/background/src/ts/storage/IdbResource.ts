@@ -1,16 +1,6 @@
-import { BaseResource } from 'get-set-fetch';
+import { BaseResource, IResource } from 'get-set-fetch';
 
 /* eslint-disable class-methods-use-this */
-
-interface IResource {
-  crawledAt: any;
-  id: number;
-  url: string;
-  crawlInProgress: boolean;
-  depth: number;
-  siteId: number;
-}
-
 export default class IdbResource extends BaseResource {
   // get a read transaction
   static rTx() {
@@ -63,7 +53,7 @@ export default class IdbResource extends BaseResource {
     return this.getAll(siteId, idbKey);
   }
 
-  static getAll(siteId: number, idbKey, instantiate: boolean = true): Promise<IdbResource[]> {
+  static getAll(siteId: number, idbKey = null, instantiate: boolean = true): Promise<IdbResource[]> {
     return new Promise((resolve, reject) => {
       const rTx = IdbResource.rTx();
       const readReq = idbKey ? rTx.index('getResourceToCrawl').getAll(idbKey) : rTx.index('siteId').getAll(siteId);
@@ -136,12 +126,15 @@ export default class IdbResource extends BaseResource {
     });
   }
 
-  crawledAt: any;
   id: number;
   url: string;
+  siteId: number;
+  crawledAt: any;
   crawlInProgress: boolean;
   depth: number;
-  siteId: number;
+  info: any;
+  blob: any;
+  mediaType: string;
 
   constructor(kwArgs: Partial<IResource> = {}) {
     super(kwArgs.siteId, kwArgs.url, kwArgs.depth);

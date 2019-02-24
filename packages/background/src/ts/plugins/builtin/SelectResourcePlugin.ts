@@ -1,9 +1,10 @@
 import SchemaHelper from '../../schema/SchemaHelper';
+import { IPlugin } from 'get-set-fetch';
 
 /**
  * Plugin responsible for selecting a resource to crawl from the current site.
  */
-export default class SelectResourcePlugin {
+export default class SelectResourcePlugin implements IPlugin {
   opts: {
     crawlFrequency: number
   };

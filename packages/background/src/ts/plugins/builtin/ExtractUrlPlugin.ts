@@ -1,11 +1,12 @@
 import SchemaHelper from '../../schema/SchemaHelper';
+import { IPlugin, IResource, ISite } from 'get-set-fetch';
 
 /**
  * Plugin responsible for extracting new resources from a resource document.
  */
 
 declare const document;
-export default class ExtractUrlPlugin {
+export default class ExtractUrlPlugin implements IPlugin {
 
   static get OPTS_SCHEMA() {
     return {
@@ -14,7 +15,7 @@ export default class ExtractUrlPlugin {
       title: 'ExtractUrlPlugin',
       type: 'object',
       properties: {
-        contentTypeRe: {
+        mediaTypeRe: {
           type: 'string',
           subType: 'regexp',
           default: '/html/i'
@@ -65,7 +66,7 @@ export default class ExtractUrlPlugin {
   }
 
   opts: {
-    contentTypeRe: RegExp,
+    mediaTypeRe: RegExp,
     extensionRe: RegExp,
     allowNoExtension: boolean,
     maxDepth: number,
@@ -76,11 +77,11 @@ export default class ExtractUrlPlugin {
     this.opts = SchemaHelper.instantiate(ExtractUrlPlugin.OPTS_SCHEMA, opts);
   }
 
-  test() {
-    return this.opts.contentTypeRe.test(document.contentType);
+  test(resource: IResource) {
+    return this.opts.mediaTypeRe.test(resource.mediaType);
   }
 
-  apply(site, resource) {
+  apply(site: ISite, resource: IResource) {
     // don't extract new resources if the max depth has been reached
     const maxDepthReached = this.opts.maxDepth === resource.depth;
     return ({ urlsToAdd: maxDepthReached ? [] : this.extractResourceUrls(site, resource) });

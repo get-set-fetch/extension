@@ -1,6 +1,7 @@
 import SchemaHelper from '../../schema/SchemaHelper';
+import { IPlugin, IResource, ISite } from 'get-set-fetch';
 
-export default class ExtractTitlePlugin {
+export default class ExtractTitlePlugin implements IPlugin {
   opts: {
     runInTab: boolean
   };
@@ -24,13 +25,13 @@ export default class ExtractTitlePlugin {
     };
   }
 
-  test() {
-    return true;
+  test(resource: IResource) {
+    return resource.mediaType.indexOf('html') !== -1;
   }
 
-  apply() {
+  apply(site: ISite, resource: IResource) {
     return {
-      info: {
+      info : {
         title: document.title
       }
     };
