@@ -1,7 +1,7 @@
 import queryString from 'query-string';
 import { assert } from 'chai';
 import { NavigationOptions } from 'puppeteer';
-import BrowserHelper from '../../utils/BrowserHelper';
+import BrowserHelper from '../../../utils/BrowserHelper';
 
 /* eslint-disable no-shadow, max-len */
 describe('Site CRUD Pages', () => {

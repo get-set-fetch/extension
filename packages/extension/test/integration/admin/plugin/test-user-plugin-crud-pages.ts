@@ -1,6 +1,6 @@
 import queryString from 'query-string';
 import { assert } from 'chai';
-import BrowserHelper from '../../utils/BrowserHelper';
+import BrowserHelper from '../../../utils/BrowserHelper';
 
 /* eslint-disable no-shadow, max-len */
 describe('UserPlugin CRUD Pages', () => {

@@ -1,6 +1,6 @@
 import queryString from 'query-string';
 import { assert } from 'chai';
-import BrowserHelper from '../../utils/BrowserHelper';
+import BrowserHelper from '../../../utils/BrowserHelper';
 
 describe('Settings Update Page', () => {
   let browser = null;

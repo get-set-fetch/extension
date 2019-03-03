@@ -2,7 +2,7 @@ import queryString from 'query-string';
 import { assert } from 'chai';
 import { readFileSync } from 'fs';
 import { join, resolve } from 'path';
-import BrowserHelper from '../../utils/BrowserHelper';
+import BrowserHelper from '../../../utils/BrowserHelper';
 import TestUtils from 'get-set-fetch/test/utils/TestUtils';
 
 /* eslint-disable no-shadow */
