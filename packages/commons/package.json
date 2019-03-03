@@ -2,7 +2,7 @@
   "name": "get-set-fetch-extension-commons",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/cjs/index.js",
+  "main": "dist/index.js",
   "types": "lib/index.d.ts",
   "files": [
     "lib",
