@@ -7,19 +7,18 @@ import tslint from 'rollup-plugin-tslint';
 export default {
   input: 'src/ts/ExtractResources.ts',
   output: {
-    file: `dist/ExtractResources.js`,
-    format: 'system',
+    file: 'dist/ExtractResources.js',
+    format: 'esm',
   },
   plugins: [
     typescript(),
-    commonjs(),
-    json(),
+    commonjs({extensions: ['.js', '.ts']}) ,
     resolve({
       browser: true,
       preferBuiltins: true,
-      extensions: ['.js', '.json'],
-      jsnext: true,
+      extensions: ['.js', '.json', '.ts', '.tsx'],
+      jsnext: false,
     }),
-    tslint(),
+   // tslint(),
   ],
 }

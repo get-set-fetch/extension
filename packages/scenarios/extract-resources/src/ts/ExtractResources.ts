@@ -1,7 +1,7 @@
-import * as ConfigFormSchema from '../resources/config-form-schema.json';
-import * as ConfigFormUISchema from '../resources/config-form-ui-schema.json';
+import { ScenarioInstance, PluginDefinition, ExportType } from 'get-set-fetch-extension-commons';
 
-import { ScenarioInstance } from 'get-set-fetch-extension-admin';
+import ConfigFormSchema from '../resources/config-form-schema';
+import ConfigFormUISchema from '../resources/config-form-ui-schema';
 
 export default class ExtractResources implements ScenarioInstance {
   getConfigFormSchema() {
@@ -13,7 +13,7 @@ export default class ExtractResources implements ScenarioInstance {
   }
 
   getPluginDefinitions(scenarioProps) {
-    const pluginDefinitions = [
+    const pluginDefinitions: PluginDefinition[] = [
         {
           name: 'SelectResourcePlugin'
         },
@@ -41,19 +41,32 @@ export default class ExtractResources implements ScenarioInstance {
     return pluginDefinitions;
   }
 
-  getResultDefinition() {
+  getResultTableHeaders() {
     return [
       {
-        label: 'Name',
-        render: (row) => (row.name)
-      },
-      {
         label: 'Title',
-        render: (row) => (row.title)
+        render: (row) => (row.info ? row.info.title: '')
       },
       {
-        label: 'Link',
+        label: 'Type',
+        render: (row) => (row.mediaType)
+      },
+      {
+        label: 'URL',
         render: (row) => (row.url)
+      }
+    ];
+  }
+
+  getResultExportOpts() {
+    return [
+      {
+        type: ExportType.CSV,
+        cols: ['url', 'info', 'mediaType']
+      },
+      {
+        type: ExportType.ZIP,
+        cols: ['blob']
       }
     ];
   }

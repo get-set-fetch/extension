@@ -1,11 +1,9 @@
 {
     "compilerOptions": {
-        "target": "ES2017",
+        "target": "esnext",
         "strict": false,
         "moduleResolution": "node",
-        "jsx": "react",
-        "resolveJsonModule": true,
+        "module": "esnext",
     },
-    "exclude": ["node_modules"],
-    "newLine": "LF",
+    "newLine": "LF"
 }
