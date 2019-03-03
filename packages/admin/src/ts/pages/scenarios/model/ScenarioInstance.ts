@@ -1,9 +1,10 @@
 import { JSONSchema6 } from "json-schema";
 import PluginDefinition from "../../sites/model/PluginDefinition";
+import { IHeaderCol } from "../../../components/Table";
 
-interface ResultColDefinition {
-  label: string;
-  render: (row:any) => any;
+interface ResultExportOpt {
+  type: 'csv'|'zip';
+  cols: string[];
 }
 
 export default interface ScenarioInstance {
@@ -11,7 +12,8 @@ export default interface ScenarioInstance {
   getConfigFormSchema: () => {default: object};
   getConfigFormUISchema: () => {default: object};
   getPluginDefinitions: (data:any) => {default: PluginDefinition[]};
-  getResultDefinition(): ResultColDefinition[];
+  getResultTableHeaders(): IHeaderCol[];
+  getResultExportOpts(): ResultExportOpt[];
 }
 
 export interface EnhancedJSONSchema extends JSONSchema6 {

@@ -9,6 +9,7 @@ import IdbLog from './IdbLog';
 import IdbSetting from './IdbSetting';
 import IdbProject from './IdbProject';
 import IdbScenario from './IdbScenario';
+import ExportHelper from '../helpers/ExportHelper';
 
 /* eslint-disable no-case-declarations */
 export default class GsfProvider {
@@ -150,6 +151,7 @@ export default class GsfProvider {
 
   static async projectHandler(request, sendResponse) {
     let reqPromise = null;
+    let projectId;
 
     switch (request.method) {
       case 'GET':
@@ -158,19 +160,30 @@ export default class GsfProvider {
           case /^projects$/.test(request.resource):
             reqPromise = GsfProvider.Project.getAll();
             break;
+          // project/export/:projectId
+          case /^project\/export\/[0-9]+$/.test(request.resource):
+            projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            const resources = await GsfProvider.Project.getAllResources(projectId);
+            reqPromise = ExportHelper.export(resources, request.body);
+            break;
           // projects/:projectId
           case /^project\/[0-9]+$/.test(request.resource):
-            const getProjectId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            reqPromise = GsfProvider.Project.get(getProjectId);
+            projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            reqPromise = GsfProvider.Project.get(projectId);
             break;
           // project/{project.id}/crawl
           case /^project\/[0-9]+\/crawl$/.test(request.resource):
-            const crawlProjectId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            const crawlProject = await GsfProvider.Project.get(crawlProjectId);
+            projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            const crawlProject = await GsfProvider.Project.get(projectId);
 
             // start crawling
             crawlProject.crawl();
             reqPromise = new Promise(resolve => resolve());
+            break;
+          // project/{project.id}/resources
+          case /^project\/[0-9]+\/resources$/.test(request.resource):
+            projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            reqPromise = GsfProvider.Project.getAllResources(projectId);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());

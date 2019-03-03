@@ -64,6 +64,7 @@
   "dependencies": {
     "get-set-fetch": "^0.3.8",
     "get-set-fetch-extension-commons": "^1.0.0",
+    "jszip": "^3.2.0",
     "url-parse": "^1.4.3"
   }
 }

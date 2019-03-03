@@ -33,7 +33,7 @@ const mainConfig = {
         'get-set-fetch', 'get-set-fetch-extension-commons',
         'murmurhash-js',
         'url-parse', 'requires-port', 'buffer', 'querystringify',
-        'systemjs',
+        'jszip'
       ],
     }),
     globals(),

@@ -2,6 +2,7 @@ import { BaseEntity, IPluginDefinition } from 'get-set-fetch';
 import Logger from '../logger/Logger';
 import IdbSite from './IdbSite';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
+import IdbResource from './IdbResource';
 
 const Log = Logger.getLogger('IdbProject');
 
@@ -73,6 +74,19 @@ export default class IdbProject extends BaseEntity {
       };
       readReq.onerror = () => reject(new Error('could not read Projects'));
     });
+  }
+
+  static async getAllResources(projectId: number): Promise<IdbResource[]> {
+    const project = await IdbProject.get(projectId);
+    const sites = await IdbSite.getAll(project.id);
+    let resources = [];
+
+    for (let i: number = 0; i < sites.length; i++) {
+      const currentResources = await IdbResource.getAll(sites[i].id);
+      resources = resources.concat(currentResources);
+    }
+
+    return resources;
   }
 
   static delAll() {
