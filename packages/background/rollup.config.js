@@ -30,7 +30,7 @@ const mainConfig = {
       extensions: ['.js', '.json'],
       jsnext: true,
       only: [
-        'get-set-fetch',
+        'get-set-fetch', 'get-set-fetch-extension-commons',
         'murmurhash-js',
         'url-parse', 'requires-port', 'buffer', 'querystringify',
         'systemjs',
@@ -38,7 +38,7 @@ const mainConfig = {
     }),
     globals(),
     builtins(),
-    tslint(),
+    // tslint(),
   ],
 };
 
@@ -55,7 +55,7 @@ const crawlPluginConfig = crawlPlugins.map(plugin => ({
   input: plugin.src,
   output: {
     file: `dist/plugins/${plugin.name}.js`,
-    format: 'system',
+    format: 'es',
   },
   plugins: [
     typescript(),

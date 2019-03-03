@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { setIn } from 'immutable';
-import GsfClient, { HttpMethod } from '../../components/GsfClient';
+import GsfClient from '../../components/GsfClient';
+import {HttpMethod} from 'get-set-fetch-extension-commons';
 import { History } from 'history';
 import { match } from 'react-router';
 import Project from './model/Project';

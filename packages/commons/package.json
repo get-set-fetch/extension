@@ -1,0 +1,38 @@
+{
+  "name": "get-set-fetch-extension-commons",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/cjs/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "lint": "tslint -c tslint.json src/**/*.ts",
+    "build": "npm run clean && npm run lint && npm run build:dist",
+    "build:dist": "rollup --config rollup.config.js"
+  },
+  "keywords": [
+    "scraper",
+    "extension"
+  ],
+  "author": "Andrei Sabau",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/get-set-fetch/extension/issues"
+  },
+  "homepage": "https://github.com/get-set-fetch/extension#readme",
+  "devDependencies": {
+    "rimraf": "^2.6.2",
+    "rollup-plugin-tslint": "^0.1.38",
+    "rollup-plugin-typescript": "^1.0.0",
+    "tslib": "^1.9.3",
+    "tslint": "^5.12.0",
+    "tslint-config-airbnb": "^5.11.1",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.2.2"
+  },
+  "dependencies": {}
+}

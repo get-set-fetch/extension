@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
+import {HttpMethod} from 'get-set-fetch-extension-commons';
 import Table, { IHeaderCol } from '../../components/Table';
-import GsfClient, { HttpMethod } from '../../components/GsfClient';
+import GsfClient from '../../components/GsfClient';
 import ExportHelper from '../../utils/ExportHelper';
 import DownloadHelper from '../../utils/DownloadHelper';
 import Site from './model/Site';

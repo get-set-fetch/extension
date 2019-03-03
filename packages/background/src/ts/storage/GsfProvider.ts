@@ -1,3 +1,4 @@
+import { HttpMethod } from 'get-set-fetch-extension-commons';
 import IdbStorage from './IdbStorage';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 import PluginManager from '../plugins/PluginManager';
@@ -68,7 +69,7 @@ export default class GsfProvider {
     let reqPromise = null;
 
     switch (request.method) {
-      case 'GET':
+      case HttpMethod.GET:
         switch (true) {
           // sites
           case /^sites$/.test(request.resource):

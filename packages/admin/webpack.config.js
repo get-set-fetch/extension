@@ -44,15 +44,14 @@ module.exports = {
       },
       {
         test: /\.(ts|tsx)$/,
-        exclude: /node_modules/,
         use: {
           loader: 'ts-loader',
           options: {
-            transpileOnly: true,
+            transpileOnly: true,            
             experimentalWatchApi: true,
             compilerOptions: {
               outDir: './dist'
-            }
+            }           
           }
         },
       },

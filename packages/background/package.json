@@ -13,12 +13,10 @@
     "lint": "tslint -c tslint.json src/**/*.ts",
     "build": "npm run clean && npm run lint && npm run build:dist && npm run copy:resources",
     "build:dist": "rollup --config rollup.config.js",
-    "copy:resources": "npm run copy:resources:html && npm run copy:resources:systemjs",
-    "copy:resources:html": "copyfiles -u 2 src/html/*.html dist",
-    "copy:resources:systemjs": "copyfiles -f node_modules/systemjs/dist/system.js dist/plugins/systemjs && copyfiles -f src/ts/systemjs/systemjs-fetch-plugin.ts dist/plugins/systemjs",
+    "copy:resources": "copyfiles -u 2 src/html/*.html dist",
     "test": "nyc --reporter=lcov mocha test ./test/**/*.ts",
     "test:report": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "test:single": "mocha test ./test/**/*.ts --grep \"Test Storage Site - CRUD\""
+    "test:single": "mocha test ./test/**/*.ts --grep \"crawl until maxDepth is reached\""
   },
   "keywords": [
     "scraper",
@@ -44,9 +42,9 @@
     "nock": "^10.0.4",
     "nyc": "^13.1.0",
     "patch-package": "^5.1.1",
-    "puppeteer": "^1.11.0",
+    "puppeteer": "^1.12.2",
     "rimraf": "^2.6.2",
-    "rollup-plugin-commonjs": "^9.1.0",
+    "rollup-plugin-commonjs": "9.1.4",
     "rollup-plugin-ignore": "^1.0.3",
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-builtins": "^2.1.2",
@@ -65,7 +63,7 @@
   },
   "dependencies": {
     "get-set-fetch": "^0.3.8",
-    "systemjs": "^3.0.0",
+    "get-set-fetch-extension-commons": "^1.0.0",
     "url-parse": "^1.4.3"
   }
 }

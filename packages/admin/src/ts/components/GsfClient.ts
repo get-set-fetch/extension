@@ -1,9 +1,5 @@
-export enum HttpMethod {
-  GET = "GET",
-  POST = "POST",
-  PUT = "PUT",
-  DELETE = "DELETE"
-}
+import { HttpMethod } from 'get-set-fetch-extension-commons';
+
 export default class GsfClient {
   static fetch(method:HttpMethod, resource:string, body?:object):Promise<object> {
     return new Promise((resolve) => {

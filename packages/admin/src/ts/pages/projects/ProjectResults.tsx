@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { match } from 'react-router';
+import { HttpMethod } from 'get-set-fetch-extension-commons';
 import ScenarioInstance from '../scenarios/model/ScenarioInstance';
-import GsfClient, { HttpMethod } from '../../components/GsfClient';
+import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
 import Table from '../../components/Table';
 import Project from './model/Project';

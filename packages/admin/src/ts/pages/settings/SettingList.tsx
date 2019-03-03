@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { setIn } from 'immutable';
-import GsfClient, { HttpMethod } from '../../components/GsfClient';
+import {HttpMethod} from 'get-set-fetch-extension-commons';
+import GsfClient from '../../components/GsfClient';
 import Setting from './model/Setting';
 import Page from '../../layout/Page';
 

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Table, { IHeaderCol } from '../../components/Table';
-import GsfClient, { HttpMethod } from '../../components/GsfClient';
+import GsfClient from '../../components/GsfClient';
+import { HttpMethod } from 'get-set-fetch-extension-commons';
 import ILog from './model/Log';
 import Page from '../../layout/Page';
 

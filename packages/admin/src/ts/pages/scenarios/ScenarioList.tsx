@@ -1,5 +1,6 @@
 import * as React from 'react';
-import GsfClient, { HttpMethod } from '../../components/GsfClient';
+import GsfClient from '../../components/GsfClient';
+import {HttpMethod} from 'get-set-fetch-extension-commons';
 import IScenario from './model/Scenario';
 import Page from '../../layout/Page';
 import Table, { IHeaderCol } from '../../components/Table';
