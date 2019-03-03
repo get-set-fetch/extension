@@ -1,0 +1,12 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "strict": false,
+        "moduleResolution": "node",
+        "typeRoots": [
+            "../typings",
+            "../node_modules/@types"
+        ]
+    },
+    "newLine": "LF"
+}

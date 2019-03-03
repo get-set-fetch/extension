@@ -17,6 +17,7 @@ declare module 'get-set-fetch' {
     constructor(name:string, url:any, opts:any, createDefaultPlugins:boolean);
     static getAll(projectId:number):Promise<BaseSite[]>;
     crawl(opts:any):Promise<any>;
+    initCrawl(opts);
   }
 
   export class BaseResource extends BaseEntity {

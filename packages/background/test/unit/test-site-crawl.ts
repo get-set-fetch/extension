@@ -6,7 +6,7 @@ import GsfProvider from '../../src/ts/storage/GsfProvider';
 
 const conn = { info: 'IndexedDB' };
 
-describe(`Test Site Crawl, using connection ${conn.info}`, () => {
+xdescribe(`Test Site Crawl, using connection ${conn.info}`, () => {
   let Site = null;
   let Resource = null;
   let Plugin = null;

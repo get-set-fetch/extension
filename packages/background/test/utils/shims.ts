@@ -6,7 +6,7 @@ define global browser window and register indexeddbshim under it with no window.
 */
 
 global.window = global;
-setGlobalVars(window, {
+setGlobalVars(global.window, {
   checkOrigin: false,
   memoryDatabase: ':memory:'
 });

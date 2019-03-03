@@ -25,7 +25,7 @@ export default class IdbSite extends BaseSite {
   }
 
   static async parseResult(result) {
-    const plugins = PluginManager.instantiate(result.pluginDefinitions);
+    const plugins = await PluginManager.instantiate(result.pluginDefinitions);
     return { plugins };
   }
 
@@ -150,10 +150,18 @@ export default class IdbSite extends BaseSite {
 
     // if no plugin definitions provided use the default ones
     this.pluginDefinitions = !kwArgs.pluginDefinitions ? PluginManager.getDefaultPluginDefs() : kwArgs.pluginDefinitions;
-    this.plugins = PluginManager.instantiate(this.pluginDefinitions);
 
     // resources from the same site are always crawled in the same tab
     this.tabId = null;
+  }
+
+  async initPlugins() {
+    this.plugins = await PluginManager.instantiate(this.pluginDefinitions);
+  }
+
+  async crawl(opts) {
+    await this.initPlugins();
+    super.crawl(opts);
   }
 
   getResourceToCrawl(crawlFrequency) {

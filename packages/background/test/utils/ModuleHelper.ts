@@ -15,20 +15,9 @@ declare global {
 
 export default class ModuleHelper {
   static async init() {
-    // make use of systemjs fetch (custom) hook in order to load plugins from IndexedDB
-    System.constructor.prototype.fetch = (url: string, init: RequestInit) => {
-      const pluginName = url;
-
-      return new Promise(async (resolve) => {
-        const plugin = await global.GsfProvider.Plugin.get(pluginName);
-        resolve(plugin.code);
-      });
-    };
-
     // 2. read and import in systemjs the builtin plugins
     const plugins: Map<string, string> = await this.getModulesContent(path.join(__dirname, '..', '..', 'dist', 'plugins'));
     await PluginManager.persistModules(plugins);
-    await PluginManager.importPlugins();
   }
 
   static getModulesContent(moduleDir): Promise<Map<string, string>> {

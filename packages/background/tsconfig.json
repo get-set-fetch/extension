@@ -3,10 +3,14 @@
         "target": "ES2017",
         "strict": false,
         "moduleResolution": "node",
+        "module": "esnext",
         "typeRoots": [
             "./typings",
             "./node_modules/@types"
         ],
+        "lib": [
+            "es2017", "dom"
+        ],        
     },
-    "newLine": "LF",     
+    "newLine": "LF",
 }

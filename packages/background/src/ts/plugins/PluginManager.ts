@@ -6,9 +6,15 @@ import { BaseNamedEntity } from 'get-set-fetch';
 
 const Log = Logger.getLogger('PluginManager');
 
-// used for allowing external defined GSF_PLUGINS in systemjsFetch function
-declare var GSF_PLUGINS;
+interface IModuleInfo {
+  module: any;
+  code: string;
+  url: string;
+}
+
 class PluginManager extends AbstractModuleManager {
+
+  static cache: Map<string, IModuleInfo> = new Map();
 
   static get DEFAULT_PLUGINS(): string[] {
     return ['SelectResourcePlugin', 'ExtensionFetchPlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin'];
@@ -26,20 +32,9 @@ class PluginManager extends AbstractModuleManager {
     return new GsfProvider.Plugin({ name: data.name,  code: data.content });
   }
 
-  static async importPlugins() {
-    const availablePlugins = await GsfProvider.Plugin.getAll();
-    for (let i = 0; i < availablePlugins.length; i += 1) {
-      Log.info(`SystemJS importing plugin ${availablePlugins[i].name}`);
-      // without specifying a parent url, System.getMatch enters an infinite loop
-      await System.import(`./${availablePlugins[i].name}`, 'a');
-      Log.info(`SystemJS importing plugin ${availablePlugins[i].name} DONE`);
-    }
-  }
-
  static async discoverPlugins() {
   const plugins = await this.getModulesContent('background/plugins');
   await this.persistModules(plugins);
-  await this.importPlugins();
 }
 
   static getDefaultPluginDefs() {
@@ -48,10 +43,10 @@ class PluginManager extends AbstractModuleManager {
   }
 
   static getAvailablePluginDefs() {
-    const pluginKeys = Array.from(Object.keys(System.getRegistry()));
+    const pluginKeys = Array.from(PluginManager.cache.keys());
 
     return pluginKeys.map((pluginKey) => {
-      const classDef = System.get(pluginKey).default;
+      const classDef = PluginManager.cache.get(pluginKey).module.default;
 
       const pluginInstance = new (classDef)();
 
@@ -64,65 +59,65 @@ class PluginManager extends AbstractModuleManager {
     });
   }
 
-  static instantiate(pluginDefinitions) {
-    return pluginDefinitions.map((pluginDefinition) => {
-      Log.info(`Instantiating plugin ${pluginDefinition.name}`);
-      const classDef = System.get(pluginDefinition.name).default;
+  static async instantiate(pluginDefinitions): Promise<any[]> {
+    const pluginInstances = [];
 
-      if (classDef) {
-        return new (classDef)(pluginDefinition.opts);
+    for (let i = 0; i < pluginDefinitions.length; i++) {
+      const pluginDef = pluginDefinitions[i];
+      Log.info(`Instantiating plugin ${pluginDef.name}`);
+
+      if (!PluginManager.cache.get(pluginDef.name)) {
+        const plugin = await GsfProvider.Plugin.get(pluginDef.name);
+        const pluginBlob = new Blob([plugin.code], { type: 'text/javascript' });
+        const pluginUrl = URL.createObjectURL(pluginBlob);
+        const pluginModule = await import(pluginUrl);
+
+        PluginManager.cache.set(
+          pluginDef.name,
+          {
+            code: plugin.code,
+            module: pluginModule,
+            url: pluginUrl
+          }
+        );
       }
-      else {
-        // could not found corresponding plugin definition
-        Log.warn(`pluginDefinition for ${pluginDefinition.name} not found`);
-        return null;
-      }
-    });
+
+      const classDef = PluginManager.cache.get(pluginDef.name).module.default;
+      const pluginInstance = new (classDef)(pluginDef.opts);
+      pluginInstances.push(pluginInstance);
+    }
+
+    /*
+    to do: handle missing plugin definitions
+    // could not found corresponding plugin definition
+    Log.warn(`pluginDefinition for ${pluginDefinition.name} not found`);
+    return null;
+    */
+
+    return pluginInstances;
   }
 
-  static async injectSystemJS(tabId) {
-    const systemJSPresent = await ActiveTabHelper.executeScript(
-      tabId,
-      { code: `System !== undefined` }
-    );
+  static async runInTab(tabId, pluginInstance, site, resource) {
+    const pluginName = pluginInstance.constructor.name;
 
-    // SystemJS already injected in current tab, nothing to do
-    if (systemJSPresent) return null;
+    const pluginInfo = PluginManager.cache.get(pluginName);
 
-    // inject systemjs
-    await ActiveTabHelper.executeScript(tabId, { file: 'background/plugins/systemjs/system.js' });
-
-    // inject systemjs custom fetch
-    await ActiveTabHelper.executeScript(tabId, { file: 'background/plugins/systemjs/systemjs-fetch-plugin.ts' });
-
-    // define module registry containing source code
-    await ActiveTabHelper.executeScript(tabId, { code: 'let GSF_PLUGINS = {}' });
-
-    // define custom fetch and hook it into systemjs
-    const systemjsFetch = function() {
-      System.constructor.prototype.fetch = (url) => {
-        const pluginName = url;
-        return new Promise((resolve) => {
-          resolve(GSF_PLUGINS[pluginName]);
-        });
-      };
-    };
-    await ActiveTabHelper.executeScript(tabId, { code: `(${systemjsFetch.toString()}())` });
-  }
-
-  static async runInTab(tabId, plugin, site, resource) {
-    await PluginManager.injectSystemJS(tabId);
-    const pluginName = plugin.constructor.name;
+    /*
+      - load each class separately, some utility classes may have already been loaded by other already loaded modules
+      if a class is already declared in the current tab, re-loading it fails with
+      "Uncaught SyntaxError: Identifier 'ClassName' has already been declared at "
+      but the other classes present in module will still load
+      - use negative lookahead (?!) to match anyting starting with a class definition but not containing another class definition
+     */
+    const moduleClasses = pluginInfo.code.match(/(class \w+ {([\s\S](?!(class \w+ {)|export .*))+)/gm);
+    for (let i = 0; i < moduleClasses.length; i += 1) {
+      await ActiveTabHelper.executeScript(tabId, { code: moduleClasses[i] });
+    }
 
     let result = {};
     try {
-      const pluginDeff = `Cls${pluginName}`;
+      const pluginDeff = `${pluginName}`;
       const pluginInstanceName = `inst${pluginName}`;
-
-      // define module content and import plugin
-      const moduleContent: string = GsfProvider.Plugin.cache[pluginName];
-      await ActiveTabHelper.executeScript(tabId, { code: `GSF_PLUGINS['${pluginName}']=String.raw\`${moduleContent}\`` });
-      await ActiveTabHelper.executeScript(tabId, { code: `System.import('./${pluginName}', 'a')` });
 
       // listen for incoming message
       const message = new Promise((resolve, reject) => {
@@ -142,14 +137,10 @@ class PluginManager extends AbstractModuleManager {
       await ActiveTabHelper.executeScript(tabId, { code: `
         (async function() {
           try {
-            // get plugin class definition
-            const ${pluginDeff} = System.get('${pluginName}').default;
-            // console.log(GSF_PLUGINS['${pluginName}'])
-            console.log(GSF_PLUGINS)
-            // console.log(${pluginDeff});
+            console.log(${pluginDeff});
 
             // instantiate plugin instance
-            const ${pluginInstanceName} = new ${pluginDeff}(${JSON.stringify(plugin.opts)})
+            const ${pluginInstanceName} = new ${pluginDeff}(${JSON.stringify(pluginInstance.opts)})
 
             // execute plugin
             let result = null;
@@ -177,6 +168,7 @@ class PluginManager extends AbstractModuleManager {
 
     return result;
   }
+
 }
 
 export default PluginManager;

@@ -27,8 +27,6 @@ export default abstract class AbstractModuleManager {
           reader.readEntries(
             async (moduleFileEntries: FileEntry[]) => {
               for (let i = 0; i < moduleFileEntries.length; i += 1) {
-              // ignore systemjs config plugins
-                if (moduleFileEntries[i].fullPath.indexOf('systemjs') !== -1) continue;
                 const moduleContent = await AbstractModuleManager.getModuleContent(moduleFileEntries[i]);
                 const moduleName = moduleFileEntries[i].name.match(/^(\w+).js$/)[1];
                 modules.set(moduleName, moduleContent);
@@ -69,14 +67,5 @@ export default abstract class AbstractModuleManager {
 
   static instantiateModule(data): BaseNamedEntity {
     return new GsfProvider.Plugin({ name: data.name,  code: data.content });
-  }
-
-  static async importModules() {
-    const availableModules: BaseNamedEntity[] = await this.getStoredModules();
-    for (let i = 0; i < availableModules.length; i += 1) {
-      Log.info(`SystemJS importing module ${availableModules[i].name}`);
-      await System.import(`${availableModules[i].name}!idb`);
-      Log.info(`SystemJS importing module ${availableModules[i].name} DONE`);
-    }
   }
 }
