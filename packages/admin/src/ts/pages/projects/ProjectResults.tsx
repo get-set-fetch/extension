@@ -30,53 +30,47 @@ export default class ProjectResults extends React.Component<IProps, IState> {
       scenario: null,
       scenarioInstance: null,
       results: null
-    }
+    };
 
-    this.exportCsv = this.exportCsv.bind(this);
-    this.exportZip = this.exportZip.bind(this);
-
-    // using SystemJS, fetch scenario from IndexedDB, only one scenario linked to project, no parametrization
-    System.constructor.prototype.fetch = () => {
-      return new Promise(resolve => {
-        resolve(this.state.scenario.code);
-      })
+    this.export = this.export.bind(this);
     }
-  }
 
   async componentDidMount() {
       const { projectId } = this.props.match.params;
 
       // load project
       const projectData = projectId ? await GsfClient.fetch(HttpMethod.GET, `project/${projectId}`) : {};
-      const project:Project = new Project(projectData);
+      const project: Project = new Project(projectData);
 
       // project not found, nothing more to do
       if (!project.id) return;
 
-      // load scenario, wait for state to be updated as systemjs import is based on it
-      const scenario:IScenario = (await GsfClient.fetch(HttpMethod.GET, `scenario/${project.scenarioId}`)) as IScenario;
+      // load scenario, wait for state to be updated as dynamic import is based on it
+      const scenario: IScenario = (await GsfClient.fetch(HttpMethod.GET, `scenario/${project.scenarioId}`)) as IScenario;
       await new Promise(resolve => {
-        this.setState({scenario}, () => resolve())
-      })
+        this.setState({ scenario }, () => resolve());
+      });
 
       // instantiate scenario
-      const scenarioInstance = await this.loadScenario(project.scenarioId);
+      const scenarioInstance = await this.loadScenario(scenario);
 
       // load results
       const results = await this.loadResourcesInfo(project);
 
-      this.setState({project, scenarioInstance, results});
+      this.setState({ project, scenarioInstance, results });
   }
 
-  async loadScenario(scenarioId: string) {
-    const ScenarioModule  = await System.import(`./${scenarioId}`);
-    const ScenarioCls = ScenarioModule.default;
-    const scenarioInstance:ScenarioInstance = new ScenarioCls();
-    scenarioInstance.id = scenarioId;
+  async loadScenario(scenario: IScenario) {
+    const scenarioBlob = new Blob([scenario.code], { type: 'text/javascript' });
+    const scenarioUrl = URL.createObjectURL(scenarioBlob);
+    const scenarioModule = await import(scenarioUrl);
+
+    const classDef = scenarioModule.default;
+    const scenarioInstance = new (classDef)();
     return scenarioInstance;
   }
 
-  async loadResourcesInfo(project:Project):Promise<object[]> {
+  async loadResourcesInfo(project: Project): Promise<object[]> {
     let resources = [];
 
     try {

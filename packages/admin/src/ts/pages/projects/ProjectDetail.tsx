@@ -68,59 +68,57 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
 
     this.changeHandler = this.changeHandler.bind(this);
     this.submitHandler = this.submitHandler.bind(this);
-
-    // using SystemJS, fetch scenarios from IndexedDB
-    System.constructor.prototype.fetch = (url:string, init:RequestInit) => {
-      const scenarioId = parseInt(/.+(\d+)$/.exec(url)[1], 10);
-      return new Promise(resolve => {
-        const scenario = this.state.scenarios.find((scenario:IScenario) => scenario.id === scenarioId)
-        resolve(scenario.code);
-      })
-    }
   }
 
   async componentDidMount() {
     // load project
     const { projectId } = this.props.match.params;
-    const data:object = projectId ? await GsfClient.fetch(HttpMethod.GET, `project/${projectId}`) : {};
-    const project:Project = new Project(data);
+    const data: object = projectId ? await GsfClient.fetch(HttpMethod.GET, `project/${projectId}`) : {};
+    const project: Project = new Project(data);
 
     // load available scenarios, wait for state to be updated as systemjs import is based on it
-    const scenarios:IScenario[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenario[];
+    const scenarios: IScenario[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenario[];
     await new Promise(resolve => {
-      this.setState({scenarios}, () => resolve())
-    })
+      this.setState({ scenarios }, () => resolve());
+    });
 
     // compute new baseProjectSchema for scenario dropdown
     const scenarioIdProp = Object.assign({}, this.state.baseProjectSchema.properties.scenarioId);
     scenarioIdProp.enum = scenarios.map(scenario => scenario.id);
     scenarioIdProp.enumNames = scenarios.map(scenario => scenario.name);
-    const baseProjectSchema = setIn(this.state.baseProjectSchema, ["properties", "scenarioId"], scenarioIdProp);
+    const baseProjectSchema = setIn(this.state.baseProjectSchema, ['properties', 'scenarioId'], scenarioIdProp);
 
     // modify schemas based on available scenarios data
-    let mergedSchema = setIn(this.state.baseProjectSchema, ["properties", "scenarioId"], scenarioIdProp);
+    let mergedSchema = setIn(this.state.baseProjectSchema, ['properties', 'scenarioId'], scenarioIdProp);
     let mergedUISchema = this.state.baseProjectUISchema;
 
     // if a scenario is already selected, instantiate and further update the merged schemas
     if (project.scenarioId) {
-      const scenarioInstance:ScenarioInstance = await this.loadScenario(project.scenarioId);
-      mergedSchema = setIn(mergedSchema, ["properties", "scenarioProps"], scenarioInstance.getConfigFormSchema().default);
-      mergedUISchema = setIn(mergedUISchema, ["scenarioProps"], scenarioInstance.getConfigFormUISchema().default);
+      // load scenario, wait for state to be updated as dynamic import is based on it
+      const scenario: IScenario = (await GsfClient.fetch(HttpMethod.GET, `scenario/${project.scenarioId}`)) as IScenario;
+
+      // instantiate scenario
+      const scenarioInstance = await this.loadScenario(scenario);
+
+      mergedSchema = setIn(mergedSchema, ['properties', 'scenarioProps'], scenarioInstance.getConfigFormSchema().default);
+      mergedUISchema = setIn(mergedUISchema, ['scenarioProps'], scenarioInstance.getConfigFormUISchema().default);
     }
 
     // update state
     this.setState({ project, baseProjectSchema, mergedSchema, mergedUISchema });
   }
 
-  async loadScenario(scenarioId: string) {
-    const ScenarioModule  = await System.import(`./${scenarioId}`);
-    const ScenarioCls = ScenarioModule.default;
-    const scenarioInstance:ScenarioInstance = new ScenarioCls();
-    scenarioInstance.id = scenarioId;
+  async loadScenario(scenario: IScenario) {
+    const scenarioBlob = new Blob([scenario.code], { type: 'text/javascript' });
+    const scenarioUrl = URL.createObjectURL(scenarioBlob);
+    const scenarioModule = await import(scenarioUrl);
+
+    const classDef = scenarioModule.default;
+    const scenarioInstance = new (classDef)();
     return scenarioInstance;
   }
 
-  async changeHandler({formData}) {
+  async changeHandler({ formData }) {
     const newScenarioId = formData.scenarioId;
     const currentScenarioId = this.state.scenarioInstance ? this.state.scenarioInstance.id : null;
     const scenarioChanged = newScenarioId !== currentScenarioId;
@@ -138,9 +136,9 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
       }
        // new scenario selected
       else {
-        const scenarioInstance:ScenarioInstance = await this.loadScenario(newScenarioId);
-        const mergedSchema = setIn(this.state.baseProjectSchema, ["properties", "scenarioProps"], scenarioInstance.getConfigFormSchema().default);
-        const mergedUISchema = setIn(this.state.baseProjectUISchema, ["scenarioProps"], scenarioInstance.getConfigFormUISchema().default);
+        const scenarioInstance: IScenarioInstance = await this.loadScenario(newScenarioId);
+        const mergedSchema = setIn(this.state.baseProjectSchema, ['properties', 'scenarioProps'], scenarioInstance.getConfigFormSchema().default);
+        const mergedUISchema = setIn(this.state.baseProjectUISchema, ['scenarioProps'], scenarioInstance.getConfigFormUISchema().default);
 
         this.setState({
           project: new Project(formData),
@@ -153,7 +151,7 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
     // base property other than scenarioId has changed
     else {
       this.setState({
-        project: new Project(formData),
+        project: new Project(formData)
       });
     }
   }
@@ -161,14 +159,14 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
   async submitHandler() {
     // validate form
     const { errors } = this.state.formRef.validate(this.state.formRef.state.formData);
-    console.log(errors)
+    console.log(errors);
     // only proceed to saving if no validation errors are present
     if (errors.length !== 0) return;
 
     // add plugable pluginDefinitions to current project
     const pluginDefinitions = this.state.scenarioInstance.getPluginDefinitions(this.state.project.scenarioProps);
 
-    const finalProject = setIn(this.state.project, ["pluginDefinitions"], pluginDefinitions);
+    const finalProject = setIn(this.state.project, ['pluginDefinitions'], pluginDefinitions);
 
     try {
       if (this.state.project.id) {
@@ -194,13 +192,13 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
 
     return (
       <Page
-        title={this.state.project.name ? this.state.project.name : "New Project"}
+        title={this.state.project.name ? this.state.project.name : 'New Project'}
       >
         <Form
-          className="form-main"
+          className='form-main'
           ref={(form) => {
             if (!this.state.formRef) {
-              this.setState({formRef: form})
+              this.setState({ formRef: form });
             }
           }}
           fields={{ SchemaField }}
@@ -216,15 +214,15 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
           formData={this.state.project.toJS()}
           onChange={this.changeHandler}
         >
-          <div className="form-group row">
-            <div className="col-sm-2"/>
-            <div className="col-sm-5">
-              <a id="save" className="btn btn-secondary" href="#" role="button" onClick={this.submitHandler}>Save</a>
-              <NavLink id="cancel" to="/projects" className="btn btn-light ml-4">Cancel</NavLink>
+          <div className='form-group row'>
+            <div className='col-sm-2'/>
+            <div className='col-sm-5'>
+              <a id='save' className='btn btn-secondary' href='#' role='button' onClick={this.submitHandler}>Save</a>
+              <NavLink id='cancel' to='/projects' className='btn btn-light ml-4'>Cancel</NavLink>
             </div>
           </div>
         </Form>
       </Page>
-    )
+    );
   }
 }

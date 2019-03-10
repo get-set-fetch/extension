@@ -4,6 +4,12 @@ import { BaseNamedEntity } from 'get-set-fetch';
 
 const Log = Logger.getLogger('PluginManager');
 
+export interface IModuleInfo {
+  module: any;
+  code: string;
+  url: string;
+}
+
 export default abstract class AbstractModuleManager {
   static getModuleContent(fileEntry: FileEntry): Promise<string> {
     return new Promise((resolve) => {
@@ -46,7 +52,7 @@ export default abstract class AbstractModuleManager {
     for (const [moduleName, moduleContent] of modules.entries()) {
       const storedModule = await this.getStoredModule(moduleName);
       if (!storedModule) {
-        const newModule: BaseNamedEntity = this.instantiateModule({
+        const newModule: BaseNamedEntity = this.createEntity({
           name: moduleName,
           content: moduleContent
         });
@@ -65,7 +71,7 @@ export default abstract class AbstractModuleManager {
     return GsfProvider.Plugin.getAll();
   }
 
-  static instantiateModule(data): BaseNamedEntity {
+  static createEntity(data): BaseNamedEntity {
     return new GsfProvider.Plugin({ name: data.name,  code: data.content });
   }
 }

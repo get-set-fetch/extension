@@ -1,16 +1,10 @@
 import GsfProvider from './../storage/GsfProvider';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 import Logger from '../logger/Logger';
-import AbstractModuleManager from './AbstractModuleManager';
+import AbstractModuleManager, { IModuleInfo } from './AbstractModuleManager';
 import { BaseNamedEntity } from 'get-set-fetch';
 
 const Log = Logger.getLogger('PluginManager');
-
-interface IModuleInfo {
-  module: any;
-  code: string;
-  url: string;
-}
 
 class PluginManager extends AbstractModuleManager {
 
@@ -28,7 +22,7 @@ class PluginManager extends AbstractModuleManager {
     return GsfProvider.Plugin.getAll();
   }
 
-  static instantiateModule(data): BaseNamedEntity {
+  static createEntity(data): BaseNamedEntity {
     return new GsfProvider.Plugin({ name: data.name,  code: data.content });
   }
 
