@@ -11,7 +11,7 @@ import ScenarioManager from './scenarios/ScenarioManager';
   const storedSettings = await GsfProvider.Setting.getAll();
   let logLevel = storedSettings.find(setting => setting.key === 'logLevel');
   if (!logLevel) {
-    logLevel = new GsfProvider.Setting({ key: 'logLevel', val: LogLevel.INFO.toString() });
+    logLevel = new GsfProvider.Setting({ key: 'logLevel', val: LogLevel.WARN.toString() });
     await logLevel.save();
   }
   Logger.setLogLevel(parseInt(logLevel.val, 10));
