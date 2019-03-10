@@ -52,7 +52,6 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-tslint": "^0.1.38",
     "rollup-plugin-typescript": "^1.0.0",
-    "rollup-plugin-typescript2": "^0.18.1",
     "sinon": "^6.1.4",
     "ts-node": "^7.0.1",
     "tslib": "^1.9.3",
