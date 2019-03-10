@@ -3,6 +3,7 @@
         "target": "ES2017",
         "strict": false,
         "moduleResolution": "node",
+        "module": "esnext",
         "jsx": "react",
         "resolveJsonModule": true,
         "esModuleInterop":true,

@@ -5,10 +5,6 @@ import 'bootstrap/js/dist/dropdown';
 import 'bootstrap/js/dist/modal';
 import 'bootstrap/js/dist/collapse';
 
-// systemjs 2.0 module management for dynamic scenario loading
-import 'systemjs/dist/system';
-import './systemjs/systemjs-fetch-plugin';
-
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import Admin from './pages/Admin';

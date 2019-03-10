@@ -10,7 +10,8 @@
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && npm run build:dist",
-    "build:dist": "webpack --config webpack.config.js --mode production --display-modules",
+    "build:dist": "rollup --environment NODE_ENV:production --config rollup.config.js && npm run copy:html",
+    "copy:html": "cpx \"src/html/**/*\" dist",
     "build:dev": "webpack-dev-server --config ./webpack.config.dev.js --mode development"
   },
   "keywords": [
@@ -30,22 +31,25 @@
     "@types/react-beautiful-dnd": "^10.0.1",
     "@types/react-jsonschema-form": "^1.0.13",
     "@types/react-router-dom": "^4.3.1",
-    "copy-webpack-plugin": "^4.5.1",
-    "css-loader": "^0.28.11",
-    "exports-loader": "^0.7.0",
-    "file-loader": "^2.0.0",
-    "html-webpack-plugin": "^3.2.0",
-    "mini-css-extract-plugin": "^0.4.0",
-    "node-sass": "^4.11.0",
-    "postcss-loader": "^3.0.0",
-    "sass-loader": "^7.1.0",
-    "style-loader": "^0.21.0",
-    "ts-loader": "^5.3.3",
-    "tslint": "^5.12.1",
-    "typescript": "^3.2.2",
-    "webpack": "^4.28.4",
-    "webpack-cli": "^3.2.1",
-    "webpack-dev-server": "^3.1.14"
+    "cpx": "^1.5.0",
+    "rimraf": "^2.6.2",
+    "rollup-plugin-commonjs": "^9.2.1",
+    "rollup-plugin-ignore": "^1.0.3",
+    "rollup-plugin-json": "^3.0.0",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-globals": "^1.2.1",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-sass": "^1.1.0",
+    "rollup-plugin-tslint": "^0.1.38",
+    "rollup-plugin-typescript": "^1.0.0",
+    "rollup-plugin-typescript2": "^0.18.1",
+    "rollup-plugin-url": "^2.2.0",
+    "ts-node": "^7.0.1",
+    "tslib": "^1.9.3",
+    "tslint": "^5.12.0",
+    "tslint-config-airbnb": "^5.11.1",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.2.2"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.3.1",
@@ -57,10 +61,9 @@
     "popper.js": "^1.14.3",
     "query-string": "^6.1.0",
     "react": "^16.4.0",
-    "react-beautiful-dnd": "^9.0.2",
+    "react-beautiful-dnd": "^10.0.4",
     "react-dom": "^16.4.0",
     "react-jsonschema-form": "^1.2.0",
-    "react-router-dom": "^4.3.1",
-    "systemjs": "^3.0.0"
+    "react-router-dom": "^4.3.1"
   }
 }
