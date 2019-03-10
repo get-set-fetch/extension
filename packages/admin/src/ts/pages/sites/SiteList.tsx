@@ -1,10 +1,8 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
-import {HttpMethod} from 'get-set-fetch-extension-commons';
+import { HttpMethod } from 'get-set-fetch-extension-commons';
 import Table, { IHeaderCol } from '../../components/Table';
 import GsfClient from '../../components/GsfClient';
-import ExportHelper from '../../utils/ExportHelper';
-import DownloadHelper from '../../utils/DownloadHelper';
 import Site from './model/Site';
 import Resource from './model/Resource';
 import Page from '../../layout/Page';
@@ -15,7 +13,51 @@ interface IState {
 }
 
 export default class SiteList extends React.Component<{}, IState> {
-  async crawlSite(site:Site) {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      header: [
+        {
+          label: 'Name',
+          render: (site: Site) => site.name
+        },
+        {
+          label: 'URL',
+          render: (site: Site) => site.url
+        },
+        {
+          label: 'Status',
+          render: (site: Site) => '-'
+        },
+        {
+          label: 'Actions',
+          renderLink: false,
+          render: (site: Site) => ([
+              <input
+                id={`crawl-${site.id}`}
+                type='button'
+                className='btn-secondary mr-2'
+                value='Crawl'
+                onClick={() => this.crawlSite(site)}
+              />,
+              <input
+                id={`delete-${site.id}`}
+                type='button'
+                className='btn-secondary'
+                value='Delete'
+                onClick={evt => this.deleteSite(site)}
+              />
+          ])
+        }
+      ],
+      data: []
+    };
+
+    this.deleteSite = this.deleteSite.bind(this);
+  }
+  async crawlSite(site: Site) {
     try {
       await GsfClient.fetch(HttpMethod.GET, `site/${site.id}/crawl`);
     }
@@ -24,7 +66,7 @@ export default class SiteList extends React.Component<{}, IState> {
     }
   }
 
-  async deleteSite(site:Site) {
+  async deleteSite(site: Site) {
     try {
       await GsfClient.fetch(HttpMethod.DELETE, 'sites', { ids: [site.id] });
     }
@@ -35,74 +77,18 @@ export default class SiteList extends React.Component<{}, IState> {
     this.loadSites();
   }
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      header: [
-        {
-          label: 'Name',
-          render: (site:Site) => site.name,
-        },
-        {
-          label: 'URL',
-          render: (site:Site) => site.url,
-        },
-        {
-          label: 'Status',
-          render: (site:Site) => "-",
-        },
-        {
-          label: 'Actions',
-          renderLink: false,
-          render: (site:Site) => ([
-              <input
-                id={`crawl-${site.id}`}
-                type="button"
-                className="btn-secondary mr-2"
-                value="Crawl"
-                onClick={() => this.crawlSite(site)}
-              />,
-              <a
-                id={`csv-${site.id}`}
-                data-id={site.id}
-                className="mr-2"
-                href="#"
-                target="_blank"
-                download={site.name}
-                onClick={this.exportCSV}
-              >
-                CSV
-              </a>,
-              <input
-                id={`delete-${site.id}`}
-                type="button"
-                className="btn-secondary"
-                value="Delete"
-                onClick={evt => this.deleteSite(site)}
-              />,
-          ]),
-        },
-      ],
-      data: [],
-    };
-
-    this.deleteSite = this.deleteSite.bind(this);
-    this.exportCSV = this.exportCSV.bind(this);
-  }
-
   componentDidMount() {
     this.loadSites();
   }
 
   async loadSites() {
-    const data:Site[] = (await GsfClient.fetch(HttpMethod.GET, 'sites')) as Site[];
+    const data: Site[] = (await GsfClient.fetch(HttpMethod.GET, 'sites')) as Site[];
     this.setState({ data });
   }
 
-  async loadResourcesInfo(siteId:string):Promise<object[]> {
+  async loadResourcesInfo(siteId: string): Promise<object[]> {
      // load just the crawled resources for the current site
-     let crawledResources:Resource[] = [];
+     let crawledResources: Resource[] = [];
      try {
        crawledResources = (await GsfClient.fetch(HttpMethod.GET, `resources/${siteId}/crawled`)) as Resource[];
      }
@@ -117,35 +103,25 @@ export default class SiteList extends React.Component<{}, IState> {
      return crawledResources.map(resource => resource.info || {});
   }
 
-  exportCSV(evt:React.MouseEvent<HTMLAnchorElement>) {
-    const siteId = evt.currentTarget.dataset.id;
-    DownloadHelper.exportCSV(this.loadResourcesInfo(siteId), evt);
-  }
-
   // eslint-disable-next-line class-methods-use-this
   render() {
     return (
       <Page
-        title="Sites"
+        title='Sites'
         actions={[
-          <NavLink id="newsite" to="/site/" className="btn btn-secondary float-right">Add New Site</NavLink>
+          <NavLink id='newsite' to='/site/' className='btn btn-secondary float-right'>Add New Site</NavLink>
         ]}
         >
         <Table
           header={this.state.header}
           rowLink={this.rowLink}
-          data={this.state.data}                 
+          data={this.state.data}
         />
       </Page>
     );
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  componentWillUnmount() {
-    DownloadHelper.revokeAllObjectUrls();
-  }
-
-  rowLink(row:Site) {
+  rowLink(row: Site) {
     return `/site/${row.id}`;
   }
 }

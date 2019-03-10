@@ -4,7 +4,7 @@ import { join, resolve } from 'path';
 import BrowserHelper from '../../../utils/BrowserHelper';
 
 /* eslint-disable no-shadow */
-describe('Site Crawl Extract Images', () => {
+xdescribe('Site Crawl Extract Images', () => {
   let browser = null;
   let adminPage = null;
 

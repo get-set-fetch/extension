@@ -6,7 +6,7 @@ import BrowserHelper from '../../../utils/BrowserHelper';
 import TestUtils from 'get-set-fetch/test/utils/TestUtils';
 
 /* eslint-disable no-shadow */
-describe('Site Crawl Extract HTML Headers', () => {
+xdescribe('Site Crawl Extract HTML Headers', () => {
   let browser = null;
   let adminPage = null;
 
