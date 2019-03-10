@@ -2,7 +2,7 @@ import * as React from 'react';
 import { NavLink } from 'react-router-dom';
 
 export interface IHeaderCol {
-  label: string,
+  label: string;
   render: (row) => any;
   renderLink?: boolean;
 }
@@ -10,7 +10,7 @@ export interface IHeaderCol {
 interface IProps {
   header: IHeaderCol[];
   data: any[];
-  emptyTableMsg?:string;
+  emptyTableMsg?: string;
   rowLink?: (row) => string;
 }
 
@@ -27,14 +27,15 @@ export default class Table extends React.Component<IProps, {}> {
     super(props);
   }
 
-
   render() {
-    if (!this.props.data || this.props.data.length === 0) return (
-      <p id="no-entries" className="ml-4"><i>{this.props.emptyTableMsg}</i></p>
-    );
+    if (!this.props.data || this.props.data.length === 0) {
+      return (
+        <p id='no-entries' className='ml-4'><i>{this.props.emptyTableMsg}</i></p>
+      );
+    }
 
     return (
-      <table className="table table-hover table-main">
+      <table className='table table-hover table-main'>
         <thead>
           <tr>
             {
@@ -45,7 +46,7 @@ export default class Table extends React.Component<IProps, {}> {
         <tbody>
           {
             this.props.data.map((row, rowIdx) => (
-              <tr key={row.toString()}>
+              <tr key={rowIdx}>
                 {
                   this.props.header.map((col, idx) => this.renderCell(row, col, idx))
                 }
@@ -58,15 +59,15 @@ export default class Table extends React.Component<IProps, {}> {
   }
 
   renderCell(row, col, idx) {
-    return idx === 0 ? this.renderThCell(row, col) : this.renderTdCell(row, col);
+    return idx === 0 ? this.renderThCell(row, col, idx) : this.renderTdCell(row, col, idx);
   }
 
-  renderThCell(row, col) {
-    return <th>{this.renderCellContent(row, col)}</th>;
+  renderThCell(row, col, idx) {
+    return <th key={idx}>{this.renderCellContent(row, col)}</th>;
   }
 
-  renderTdCell(row, col) {
-    return <td>{this.renderCellContent(row, col)}</td>;
+  renderTdCell(row, col, idx) {
+    return <td  key={idx}>{this.renderCellContent(row, col)}</td>;
   }
 
   renderCellContent(row, col) {
@@ -74,7 +75,7 @@ export default class Table extends React.Component<IProps, {}> {
       return col.render(row);
     }
     else {
-      return <NavLink to={this.props.rowLink(row)} className="btn-block">{col.render(row)}</NavLink>;
+      return <NavLink to={this.props.rowLink(row)} className='btn-block'>{col.render(row)}</NavLink>;
     }
   }
 }

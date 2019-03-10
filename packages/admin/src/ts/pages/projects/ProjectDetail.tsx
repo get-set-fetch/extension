@@ -21,7 +21,7 @@ interface IProps {
   history: History;
   match: match<{
     projectId: string;
-  }>
+  }>;
 }
 
 interface IState {
