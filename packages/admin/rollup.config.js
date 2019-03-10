@@ -1,7 +1,6 @@
 import commonjs from 'rollup-plugin-commonjs';
 import typescript from 'rollup-plugin-typescript';
 import json from 'rollup-plugin-json';
-import ignore from 'rollup-plugin-ignore';
 import resolve from 'rollup-plugin-node-resolve';
 import globals from 'rollup-plugin-node-globals';
 import builtins from 'rollup-plugin-node-builtins';
