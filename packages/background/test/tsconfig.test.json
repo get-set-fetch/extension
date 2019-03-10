@@ -3,10 +3,12 @@
         "target": "esnext",
         "strict": false,
         "moduleResolution": "node",
+        "module": "commonjs",
         "typeRoots": [
             "../typings",
             "../node_modules/@types"
-        ]
+        ],
+        "allowJs": true,
     },
     "newLine": "LF"
 }
