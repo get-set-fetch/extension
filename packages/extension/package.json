@@ -21,8 +21,8 @@
     "copy:bkg:watch": "cpx  \"node_modules/get-set-fetch-extension-background/dist/**/*\" dist/background --watch",
     "copy:popup:watch": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup --watch",
     "copy:admin:watch": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin --watch",
-    "test": "mocha test ./test/integration/**/*.ts --exit",
-    "test:single": "mocha test ./test/integration/**/*.ts --grep \"Test Crawl Site Images\""
+    "test": "mocha test \"./test/integration/**/*.ts\" --exit",
+    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Test Crawl Project Extract Resources\""
   },
   "author": "",
   "license": "ISC",
