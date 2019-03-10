@@ -1,9 +1,9 @@
-import { ScenarioInstance, PluginDefinition, ExportType } from 'get-set-fetch-extension-commons';
+import { IScenarioInstance, ExportType, IExportOpt, IPluginDefinition } from 'get-set-fetch-extension-commons';
 
 import ConfigFormSchema from '../resources/config-form-schema';
 import ConfigFormUISchema from '../resources/config-form-ui-schema';
 
-export default class ExtractResources implements ScenarioInstance {
+export default class ExtractResources implements IScenarioInstance {
   getConfigFormSchema() {
     return ConfigFormSchema;
   }
@@ -13,7 +13,7 @@ export default class ExtractResources implements ScenarioInstance {
   }
 
   getPluginDefinitions(scenarioProps) {
-    const pluginDefinitions: PluginDefinition[] = [
+    const pluginDefinitions: IPluginDefinition[] = [
         {
           name: 'SelectResourcePlugin'
         },
@@ -58,11 +58,13 @@ export default class ExtractResources implements ScenarioInstance {
     ];
   }
 
-  getResultExportOpts() {
+  getResultExportOpts(): IExportOpt[] {
     return [
       {
         type: ExportType.CSV,
-        cols: ['url', 'info', 'mediaType']
+        cols: ['url', 'info.title', 'mediaType'],
+        fieldSeparator: ',',
+        lineSeparator: '\n'
       },
       {
         type: ExportType.ZIP,

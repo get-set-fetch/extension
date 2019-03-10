@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { setIn } from 'immutable';
 import GsfClient from '../../components/GsfClient';
-import {HttpMethod} from 'get-set-fetch-extension-commons';
+import { HttpMethod, IEnhancedJSONSchema, IScenarioInstance } from 'get-set-fetch-extension-commons';
 import { History } from 'history';
 import { match } from 'react-router';
 import Project from './model/Project';
@@ -9,11 +9,10 @@ import Scenario from '../scenarios/model/Scenario';
 import Form, { UiSchema } from 'react-jsonschema-form';
 import BaseFormSchema from './schema/project-form-schema.json';
 import BaseFormUISchema from './schema/project-form-ui-schema.json';
-import ScenarioInstance, { EnhancedJSONSchema } from '../scenarios/model/ScenarioInstance';
-import SchemaField from "../../components/react-jsonschema-form/SchemaField";
-import BaseInput from "../../components/react-jsonschema-form/widgets/BaseInput";
-import ScenarioDescription from "../../components/react-jsonschema-form/widgets/ScenarioDescription";
-import ScenarioLink from "../../components/react-jsonschema-form/widgets/ScenarioLink";
+import SchemaField from '../../components/react-jsonschema-form/SchemaField';
+import BaseInput from '../../components/react-jsonschema-form/widgets/BaseInput';
+import ScenarioDescription from '../../components/react-jsonschema-form/widgets/ScenarioDescription';
+import ScenarioLink from '../../components/react-jsonschema-form/widgets/ScenarioLink';
 import { NavLink } from 'react-router-dom';
 import Page from '../../layout/Page';
 import IScenario from '../scenarios/model/Scenario';
@@ -29,14 +28,14 @@ interface IState {
   project: Project;
 
   scenarios: IScenario[];
-  scenarioInstance: ScenarioInstance;
+  scenarioInstance: IScenarioInstance;
 
   // schemas defining project props without plugable scenario props
-  baseProjectSchema: EnhancedJSONSchema;
+  baseProjectSchema: IEnhancedJSONSchema;
   baseProjectUISchema: UiSchema;
 
   // schemas defining project props combined with plugable scenario props
-  mergedSchema: EnhancedJSONSchema;
+  mergedSchema: IEnhancedJSONSchema;
   mergedUISchema: UiSchema;
 
   // reference to form element
@@ -48,7 +47,7 @@ declare const System: any;
 export default class ProjectDetail extends React.Component<IProps, IState> {
   static defaultProps = {
     projectId: null
-  }
+  };
 
   constructor(props) {
     super(props);
@@ -58,13 +57,13 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
       scenarios: [],
       scenarioInstance: null,
 
-      baseProjectSchema: BaseFormSchema as EnhancedJSONSchema,
+      baseProjectSchema: BaseFormSchema as IEnhancedJSONSchema,
       baseProjectUISchema: BaseFormUISchema,
 
-      mergedSchema: BaseFormSchema as EnhancedJSONSchema,
+      mergedSchema: BaseFormSchema as IEnhancedJSONSchema,
       mergedUISchema: BaseFormUISchema,
 
-      formRef: null,
+      formRef: null
     };
 
     this.changeHandler = this.changeHandler.bind(this);

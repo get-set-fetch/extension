@@ -1,36 +1,25 @@
 import * as React from 'react';
 import { match } from 'react-router';
-import { HttpMethod } from 'get-set-fetch-extension-commons';
-import ScenarioInstance from '../scenarios/model/ScenarioInstance';
+import { IScenarioInstance, HttpMethod, IExportOpt, IExportResult, ExportType } from 'get-set-fetch-extension-commons';
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
 import Table from '../../components/Table';
 import Project from './model/Project';
 import IScenario from '../scenarios/model/Scenario';
-import { NavLink } from 'react-router-dom';
-import DownloadHelper from '../../utils/DownloadHelper';
 import Resource from '../sites/model/Resource';
-import Site from '../sites/model/Site';
 
 interface IProps {
   match: match<{
     projectId: string;
-  }>
+  }>;
 }
 
 interface IState {
-  project:Project;
-  scenario:IScenario;
-  scenarioInstance: ScenarioInstance;
+  project: Project;
+  scenario: IScenario;
+  scenarioInstance: IScenarioInstance;
   results: object[];
 }
-
-interface IExportInfo {
-  url?: string;
-  error?: string;
-}
-
-declare const System: any;
 
 export default class ProjectResults extends React.Component<IProps, IState> {
   constructor(props) {
