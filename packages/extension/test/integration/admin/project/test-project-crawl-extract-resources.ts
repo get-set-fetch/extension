@@ -3,13 +3,14 @@ import { assert } from 'chai';
 import { join, resolve } from 'path';
 import BrowserHelper from '../../../utils/BrowserHelper';
 import TestUtils from 'get-set-fetch/test/utils/TestUtils';
+import { readFileSync } from 'fs';
 
 /* eslint-disable no-shadow */
 describe('Project Crawl Extract Resources', () => {
   let browser = null;
   let adminPage = null;
 
-  const targetDir = join('test', 'tmp'); // ../../test/tmp';
+  const targetDir = join(__dirname, '..', '..', '..', 'tmp');
 
   const gotoOpts = {
     timeout: 10 * 1000,
@@ -53,6 +54,14 @@ describe('Project Crawl Extract Resources', () => {
     ]
   };
 
+  const expectedResources = [
+    { url: 'http://www.sitea.com/index.html', mediaType: 'text/html', info: { title: 'siteA' } },
+    { url: 'http://www.sitea.com/pageA.html', mediaType: 'text/html', info: { title: 'pageA' } },
+    { url: 'http://www.sitea.com/pageB.html', mediaType: 'text/html', info: { title: 'pageB' } },
+    { url: 'http://www.sitea.com/img/imgA-150.png', mediaType: 'image/png', info: { width: 150, height: 150, name: 'imgA-150.png' } },
+    { url: 'http://www.sitea.com/img/imgB-850.png', mediaType: 'image/png', info: { width: 850, height: 850, name: 'imgB-850.png' } }
+  ];
+
   before(async () => {
     browser = await BrowserHelper.launch();
     adminPage = await browser.newPage();
@@ -74,7 +83,7 @@ describe('Project Crawl Extract Resources', () => {
   });
 
   after(async () => {
-    // await browser.close();
+    await browser.close();
   });
 
   async function waitForCrawlComplete(adminPage, siteId, resolve = null) {
@@ -96,6 +105,47 @@ describe('Project Crawl Extract Resources', () => {
     }
 
     return null;
+  }
+
+  async function checkCrawledResources(siteId) {
+    // retrieve crawled resources
+    const crawledResources = await adminPage.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/crawled`), siteId);
+    assert.strictEqual(5, crawledResources.length);
+
+    // check each resource
+    for (let i = 0; i < crawledResources.length; i += 1) {
+      const crawledResource = crawledResources[i];
+      const expectedResource = expectedResources.find(resource => resource.url === crawledResource.url);
+      assert.strictEqual(crawledResource.url, expectedResource.url);
+      assert.strictEqual(crawledResource.mediaType, expectedResource.mediaType);
+      assert.deepEqual(crawledResource.info, expectedResource.info);
+    }
+  }
+
+  async function downloadCsv(project) {
+    const csvLink = `a#csv-${project.id}`;
+    await adminPage.waitFor(csvLink);
+    await adminPage.click(csvLink);
+
+    // wait a bit for file to be generated and saved
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // check file content
+    const expectedHeader = 'url,info.title,mediaType';
+    const expectedBody: string[] = expectedResources
+      .map(
+        resource =>
+        [resource.url, resource.info.title ? resource.info.title : '', resource.mediaType].join(',')
+      );
+
+    const generatedContent = readFileSync(resolve(targetDir, `${project.name}.csv`), 'utf8');
+    const csvLines = generatedContent.split('\n');
+
+    const generatedHeader = csvLines[0];
+    const generatedBody = csvLines.slice(1);
+
+    assert.strictEqual(generatedHeader, expectedHeader);
+    // assert.sameDeepMembers(generatedBody, expectedBody);
   }
 
   it('Test Crawl Project Extract Resources', async () => {
@@ -122,25 +172,8 @@ describe('Project Crawl Extract Resources', () => {
     // wait for all resources to be crawled (resource.crawledAt is updated for all resources)
     await waitForCrawlComplete(adminPage, loadedSite.id);
 
-    // retrieve crawled resources
-    const crawledResources = await adminPage.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/crawled`), loadedSite.id);
-    assert.strictEqual(5, crawledResources.length);
-
-    // check each resource
-    const expectedResources = {
-      'http://www.sitea.com/index.html': { mediaType: 'text/html', info: { title: 'siteA' } } ,
-      'http://www.sitea.com/pageA.html': { mediaType: 'text/html', info: { title: 'pageA' } } ,
-      'http://www.sitea.com/pageB.html': { mediaType: 'text/html', info: { title: 'pageB' } } ,
-      'http://www.sitea.com/img/imgA-150.png': { mediaType: 'image/png', info: { width: 150, height: 150 } },
-      'http://www.sitea.com/img/imgB-850.png': { mediaType: 'image/png', info: { width: 850, height: 850 } }
-    };
-
-    for (let i = 0; i < crawledResources.length; i += 1) {
-      const crawledResource = crawledResources[i];
-      const { url } = crawledResource;
-      assert.strictEqual(crawledResource.mediaType, expectedResources[url].mediaType);
-      assert.deepEqual(crawledResource.info, expectedResources[url].info);
-    }
+    // check crawled resources
+    await checkCrawledResources(loadedSite.id);
 
     // reload project list
     await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
@@ -148,6 +181,7 @@ describe('Project Crawl Extract Resources', () => {
 
     // goto project results page
     const resultsInputId = `input#results-${loadedProject.id}[type=button]`;
+    await adminPage.waitFor(resultsInputId);
     await adminPage.click(resultsInputId);
 
     // start a CDPSession in order to change download behavior via Chrome Devtools Protocol
@@ -159,24 +193,15 @@ describe('Project Crawl Extract Resources', () => {
       downloadPath: resolve(targetDir)
     });
 
+    // open export dropdown
+    const downloadBtn = 'button#export';
+    await adminPage.waitFor(downloadBtn);
+    await adminPage.click(downloadBtn);
+
     // download csv
-    const exportCsvId = `a#csv-${loadedProject.id}`;
-    await adminPage.waitFor(exportCsvId);
-    await adminPage.click(exportCsvId);
+    await downloadCsv(loadedProject);
 
-    // wait a bit for file to be generated and saved
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    /*
-    // check file content
-    const expectedHeader = 'title';
-    const expectedBody = Object
-      .values(titles)
-      .join('\n');
-    const expectedCsv = `${expectedHeader}\n${expectedBody}`;
-    const generatedCsv = readFileSync(resolve('./', 'test', 'tmp', `${loadedProject.name}.txt`), 'utf8');
-    assert.strictEqual(expectedCsv, generatedCsv);
-    */
     // download zip
   });
+
 });
