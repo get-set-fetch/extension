@@ -37,7 +37,8 @@ export default class ImageFilterPlugin implements IPlugin {
         resolve({
           info: {
             width: img.naturalWidth,
-            height: img.naturalHeight
+            height: img.naturalHeight,
+            name: resource.url.split('/').pop().split('#')[0].split('?')[0]
           }
         });
       };
