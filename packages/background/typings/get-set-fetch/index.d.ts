@@ -39,7 +39,7 @@ declare module 'get-set-fetch' {
     siteId: number;
     mediaType: string;
     blob: any;
-    info: {};
+    info: any;
   }
 
   export interface IPluginDefinition {

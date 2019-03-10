@@ -33,7 +33,7 @@ export default class ProjectResults extends React.Component<IProps, IState> {
     };
 
     this.export = this.export.bind(this);
-    }
+  }
 
   async componentDidMount() {
       const { projectId } = this.props.match.params;
@@ -89,12 +89,12 @@ export default class ProjectResults extends React.Component<IProps, IState> {
     return crawledResources.map(resource => resource.info || {});
     */
 
-    return resources;    
+    return resources;
  }
 
-  async exportCsv(evt:React.MouseEvent<HTMLAnchorElement>) {
-    const {currentTarget} = evt;
-    
+  async export(evt: React.MouseEvent<HTMLAnchorElement>, exportType: ExportType) {
+    const { currentTarget } = evt;
+
     // download href has just been set don't recreate it again, allow the browser to naturally follow the download link
     if (currentTarget.hasAttribute('downloadready')) {
       currentTarget.removeAttribute('downloadready');
@@ -102,28 +102,11 @@ export default class ProjectResults extends React.Component<IProps, IState> {
     }
     evt.preventDefault();
 
-    const exportOpt = this.state.scenarioInstance.getResultExportOpts().find(exportOpt => exportOpt.type === 'csv');
-    const exportInfo:IExportInfo = await GsfClient.fetch(HttpMethod.GET, `project/export/${this.state.project.id}`, exportOpt);
+    const exportOpt: IExportOpt = this.state.scenarioInstance.getResultExportOpts().find(exportOpt => exportOpt.type === exportType);
+    const exportInfo: IExportResult = await GsfClient.fetch(HttpMethod.GET, `project/export/${this.state.project.id}`, exportOpt);
 
     currentTarget.href = exportInfo.url;
-    currentTarget.setAttribute('downloadready', "true");
-    currentTarget.click();
-  }
-
-  async exportZip(evt:React.MouseEvent<HTMLAnchorElement>) {
-    const {currentTarget} = evt;
-
-    // download href has just been set don't recreate it again, allow the browser to naturally follow the download link
-    if (currentTarget.hasAttribute('downloadready')) {
-      currentTarget.removeAttribute('downloadready');
-      return;
-    }
-
-    evt.preventDefault();
-
-    const exportInfo:IExportInfo = await GsfClient.fetch(HttpMethod.GET, `project/export/${this.state.project.id}`);
-    currentTarget.href = exportInfo.url;
-    currentTarget.setAttribute('downloadready', "true");
+    currentTarget.setAttribute('downloadready', 'true');
     currentTarget.click();
   }
 
@@ -133,13 +116,13 @@ export default class ProjectResults extends React.Component<IProps, IState> {
 
     return (
       <Page
-        title={this.state.project.id ? `${this.state.project.name} results` : "Project not found"}
+        title={this.state.project.id ? `${this.state.project.name} results` : 'Project not found'}
         actions={ this.state.project.id ? this.renderExportButton() : [] }
         >
         {
           // project not found
           !this.state.project.id && (
-            <div className="alert alert-danger" role="alert">
+            <div className='alert alert-danger' role='alert'>
                <p>Project not found</p>
             </div>
           )
@@ -158,32 +141,33 @@ export default class ProjectResults extends React.Component<IProps, IState> {
 
   renderExportButton() {
     return ([
-      <div className="dropdown btn btn-secondary mr-2 float-right">
+      <div className='dropdown btn btn-secondary mr-2 float-right'>
         <button
-          className="btn btn-secondary dropdown-toggle"
-          type="button"
-          data-toggle="dropdown"
-          aria-haspopup="true"
-          aria-expanded="false">
+          id='export'
+          className='btn btn-secondary dropdown-toggle'
+          type='button'
+          data-toggle='dropdown'
+          aria-haspopup='true'
+          aria-expanded='false'>
           Export
         </button>
-        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <div className='dropdown-menu' aria-labelledby='dropdownMenuButton'>
         {
           this.state.scenarioInstance.getResultExportOpts().map(exportOpt => (
             <a
               id={`${exportOpt.type}-${this.state.project.id}`}
-              className="dropdown-item"
-              href="#"
-              target="_blank"
-              download={this.state.project.name}
-              onClick={exportOpt.type === 'csv' ? this.exportCsv : this.exportZip}
+              className='dropdown-item'
+              href='#'
+              target='_blank'
+              download={`${this.state.project.name}.${exportOpt.type}`}
+              onClick={(evt)=> this.export(evt, exportOpt.type)}
             >
-              {exportOpt.type === 'csv' ? 'CSV' : 'ZIP'}
+              {exportOpt.type.toLocaleUpperCase()}
             </a>
           ))
         }
         </div>
       </div>
-    ])
+    ]);
   }
 }
