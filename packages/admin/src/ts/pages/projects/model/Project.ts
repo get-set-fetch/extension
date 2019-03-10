@@ -1,4 +1,4 @@
-import { Record } from "immutable";
+import { Record } from 'immutable';
 
 interface IPluginDefinition {
   name: string;
@@ -9,7 +9,7 @@ interface IProjectProps {
   description: string;
   url: string;
   scenarioId: string;
-  scenarioProps:object;
+  scenarioProps: object;
   pluginDefinitions: IPluginDefinition[];
 }
 
@@ -21,17 +21,17 @@ const defaultProjectProps: IProjectProps = {
   scenarioId: null,
   scenarioProps: {},
   pluginDefinitions: []
-}
+};
 
 export default class Project extends Record(defaultProjectProps) implements IProjectProps {
-  public readonly id: string;
-  public readonly name: string;
-  public readonly description: string;
-  public readonly url: string;
-  public readonly scenarioId: string;
-  public readonly scenarioProps: object;
+  readonly id: string;
+  readonly name: string;
+  readonly description: string;
+  readonly url: string;
+  readonly scenarioId: string;
+  readonly scenarioProps: object;
 
-  public constructor(values?: Partial<IProjectProps>) {
-    values ? super(values) : super()
+  constructor(values?: Partial<IProjectProps>) {
+    values ? super(values) : super();
   }
 }
