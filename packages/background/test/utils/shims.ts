@@ -1,3 +1,4 @@
+import { JSDOM } from 'jsdom';
 import * as setGlobalVars from 'indexeddbshim';
 
 /*
@@ -10,3 +11,7 @@ setGlobalVars(global.window, {
   checkOrigin: false,
   memoryDatabase: ':memory:'
 });
+
+// init jsdom environment for testing plugins running in browser
+const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
+global.window.document = dom.window.document;
