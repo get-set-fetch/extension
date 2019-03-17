@@ -1,5 +1,4 @@
-import SchemaHelper from '../../schema/SchemaHelper';
-import { IPlugin, ISite, IResource } from 'get-set-fetch';
+import { SchemaHelper, IPlugin, ISite, IResource } from 'get-set-fetch-extension-commons';
 
 export default class ImageFilterPlugin implements IPlugin {
   opts: {

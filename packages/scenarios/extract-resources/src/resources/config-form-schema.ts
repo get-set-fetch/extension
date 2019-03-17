@@ -1,6 +1,6 @@
 export default {
   type: 'object',
-  required: ['extensions', 'maxDepth'],
+  required: ['extensionRe', 'maxDepth'],
   properties: {
     description: {
       type: 'string',
@@ -9,13 +9,14 @@ export default {
     },
     link: {
       type: 'string',
-      title: 'HomePage',
-      default: 'http://www.aaa'
+      title: 'GetSetFetch',
+      default: 'http://www.getsetfetch.org/plugins'
     },
-    extensions: {
+    extensionRe: {
       type: 'string',
+      subType: 'regexp',
       title: 'Extensions',
-      default: 'gif, jpg, png'
+      default: '/^(gif|png|jpg|jpeg)$/i'
     },
     maxDepth: {
       type: 'string',

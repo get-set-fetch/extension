@@ -1,5 +1,5 @@
 export default {
-  'ui:order': ['description', 'link', 'extensions', 'maxDepth'],
+  'ui:order': ['description', 'link', 'extensionRe', 'maxDepth'],
   'description': {
     'ui:widget': 'ScenarioDescription',
     'ui:options': {
@@ -12,7 +12,7 @@ export default {
       label: false
     }
   },
-  'extensions': {
+  'extensionRe': {
     'ui:help': 'File extensions you want to save'
   }
 };

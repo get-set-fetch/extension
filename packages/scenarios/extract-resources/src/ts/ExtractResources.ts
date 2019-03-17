@@ -1,9 +1,10 @@
-import { IScenarioInstance, ExportType, IExportOpt, IPluginDefinition } from 'get-set-fetch-extension-commons';
+import { IScenario, ExportType, IExportOpt, IPluginDefinition } from 'get-set-fetch-extension-commons';
 
 import ConfigFormSchema from '../resources/config-form-schema';
 import ConfigFormUISchema from '../resources/config-form-ui-schema';
+import ImageFilterPlugin from './plugins/ImageFilterPlugin';
 
-export default class ExtractResources implements IScenarioInstance {
+export default class ExtractResources implements IScenario {
   getConfigFormSchema() {
     return ConfigFormSchema;
   }
@@ -12,33 +13,50 @@ export default class ExtractResources implements IScenarioInstance {
     return ConfigFormUISchema;
   }
 
+  getDescription() {
+    return ConfigFormSchema.properties.description.default;
+  }
+
+  getLink() {
+    return {
+      href: ConfigFormSchema.properties.link.default,
+      title: ConfigFormSchema.properties.link.title
+    };
+  }
+
   getPluginDefinitions(scenarioProps) {
     const pluginDefinitions: IPluginDefinition[] = [
-        {
-          name: 'SelectResourcePlugin'
-        },
-        {
-          name: 'ExtensionFetchPlugin'
-        },
-        {
-          name: 'ExtractUrlPlugin'
-        },
-        {
-          name: 'ExtractTitlePlugin',
-          opts: {
-            extensions: scenarioProps.extensions,
-            maxDepth: scenarioProps.maxDepth
-          }
-        },
-        {
-          name: 'UpdateResourcePlugin'
-        },
-        {
-          name: 'InsertResourcePlugin'
+      {
+        name: 'SelectResourcePlugin'
+      },
+      {
+        name: 'ExtensionFetchPlugin'
+      },
+      {
+        name: 'ExtractUrlPlugin',
+        opts: {
+          extensionRe: scenarioProps.extensionRe
         }
-      ];
+      },
+      {
+        name: 'ExtractTitlePlugin'
+      },
+      {
+        name: 'ImageFilterPlugin'
+      },
+      {
+        name: 'UpdateResourcePlugin'
+      },
+      {
+        name: 'InsertResourcePlugin'
+      }
+    ];
 
     return pluginDefinitions;
+  }
+
+  getAdditionalPlugins() {
+    return { ImageFilterPlugin };
   }
 
   getResultTableHeaders() {
