@@ -6,6 +6,7 @@ export default class BrowserHelper {
   static async launch() {
     const browser = await launch({
       headless: false,
+      slowMo: 20,
       args: [
         '--proxy-server=localhost:3000',
         `--disable-extensions-except=${extension.path}`,
@@ -48,3 +49,11 @@ export default class BrowserHelper {
     }
   }
 }
+
+const clear = async (page, selector) => {
+  await page.evaluate(selector => {
+    document.querySelector(selector).value = '';
+  }, selector);
+};
+
+export { clear };
