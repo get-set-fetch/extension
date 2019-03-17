@@ -1,44 +1,16 @@
-import { JSONSchema6 } from 'json-schema';
-import { ExportType, HttpMethod } from ".";
-
-export {ExportType, HttpMethod};
-
-export interface IScenarioInstance {
-  id?: string;
-  getConfigFormSchema: () => object;
-  getConfigFormUISchema: () => object;
-  getPluginDefinitions: (data:any) => IPluginDefinition[];
-  getResultTableHeaders(): IHeaderCol[];
-  getResultExportOpts(): IExportOpt[];
-}
-
-export class IPluginDefinition {
-  public readonly name:string;
-  public readonly opts?:object;
-}
-
-export interface IHeaderCol {
-  label: string,
-  render: (row) => any;
-  renderLink?: boolean;
-}
+export { ExportType, HttpMethod } from ".";
+export { SchemaHelper } from './schema/SchemaHelper';
+export { IHeaderCol } from "./table";
+export { IScenarioDefinition, IScenario, IExportOpt, IExportResult, IEnhancedJSONSchema } from "./scenario";
+export { IPluginDefinition, IPlugin } from "./plugin";
+export { ISite } from "./site";
+export {  IResource } from "./resource";
 
 
-export interface IExportOpt {
-  type: ExportType;
-  cols: string[];
-  fieldSeparator?: string;
-  lineSeparator?:string;
-}
 
-export interface IExportResult {
-  url?: string;
-  error?: string;
-}
+ 
 
-export interface IEnhancedJSONSchema extends JSONSchema6 {
-  properties?: {
-    [k: string]: IEnhancedJSONSchema;
-  };
-  enumNames?: string[];
-}
+
+
+
+

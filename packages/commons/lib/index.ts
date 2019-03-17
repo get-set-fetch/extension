@@ -1,3 +1,5 @@
+export { SchemaHelper } from './schema/SchemaHelper';
+
 export enum HttpMethod {
   GET = 'GET',
   POST = 'POST',
