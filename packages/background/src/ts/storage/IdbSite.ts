@@ -71,37 +71,54 @@ export default class IdbSite extends BaseSite {
     });
   }
 
-  static delAll() {
+  static getAllIds(projectId?: number): Promise<number[]> {
     return new Promise((resolve, reject) => {
-      const rwTx = IdbSite.rwTx();
-      const req = rwTx.clear();
-      req.onsuccess = () => resolve();
-      req.onerror = () => reject(new Error('could not clear Sites'));
+      const rTx = IdbSite.rTx();
+      const readReq = projectId ? rTx.index('projectId').getAll(projectId) : rTx.getAll();
+
+      readReq.onsuccess = async (e) => {
+        const { result } = e.target;
+        if (!result) {
+          resolve(null);
+        }
+        else {
+          const siteIds = result.map(row => row.id);
+          resolve(siteIds);
+        }
+      };
+      readReq.onerror = () => reject(new Error('could not read sites'));
     });
   }
 
-  static delSome(ids, resolve = null, reject = null) {
-    if (resolve && reject) {
-      const rwTx = IdbSite.rwTx();
-      const req = rwTx.delete(ids.pop());
-      req.onsuccess = () => {
-        if (ids.length === 0) {
-          resolve();
-        }
-        else this.delSome(ids, resolve, reject);
-      };
-      req.onerror = () => reject(new Error('could not delSome Sites'));
-      return null;
-    }
-
-    // tslint:disable-next-line:no-shadowed-variable
-    return new Promise((resolve, reject) => {
-      if (ids && ids.length > 0) {
-        this.delSome(ids, resolve, reject);
-      }
-      else {
+  static delAll() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const siteIds = await IdbSite.getAllIds();
+        await IdbSite.delSome(siteIds);
         resolve();
       }
+      catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  static async delSome(siteIds: number[]) {
+    return Promise.all(
+      siteIds.map(async (siteId) => {
+        const resourcesIds = await IdbResource.getAllIds(siteId);
+        await IdbResource.delSome(resourcesIds);
+        await IdbSite.delSingle(siteId);
+      })
+    );
+  }
+
+  static delSingle(siteId) {
+    return new Promise((resolve, reject) => {
+      const rwTx = IdbSite.rwTx();
+      const req = rwTx.delete(siteId);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(new Error(`could not delete site: ${siteId}`));
     });
   }
 
@@ -329,11 +346,19 @@ export default class IdbSite extends BaseSite {
   }
 
   del() {
-    return new Promise((resolve, reject) => {
-      const rwTx = IdbSite.rwTx();
-      const req = rwTx.delete(this.id);
-      req.onsuccess = () => resolve();
-      req.onerror = () => reject(new Error(`could not delete site: ${this.url}`));
+    return new Promise(async (resolve, reject) => {
+      try {
+        // delete linked resources
+        const resourceIds = await IdbResource.getAllIds(this.id);
+        await IdbResource.delSome(resourceIds);
+
+         // delete site
+        await IdbSite.delSingle(this.id);
+        resolve();
+      }
+      catch (error) {
+        reject(error);
+      }
     });
   }
 

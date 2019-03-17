@@ -19,7 +19,6 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
 
   beforeEach(async () => {
     // cleanup
-    await Site.delAll();
     await Project.delAll();
 
     // save project
@@ -67,11 +66,15 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
 
   it('delete', async () => {
     // delete project
-    const delProject = await Site.get(expectedProject.id);
+    const delProject = await Project.get(expectedProject.id);
     await delProject.del();
 
     // get and compare
-    const getProject = await Site.get(expectedProject.id);
+    const getProject = await Project.get(expectedProject.id);
     assert.isNull(getProject);
+
+    // make sure linked sites are also deleted
+    const linkedSites = await Site.getAll();
+    assert.sameDeepMembers(linkedSites, []);
   });
 });

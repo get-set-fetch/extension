@@ -77,6 +77,25 @@ export default class IdbProject extends BaseEntity {
     });
   }
 
+  static getAllIds(): Promise<number[]> {
+    return new Promise((resolve, reject) => {
+      const rTx = IdbProject.rTx();
+      const readReq = rTx.getAll();
+
+      readReq.onsuccess = async (e) => {
+        const { result } = e.target;
+        if (!result) {
+          resolve(null);
+        }
+        else {
+          const projectIds = result.map(row => row.id);
+          resolve(projectIds);
+        }
+      };
+      readReq.onerror = () => reject(new Error('could not read projects'));
+    });
+  }
+
   static async getAllResources(projectId: number): Promise<IdbResource[]> {
     const project = await IdbProject.get(projectId);
     const sites = await IdbSite.getAll(project.id);
@@ -91,36 +110,34 @@ export default class IdbProject extends BaseEntity {
   }
 
   static delAll() {
-    return new Promise((resolve, reject) => {
-      const rwTx = IdbProject.rwTx();
-      const req = rwTx.clear();
-      req.onsuccess = () => resolve();
-      req.onerror = () => reject(new Error('could not clear Projects'));
+    return new Promise(async (resolve, reject) => {
+      try {
+        const projectIds = await IdbProject.getAllIds();
+        await IdbProject.delSome(projectIds);
+        resolve();
+      }
+      catch (err) {
+        reject(err);
+      }
     });
   }
 
-  static delSome(ids, resolve = null, reject = null) {
-    if (resolve && reject) {
-      const rwTx = IdbProject.rwTx();
-      const req = rwTx.delete(ids.pop());
-      req.onsuccess = () => {
-        if (ids.length === 0) {
-          resolve();
-        }
-        else this.delSome(ids, resolve, reject);
-      };
-      req.onerror = () => reject(new Error('could not delSome Projects'));
-      return null;
-    }
+  static async delSome(projectIds) {
+    return Promise.all(
+      projectIds.map(async (projectId) => {
+        const siteIds = await IdbSite.getAllIds(projectId);
+        await IdbSite.delSome(siteIds);
+        await IdbProject.delSingle(projectId);
+      })
+    );
+  }
 
-    // tslint:disable-next-line:no-shadowed-variable
+  static delSingle(projectId) {
     return new Promise((resolve, reject) => {
-      if (ids && ids.length > 0) {
-        this.delSome(ids, resolve, reject);
-      }
-      else {
-        resolve();
-      }
+      const rwTx = IdbProject.rwTx();
+      const req = rwTx.delete(projectId);
+      req.onsuccess = () => resolve();
+      req.onerror = () => reject(new Error(`could not delete project: ${projectId}`));
     });
   }
 
@@ -170,11 +187,19 @@ export default class IdbProject extends BaseEntity {
   }
 
   del() {
-    return new Promise((resolve, reject) => {
-      const rwTx = IdbProject.rwTx();
-      const reqUpdateResource = rwTx.delete(this.id);
-      reqUpdateResource.onsuccess = () => resolve();
-      reqUpdateResource.onerror = () => reject(new Error(`could not delete project: ${this.name}`));
+    return new Promise(async (resolve, reject) => {
+      try {
+        // delete linked sites
+        const siteIds = await IdbSite.getAllIds(this.id);
+        await IdbSite.delSome(siteIds);
+
+         // delete project
+        await IdbProject.delSingle(this.id);
+        resolve();
+      }
+      catch (error) {
+        reject(error);
+      }
     });
   }
 

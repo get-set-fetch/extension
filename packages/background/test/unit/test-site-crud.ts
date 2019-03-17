@@ -7,6 +7,7 @@ import IdbSite from '../../src/ts/storage/IdbSite';
 const conn = { info: 'IndexedDB' };
 
 describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
+  let Resource = null;
   let Site = null;
   let Plugin = null;
   const expectedSite: Partial<IdbSite> = {
@@ -29,7 +30,7 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
 
   before(async () => {
      // 1. storage init, populate GsfProvider used by some plugin related classes
-    ({ Site, Plugin } = await IdbStorage.init());
+    ({ Site, Plugin, Resource } = await IdbStorage.init());
     GsfProvider.Plugin = Plugin;
     global.GsfProvider = { Plugin };
 
@@ -104,6 +105,10 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
   });
 
   it('delete', async () => {
+    // link a 2nd resource to site
+    const resource =  new Resource({ siteId: expectedSite.id, url: expectedSite.url });
+    await resource.save();
+
     // delete site
     const delSite = await Site.get(expectedSite.id);
     await delSite.del();
@@ -111,5 +116,9 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
     // get and compare
     const getSite = await Site.get(expectedSite.id);
     assert.isNull(getSite);
+
+    // make sure linked resources are also deleted
+    const linkedResources = await Resource.getAll();
+    assert.sameDeepMembers(linkedResources, []);
   });
 });

@@ -78,6 +78,25 @@ export default class IdbResource extends BaseResource {
     });
   }
 
+  static getAllIds(siteId: number): Promise<number[]> {
+    return new Promise((resolve, reject) => {
+      const rTx = IdbResource.rTx();
+      const readReq = rTx.index('siteId').getAll(siteId);
+
+      readReq.onsuccess = async (e) => {
+        const { result } = e.target;
+        if (!result) {
+          resolve(null);
+        }
+        else {
+          const resourceIds = result.map(row => row.id);
+          resolve(resourceIds);
+        }
+      };
+      readReq.onerror = () => reject(new Error('could not read resources'));
+    });
+  }
+
   // within a transaction find a resource to crawl and set its crawlInProgress flag
   static getResourceToCrawlWithKey(idbKey) {
     return new Promise((resolve, reject) => {
@@ -124,6 +143,31 @@ export default class IdbResource extends BaseResource {
       const req = rwTx.clear();
       req.onsuccess = () => resolve();
       req.onerror = () => reject(new Error('could not clear Resources'));
+    });
+  }
+
+  static delSome(ids, resolve = null, reject = null) {
+    if (resolve && reject) {
+      const rwTx = IdbResource.rwTx();
+      const req = rwTx.delete(ids.pop());
+      req.onsuccess = () => {
+        if (ids.length === 0) {
+          resolve();
+        }
+        else this.delSome(ids, resolve, reject);
+      };
+      req.onerror = () => reject(new Error('could not delsome Resources'));
+      return null;
+    }
+
+    // tslint:disable-next-line:no-shadowed-variable
+    return new Promise((resolve, reject) => {
+      if (ids && ids.length > 0) {
+        this.delSome(ids, resolve, reject);
+      }
+      else {
+        resolve();
+      }
     });
   }
 

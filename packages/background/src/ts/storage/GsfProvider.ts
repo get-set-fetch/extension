@@ -166,10 +166,15 @@ export default class GsfProvider {
             const resources = await GsfProvider.Project.getAllResources(projectId);
             reqPromise = ExportHelper.export(resources, request.body);
             break;
-          // projects/:projectId
+          // project/:projectId
           case /^project\/[0-9]+$/.test(request.resource):
             projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
             reqPromise = GsfProvider.Project.get(projectId);
+            break;
+          // project/:projectName , don't allow "/" so that we can differentiate /crawl verb as another switch option
+          case /^project\/[^/]+$/.test(request.resource):
+            const projectName = /^project\/(.+)$/.exec(request.resource)[1];
+            reqPromise = GsfProvider.Project.get(projectName);
             break;
           // project/{project.id}/crawl
           case /^project\/[0-9]+\/crawl$/.test(request.resource):
@@ -214,7 +219,7 @@ export default class GsfProvider {
       case 'DELETE':
         switch (true) {
           // project
-          case /^project$/.test(request.resource):
+          case /^projects$/.test(request.resource):
             reqPromise = GsfProvider.Project.delSome(request.body.ids);
             break;
           default:
