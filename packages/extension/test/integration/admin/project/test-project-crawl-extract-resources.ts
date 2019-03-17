@@ -1,9 +1,10 @@
+import JSZip from 'jszip/dist/jszip';
 import queryString from 'query-string';
+import { readFileSync } from 'fs';
+import TestUtils from 'get-set-fetch/test/utils/TestUtils';
 import { assert } from 'chai';
 import { join, resolve } from 'path';
 import BrowserHelper from '../../../utils/BrowserHelper';
-import TestUtils from 'get-set-fetch/test/utils/TestUtils';
-import { readFileSync } from 'fs';
 
 /* eslint-disable no-shadow */
 describe('Project Crawl Extract Resources', () => {
@@ -109,20 +110,22 @@ describe('Project Crawl Extract Resources', () => {
 
   async function checkCrawledResources(siteId) {
     // retrieve crawled resources
-    const crawledResources = await adminPage.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/crawled`), siteId);
-    assert.strictEqual(5, crawledResources.length);
+    let actualResources = await adminPage.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/crawled`), siteId);
 
-    // check each resource
-    for (let i = 0; i < crawledResources.length; i += 1) {
-      const crawledResource = crawledResources[i];
-      const expectedResource = expectedResources.find(resource => resource.url === crawledResource.url);
-      assert.strictEqual(crawledResource.url, expectedResource.url);
-      assert.strictEqual(crawledResource.mediaType, expectedResource.mediaType);
-      assert.deepEqual(crawledResource.info, expectedResource.info);
-    }
+    // only keep the properties we're interested in
+    actualResources = actualResources.map(({ url, mediaType, info })=> ({ url, mediaType, info }) );
+
+    // check matching
+    assert.sameDeepMembers(actualResources, expectedResources);
   }
 
   async function downloadCsv(project) {
+    // open export dropdown
+    const downloadBtn = 'button#export';
+    await adminPage.waitFor(downloadBtn);
+    await adminPage.click(downloadBtn);
+
+    // initiate download
     const csvLink = `a#csv-${project.id}`;
     await adminPage.waitFor(csvLink);
     await adminPage.click(csvLink);
@@ -145,7 +148,29 @@ describe('Project Crawl Extract Resources', () => {
     const generatedBody = csvLines.slice(1);
 
     assert.strictEqual(generatedHeader, expectedHeader);
-    // assert.sameDeepMembers(generatedBody, expectedBody);
+    assert.sameDeepMembers(generatedBody, expectedBody);
+  }
+
+  async function downloadZip(project) {
+    // open export dropdown
+    const downloadBtn = 'button#export';
+    await adminPage.waitFor(downloadBtn);
+    await adminPage.click(downloadBtn);
+
+    // initiate download
+    const zipLink = `a#zip-${project.id}`;
+    await adminPage.waitFor(zipLink);
+    await adminPage.click(zipLink);
+
+    // wait a bit for file to be generated and saved
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    const generatedContent = readFileSync(resolve(targetDir, `${project.name}.zip`), 'binary');
+    const archive = await JSZip.loadAsync(generatedContent);
+
+    const expectedEntries = ['imgA-150.png', 'imgB-850.png'];
+    const actualEntries = Object.keys(archive.files).map(name => archive.files[name].name);
+    assert.sameDeepMembers(actualEntries, expectedEntries);
   }
 
   it('Test Crawl Project Extract Resources', async () => {
@@ -193,15 +218,11 @@ describe('Project Crawl Extract Resources', () => {
       downloadPath: resolve(targetDir)
     });
 
-    // open export dropdown
-    const downloadBtn = 'button#export';
-    await adminPage.waitFor(downloadBtn);
-    await adminPage.click(downloadBtn);
-
     // download csv
     await downloadCsv(loadedProject);
 
     // download zip
+    await downloadZip(loadedProject);
   });
 
 });

@@ -22,7 +22,7 @@
     "copy:popup:watch": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup --watch",
     "copy:admin:watch": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin --watch",
     "test": "mocha test \"./test/integration/**/*.ts\" --exit",
-    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Test Crawl Project Extract Resources\""
+    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Scenario Builtin List\""
   },
   "author": "",
   "license": "ISC",
@@ -45,6 +45,7 @@
     "chai": "^4.1.2",
     "connect": "^3.6.6",
     "cpx": "^1.5.0",
+    "jszip": "^3.2.0",
     "mocha": "^5.2.0",
     "nock": "^10.0.4",
     "puppeteer": "^1.6.1",
