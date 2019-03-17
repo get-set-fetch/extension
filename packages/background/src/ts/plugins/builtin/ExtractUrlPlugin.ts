@@ -1,5 +1,4 @@
-import SchemaHelper from '../../schema/SchemaHelper';
-import { IPlugin, IResource, ISite } from 'get-set-fetch';
+import { SchemaHelper, IPlugin, IResource, ISite } from 'get-set-fetch-extension-commons';
 
 /**
  * Plugin responsible for extracting new resources from a resource document.
@@ -15,15 +14,10 @@ export default class ExtractUrlPlugin implements IPlugin {
       title: 'ExtractUrlPlugin',
       type: 'object',
       properties: {
-        mediaTypeRe: {
-          type: 'string',
-          subType: 'regexp',
-          default: '/html/i'
-        },
         extensionRe: {
           type: 'string',
           subType: 'regexp',
-          default: '/^(html|htm|php)$/i'
+          default: null
         },
         allowNoExtension: {
           type: 'boolean',
@@ -78,7 +72,7 @@ export default class ExtractUrlPlugin implements IPlugin {
   }
 
   test(resource: IResource) {
-    return this.opts.mediaTypeRe.test(resource.mediaType);
+    return (/html/i).test(resource.mediaType);
   }
 
   apply(site: ISite, resource: IResource) {
@@ -104,7 +98,10 @@ export default class ExtractUrlPlugin implements IPlugin {
     const validUrls = new Set();
 
     partialUrls.forEach((partialUrl) => {
+      // construct resource full URL without #hhtml_fragment_identifiers
       const resourceUrl = new URL(partialUrl, currentUrl);
+      resourceUrl.hash='';
+
       // this.createResourceUrl(currentUrl, partialUrl);
       if (this.isValidResourceUrl(currentUrl, resourceUrl)) {
         validUrls.add(resourceUrl.toString());
@@ -124,11 +121,6 @@ export default class ExtractUrlPlugin implements IPlugin {
       // relative path
       resourceUrl = new URL(ExtractUrlPlugin.absoluteUrl(currentUrl.pathname, partialUrl));
     }
-
-    // create complete url without hash, page#1, page#2 should point to the same resource
-    // resourceUrl.hash = undefined;
-    // include "//" after protocol
-    // resourceUrl.slashes = true;
 
     resourceUrl.protocol = resourceUrl.protocol && resourceUrl.protocol.length > 0 ? resourceUrl.protocol : currentUrl.protocol;
     resourceUrl.host = resourceUrl.host && resourceUrl.host.length > 0 ? resourceUrl.host : currentUrl.host;
@@ -159,7 +151,12 @@ export default class ExtractUrlPlugin implements IPlugin {
     if (extIdx !== -1) {
       const extVal = resourceUrl.pathname.substr(extIdx + 1);
 
-      // . represents extension and not part of path, if extension make sure it's the correct one
+      // always add html looking resources to crawl
+      if (/htm/.test(extVal) || /php/.test(extVal)) {
+        return true;
+      }
+
+      // only add non html loooking resources if they match the extensionRe option
       return extVal.match(this.opts.extensionRe) !== null;
     }
 

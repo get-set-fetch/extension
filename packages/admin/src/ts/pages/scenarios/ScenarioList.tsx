@@ -1,9 +1,9 @@
 import * as React from 'react';
 import GsfClient from '../../components/GsfClient';
-import {HttpMethod} from 'get-set-fetch-extension-commons';
-import IScenario from './model/Scenario';
+import { HttpMethod, IHeaderCol, IScenarioDefinition, IScenario } from 'get-set-fetch-extension-commons';
 import Page from '../../layout/Page';
-import Table, { IHeaderCol } from '../../components/Table';
+import Table from '../../components/Table';
+import ScenarioHelper from './model/ScenarioHelper';
 
 interface IState {
   scenarios: IScenario[];
@@ -18,14 +18,18 @@ export default class ScenarioList extends React.Component<{}, IState> {
       header: [
         {
           label: 'Name',
-          render: (scenario:IScenario) => (scenario.name),
+          render: (scenario: IScenario) => (scenario.constructor.name)
         },
         {
           label: 'Description',
-          render: (scenario:IScenario) => (<span style={{ textOverflow: 'ellipsis' }}>{scenario.description ? scenario.description.substr(0, 100): ""}</span>),
+          render: (scenario: IScenario) => (<span style={{ textOverflow: 'ellipsis' }}>{scenario.getDescription().substr(0, 100)}</span>)
         },
+        {
+          label: 'Link',
+          render: (scenario: IScenario) => (<a href={scenario.getLink().href} target='_blank'>{scenario.getLink().title}</a>)
+        }
       ],
-      scenarios: [],
+      scenarios: []
     };
   }
 
@@ -34,7 +38,13 @@ export default class ScenarioList extends React.Component<{}, IState> {
   }
 
   async loadScenarios() {
-    const scenarios:IScenario[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenario[];
+    const scenarioDefinitions: IScenarioDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioDefinition[];
+    const scenarios = await Promise.all(
+      scenarioDefinitions.map(
+        scenarioDefinition => ScenarioHelper.instantiate(scenarioDefinition.id.toString())
+      )
+    );
+
     this.setState({ scenarios });
   }
 
@@ -44,11 +54,11 @@ export default class ScenarioList extends React.Component<{}, IState> {
 
     return (
       <Page
-        title="Available Scenarios"
+        title='Available Scenarios'
         >
         <Table
           header={this.state.header}
-          data={this.state.scenarios}          
+          data={this.state.scenarios}
         />
       </Page>
     );

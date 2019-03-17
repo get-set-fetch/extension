@@ -1,5 +1,4 @@
-import SchemaHelper from '../../schema/SchemaHelper';
-import { IPlugin } from 'get-set-fetch';
+import { SchemaHelper, IPlugin } from 'get-set-fetch-extension-commons';
 
 /**
  * Plugin responsible for selecting a resource to crawl from the current site.

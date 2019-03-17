@@ -1,4 +1,5 @@
-import { BaseEntity, IPluginDefinition } from 'get-set-fetch';
+import { BaseEntity } from 'get-set-fetch';
+import { IPluginDefinition } from 'get-set-fetch-extension-commons';
 import Logger from '../logger/Logger';
 import IdbSite from './IdbSite';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';

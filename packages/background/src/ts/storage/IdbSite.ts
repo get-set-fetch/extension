@@ -1,4 +1,5 @@
-import { BaseSite, BloomFilter, IPluginDefinition, ISite } from 'get-set-fetch';
+import { IPluginDefinition, ISite  } from 'get-set-fetch-extension-commons';
+import { BaseSite, BloomFilter } from 'get-set-fetch';
 import IdbResource from './IdbResource';
 import PluginManager from '../plugins/PluginManager';
 

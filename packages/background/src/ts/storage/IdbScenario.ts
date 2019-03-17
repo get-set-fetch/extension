@@ -8,7 +8,6 @@ const Log = Logger.getLogger('IdbScenario');
 interface IScenario {
   id: number;
   name: string;
-  description: string;
   code: string;
 }
 
@@ -16,7 +15,7 @@ export default class IdbScenario extends BaseEntity {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'name', 'description', 'code'];
+    return ['id', 'name', 'code'];
   }
 
   // get a read transaction
@@ -106,7 +105,6 @@ export default class IdbScenario extends BaseEntity {
 
   id: number;
   name: string;
-  description: string;
   code: string;
 
   constructor(kwArgs: Partial<IScenario> = {}) {

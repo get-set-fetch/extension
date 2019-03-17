@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { match } from 'react-router';
-import { IScenarioInstance, HttpMethod, IExportOpt, IExportResult, ExportType } from 'get-set-fetch-extension-commons';
+import { IScenario, HttpMethod, IExportOpt, IExportResult, ExportType, IScenarioDefinition } from 'get-set-fetch-extension-commons';
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
 import Table from '../../components/Table';
 import Project from './model/Project';
-import IScenario from '../scenarios/model/Scenario';
 import Resource from '../sites/model/Resource';
+import ScenarioHelper from '../scenarios/model/ScenarioHelper';
 
 interface IProps {
   match: match<{
@@ -17,7 +17,6 @@ interface IProps {
 interface IState {
   project: Project;
   scenario: IScenario;
-  scenarioInstance: IScenarioInstance;
   results: object[];
 }
 
@@ -28,7 +27,6 @@ export default class ProjectResults extends React.Component<IProps, IState> {
     this.state = {
       project: null,
       scenario: null,
-      scenarioInstance: null,
       results: null
     };
 
@@ -45,29 +43,13 @@ export default class ProjectResults extends React.Component<IProps, IState> {
       // project not found, nothing more to do
       if (!project.id) return;
 
-      // load scenario, wait for state to be updated as dynamic import is based on it
-      const scenario: IScenario = (await GsfClient.fetch(HttpMethod.GET, `scenario/${project.scenarioId}`)) as IScenario;
-      await new Promise(resolve => {
-        this.setState({ scenario }, () => resolve());
-      });
-
       // instantiate scenario
-      const scenarioInstance = await this.loadScenario(scenario);
+      const scenario = await ScenarioHelper.instantiate(project.scenarioId);
 
       // load results
       const results = await this.loadResourcesInfo(project);
 
-      this.setState({ project, scenarioInstance, results });
-  }
-
-  async loadScenario(scenario: IScenario) {
-    const scenarioBlob = new Blob([scenario.code], { type: 'text/javascript' });
-    const scenarioUrl = URL.createObjectURL(scenarioBlob);
-    const scenarioModule = await import(scenarioUrl);
-
-    const classDef = scenarioModule.default;
-    const scenarioInstance = new (classDef)();
-    return scenarioInstance;
+      this.setState({ project, scenario, results });
   }
 
   async loadResourcesInfo(project: Project): Promise<object[]> {
@@ -102,7 +84,7 @@ export default class ProjectResults extends React.Component<IProps, IState> {
     }
     evt.preventDefault();
 
-    const exportOpt: IExportOpt = this.state.scenarioInstance.getResultExportOpts().find(exportOpt => exportOpt.type === exportType);
+    const exportOpt: IExportOpt = this.state.scenario.getResultExportOpts().find(exportOpt => exportOpt.type === exportType);
     const exportInfo: IExportResult = await GsfClient.fetch(HttpMethod.GET, `project/export/${this.state.project.id}`, exportOpt);
 
     currentTarget.href = exportInfo.url;
@@ -131,7 +113,7 @@ export default class ProjectResults extends React.Component<IProps, IState> {
           // project found, render results
           this.state.project.id &&
             <Table
-            header={this.state.scenarioInstance.getResultTableHeaders()}
+            header={this.state.scenario.getResultTableHeaders()}
             data={this.state.results}
           />
         }
@@ -153,7 +135,7 @@ export default class ProjectResults extends React.Component<IProps, IState> {
         </button>
         <div className='dropdown-menu' aria-labelledby='dropdownMenuButton'>
         {
-          this.state.scenarioInstance.getResultExportOpts().map(exportOpt => (
+          this.state.scenario.getResultExportOpts().map(exportOpt => (
             <a
               id={`${exportOpt.type}-${this.state.project.id}`}
               className='dropdown-item'

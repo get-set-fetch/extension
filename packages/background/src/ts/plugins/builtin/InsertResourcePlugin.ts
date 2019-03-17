@@ -1,4 +1,4 @@
-import { IPlugin } from 'get-set-fetch';
+import { IPlugin } from 'get-set-fetch-extension-commons';
 
 /**
  * Plugin responsible for saving new resources within the current site.

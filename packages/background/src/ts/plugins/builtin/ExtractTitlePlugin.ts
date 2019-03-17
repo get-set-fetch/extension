@@ -1,5 +1,5 @@
-import SchemaHelper from '../../schema/SchemaHelper';
-import { IPlugin, IResource, ISite } from 'get-set-fetch';
+
+import { SchemaHelper, IPlugin, IResource, ISite } from 'get-set-fetch-extension-commons';
 
 export default class ExtractTitlePlugin implements IPlugin {
   opts: {

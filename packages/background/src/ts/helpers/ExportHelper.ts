@@ -1,6 +1,5 @@
 import JSZip from 'jszip/dist/jszip';
-import { IResource } from 'get-set-fetch';
-import { IExportOpt, IExportResult, ExportType } from 'get-set-fetch-extension-commons';
+import { IExportOpt, IExportResult, ExportType, IResource } from 'get-set-fetch-extension-commons';
 
 export default class ExportHelper {
   static export(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
@@ -22,9 +21,9 @@ export default class ExportHelper {
 
       const zip = new JSZip();
       resources.forEach(resource => {
-        if (resource.blob) {
+        if (resource[blobCol]) {
           const name = resource.info && resource.info.name ? resource.info.name : resource.url.substr(-10);
-          zip.file(name, resource.blob);
+          zip.file(name, resource[blobCol]);
         }
       });
 

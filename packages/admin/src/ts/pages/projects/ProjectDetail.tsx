@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { setIn } from 'immutable';
 import GsfClient from '../../components/GsfClient';
-import { HttpMethod, IEnhancedJSONSchema, IScenarioInstance } from 'get-set-fetch-extension-commons';
+import { HttpMethod, IEnhancedJSONSchema, IScenarioInstance, IScenarioDefinition } from 'get-set-fetch-extension-commons';
+import ScenarioHelper from '../scenarios/model/ScenarioHelper';
 import { History } from 'history';
 import { match } from 'react-router';
 import Project from './model/Project';
-import Scenario from '../scenarios/model/Scenario';
 import Form, { UiSchema } from 'react-jsonschema-form';
 import BaseFormSchema from './schema/project-form-schema.json';
 import BaseFormUISchema from './schema/project-form-ui-schema.json';
@@ -15,7 +15,6 @@ import ScenarioDescription from '../../components/react-jsonschema-form/widgets/
 import ScenarioLink from '../../components/react-jsonschema-form/widgets/ScenarioLink';
 import { NavLink } from 'react-router-dom';
 import Page from '../../layout/Page';
-import IScenario from '../scenarios/model/Scenario';
 
 interface IProps {
   history: History;
@@ -27,7 +26,6 @@ interface IProps {
 interface IState {
   project: Project;
 
-  scenarios: IScenario[];
   scenarioInstance: IScenarioInstance;
 
   // schemas defining project props without plugable scenario props
@@ -42,8 +40,6 @@ interface IState {
   formRef: any;
 }
 
-declare const System: any;
-
 export default class ProjectDetail extends React.Component<IProps, IState> {
   static defaultProps = {
     projectId: null
@@ -54,7 +50,6 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
 
     this.state = {
       project: null,
-      scenarios: [],
       scenarioInstance: null,
 
       baseProjectSchema: BaseFormSchema as IEnhancedJSONSchema,
@@ -76,11 +71,8 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
     const data: object = projectId ? await GsfClient.fetch(HttpMethod.GET, `project/${projectId}`) : {};
     const project: Project = new Project(data);
 
-    // load available scenarios, wait for state to be updated as systemjs import is based on it
-    const scenarios: IScenario[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenario[];
-    await new Promise(resolve => {
-      this.setState({ scenarios }, () => resolve());
-    });
+    // load available scenarios
+    const scenarios: IScenarioDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioDefinition[];
 
     // compute new baseProjectSchema for scenario dropdown
     const scenarioIdProp = Object.assign({}, this.state.baseProjectSchema.properties.scenarioId);
@@ -92,30 +84,18 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
     let mergedSchema = setIn(this.state.baseProjectSchema, ['properties', 'scenarioId'], scenarioIdProp);
     let mergedUISchema = this.state.baseProjectUISchema;
 
-    // if a scenario is already selected, instantiate and further update the merged schemas
+    // a scenario is already selected
     if (project.scenarioId) {
-      // load scenario, wait for state to be updated as dynamic import is based on it
-      const scenario: IScenario = (await GsfClient.fetch(HttpMethod.GET, `scenario/${project.scenarioId}`)) as IScenario;
-
       // instantiate scenario
-      const scenarioInstance = await this.loadScenario(scenario);
+      const scenarioInstance = await ScenarioHelper.instantiate(project.scenarioId);
 
-      mergedSchema = setIn(mergedSchema, ['properties', 'scenarioProps'], scenarioInstance.getConfigFormSchema().default);
-      mergedUISchema = setIn(mergedUISchema, ['scenarioProps'], scenarioInstance.getConfigFormUISchema().default);
+      // further update the merged schemas
+      mergedSchema = setIn(mergedSchema, ['properties', 'scenarioProps'], scenarioInstance.getConfigFormSchema());
+      mergedUISchema = setIn(mergedUISchema, ['scenarioProps'], scenarioInstance.getConfigFormUISchema());
     }
 
     // update state
     this.setState({ project, baseProjectSchema, mergedSchema, mergedUISchema });
-  }
-
-  async loadScenario(scenario: IScenario) {
-    const scenarioBlob = new Blob([scenario.code], { type: 'text/javascript' });
-    const scenarioUrl = URL.createObjectURL(scenarioBlob);
-    const scenarioModule = await import(scenarioUrl);
-
-    const classDef = scenarioModule.default;
-    const scenarioInstance = new (classDef)();
-    return scenarioInstance;
   }
 
   async changeHandler({ formData }) {
@@ -136,9 +116,10 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
       }
        // new scenario selected
       else {
-        const scenarioInstance: IScenarioInstance = await this.loadScenario(newScenarioId);
-        const mergedSchema = setIn(this.state.baseProjectSchema, ['properties', 'scenarioProps'], scenarioInstance.getConfigFormSchema().default);
-        const mergedUISchema = setIn(this.state.baseProjectUISchema, ['scenarioProps'], scenarioInstance.getConfigFormUISchema().default);
+        const scenarioInstance: IScenarioInstance = await ScenarioHelper.instantiate(newScenarioId);
+        console.log(scenarioInstance.getConfigFormSchema());
+        const mergedSchema = setIn(this.state.baseProjectSchema, ['properties', 'scenarioProps'], scenarioInstance.getConfigFormSchema());
+        const mergedUISchema = setIn(this.state.baseProjectUISchema, ['scenarioProps'], scenarioInstance.getConfigFormUISchema());
 
         this.setState({
           project: new Project(formData),

@@ -1,4 +1,5 @@
-import { BaseResource, IResource } from 'get-set-fetch';
+import { BaseResource } from 'get-set-fetch';
+import { IResource } from 'get-set-fetch-extension-commons';
 
 /* eslint-disable class-methods-use-this */
 export default class IdbResource extends BaseResource {

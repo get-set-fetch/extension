@@ -1,4 +1,4 @@
-import { IPlugin } from 'get-set-fetch';
+import { IPlugin } from 'get-set-fetch-extension-commons';
 
 /**
  * Plugin responsible for updating a resource after crawling it.

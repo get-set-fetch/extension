@@ -1,6 +1,6 @@
 import URL from 'url-parse';
 import ActiveTabHelper from '../../helpers/ActiveTabHelper';
-import { IPlugin, IResource, ISite } from 'get-set-fetch';
+import { IPlugin, IResource, ISite } from 'get-set-fetch-extension-commons';
 
 export default class ExtensionFetchPlugin implements IPlugin {
 

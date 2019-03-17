@@ -1,11 +1,6 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
-
-export interface IHeaderCol {
-  label: string;
-  render: (row) => any;
-  renderLink?: boolean;
-}
+import { IHeaderCol } from 'get-set-fetch-extension-commons';
 
 interface IProps {
   header: IHeaderCol[];

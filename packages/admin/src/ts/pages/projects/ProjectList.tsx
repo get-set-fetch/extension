@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { History } from 'history';
 import { NavLink } from 'react-router-dom';
-import {HttpMethod} from 'get-set-fetch-extension-commons';
+import { HttpMethod } from 'get-set-fetch-extension-commons';
 import Table, { IHeaderCol } from '../../components/Table';
 import GsfClient from '../../components/GsfClient';
 import Project from './model/Project';
@@ -18,7 +18,59 @@ interface IState {
 }
 
 export default class ProjectList extends React.Component<IProps, IState> {
-  async crawlProject(project:Project) {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      header: [
+        {
+          label: 'Name',
+          render: (project: Project) => (project.name)
+        },
+        {
+          label: 'Description',
+          render: (project: Project) => (<span style={{ textOverflow: 'ellipsis' }}>{project.description ? project.description.substr(0, 100) : ''}</span>)
+        },
+        {
+          label: 'Status',
+          render: (project: Project) => '-'
+        },
+        {
+          label: 'Actions',
+          renderLink: false,
+          render: (project: Project) => ([
+              <input
+                id={`crawl-${project.id}`}
+                type='button'
+                className='btn-secondary mr-2'
+                value='Crawl'
+                onClick={() => this.crawlProject(project)}
+              />,
+              <input
+                id={`results-${project.id}`}
+                type='button'
+                className='btn-secondary mr-2'
+                value='Results'
+                onClick={() => this.viewResults(project)}
+              />,
+              <input
+                id={`delete-${project.id}`}
+                type='button'
+                className='btn-secondary'
+                value='Delete'
+                onClick={evt => this.deleteProject(project)}
+              />
+          ])
+        }
+      ],
+      data: [],
+      selectedRows: []
+    };
+
+    this.deleteHandler = this.deleteHandler.bind(this);
+  }
+  async crawlProject(project: Project) {
     try {
       await GsfClient.fetch(HttpMethod.GET, `project/${project.id}/crawl`);
     }
@@ -27,7 +79,7 @@ export default class ProjectList extends React.Component<IProps, IState> {
     }
   }
 
-  async deleteProject(project:Project) {
+  async deleteProject(project: Project) {
     try {
       await GsfClient.fetch(HttpMethod.DELETE, 'projects', { ids: [project.id] });
     }
@@ -38,60 +90,8 @@ export default class ProjectList extends React.Component<IProps, IState> {
     this.loadProjects();
   }
 
-  viewResults(project:Project) {
+  viewResults(project: Project) {
     this.props.history.push(`/project/${project.id}/results`);
-  }
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      header: [
-        {
-          label: 'Name',
-          render: (project:Project) => (project.name),
-        },
-        {
-          label: 'Description',
-          render: (project:Project) => (<span style={{ textOverflow: 'ellipsis' }}>{project.description ? project.description.substr(0, 100) : ""}</span>),
-        },
-        {
-          label: 'Status',
-          render: (project:Project) => "-",
-        },
-        {
-          label: 'Actions',
-          renderLink: false,
-          render: (project:Project) => ([
-              <input
-                id={`crawl-${project.id}`}
-                type="button"
-                className="btn-secondary mr-2"
-                value="Crawl"
-                onClick={() => this.crawlProject(project)}
-              />,
-              <input
-                id={`results-${project.id}`}
-                type="button"
-                className="btn-secondary mr-2"
-                value="Results"
-                onClick={() => this.viewResults(project)}
-              />,
-              <input
-                id={`delete-${project.id}`}
-                type="button"
-                className="btn-secondary"
-                value="Delete"
-                onClick={evt => this.deleteProject(project)}
-              />,
-          ]),
-        }
-      ],
-      data: [],
-      selectedRows: [],
-    };
-
-    this.deleteHandler = this.deleteHandler.bind(this);
   }
 
   componentDidMount() {
@@ -99,7 +99,7 @@ export default class ProjectList extends React.Component<IProps, IState> {
   }
 
   async loadProjects() {
-    const data:Project[] = (await GsfClient.fetch(HttpMethod.GET, 'projects')) as Project[];
+    const data: Project[] = (await GsfClient.fetch(HttpMethod.GET, 'projects')) as Project[];
     this.setState({ data });
   }
 
@@ -127,21 +127,21 @@ export default class ProjectList extends React.Component<IProps, IState> {
   render() {
     return (
       <Page
-        title="Projects"
+        title='Projects'
         actions={[
-          <NavLink to="/project/" className="btn btn-secondary float-right">New Project</NavLink>
+          <NavLink id='newproject' to='/project/' className='btn btn-secondary float-right'>New Project</NavLink>
         ]}
         >
         <Table
           header={this.state.header}
           rowLink={this.rowLink}
-          data={this.state.data}       
+          data={this.state.data}
         />
       </Page>
     );
   }
 
-  rowLink(row:Project) {
+  rowLink(row: Project) {
     return `/project/${row.id}`;
   }
 }
