@@ -7,7 +7,7 @@ export default class IdbPlugin extends BaseEntity implements IPluginStorage {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'name', 'code'];
+    return ['id', 'name', 'code', 'scenarioId'];
   }
 
   static cache: Map<string,string> = new Map<string, string>();
@@ -97,11 +97,12 @@ export default class IdbPlugin extends BaseEntity implements IPluginStorage {
     });
   }
 
-  id: any;
+  id: number;
   name: string;
   code: string;
+  scenarioId: number;
 
-  constructor(kwArgs: Partial<IPlugin> = {}) {
+  constructor(kwArgs: Partial<IPluginStorage> = {}) {
     super();
     for (const key in kwArgs) {
       this[key] = kwArgs[key];

@@ -100,7 +100,7 @@ export default class IdbScenario extends BaseEntity implements IScenarioStorage 
   name: string;
   code: string;
 
-  constructor(kwArgs: Partial<IScenario> = {}) {
+  constructor(kwArgs: Partial<IScenarioStorage> = {}) {
     super();
     for (const key in kwArgs) {
       this[key] = kwArgs[key];
