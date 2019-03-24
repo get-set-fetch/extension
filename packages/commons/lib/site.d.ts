@@ -10,15 +10,15 @@ export interface ISite {
   pluginDefinitions: IPluginDefinition[];
   plugins: any;
 
-  opts: {
-    crawl: {
-      maxConnections: number,
-      maxResources: number,
-      delay: number
-    },
+  crawlOpts: {
+    maxResources: number,
+    delay: number
+  },
+
+  storageOpts: {
     resourceFilter: {
       maxEntries: number,
       probability: number
     }
-  };
+  }
 }

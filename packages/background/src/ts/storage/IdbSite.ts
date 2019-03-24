@@ -131,12 +131,12 @@ export default class IdbSite extends BaseEntity {
   pluginDefinitions: IPluginDefinition[];
   plugins: any;
 
-  opts: {
-    crawl: {
-      maxConnections: number,
-      maxResources: number,
-      delay: number
-    },
+  crawlOpts: {
+    maxResources: number,
+    delay: number
+  };
+
+  storageOpts: {
     resourceFilter: {
       maxEntries: number,
       probability: number
@@ -144,25 +144,25 @@ export default class IdbSite extends BaseEntity {
   };
 
   constructor(kwArgs: Partial<ISite> = {}) {
-  // constructor(name, url, opts, pluginDefinitions) {
-    super(kwArgs.name, kwArgs.url, kwArgs.opts, false);
+    super();
 
     for (const key in kwArgs) {
       this[key] = kwArgs[key];
     }
 
-    if (!kwArgs.opts || !kwArgs.opts.crawl) {
-      this.opts.crawl = {
-        maxConnections: 1,
-        maxResources: 10,
-        delay: 100
+    if (!kwArgs.crawlOpts) {
+      this.crawlOpts = {
+        maxResources: 500,
+        delay: 1000
       };
     }
 
-    if (!kwArgs.opts || !kwArgs.opts.resourceFilter) {
-      this.opts.resourceFilter = {
-        maxEntries: 5000,
-        probability: 0.01
+    if (!kwArgs.storageOpts) {
+      this.storageOpts = {
+        resourceFilter: {
+          maxEntries: 5000,
+          probability: 0.01
+        }
       };
     }
 
@@ -173,23 +173,34 @@ export default class IdbSite extends BaseEntity {
     this.tabId = null;
   }
 
-  async initPlugins() {
-    this.plugins = await PluginManager.instantiate(this.pluginDefinitions);
-  }
-
-  async crawl(opts) {
-    await this.initPlugins();
-    super.crawl(opts);
-  }
-
   getResourceToCrawl(crawlFrequency) {
     return IdbResource.getResourceToCrawl(this.id, crawlFrequency);
+  }
+
+  async crawl() {
+    this.plugins = await PluginManager.instantiate(this.pluginDefinitions);
+
+    let resourcesNo = (await IdbSite.getAllIds()).length;
+    let resource;
+    do {
+      await new Promise(resolve => setTimeout(resolve, this.crawlOpts.delay));
+      try {
+        resource = await this.crawlResource();
+      }
+      catch (err) {
+        // todo: if resource in status "crawling", reset it, or try another crawlResource a fixed number of times
+      }
+      finally {
+        resourcesNo += 1;
+      }
+    }
+    while (resource && resourcesNo < this.crawlOpts.maxResources);
   }
 
   /**
    * loop through ordered (based on phase) plugins and apply each one to the current (site, resource) pair
    */
-  async crawlResource() {
+  crawlResource() {
     return new Promise(async (resolve, reject) => {
       let resource = null;
       for (let i = 0; i < this.plugins.length; i += 1) {
@@ -232,29 +243,29 @@ export default class IdbSite extends BaseEntity {
       }
 
       if (resource) {
-        Log.debug(`Resource successfully crawled: ${JSON.stringify(resource)}`);
-        Log.info(`Resource successfully crawled: ${resource.url}`);
+        Log.debug(`Resource successfully crawled (json): ${JSON.stringify(resource)}`);
+        Log.info(`Resource successfully crawled (url): ${resource.url}`);
       }
       resolve(resource);
     });
   }
 
   async executePlugin(plugin, resource) {
-    Log.debug(
+    Log.info(
       `Executing plugin ${plugin.constructor.name} `,
       `using options ${JSON.stringify(plugin.opts)} `,
       `against resource ${JSON.stringify(resource)}`
     );
 
     if (plugin.opts && plugin.opts.runInTab) {
-      return PluginManager.runInTab(this.tabId, plugin, this, resource);
+      return await PluginManager.runInTab(this.tabId, plugin, this, resource);
     }
 
     // test if plugin is aplicable
     const isApplicable = await plugin.test(resource);
 
     if (isApplicable) {
-      return plugin.apply(this, resource);
+      return await plugin.apply(this, resource);
     }
 
     return null;
@@ -293,7 +304,7 @@ export default class IdbSite extends BaseEntity {
       const reqReadSite = tx.objectStore('Sites').get(this.id);
       reqReadSite.onsuccess = (e) => {
         const latestSite = e.target.result;
-        const { maxEntries, probability } = this.opts.resourceFilter;
+        const { maxEntries, probability } = this.storageOpts.resourceFilter;
         const bloomFilter = BloomFilter.create(maxEntries, probability, latestSite.resourceFilter);
 
         // create new resources

@@ -15,12 +15,11 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
     projectId: 1,
     name: 'siteA',
     url: 'http://siteA',
-    opts: {
-      crawl: {
-        maxConnections: 1,
-        maxResources: 10,
-        delay: 100
-      },
+    crawlOpts: {
+      maxResources: 10,
+      delay: 100
+    },
+    storageOpts: {
       resourceFilter: {
         maxEntries: 5000,
         probability: 0.01
@@ -81,7 +80,8 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
     assert.strictEqual(expectedSite.projectId, siteById.projectId);
     assert.strictEqual(expectedSite.name, siteById.name);
     assert.strictEqual(expectedSite.url, siteById.url);
-    assert.deepEqual(expectedSite.opts.resourceFilter, Site.defaultSiteOpts.resourceFilter);
+    assert.deepEqual(expectedSite.storageOpts, expectedSite.storageOpts);
+    assert.deepEqual(expectedSite.crawlOpts, expectedSite.crawlOpts);
 
     // get site by name
     const siteByName = await Site.get(expectedSite.name);

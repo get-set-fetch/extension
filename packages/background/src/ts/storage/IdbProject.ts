@@ -213,7 +213,7 @@ export default class IdbProject extends BaseEntity {
       sites[i].tabId = tab.id;
 
       // start crawling
-      sites[i].crawl(sites[i].opts.crawl);
+      sites[i].crawl();
     }
   }
 

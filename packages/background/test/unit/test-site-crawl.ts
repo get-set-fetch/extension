@@ -1,4 +1,5 @@
 import * as sinon from 'sinon';
+import { assert } from 'chai';
 import IdbStorage from '../../src/ts/storage/IdbStorage';
 import PluginManager from '../../src/ts/plugins/PluginManager';
 import ModuleHelper from '../utils/ModuleHelper';
@@ -6,10 +7,11 @@ import GsfProvider from '../../src/ts/storage/GsfProvider';
 
 const conn = { info: 'IndexedDB' };
 
-xdescribe(`Test Site Crawl, using connection ${conn.info}`, () => {
+describe(`Test Site Crawl, using connection ${conn.info}`, () => {
   let Site = null;
   let Resource = null;
   let Plugin = null;
+  let site;
 
   before(async () => {
     // 1. storage init, populate GsfProvider used by some plugin related classes
@@ -20,6 +22,12 @@ xdescribe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // discover, register builtin plugins
     await ModuleHelper.init();
+
+    // stub ExtractUrlPlugin, the only one running in tab via "runInTab"
+    sinon.stub(PluginManager, 'runInTab').callsFake((tabId, plugin, site, resource) => {
+      plugin.extractResourceUrls = () => [`http://siteA/page-${resource.depth + 1}.html`];
+      return plugin.apply(site, resource);
+    });
   });
 
   beforeEach(async () => {
@@ -27,11 +35,9 @@ xdescribe(`Test Site Crawl, using connection ${conn.info}`, () => {
     await Site.delAll();
 
     // save site
-    const pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
-      pluginDef => ['SelectResourcePlugin', 'UpdateResourcePlugin'].indexOf(pluginDef.name) !== -1
-    );
-
-    const site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions });
+    const testPlugins = ['SelectResourcePlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin'];
+    const pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(pluginDef => testPlugins.indexOf(pluginDef.name) !== -1);
+    site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions });
     await site.save();
   });
 
@@ -39,202 +45,71 @@ xdescribe(`Test Site Crawl, using connection ${conn.info}`, () => {
     await IdbStorage.close();
   });
 
-  it('default sequential crawl, 5 resources', async () => {
-    const site = await Site.get('siteA');
+  it('crawl all available resources', async () => {
+    const maxResources = 5;
+    site.pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
+      pluginDef => ['SelectResourcePlugin', 'UpdateResourcePlugin'].indexOf(pluginDef.name) !== -1
+    );
 
     // save 4 additional resources, an initial resource is created when the site is created
-    for (let i = 1; i <= 4; i += 1) {
-      const resource = new Resource({ siteId: site.id, url: `url-${i}` });
+    for (let i = 1; i < maxResources - 1; i += 1) {
+      const resource = new Resource({ siteId: site.id, url: `url-${i}`, depth: 1 });
       await resource.save();
     }
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
     await site.crawl();
 
-    /*
-      re-opening 1 connection(s)
-      resource http://siteA crawled, connActive: 0
-      re-opening 1 connection(s)
-      resource url-1 crawled, connActive: 0
-      re-opening 1 connection(s)
-      resource url-2 crawled, connActive: 0
-      re-opening 1 connection(s)
-      resource url-3 crawled, connActive: 0
-      re-opening 1 connection(s)
-      resource url-4 crawled, connActive: 0
-      re-opening 1 connection(s)
-      no resource to crawl found, connActive: 0
-      */
-    sinon.assert.callCount(crawlResourceSpy, 6);
-  });
-
-  it('parallel crawl, 5 resources available from the begining, maxConnections: 2', async () => {
-    const site = await Site.get('siteA');
-
-    // save 4 additional resources, an initial resource is created when the site is created
-    for (let i = 1; i <= 4; i += 1) {
-      const resource = new Resource({ siteId: site.id, url: `url-${i}` });
-      await resource.save();
-    }
-    const crawlResourceSpy = sinon.spy(site, 'crawlResource');
-    await site.crawl({ maxConnections: 2 });
-
-    /*
-      re-opening 2 connection(s)
-      resource http://siteA crawled, connActive: 1
-      resource url-1 crawled, connActive: 0
-      re-opening 2 connection(s)
-      resource url-2 crawled, connActive: 1
-      resource url-3 crawled, connActive: 0
-      re-opening 2 connection(s)
-      no resource to crawl found, connActive: 1
-      resource url-4 crawled, connActive: 0
-      re-opening 2 connection(s)
-      no resource to crawl found, connActive: 1
-      no resource to crawl found, connActive: 0
-      */
-    sinon.assert.callCount(crawlResourceSpy, 8);
-  });
-
-  it('parallel crawl, 5 resources available from the begining, maxConnections: 3', async () => {
-    const site = await Site.get('siteA');
-
-    // save 4 additional resources, an initial resource is created when the site is created
-    for (let i = 1; i <= 4; i += 1) {
-      const resource = new Resource({ siteId: site.id, url: `url-${i}` });
-      await resource.save();
-    }
-    const crawlResourceSpy = sinon.spy(site, 'crawlResource');
-    await site.crawl({ maxConnections: 3 });
-
-    /*
-      re-opening 3 connection(s)
-      resource http://siteA crawled, connActive: 2, connPending: 1
-      resource url-1 crawled, connActive: 1
-      resource url-2 crawled, connActive: 0
-      re-opening 3 connection(s)
-      no resource to crawl found, connActive: 2
-      resource url-3 crawled, connActive: 1
-      resource url-4 crawled, connActive: 0
-      re-opening 3 connection(s)
-      no resource to crawl found, connActive: 2
-      no resource to crawl found, connActive: 1
-      no resource to crawl found, connActive: 0
-      */
-    sinon.assert.callCount(crawlResourceSpy, 9);
-  });
-
-  /*
-    a single initial resource is available
-    after the initial resource is crawled, the rest of the resources are available for crawling
-    */
-  it('parallel crawl, 5 resources available gradually, maxConnections: 2', async () => {
-    const site = await Site.get('siteA');
-
-    // save 4 additional resources, an initial resource is created when the site is created
-    for (let i = 1; i < 4; i += 1) {
-      const resource = new Resource({ siteId: site.id, url: `url-${i}` });
-      await resource.save();
-    }
-
-    const crawlResourceStub = sinon.stub(site, 'crawlResource');
-
-    // override crawlResource on 2nd call to return null - no resource found
-    crawlResourceStub.onCall(1).resolves(null);
-    crawlResourceStub.callThrough();
-
-    await site.crawl({ maxConnections: 2 });
-
-    /*
-      re-opening 2 connection(s)
-      no resource to crawl found, connActive: 1
-      resource http://siteA crawled, connActive: 0
-      re-opening 2 connection(s)
-      resource url-1 crawled, connActive: 1
-      resource url-2 crawled, connActive: 0
-      re-opening 2 connection(s)
-      no resource to crawl found, connActive: 1
-      resource url-3 crawled, connActive: 0
-      re-opening 2 connection(s)
-      no resource to crawl found, connActive: 1
-      no resource to crawl found, connActive: 0
-      */
-    sinon.assert.callCount(crawlResourceStub, 8);
-  });
-
-  /*
-    a single initial resource is available
-    after the initial resource is crawled, the rest of the resources are available for crawling
-    */
-  it('parallel crawl, 5 resources available gradually, maxConnections: 3', async () => {
-    const site = await Site.get('siteA');
-
-    // save 4 additional resources, an initial resource is created when the site is created
-    for (let i = 1; i < 4; i += 1) {
-      const resource = new Resource({ siteId: site.id, url: `url-${i}` });
-      await resource.save();
-    }
-
-    const crawlResourceStub = sinon.stub(site, 'crawlResource');
-
-    // override crawlResource on 2nd and 3rd calls to return null - no resource found
-    crawlResourceStub.onCall(1).resolves(null);
-    crawlResourceStub.onCall(2).resolves(null);
-    crawlResourceStub.callThrough();
-
-    await site.crawl({ maxConnections: 3 });
-
-    /*
-      re-opening 3 connection(s)
-      no resource to crawl found, connActive: 2
-      no resource to crawl found, connActive: 1
-      resource http://siteA crawled, connActive: 0
-      re-opening 3 connection(s)
-      resource url-1 crawled, connActive: 2
-      resource url-2 crawled, connActive: 1
-      resource url-3 crawled, connActive: 0
-      re-opening 3 connection(s)
-      no resource to crawl found, connActive: 2
-      no resource to crawl found, connActive: 1
-      no resource to crawl found, connActive: 0
-      */
-    sinon.assert.callCount(crawlResourceStub, 9);
+    sinon.assert.callCount(crawlResourceSpy, maxResources);
   });
 
   it('crawl until maxDepth is reached', async () => {
-    // cleanup
-    await Site.delAll();
-
-    sinon.stub(PluginManager, 'runInTab').callsFake((tabId, plugin, site, resource) => {
-      plugin.extractResourceUrls = () => [`http://siteA/page-${resource.depth + 1}.html`];
-      return plugin.apply(site, resource);
-    });
-
-    const defaultPluginDefs = PluginManager.getDefaultPluginDefs();
-    const selectPlugDef = defaultPluginDefs.find(pluginDef => pluginDef.name === 'SelectResourcePlugin');
-    const extractUrlPlugDef = defaultPluginDefs.find(pluginDef => pluginDef.name === 'ExtractUrlPlugin');
-    extractUrlPlugDef.opts.maxDepth = 3;
-    const updatePlugDef = defaultPluginDefs.find(pluginDef => pluginDef.name === 'UpdateResourcePlugin');
-    const insertPlugDef = defaultPluginDefs.find(pluginDef => pluginDef.name === 'InsertResourcePlugin');
-
-    const pluginDefinitions = [selectPlugDef, extractUrlPlugDef, updatePlugDef, insertPlugDef];
-
-    const site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions });
-    await site.save();
+    const maxDepth = 3;
+    const extractUrlPlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlPlugin');
+    extractUrlPlugDef.opts.maxDepth = maxDepth;
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
     await site.crawl();
 
     // crawl resources of depth 0-3 + failed attempt returning a null resources indicating the crawling is complete
-    sinon.assert.callCount(crawlResourceSpy, 4 + 1);
+    sinon.assert.callCount(crawlResourceSpy, maxDepth + 2);
   });
 
-  // ignored until maxResources flag is implemented at plugin level instead of site level
-  xit('crawl until maxResources is reached', async () => {
-    const site = await Site.get('siteA');
+  it('crawl until maxResources is reached', async () => {
+    // define maxResources threshold
+    const maxResources = 7;
+    site.crawlOpts.maxResources = maxResources;
+
+    // make sure maxDepth is not reached before reaching maxResources threshold
+    const extractUrlPlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlPlugin');
+    extractUrlPlugDef.opts.maxDepth = 100;
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
-    await site.crawl({ maxResources: 7 });
+    await site.crawl();
 
-    sinon.assert.callCount(crawlResourceSpy, 7);
+    // when saving a new site, a resource with the same url is automatically created, deduct it
+    sinon.assert.callCount(crawlResourceSpy, maxResources - 1);
+  });
+
+  it('check crawl delay', async () => {
+    // define crawl delay
+    const delay = 500;
+    site.crawlOpts.delay = delay;
+
+    // keep the plugins to a minimum
+    site.pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
+      pluginDef => ['SelectResourcePlugin', 'UpdateResourcePlugin'].indexOf(pluginDef.name) !== -1
+    );
+
+    const crawlResourceSpy = sinon.spy(site, 'crawlResource');
+
+    const hrstart = process.hrtime();
+    await site.crawl();
+    const hrend = process.hrtime(hrstart);
+
+    const elapsedTime = 1000 * hrend[0] + hrend[1] / 1000 / 1000;
+
+    // a single resource has been crawled succefully, 2nd one returned null causing crawl to stop
+    sinon.assert.callCount(crawlResourceSpy, 2);
+    assert.approximately(elapsedTime, delay * 2, delay * 0.1);
   });
 });
