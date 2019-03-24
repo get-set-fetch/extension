@@ -101,7 +101,7 @@ export default class GsfProvider {
             crawlSite.tabId = tab.id;
 
             // start crawling
-            crawlSite.crawl(crawlSite.opts.crawl);
+            crawlSite.crawl();
             reqPromise = new Promise(resolve => resolve());
             break;
           default:
