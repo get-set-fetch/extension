@@ -1,9 +1,10 @@
 import { JSONSchema6 } from 'json-schema';
 import { ExportType } from ".";
 import { IHeaderCol } from "./table";
-import { IPluginDefinition } from './plugin';
+import { IPluginDefinition, IPlugin } from './plugin';
+import { IModuleDefinition } from './storage';
 
-export interface IScenarioDefinition {
+interface IScenarioStorage {
   id: number;
   name: string;
   code: string;
