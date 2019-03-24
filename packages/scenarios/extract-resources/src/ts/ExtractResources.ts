@@ -1,4 +1,4 @@
-import { IScenario, ExportType, IExportOpt, IPluginDefinition } from 'get-set-fetch-extension-commons';
+import { IScenario, ExportType, IExportOpt, IPluginDefinition, IPlugin, IModuleDefinition } from 'get-set-fetch-extension-commons';
 
 import ConfigFormSchema from '../resources/config-form-schema';
 import ConfigFormUISchema from '../resources/config-form-ui-schema';
@@ -55,10 +55,6 @@ export default class ExtractResources implements IScenario {
     return pluginDefinitions;
   }
 
-  getAdditionalPlugins() {
-    return { ImageFilterPlugin };
-  }
-
   getResultTableHeaders() {
     return [
       {
@@ -91,3 +87,7 @@ export default class ExtractResources implements IScenario {
     ];
   }
 }
+
+export const embeddedPlugins = {
+  ImageFilterPlugin
+};

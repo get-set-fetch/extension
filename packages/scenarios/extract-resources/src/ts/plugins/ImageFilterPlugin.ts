@@ -11,7 +11,7 @@ export default class ImageFilterPlugin implements IPlugin {
 
   static get OPTS_SCHEMA() {
     return {
-      $id: 'https://getsetfetch.org/extract-url-plugin.schema.json',
+      $id: 'https://getsetfetch.org/image-filter-plugin.schema.json',
       $schema: 'http://json-schema.org/draft-07/schema#',
       title: 'ImageFilterPlugin',
       type: 'object',
