@@ -1,14 +1,9 @@
 import { BaseEntity } from 'get-set-fetch';
+import { IPluginStorage } from 'get-set-fetch-extension-commons';
 
 /* eslint-disable class-methods-use-this */
 
-interface IPlugin {
-  name: string;
-  id: any;
-  code: string;
-}
-
-export default class IdbPlugin extends BaseEntity {
+export default class IdbPlugin extends BaseEntity implements IPluginStorage {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {

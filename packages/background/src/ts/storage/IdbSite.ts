@@ -1,5 +1,5 @@
 import { IPluginDefinition, ISite  } from 'get-set-fetch-extension-commons';
-import { BaseSite, BloomFilter } from 'get-set-fetch';
+import { BaseEntity, BloomFilter } from 'get-set-fetch';
 import IdbResource from './IdbResource';
 import PluginManager from '../plugins/PluginManager';
 
@@ -8,7 +8,7 @@ import Logger from '../logger/Logger';
 const Log = Logger.getLogger('IdbSite');
 
 /* eslint-disable class-methods-use-this */
-export default class IdbSite extends BaseSite {
+export default class IdbSite extends BaseEntity {
 
   // IndexedDB can't do partial update, define all site properties to be stored
   get props() {

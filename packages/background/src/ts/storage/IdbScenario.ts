@@ -1,17 +1,10 @@
 import { BaseEntity } from 'get-set-fetch';
 import Logger from '../logger/Logger';
+import { IScenarioStorage } from 'get-set-fetch-extension-commons/lib/scenario';
 
 const Log = Logger.getLogger('IdbScenario');
 
-/* eslint-disable class-methods-use-this */
-
-interface IScenario {
-  id: number;
-  name: string;
-  code: string;
-}
-
-export default class IdbScenario extends BaseEntity {
+export default class IdbScenario extends BaseEntity implements IScenarioStorage {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
