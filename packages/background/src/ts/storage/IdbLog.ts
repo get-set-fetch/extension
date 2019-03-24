@@ -7,13 +7,14 @@ interface ILog {
   level: number;
   cls: string;
   msg: string;
+  stack?: string;
   id: number;
 }
 export default class IdbLog extends BaseEntity {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'date', 'level', 'cls', 'msg'];
+    return ['id', 'date', 'level', 'cls', 'msg', 'stack'];
   }
 
   // get a read transaction
@@ -60,6 +61,7 @@ export default class IdbLog extends BaseEntity {
   level: number;
   cls: string;
   msg: string;
+  stack: string;
   id: number;
 
   constructor(kwArgs: Partial<ILog> = {}) {

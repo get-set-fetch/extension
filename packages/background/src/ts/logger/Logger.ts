@@ -66,7 +66,17 @@ export default class Logger {
 
   error(...args) {
     if (Logger.logLevel > 4) return;
-    const logEntry = new IdbLog({ level: LogLevel.ERROR, cls: this.cls, msg: Logger.stringifyArgs(args) });
+    const logEntry = new IdbLog({ level: LogLevel.ERROR, cls: this.cls });
+    if (args.length === 1 && args[0] instanceof Error) {
+      const err: Error = args[0] as Error;
+      logEntry.msg = err.message;
+      logEntry.stack = err.stack;
+    }
+    else {
+      logEntry.msg = Logger.stringifyArgs(args);
+    }
+
+    console.log(logEntry);
     logEntry.save();
   }
 }
