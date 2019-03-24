@@ -2,7 +2,7 @@ import { GsfProvider, PluginManager } from './background-bundle';
 import Logger, { LogLevel } from './logger/Logger';
 import ScenarioManager from './scenarios/ScenarioManager';
 
-// const Log = Logger.getLogger('background-main');
+const Log = Logger.getLogger('background-main');
 
 (async () => {
   await GsfProvider.init();
@@ -16,9 +16,15 @@ import ScenarioManager from './scenarios/ScenarioManager';
   }
   Logger.setLogLevel(parseInt(logLevel.val, 10));
 
-  // 2. read all builtin plugins, persist them as Plugin
-  await PluginManager.discoverPlugins();
+  try {
+    // 2. read all builtin plugins, persist them as Plugin
+    await PluginManager.discoverPlugins();
 
-  // 3. read all builtin scenarios, persist them as Scenario
-  await ScenarioManager.discoverPlugins();
+    // 3. read all builtin scenarios, persist them as Scenario
+    await ScenarioManager.discoverScenarios();
+  }
+  catch (err) {
+    Log.error(err);
+  }
+
 })();

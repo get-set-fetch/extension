@@ -1,12 +1,15 @@
 import GsfProvider from './../storage/GsfProvider';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 import Logger from '../logger/Logger';
-import AbstractModuleManager, { IModuleInfo } from './AbstractModuleManager';
+import BaseModuleManager from './BaseModuleManager';
 import { BaseNamedEntity } from 'get-set-fetch';
+import { IModuleInfo } from 'get-set-fetch-extension-commons';
+import ScenarioManager from '../scenarios/ScenarioManager';
+import IdbPlugin from '../storage/IdbPlugin';
 
 const Log = Logger.getLogger('PluginManager');
 
-class PluginManager extends AbstractModuleManager {
+class PluginManager extends BaseModuleManager {
 
   static cache: Map<string, IModuleInfo> = new Map();
 
@@ -14,21 +17,23 @@ class PluginManager extends AbstractModuleManager {
     return ['SelectResourcePlugin', 'ExtensionFetchPlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin'];
   }
 
-  static getStoredModule(moduleName): Promise<BaseNamedEntity> {
-    return GsfProvider.Plugin.get(moduleName);
-  }
-
-  static getStoredModules(): Promise<BaseNamedEntity[]> {
-    return GsfProvider.Plugin.getAll();
-  }
-
-  static createEntity(data): BaseNamedEntity {
-    return new GsfProvider.Plugin({ name: data.name,  code: data.content });
+  static persistPlugins(plugins: IdbPlugin[]) {
+    return Promise.all(
+      plugins.map(async (plugin) => {
+        const storedPlugin = await GsfProvider.Plugin.get(plugin.name);
+        if (!storedPlugin) {
+          Log.info(`Saving plugin ${plugin.name} to database`);
+          await plugin.save();
+          Log.info(`Saving plugin ${plugin.name} to database DONE`);
+        }
+      })
+    );
   }
 
  static async discoverPlugins() {
-  const plugins = await this.getModulesContent('background/plugins');
-  await this.persistModules(plugins);
+  const pluginDefinitions = await this.getModulesContent('background/plugins');
+  const plugins = pluginDefinitions.map(moduleDef => new GsfProvider.Plugin(moduleDef));
+  await PluginManager.persistPlugins(plugins);
 }
 
   static getDefaultPluginDefs() {
@@ -53,27 +58,41 @@ class PluginManager extends AbstractModuleManager {
     });
   }
 
+  static async register(name: string) {
+    // scenario already registered
+    if (PluginManager.cache.get(name)) return;
+
+    const plugin = await GsfProvider.Plugin.get(name);
+    let moduleInfo: IModuleInfo;
+
+    // builtin plugin, not linked to a scenario
+    if (!plugin.scenarioId) {
+      const pluginBlob = new Blob([plugin.code], { type: 'text/javascript' });
+      const pluginUrl = URL.createObjectURL(pluginBlob);
+      const pluginModule = await import(pluginUrl);
+
+      moduleInfo = {
+        code: plugin.code,
+        module: pluginModule,
+        url: pluginUrl
+      };
+    }
+    // plugin linked to a scenario
+    else {
+      moduleInfo = await ScenarioManager.resolveEmbeddedPlugin(plugin);
+    }
+
+    PluginManager.cache.set(name, moduleInfo);
+  }
+
   static async instantiate(pluginDefinitions): Promise<any[]> {
     const pluginInstances = [];
 
-    for (let i = 0; i < pluginDefinitions.length; i++) {
-      const pluginDef = pluginDefinitions[i];
+    for (const pluginDef of pluginDefinitions) {
       Log.info(`Instantiating plugin ${pluginDef.name}`);
 
       if (!PluginManager.cache.get(pluginDef.name)) {
-        const plugin = await GsfProvider.Plugin.get(pluginDef.name);
-        const pluginBlob = new Blob([plugin.code], { type: 'text/javascript' });
-        const pluginUrl = URL.createObjectURL(pluginBlob);
-        const pluginModule = await import(pluginUrl);
-
-        PluginManager.cache.set(
-          pluginDef.name,
-          {
-            code: plugin.code,
-            module: pluginModule,
-            url: pluginUrl
-          }
-        );
+        await PluginManager.register(pluginDef.name);
       }
 
       const classDef = PluginManager.cache.get(pluginDef.name).module.default;
@@ -131,8 +150,6 @@ class PluginManager extends AbstractModuleManager {
       await ActiveTabHelper.executeScript(tabId, { code: `
         (async function() {
           try {
-            console.log(${pluginDeff});
-
             // instantiate plugin instance
             const ${pluginInstanceName} = new ${pluginDeff}(${JSON.stringify(pluginInstance.opts)})
 
@@ -144,7 +161,6 @@ class PluginManager extends AbstractModuleManager {
             }
 
             // send the result back via messaging as the promise content will just be serialized to {}
-            console.log(result);
             chrome.runtime.sendMessage({resolved: true, result});
           }
           catch(err) {

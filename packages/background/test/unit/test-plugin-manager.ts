@@ -4,7 +4,7 @@ import PluginManager from '../../src/ts/plugins/PluginManager';
 import GsfProvider from '../../src/ts/storage/GsfProvider';
 import IdbStorage from '../../src/ts/storage/IdbStorage';
 
-xdescribe('Test PluginManager', () => {
+describe('Test PluginManager', () => {
   before(async () => {
     // 1. storage init, populate GsfProvider used by some plugin related classes
     const { Plugin } = await IdbStorage.init();
@@ -16,19 +16,38 @@ xdescribe('Test PluginManager', () => {
   });
 
   it('instantiate default plugins', async () => {
-    const expectedPluginsNames = [
-      { name: 'SelectResourcePlugin', opts: {} },
-      { name: 'ExtensionFetchPlugin', opts: {} },
-      { name: 'ExtractUrlPlugin', opts: {} },
-      { name: 'UpdateResourcePlugin', opts: {} },
-      { name: 'InsertResourcePlugin', opts: {} }
+    const expectedPluginInfo = [
+      {
+        name: 'SelectResourcePlugin',
+        opts: {
+          crawlFrequency: -1
+        }
+      },
+      {
+        name: 'ExtensionFetchPlugin',
+        opts: undefined
+      },
+      {
+        name: 'ExtractUrlPlugin',
+        opts: {
+          allowNoExtension: true,
+          extensionRe: null,
+          maxDepth: -1,
+          runInTab: true
+        }
+      },
+      {
+        name: 'UpdateResourcePlugin',
+        opts: undefined
+      },
+      {
+        name: 'InsertResourcePlugin',
+        opts: undefined
+      }
     ];
     const actualPlugins = await PluginManager.instantiate(PluginManager.getDefaultPluginDefs());
+    const actualPluginInfo = actualPlugins.map(plugin => ({ name: plugin.constructor.name, opts: plugin.opts }));
 
-    assert.strictEqual(actualPlugins.length, expectedPluginsNames.length);
-    for (let i = 0; i < actualPlugins.length; i += 1) {
-      const foundIdx = expectedPluginsNames.findIndex(plugin => plugin.name === actualPlugins[i].constructor.name);
-      assert.isAtLeast(foundIdx, 0, `plugin ${actualPlugins[i].constructor.name} not found`);
-    }
+    assert.sameDeepOrderedMembers(actualPluginInfo, expectedPluginInfo);
   });
 });

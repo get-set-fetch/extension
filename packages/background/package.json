@@ -16,7 +16,7 @@
     "copy:resources": "copyfiles -u 2 src/html/*.html dist",
     "test": "nyc --reporter=lcov mocha test ./test/**/*.ts",
     "test:report": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "test:single": "mocha test ./test/**/*.ts --grep \"crawl until maxDepth is reached\""
+    "test:single": "mocha test ./test/**/*.ts --grep \"Test Site Crawl\""
   },
   "keywords": [
     "scraper",
