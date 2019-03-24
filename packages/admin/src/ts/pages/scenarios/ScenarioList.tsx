@@ -1,6 +1,6 @@
 import * as React from 'react';
 import GsfClient from '../../components/GsfClient';
-import { HttpMethod, IHeaderCol, IScenarioDefinition, IScenario } from 'get-set-fetch-extension-commons';
+import { HttpMethod, IHeaderCol, IModuleDefinition, IScenario } from 'get-set-fetch-extension-commons';
 import Page from '../../layout/Page';
 import Table from '../../components/Table';
 import ScenarioHelper from './model/ScenarioHelper';
@@ -38,7 +38,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
   }
 
   async loadScenarios() {
-    const scenarioDefinitions: IScenarioDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioDefinition[];
+    const scenarioDefinitions: IModuleDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IModuleDefinition[];
     const scenarios = await Promise.all(
       scenarioDefinitions.map(
         scenarioDefinition => ScenarioHelper.instantiate(scenarioDefinition.id.toString())

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { match } from 'react-router';
-import { IScenario, HttpMethod, IExportOpt, IExportResult, ExportType, IScenarioDefinition } from 'get-set-fetch-extension-commons';
+import { IScenario, HttpMethod, IExportOpt, IExportResult, ExportType } from 'get-set-fetch-extension-commons';
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
 import Table from '../../components/Table';

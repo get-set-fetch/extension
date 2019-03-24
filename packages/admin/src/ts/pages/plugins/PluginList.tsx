@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
-import {HttpMethod} from 'get-set-fetch-extension-commons';
-import Table, { IHeaderCol } from '../../components/Table';
+import { HttpMethod, IHeaderCol } from 'get-set-fetch-extension-commons';
+import Table from '../../components/Table';
 import GsfClient from '../../components/GsfClient';
 import Plugin from './model/Plugin';
 import Page from '../../layout/Page';
@@ -20,28 +20,32 @@ export default class PluginList extends React.Component<{}, IState> {
       header: [
         {
           label: 'Name',
-          render: (plugin:Plugin) => plugin.name,
+          render: (plugin: Plugin) => plugin.name
         },
         {
           label: 'Code',
-          render: (plugin:Plugin) => (<span style={{ textOverflow: 'ellipsis' }}>{plugin.code.substr(0, 100)}</span>),
+          render: (plugin: Plugin) => (
+            <span style={{ textOverflow: 'ellipsis' }}>
+              {!plugin.scenarioId ? plugin.code.substr(0, 100) : 'embedded plugin'}
+            </span>
+          )
         },
         {
           label: 'Actions',
           renderLink: false,
-          render: (plugin:Plugin) => ([
+          render: (plugin: Plugin) => ([
               <input
                 id={`delete-${plugin.id}`}
-                type="button"
-                className="btn-secondary"
-                value="Delete"
+                type='button'
+                className='btn-secondary'
+                value='Delete'
                 onClick={evt => this.deletePlugin(plugin)}
-              />,
-          ]),
-        },
+              />
+          ])
+        }
       ],
       data: [],
-      selectedRows: [],
+      selectedRows: []
     };
 
     this.deletePlugin = this.deletePlugin.bind(this);
@@ -52,11 +56,11 @@ export default class PluginList extends React.Component<{}, IState> {
   }
 
   async loadPlugins() {
-    const data:Plugin[] = (await GsfClient.fetch(HttpMethod.GET, 'plugins')) as Plugin[];
+    const data: Plugin[] = (await GsfClient.fetch(HttpMethod.GET, 'plugins')) as Plugin[];
     this.setState({ data });
   }
 
-  async deletePlugin(plugin:Plugin) {
+  async deletePlugin(plugin: Plugin) {
     try {
       // remove plugins
       await GsfClient.fetch(HttpMethod.DELETE, 'plugins', { ids: [plugin.id] });
@@ -75,21 +79,21 @@ export default class PluginList extends React.Component<{}, IState> {
   render() {
     return (
       <Page
-        title="Available Plugins"
+        title='Available Plugins'
         actions={[
-          <NavLink id="newplugin" to="/plugin/" className="btn btn-secondary float-right">New Plugin</NavLink>
+          <NavLink id='newplugin' to='/plugin/' className='btn btn-secondary float-right'>New Plugin</NavLink>
         ]}
         >
         <Table
           header={this.state.header}
           rowLink={this.rowLink}
-          data={this.state.data}                 
+          data={this.state.data}
         />
       </Page>
     );
   }
 
-  rowLink(row:Plugin) {
+  rowLink(row: Plugin) {
     return `/plugin/${row.id}`;
   }
 }

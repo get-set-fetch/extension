@@ -1,23 +1,18 @@
-import { Record } from "immutable";
+import { Record } from 'immutable';
+import { IModuleDefinition, IPluginStorage } from 'get-set-fetch-extension-commons';
 
-interface PluginProps {
-  id: string;
-  name: string;
-  code: string;
-}
-
-const defaultPluginProps: PluginProps = {
+const defaultPluginProps: IPluginStorage = {
   id: null,
   name: null,
-  code: null
-}
+  code: null,
+};
 
-export default class Plugin extends Record(defaultPluginProps) implements PluginProps {
-  public readonly id: string;
-  public readonly name: string;
-  public readonly code: string;
+export default class Plugin extends Record(defaultPluginProps) implements IModuleDefinition {
+  readonly id: number;
+  readonly name: string;
+  readonly code: string;
 
-  public constructor(values?: Partial<PluginProps>) {
-    values ? super(values) : super()
+  constructor(values?: Partial<IModuleDefinition>) {
+    values ? super(values) : super();
   }
 }

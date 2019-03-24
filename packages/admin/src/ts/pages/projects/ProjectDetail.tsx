@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { setIn } from 'immutable';
 import GsfClient from '../../components/GsfClient';
-import { HttpMethod, IEnhancedJSONSchema, IScenarioInstance, IScenarioDefinition } from 'get-set-fetch-extension-commons';
+import { HttpMethod, IEnhancedJSONSchema, IScenario, IModuleDefinition } from 'get-set-fetch-extension-commons';
 import ScenarioHelper from '../scenarios/model/ScenarioHelper';
 import { History } from 'history';
 import { match } from 'react-router';
@@ -26,7 +26,7 @@ interface IProps {
 interface IState {
   project: Project;
 
-  scenarioInstance: IScenarioInstance;
+  scenario: IScenario;
 
   // schemas defining project props without plugable scenario props
   baseProjectSchema: IEnhancedJSONSchema;
@@ -50,7 +50,7 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
 
     this.state = {
       project: null,
-      scenarioInstance: null,
+      scenario: null,
 
       baseProjectSchema: BaseFormSchema as IEnhancedJSONSchema,
       baseProjectUISchema: BaseFormUISchema,
@@ -72,7 +72,7 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
     const project: Project = new Project(data);
 
     // load available scenarios
-    const scenarios: IScenarioDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioDefinition[];
+    const scenarios: IModuleDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IModuleDefinition[];
 
     // compute new baseProjectSchema for scenario dropdown
     const scenarioIdProp = Object.assign({}, this.state.baseProjectSchema.properties.scenarioId);
@@ -100,7 +100,7 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
 
   async changeHandler({ formData }) {
     const newScenarioId = formData.scenarioId;
-    const currentScenarioId = this.state.scenarioInstance ? this.state.scenarioInstance.id : null;
+    const currentScenarioId = this.state.scenario ? this.state.scenario.id : null;
     const scenarioChanged = newScenarioId !== currentScenarioId;
 
     // scenario option changed
@@ -109,21 +109,20 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
       if (!newScenarioId) {
         this.setState({
           project: new Project(formData),
-          scenarioInstance: null,
+          scenario: null,
           mergedSchema: this.state.baseProjectSchema,
           mergedUISchema: this.state.baseProjectUISchema
         });
       }
        // new scenario selected
       else {
-        const scenarioInstance: IScenarioInstance = await ScenarioHelper.instantiate(newScenarioId);
-        console.log(scenarioInstance.getConfigFormSchema());
-        const mergedSchema = setIn(this.state.baseProjectSchema, ['properties', 'scenarioProps'], scenarioInstance.getConfigFormSchema());
-        const mergedUISchema = setIn(this.state.baseProjectUISchema, ['scenarioProps'], scenarioInstance.getConfigFormUISchema());
+        const scenario: IScenario = await ScenarioHelper.instantiate(newScenarioId);
+        const mergedSchema = setIn(this.state.baseProjectSchema, ['properties', 'scenarioProps'], scenario.getConfigFormSchema());
+        const mergedUISchema = setIn(this.state.baseProjectUISchema, ['scenarioProps'], scenario.getConfigFormUISchema());
 
         this.setState({
           project: new Project(formData),
-          scenarioInstance,
+          scenario,
           mergedSchema,
           mergedUISchema
         });
@@ -140,12 +139,12 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
   async submitHandler() {
     // validate form
     const { errors } = this.state.formRef.validate(this.state.formRef.state.formData);
-    console.log(errors);
+
     // only proceed to saving if no validation errors are present
     if (errors.length !== 0) return;
 
     // add plugable pluginDefinitions to current project
-    const pluginDefinitions = this.state.scenarioInstance.getPluginDefinitions(this.state.project.scenarioProps);
+    const pluginDefinitions = this.state.scenario.getPluginDefinitions(this.state.project.scenarioProps);
 
     const finalProject = setIn(this.state.project, ['pluginDefinitions'], pluginDefinitions);
 
