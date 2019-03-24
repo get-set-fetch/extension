@@ -54,7 +54,15 @@ describe('UserPlugin CRUD Pages', () => {
     );
 
     // compare
-    const expectedPluginNames = ['ExtensionFetchPlugin', 'ExtractTitlePlugin', 'ExtractUrlPlugin', 'InsertResourcePlugin', 'SelectResourcePlugin', 'UpdateResourcePlugin', 'ImageFilterPlugin'];
+    const expectedPluginNames = [
+      'ExtensionFetchPlugin',
+      'ExtractTitlePlugin',
+      'ExtractUrlPlugin',
+      'InsertResourcePlugin',
+      'SelectResourcePlugin',
+      'UpdateResourcePlugin',
+      'ImageFilterPlugin'
+    ];
     assert.sameMembers(pluginNames, expectedPluginNames);
   });
 

@@ -6,9 +6,12 @@ export default class BrowserHelper {
   static async launch() {
     const browser = await launch({
       headless: false,
+      ignoreHTTPSErrors: true,
       slowMo: 20,
       args: [
-        '--proxy-server=localhost:3000',
+        '--host-rules=MAP * 127.0.0.1',
+        '--proxy-server="http=localhost:80;https=localhost:443"',
+        '--ignore-certificate-errors',
         `--disable-extensions-except=${extension.path}`,
         `--load-extension=${extension.path}`,
         '--no-sandbox'

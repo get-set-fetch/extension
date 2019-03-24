@@ -22,7 +22,7 @@
     "copy:popup:watch": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup --watch",
     "copy:admin:watch": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin --watch",
     "test": "mocha test \"./test/integration/**/*.ts\" --exit",
-    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Scenario Builtin List\""
+    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Project Crawl Extract Resources\""
   },
   "author": "",
   "license": "ISC",
@@ -31,12 +31,14 @@
     "get-set-fetch-extension-background": "1.0.0",
     "get-set-fetch-extension-popup": "^1.0.0",
     "get-set-fetch-extension-admin": "^1.0.0",
+    "get-set-fetch-extension-commons": "^1.0.0",
     "get-set-fetch-scenario-extract-resources": "^1.0.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/connect": "^3.4.32",
     "@types/mocha": "^5.2.5",
+    "@types/node-forge": "^0.8.0",
     "@types/puppeteer": "^1.12.1",
     "@types/serve-static": "^1.13.2",
     "babel-core": "^6.26.3",
@@ -48,6 +50,7 @@
     "jszip": "^3.2.0",
     "mocha": "^5.2.0",
     "nock": "^10.0.4",
+    "node-forge": "^0.8.2",
     "puppeteer": "^1.6.1",
     "query-string": "^6.1.0",
     "serve-static": "^1.13.2",
