@@ -73,7 +73,7 @@ describe('Project CRUD Pages', () => {
   });
 
   after(async () => {
-    // await browser.close();
+    await browser.close();
   });
 
   it('Test Create New Project', async () => {
@@ -94,7 +94,7 @@ describe('Project CRUD Pages', () => {
     // dropdown scenario is correctly populated
     const expectedScenarioIdOpts = [
       { value: '', label: '' },
-      { value: '1', label: 'ExtractResources' }
+      { value: '1', label: 'get-set-fetch-scenario-extract-resources' }
     ];
     const scenarioIdOpts = await projectPage.evaluate(
       () =>

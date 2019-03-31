@@ -12,8 +12,9 @@
     "copy:bkg": "cpx  \"node_modules/get-set-fetch-extension-background/dist/**/*\" dist/background",
     "copy:popup": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup",
     "copy:admin": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin",
-    "copy:scenario-extract-resource": "cpx \"node_modules/get-set-fetch-scenario-extract-resources/dist/**/*\" dist/scenarios",
-    "copy:scenarios": "npm run copy:scenario-extract-resource",
+    "copy:scenario-extract-resource-dist": "cpx \"node_modules/get-set-fetch-scenario-extract-resources/dist/**/*\" dist/scenarios/get-set-fetch-scenario-extract-resources/dist",
+    "copy:scenario-extract-resource-pkg": "cpx \"node_modules/get-set-fetch-scenario-extract-resources/package.json\" dist/scenarios/get-set-fetch-scenario-extract-resources",
+    "copy:scenarios": "npm run copy:scenario-extract-resource-dist && npm run copy:scenario-extract-resource-pkg",
     "build:watch:admin": "npm run build && npm run copy:admin:watch",
     "build:watch:popup": "npm run build && npm run copy:popup:watch",
     "build:watch:bkg": "npm run build && npm run copy:bkg:watch",
@@ -22,6 +23,7 @@
     "copy:popup:watch": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup --watch",
     "copy:admin:watch": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin --watch",
     "test": "mocha test \"./test/integration/**/*.ts\" --exit",
+    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Test Scenario Builtin List\""
   },
   "author": {
 	  "name": "Andrei Sabau"

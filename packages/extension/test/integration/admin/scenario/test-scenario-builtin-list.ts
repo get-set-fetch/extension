@@ -33,7 +33,7 @@ describe('Scenario Builtin List', () => {
   });
 
   after(async () => {
-    await browser.close();
+    // await browser.close();
   });
 
   it('Test Scenario Builtin List', async () => {
@@ -43,9 +43,14 @@ describe('Scenario Builtin List', () => {
     // check builtin scenarios presence in scenario list
     const expectedScenarios = [
       {
-        name: 'ExtractResources',
+        name: 'get-set-fetch-scenario-extract-resources',
         description: 'Extract Resources scenario is used for extracting various resources from the corresponding sites.',
-        link: 'GetSetFetch'
+        homepage: 'https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-resources'
+      },
+      {
+        name: 'extract-html-headings',
+        description: 'Extract Html Headings description',
+        homepage: 'https://github.com/authora/extract-html-headings'
       }
     ];
 
@@ -54,7 +59,7 @@ describe('Scenario Builtin List', () => {
         (row) => ({
           name: (row.children[0] as HTMLTableCellElement).innerText,
           description: (row.children[1] as HTMLTableCellElement).innerText,
-          link: (row.children[2] as HTMLTableCellElement).innerText
+          homepage: (row.children[2] as HTMLTableCellElement).innerText
         })
       );
     });
