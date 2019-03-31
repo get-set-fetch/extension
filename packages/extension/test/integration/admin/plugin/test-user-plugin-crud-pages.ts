@@ -56,7 +56,6 @@ describe('UserPlugin CRUD Pages', () => {
     // compare
     const expectedPluginNames = [
       'ExtensionFetchPlugin',
-      'ExtractTitlePlugin',
       'ExtractUrlPlugin',
       'InsertResourcePlugin',
       'SelectResourcePlugin',
