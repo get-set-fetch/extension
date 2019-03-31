@@ -12,5 +12,5 @@
       "npmClientArgs": []      
     }
   },
-  "packages": ["packages/**/*"]
+  "packages": ["packages/*", "packages/scenarios/**/*"]
 }
