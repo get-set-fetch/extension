@@ -7,7 +7,7 @@ import { join, resolve } from 'path';
 import BrowserHelper from '../../../utils/BrowserHelper';
 
 /* eslint-disable no-shadow */
-describe('Project Crawl Extract Resources', () => {
+xdescribe('Project Crawl Extract Resources', () => {
   let browser = null;
   let adminPage = null;
 
