@@ -9,8 +9,8 @@ export default class BrowserHelper {
       ignoreHTTPSErrors: true,
       slowMo: 20,
       args: [
-        '--host-rules=MAP * 127.0.0.1',
-        '--proxy-server="http=localhost:80;https=localhost:443"',
+        '--host-rules=MAP *:80 127.0.0.1:8080, MAP *:443 127.0.0.1:8443',
+        '--proxy-server="http=localhost:8080;https=localhost:8443"',
         '--ignore-certificate-errors',
         `--disable-extensions-except=${extension.path}`,
         `--load-extension=${extension.path}`,

@@ -24,8 +24,8 @@ scenarioSite.use(serveStatic('./test/resources/sites/registry.npmjs.org'));
 app.use(vhost('registry.npmjs.org', scenarioSite));
 
 // serve the content over http
-http.createServer(app).listen(80);
+http.createServer(app).listen(8080);
 
 // server the content over https
 const tlsOpts = CertGenerator.generate();
-https.createServer(tlsOpts, app).listen(443);
+https.createServer(tlsOpts, app).listen(8443);
