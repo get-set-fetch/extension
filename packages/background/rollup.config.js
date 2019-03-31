@@ -7,22 +7,26 @@ import globals from 'rollup-plugin-node-globals';
 import builtins from 'rollup-plugin-node-builtins';
 import tslint from 'rollup-plugin-tslint';
 
-
 const mainConfig = {
   input: [
     'src/ts/background-bundle.ts',
-    'src/ts/background-main.ts',
+    'src/ts/background-main.ts'
   ],
   output: {
     dir: 'dist',
-    format: 'esm',
+    format: 'esm'
   },
   experimentalCodeSplitting: true,
+  chunkFileNames: '[name]-1.js',
   sourceMap: true,
   plugins: [
     ignore(['https', 'http', 'jsdom', 'fs', 'path', 'puppeteer', 'console', 'knex', 'mongodb', '__filename']),
     typescript(),
-    commonjs(),
+    commonjs({
+      namedExports: {
+        'pako': [ 'inflate' ]
+      }
+    }),
     json(),
     resolve({
       browser: true,
@@ -33,13 +37,13 @@ const mainConfig = {
         'get-set-fetch', 'get-set-fetch-extension-commons',
         'murmurhash-js',
         'url-parse', 'requires-port', 'buffer', 'querystringify',
-        'jszip'
-      ],
+        'jszip', 'pako', 'untar.js'
+      ]
     }),
     globals(),
-    builtins(),
+    builtins()
     // tslint(),
-  ],
+  ]
 };
 
 const crawlPlugins = [
@@ -48,13 +52,12 @@ const crawlPlugins = [
   { name: 'InsertResourcePlugin', src: 'src/ts/plugins/builtin/InsertResourcePlugin.ts' },
   { name: 'ExtensionFetchPlugin', src: 'src/ts/plugins/builtin/ExtensionFetchPlugin.ts' },
   { name: 'ExtractUrlPlugin', src: 'src/ts/plugins/builtin/ExtractUrlPlugin.ts' },
-  { name: 'ExtractTitlePlugin', src: 'src/ts/plugins/builtin/ExtractTitlePlugin.ts' },
 ];
 const crawlPluginConfig = crawlPlugins.map(plugin => ({
   input: plugin.src,
   output: {
     file: `dist/plugins/${plugin.name}.js`,
-    format: 'es',
+    format: 'es'
   },
   plugins: [
     typescript(),
@@ -65,11 +68,11 @@ const crawlPluginConfig = crawlPlugins.map(plugin => ({
       extensions: ['.js', '.json'],
       jsnext: true,
       only: [
-        'get-set-fetch-extension-commons',
-      ],
-    }),
-    //tslint(),
-  ],
+        'get-set-fetch-extension-commons'
+      ]
+    })
+    // tslint(),
+  ]
 }));
 
 export default [mainConfig, ...crawlPluginConfig];
