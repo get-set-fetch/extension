@@ -3,11 +3,14 @@ import { ExportType } from ".";
 import { IHeaderCol } from "./table";
 import { IPluginDefinition, IPlugin } from './plugin';
 import { IModuleDefinition } from './storage';
+import { NpmPackage } from './npm';
 
-interface IScenarioStorage {
-  id: number;
+interface IScenarioPackage {
+  id?: number;
   name: string;
+  package: NpmPackage;
   code: string;
+  builtin: boolean;
 }
 
 export interface IScenarioLink {
@@ -17,8 +20,6 @@ export interface IScenarioLink {
 
 export interface IScenario {
   id?: string;
-  getDescription: () => string;
-  getLink: () => IScenarioLink;
   getConfigFormSchema: () => object;
   getConfigFormUISchema: () => object;
   getPluginDefinitions: (data:any) => IPluginDefinition[];

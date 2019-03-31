@@ -1,29 +1,30 @@
 import { BaseEntity } from 'get-set-fetch';
 import Logger from '../logger/Logger';
-import { IScenarioStorage } from 'get-set-fetch-extension-commons/lib/scenario';
+import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
+import { NpmPackage } from 'get-set-fetch-extension-commons';
 
 const Log = Logger.getLogger('IdbScenario');
 
-export default class IdbScenario extends BaseEntity implements IScenarioStorage {
+export default class IdbScenarioPackage extends BaseEntity implements IScenarioPackage {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'name', 'code'];
+    return ['id', 'name', 'package', 'code', 'builtin'];
   }
 
   // get a read transaction
   static rTx() {
-    return IdbScenario.db.transaction('Scenarios').objectStore('Scenarios');
+    return IdbScenarioPackage.db.transaction('ScenarioPackages').objectStore('ScenarioPackages');
   }
 
   // get a read-write transaction
   static rwTx() {
-    return IdbScenario.db.transaction('Scenarios', 'readwrite').objectStore('Scenarios');
+    return IdbScenarioPackage.db.transaction('ScenarioPackages', 'readwrite').objectStore('ScenarioPackages');
   }
 
-  static get(nameOrId): Promise<IdbScenario> {
+  static get(nameOrId): Promise<IdbScenarioPackage> {
     return new Promise((resolve, reject) => {
-      const rTx = IdbScenario.rTx();
+      const rTx = IdbScenarioPackage.rTx();
       const readReq = (Number.isInteger(nameOrId) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
       readReq.onsuccess = (e) => {
@@ -32,7 +33,7 @@ export default class IdbScenario extends BaseEntity implements IScenarioStorage 
           resolve(null);
         }
         else {
-          resolve(new IdbScenario(result));
+          resolve(new IdbScenarioPackage(result));
         }
       };
       readReq.onerror = () => {
@@ -41,9 +42,9 @@ export default class IdbScenario extends BaseEntity implements IScenarioStorage 
     });
   }
 
-  static getAll(): Promise<IdbScenario[]> {
+  static getAll(): Promise<IdbScenarioPackage[]> {
     return new Promise((resolve, reject) => {
-      const rTx = IdbScenario.rTx();
+      const rTx = IdbScenarioPackage.rTx();
       const readReq = rTx.getAll();
 
       readReq.onsuccess = (e) => {
@@ -53,27 +54,27 @@ export default class IdbScenario extends BaseEntity implements IScenarioStorage 
         }
         else {
           for (let i = 0; i < result.length; i += 1) {
-            result[i] = new IdbScenario(result[i]);
+            result[i] = new IdbScenarioPackage(result[i]);
           }
           resolve(result);
         }
       };
-      readReq.onerror = () => reject(new Error('could not read Scenarios'));
+      readReq.onerror = () => reject(new Error('could not read ScenarioPackages'));
     });
   }
 
   static delAll() {
     return new Promise((resolve, reject) => {
-      const rwTx = IdbScenario.rwTx();
+      const rwTx = IdbScenarioPackage.rwTx();
       const req = rwTx.clear();
       req.onsuccess = () => resolve();
-      req.onerror = () => reject(new Error('could not clear Scenarios'));
+      req.onerror = () => reject(new Error('could not clear ScenarioPackages'));
     });
   }
 
   static delSome(ids, resolve = null, reject = null) {
     if (resolve && reject) {
-      const rwTx = IdbScenario.rwTx();
+      const rwTx = IdbScenarioPackage.rwTx();
       const req = rwTx.delete(ids.pop());
       req.onsuccess = () => {
         if (ids.length === 0) {
@@ -81,7 +82,7 @@ export default class IdbScenario extends BaseEntity implements IScenarioStorage 
         }
         else this.delSome(ids, resolve, reject);
       };
-      req.onerror = () => reject(new Error('could not delSome Scenarios'));
+      req.onerror = () => reject(new Error('could not delSome ScenarioPackages'));
       return null;
     }
 
@@ -98,9 +99,11 @@ export default class IdbScenario extends BaseEntity implements IScenarioStorage 
 
   id: number;
   name: string;
+  package: NpmPackage;
   code: string;
+  builtin: boolean = false;
 
-  constructor(kwArgs: Partial<IScenarioStorage> = {}) {
+  constructor(kwArgs: Partial<IScenarioPackage> = {}) {
     super();
     for (const key in kwArgs) {
       this[key] = kwArgs[key];
@@ -109,31 +112,31 @@ export default class IdbScenario extends BaseEntity implements IScenarioStorage 
 
   save(): Promise<number> {
     return new Promise((resolve, reject) => {
-      const rwTx = IdbScenario.rwTx();
+      const rwTx = IdbScenarioPackage.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());
       reqAddResource.onsuccess = (e) => {
         this.id = e.target.result;
         resolve(this.id);
       };
-      reqAddResource.onerror = () => reject(new Error(`could not add project: ${this.name}`));
+      reqAddResource.onerror = () => reject(new Error(`could not add scenarioPackage: ${this.name}`));
     });
   }
 
   update() {
     return new Promise((resolve, reject) => {
-      const rwTx = IdbScenario.rwTx();
+      const rwTx = IdbScenarioPackage.rwTx();
       const reqUpdateResource = rwTx.put(this.serialize());
       reqUpdateResource.onsuccess = () => resolve();
-      reqUpdateResource.onerror = () => reject(new Error(`could not update project: ${this.name}`));
+      reqUpdateResource.onerror = () => reject(new Error(`could not update scenarioPackage: ${this.name}`));
     });
   }
 
   del() {
     return new Promise((resolve, reject) => {
-      const rwTx = IdbScenario.rwTx();
+      const rwTx = IdbScenarioPackage.rwTx();
       const reqUpdateResource = rwTx.delete(this.id);
       reqUpdateResource.onsuccess = () => resolve();
-      reqUpdateResource.onerror = () => reject(new Error(`could not delete project: ${this.name}`));
+      reqUpdateResource.onerror = () => reject(new Error(`could not delete scenarioPackage: ${this.name}`));
     });
   }
 

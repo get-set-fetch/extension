@@ -6,6 +6,7 @@ export { IPluginStorage, IPluginDefinition, IPlugin } from "./plugin";
 export { ISite } from "./site";
 export { IResource } from "./resource";
 export { IModuleDefinition, IModuleInfo } from "./storage";
+export { NpmPackage } from "./npm";
 
 
 

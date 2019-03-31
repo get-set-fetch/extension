@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { setIn } from 'immutable';
 import GsfClient from '../../components/GsfClient';
-import { HttpMethod, IEnhancedJSONSchema, IScenario, IModuleDefinition } from 'get-set-fetch-extension-commons';
+import { HttpMethod, IEnhancedJSONSchema, IScenario } from 'get-set-fetch-extension-commons';
 import ScenarioHelper from '../scenarios/model/ScenarioHelper';
 import { History } from 'history';
 import { match } from 'react-router';
@@ -15,6 +15,7 @@ import ScenarioDescription from '../../components/react-jsonschema-form/widgets/
 import ScenarioLink from '../../components/react-jsonschema-form/widgets/ScenarioLink';
 import { NavLink } from 'react-router-dom';
 import Page from '../../layout/Page';
+import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
 
 interface IProps {
   history: History;
@@ -72,12 +73,12 @@ export default class ProjectDetail extends React.Component<IProps, IState> {
     const project: Project = new Project(data);
 
     // load available scenarios
-    const scenarios: IModuleDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IModuleDefinition[];
+    const scenarioPkgs: IScenarioPackage[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioPackage[];
 
     // compute new baseProjectSchema for scenario dropdown
     const scenarioIdProp = Object.assign({}, this.state.baseProjectSchema.properties.scenarioId);
-    scenarioIdProp.enum = scenarios.map(scenario => scenario.id);
-    scenarioIdProp.enumNames = scenarios.map(scenario => scenario.name);
+    scenarioIdProp.enum = scenarioPkgs.map(pkg => pkg.id);
+    scenarioIdProp.enumNames = scenarioPkgs.map(pkg => pkg.name);
     const baseProjectSchema = setIn(this.state.baseProjectSchema, ['properties', 'scenarioId'], scenarioIdProp);
 
     // modify schemas based on available scenarios data

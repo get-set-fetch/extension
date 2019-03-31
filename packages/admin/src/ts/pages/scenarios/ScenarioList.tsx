@@ -1,12 +1,12 @@
 import * as React from 'react';
 import GsfClient from '../../components/GsfClient';
-import { HttpMethod, IHeaderCol, IModuleDefinition, IScenario } from 'get-set-fetch-extension-commons';
+import { HttpMethod, IHeaderCol } from 'get-set-fetch-extension-commons';
 import Page from '../../layout/Page';
 import Table from '../../components/Table';
-import ScenarioHelper from './model/ScenarioHelper';
+import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
 
 interface IState {
-  scenarios: IScenario[];
+  scenarioPkgs: IScenarioPackage[];
   header: IHeaderCol[];
 }
 
@@ -18,23 +18,23 @@ export default class ScenarioList extends React.Component<{}, IState> {
       header: [
         {
           label: 'Name',
-          render: (scenario: IScenario) => (scenario.constructor.name)
+          render: (scenarioPkg: IScenarioPackage) => (scenarioPkg.name)
         },
         {
           label: 'Description',
-          render: (scenario: IScenario) => (<span style={{ textOverflow: 'ellipsis' }}>{scenario.getDescription().substr(0, 100)}</span>)
+          render: (scenarioPkg: IScenarioPackage) => (<span style={{ textOverflow: 'ellipsis' }}>{scenarioPkg.package.description.substr(0, 100)}</span>)
         },
         {
-          label: 'Link',
-          render: (scenario: IScenario) => (<a href={scenario.getLink().href} target='_blank'>{scenario.getLink().title}</a>)
+          label: 'Homepage',
+          render: (scenarioPkg: IScenarioPackage) => (<a href={scenarioPkg.package.homepage} target='_blank'>{scenarioPkg.package.homepage}</a>)
         }
       ],
-      scenarios: []
+      scenarioPkgs: []
     };
   }
 
   componentDidMount() {
-    this.loadScenarios();
+    this.loadScenarioPackages();
   }
 
   async loadScenarios() {
@@ -50,7 +50,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
 
   // eslint-disable-next-line class-methods-use-this
   render() {
-    if (!this.state.scenarios) return null;
+    if (!this.state.scenarioPkgs) return null;
 
     return (
       <Page
@@ -58,7 +58,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
         >
         <Table
           header={this.state.header}
-          data={this.state.scenarios}
+          data={this.state.scenarioPkgs}
         />
       </Page>
     );
