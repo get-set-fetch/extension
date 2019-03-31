@@ -30,7 +30,7 @@ class PluginManager extends BaseModuleManager {
     );
   }
 
- static async discoverPlugins() {
+ static async discoverLocalPlugins() {
   const pluginDefinitions = await this.getModulesContent('background/plugins');
   const plugins = pluginDefinitions.map(moduleDef => new GsfProvider.Plugin(moduleDef));
   await PluginManager.persistPlugins(plugins);
