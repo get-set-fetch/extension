@@ -9,8 +9,10 @@
     "build:dist": "rollup --config rollup.config.js",
     "build:dev": "rollup --config rollup.dev.config.js --watch"
   },
-  "author": "",
-  "license": "ISC",
+  "author": {
+	  "name": "Andrei Sabau"
+  },
+  "license": "MIT",
   "devDependencies": {
     "@types/react": "^16.7.20",
     "@types/react-dom": "^16.0.11",

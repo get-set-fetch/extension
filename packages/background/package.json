@@ -22,7 +22,9 @@
     "scraper",
     "extension"
   ],
-  "author": "Andrei Sabau",
+  "author": {
+	  "name": "Andrei Sabau"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/get-set-fetch/extension/issues"
