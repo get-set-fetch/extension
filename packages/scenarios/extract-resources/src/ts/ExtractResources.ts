@@ -13,17 +13,6 @@ export default class ExtractResources implements IScenario {
     return ConfigFormUISchema;
   }
 
-  getDescription() {
-    return ConfigFormSchema.properties.description.default;
-  }
-
-  getLink() {
-    return {
-      href: ConfigFormSchema.properties.link.default,
-      title: ConfigFormSchema.properties.link.title
-    };
-  }
-
   getPluginDefinitions(scenarioProps) {
     const pluginDefinitions: IPluginDefinition[] = [
       {

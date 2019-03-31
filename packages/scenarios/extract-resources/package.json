@@ -1,8 +1,9 @@
 {
   "name": "get-set-fetch-scenario-extract-resources",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Extract Resources scenario is used for extracting various resources from the corresponding sites.",
+  "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-resources",
+  "main": "dist/ExtractResources.js",
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && npm run build:dist",
