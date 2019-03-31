@@ -110,6 +110,6 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // a single resource has been crawled succefully, 2nd one returned null causing crawl to stop
     sinon.assert.callCount(crawlResourceSpy, 2);
-    assert.approximately(elapsedTime, delay * 2, delay * 0.1);
+    assert.approximately(elapsedTime, delay * 2, delay * 0.20);
   });
 });
