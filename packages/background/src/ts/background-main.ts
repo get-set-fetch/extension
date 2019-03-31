@@ -18,10 +18,10 @@ const Log = Logger.getLogger('background-main');
 
   try {
     // 2. read all builtin plugins, persist them as Plugin
-    await PluginManager.discoverPlugins();
+    await PluginManager.discoverLocalPlugins();
 
     // 3. read all builtin scenarios, persist them as Scenario
-    await ScenarioManager.discoverScenarios();
+    await ScenarioManager.discoverLocalScenarios();
   }
   catch (err) {
     Log.error(err);
