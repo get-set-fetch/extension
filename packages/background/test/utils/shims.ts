@@ -1,5 +1,6 @@
 import { JSDOM } from 'jsdom';
 import * as setGlobalVars from 'indexeddbshim';
+import { TextDecoder } from 'util';
 
 /*
 node.js does not support IndexedDB
@@ -14,3 +15,11 @@ setGlobalVars(global.window, {
 // init jsdom environment for testing plugins running in browser
 const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
 global.window.document = dom.window.document;
+
+// "polyfill" fetch in order to have something to stub
+global.window.fetch = () => Promise.resolve();
+
+// "polyfill" TextDecoder, nodejs prior to 11 (not yet LTS) makes TextDecoder available from utils not global
+if (!global.TextDecoder) {
+  global.TextDecoder = TextDecoder;
+}

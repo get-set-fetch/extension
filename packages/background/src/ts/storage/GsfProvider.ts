@@ -355,6 +355,9 @@ export default class GsfProvider {
           case /^scenarios$/.test(request.resource):
             reqPromise = GsfProvider.ScenarioPackage.getAll();
             break;
+          // available scenarios
+          case /^scenarios\/available$/.test(request.resource):
+            reqPromise = ScenarioManager.getNpmScenarios();
             break;
           // scenario/:scenarioId
           case /^scenario\/[0-9]+$/.test(request.resource):

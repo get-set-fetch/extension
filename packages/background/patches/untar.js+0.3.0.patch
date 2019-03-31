@@ -1,0 +1,12 @@
+patch-package
+--- a/node_modules/untar.js/lib/bytestream.js
++++ b/node_modules/untar.js/lib/bytestream.js
+@@ -18,7 +18,7 @@
+  * @param {number=} opt_length The length of this BitStream
+  * @constructor
+  */
+-ByteStream = function(ab, opt_offset, opt_length) {
++const ByteStream = function(ab, opt_offset, opt_length) {
+     var offset = opt_offset || 0;
+     var length = opt_length || ab.byteLength;
+     this.bytes = new Uint8Array(ab, offset, length);

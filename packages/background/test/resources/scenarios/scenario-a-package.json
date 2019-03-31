@@ -1,0 +1,18 @@
+{
+	"name": "scenario-a",
+	"version": "0.1.5",
+	"description": "Scenario A description",
+	"main": "dist/scenario-a.js",
+	"author": {
+		"name": "Author A"
+	},
+	"license": "MIT",
+	"homepage": "https://github.com/scenario-a/scenario-a#readme",
+	"dist": {
+		"integrity": "sha512-Z3XfEJtjC+FJ68XhrcmlV4furGljj7vo61YGEJJnBWIXIB3j5jXA6ocpSMTIlshF13oT2Nj6+ujqYjWeZwmj/Q==",
+		"shasum": "babcbeabcddae752796fb3f30beae09757d2dd7b",
+		"tarball": "https://registry.npmjs.org/scenario-a/-/scenario-a-0.1.5.tgz",
+		"fileCount": 11,
+		"unpackedSize": 11280
+	}
+}

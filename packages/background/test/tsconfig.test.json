@@ -10,5 +10,8 @@
         ],
         "allowJs": true,
     },
-    "newLine": "LF"
+    "newLine": "LF",
+    "include": [
+        "../typings/global.d.ts",
+    ]
 }

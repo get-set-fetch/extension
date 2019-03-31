@@ -37,15 +37,17 @@ export default class ScenarioList extends React.Component<{}, IState> {
     this.loadScenarioPackages();
   }
 
-  async loadScenarios() {
-    const scenarioDefinitions: IModuleDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IModuleDefinition[];
-    const scenarios = await Promise.all(
-      scenarioDefinitions.map(
-        scenarioDefinition => ScenarioHelper.instantiate(scenarioDefinition.id.toString())
-      )
-    );
+  async loadScenarioPackages() {
+    // get installed scenario packages
+    const installedPkgs: IScenarioPackage[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioPackage[];
+    const installedPkgNames = installedPkgs.map(pkg => pkg.name);
 
-    this.setState({ scenarios });
+    // get available scenario packages, only show the not already installed ones
+    let availablePkgs: IScenarioPackage[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios/available')) as IScenarioPackage[];
+    availablePkgs = availablePkgs.filter(pkg => installedPkgNames.indexOf(pkg.name) === -1);
+
+    const scenarioPkgs = installedPkgs.concat(availablePkgs);
+    this.setState({ scenarioPkgs });
   }
 
   // eslint-disable-next-line class-methods-use-this

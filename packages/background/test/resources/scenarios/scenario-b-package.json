@@ -1,0 +1,18 @@
+{
+	"name": "scenario-b",
+  "version": "2.3.0",
+  "description": "Scenario B description",
+  "main": "index.js",
+  "author": {
+    "name": "Author B"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/scenario-b/scenario-b#readme",
+  "dist": {
+    "integrity": "sha512-Z3XfEJtjC+FJ68XhrcmlV4furGljj7vo61YGEJJnBWIXIB3j5jXA6ocpSMTIlshF13oT2Nj6+ujqYjWeZwmj/Q==",
+    "shasum": "babcbeabcddae752796fb3f30beae09757d2dd7b",
+    "tarball": "https://registry.npmjs.org/scenario-b/-/scenario-b-2.3.0.tgz",
+    "fileCount": 11,
+    "unpackedSize": 11280
+  }
+}
