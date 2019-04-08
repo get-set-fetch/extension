@@ -1,3 +1,17 @@
 {
-  "ui:order": ["name", "description", "url", "scenarioId", "scenarioProps"]
+  "ui:order": ["name", "description", "url", "scenarioId", "scenarioProps"],
+  "scenarioProps": {
+    "homepage": {
+      "ui:widget": "ScenarioHomepage",
+      "ui:options": {
+        "label": false
+      }
+    },
+    "description": {
+      "ui:widget": "ScenarioDescription",
+      "ui:options": {
+        "label": false
+      }
+    }
+  }
 }

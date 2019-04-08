@@ -3,10 +3,36 @@
   "type": "object",
   "required": ["name", "url", "scenarioId"],
   "properties": {
-    "name": {"type": "string", "title": "Name"},
-    "description": {"type": "string", "title": "Description"},
-    "url": {"type": "string", "title": "URL"},
-    "scenarioId": {"type": "number", "title": "Crawl Scenario", "enum": [], "enumNames": []},
-    "scenarioProps": {"type": "object"}
+    "name": {
+      "type": "string",
+      "title": "Name"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "url": {
+      "type": "string",
+      "title": "URL"
+    },
+    "scenarioId": {
+      "type": "number",
+      "title": "Crawl Scenario",
+      "enum": [],
+      "enumNames": []
+    },
+    "scenarioProps": {
+      "type": "object",
+      "title": "",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "homepage": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
   }
 }

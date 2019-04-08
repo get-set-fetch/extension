@@ -1,19 +1,7 @@
 import { Record } from 'immutable';
+import { IProjectStorage } from 'get-set-fetch-extension-commons';
 
-interface IPluginDefinition {
-  name: string;
-}
-interface IProjectProps {
-  id: string;
-  name: string;
-  description: string;
-  url: string;
-  scenarioId: string;
-  scenarioProps: object;
-  pluginDefinitions: IPluginDefinition[];
-}
-
-const defaultProjectProps: IProjectProps = {
+const defaultProjectProps: IProjectStorage = {
   id: null,
   name: null,
   description: null,
@@ -23,15 +11,15 @@ const defaultProjectProps: IProjectProps = {
   pluginDefinitions: []
 };
 
-export default class Project extends Record(defaultProjectProps) implements IProjectProps {
-  readonly id: string;
+export default class Project extends Record(defaultProjectProps) implements IProjectStorage {
+  readonly id: number;
   readonly name: string;
   readonly description: string;
   readonly url: string;
-  readonly scenarioId: string;
-  readonly scenarioProps: object;
+  readonly scenarioId: number;
+  readonly scenarioProps: any;
 
-  constructor(values?: Partial<IProjectProps>) {
+  constructor(values?: Partial<IProjectStorage>) {
     values ? super(values) : super();
   }
 }
