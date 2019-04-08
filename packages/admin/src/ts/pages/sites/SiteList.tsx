@@ -109,7 +109,7 @@ export default class SiteList extends React.Component<{}, IState> {
       <Page
         title='Sites'
         actions={[
-          <NavLink id='newsite' to='/site/' className='btn btn-secondary float-right'>Add New Site</NavLink>
+          <NavLink id='newsite' to='/site/' className='btn btn-secondary float-right'>New Site</NavLink>
         ]}
         >
         <Table
