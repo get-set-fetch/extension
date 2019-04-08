@@ -28,9 +28,6 @@ export default class ExtractResources implements IScenario {
         }
       },
       {
-        name: 'ExtractTitlePlugin'
-      },
-      {
         name: 'ImageFilterPlugin'
       },
       {
@@ -65,7 +62,7 @@ export default class ExtractResources implements IScenario {
     return [
       {
         type: ExportType.CSV,
-        cols: ['url', 'info.title', 'mediaType'],
+        cols: ['url', 'mediaType'],
         fieldSeparator: ',',
         lineSeparator: '\n'
       },
