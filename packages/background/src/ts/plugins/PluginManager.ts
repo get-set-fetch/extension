@@ -2,7 +2,6 @@ import GsfProvider from './../storage/GsfProvider';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 import Logger from '../logger/Logger';
 import BaseModuleManager from './BaseModuleManager';
-import { BaseNamedEntity } from 'get-set-fetch';
 import { IModuleInfo } from 'get-set-fetch-extension-commons';
 import ScenarioManager from '../scenarios/ScenarioManager';
 import IdbPlugin from '../storage/IdbPlugin';
@@ -63,9 +62,12 @@ class PluginManager extends BaseModuleManager {
     if (PluginManager.cache.get(name)) return;
 
     const plugin = await GsfProvider.Plugin.get(name);
-    let moduleInfo: IModuleInfo;
+    if (!plugin) {
+      throw new Error(`could not find plugin ${name}`);
+    }
 
     // builtin plugin, not linked to a scenario
+    let moduleInfo: IModuleInfo;
     if (!plugin.scenarioId) {
       const pluginBlob = new Blob([plugin.code], { type: 'text/javascript' });
       const pluginUrl = URL.createObjectURL(pluginBlob);

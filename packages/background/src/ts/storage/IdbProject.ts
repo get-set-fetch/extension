@@ -1,5 +1,5 @@
 import { BaseEntity } from 'get-set-fetch';
-import { IPluginDefinition } from 'get-set-fetch-extension-commons';
+import { IProjectStorage, IPluginDefinition } from 'get-set-fetch-extension-commons';
 import Logger from '../logger/Logger';
 import IdbSite from './IdbSite';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
@@ -9,17 +9,7 @@ const Log = Logger.getLogger('IdbProject');
 
 /* eslint-disable class-methods-use-this */
 
-interface IProject {
-  id: number;
-  name: string;
-  description: string;
-  url: string;
-  scenarioId: string;
-  scenarioProps: object;
-  pluginDefinitions: IPluginDefinition[];
-}
-
-export default class IdbProject extends BaseEntity {
+export default class IdbProject extends BaseEntity implements IProjectStorage {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
@@ -145,11 +135,11 @@ export default class IdbProject extends BaseEntity {
   name: string;
   description: string;
   url: string;
-  scenarioId: string;
+  scenarioId: number;
   scenarioProps: object;
   pluginDefinitions: IPluginDefinition[];
 
-  constructor(kwArgs: Partial<IProject> = {}) {
+  constructor(kwArgs: Partial<IProjectStorage> = {}) {
     super();
     for (const key in kwArgs) {
       this[key] = kwArgs[key];

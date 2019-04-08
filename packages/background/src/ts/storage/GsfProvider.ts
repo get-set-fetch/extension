@@ -368,6 +368,17 @@ export default class GsfProvider {
             reqPromise = new Promise(resolve => resolve());
         }
         break;
+      case 'POST':
+        switch (true) {
+          // scenario
+          case /^scenario$/.test(request.resource):
+            const scenarioPkg = new GsfProvider.ScenarioPackage(request.body);
+            reqPromise = scenarioPkg.save();
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
       case 'DELETE':
         switch (true) {
           // scenarios

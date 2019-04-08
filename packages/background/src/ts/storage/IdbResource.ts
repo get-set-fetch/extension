@@ -65,13 +65,18 @@ export default class IdbResource extends BaseResource {
           resolve(null);
         }
         else {
-          if (instantiate) {
-            for (let i = 0; i < result.length; i += 1) {
-              Object.assign(result[i], this.parseResult(result[i]));
-              result[i] = new IdbResource(result[i]);
+          try {
+            if (instantiate) {
+              for (let i = 0; i < result.length; i += 1) {
+                Object.assign(result[i], this.parseResult(result[i]));
+                result[i] = new IdbResource(result[i]);
+              }
             }
+            resolve(result);
           }
-          resolve(result);
+          catch (err) {
+            reject(err);
+          }
         }
       };
       readReq.onerror = () => reject(new Error(`could not read site: ${siteId}`));

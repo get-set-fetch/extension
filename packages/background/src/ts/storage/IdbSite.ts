@@ -60,11 +60,16 @@ export default class IdbSite extends BaseEntity {
           resolve(null);
         }
         else {
-          for (let i = 0; i < result.length; i += 1) {
-            Object.assign(result[i], (await this.parseResult(result[i])));
-            result[i] = new IdbSite(result[i]);
+          try {
+            for (let i = 0; i < result.length; i += 1) {
+              Object.assign(result[i], (await this.parseResult(result[i])));
+              result[i] = new IdbSite(result[i]);
+            }
+            resolve(result);
           }
-          resolve(result);
+          catch (err) {
+            reject(err);
+          }
         }
       };
       readReq.onerror = () => reject(new Error('could not read sites'));

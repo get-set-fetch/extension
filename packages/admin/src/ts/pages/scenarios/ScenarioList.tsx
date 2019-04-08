@@ -5,6 +5,16 @@ import Page from '../../layout/Page';
 import Table from '../../components/Table';
 import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
 
+enum ScenarioStatus {
+  INSTALLED = 'Installed',
+  AVAILABLE = 'Available',
+  BUILTIN = 'Built-in'
+}
+
+interface IAdvancedScenarioPackage extends IScenarioPackage {
+  status: ScenarioStatus;
+}
+
 interface IState {
   scenarioPkgs: IScenarioPackage[];
   header: IHeaderCol[];
@@ -18,19 +28,53 @@ export default class ScenarioList extends React.Component<{}, IState> {
       header: [
         {
           label: 'Name',
-          render: (scenarioPkg: IScenarioPackage) => (scenarioPkg.name)
+          render: (scenarioPkg: IAdvancedScenarioPackage) => (scenarioPkg.name)
         },
         {
           label: 'Description',
-          render: (scenarioPkg: IScenarioPackage) => (<span style={{ textOverflow: 'ellipsis' }}>{scenarioPkg.package.description.substr(0, 100)}</span>)
+          render: (scenarioPkg: IAdvancedScenarioPackage) => (<span style={{ textOverflow: 'ellipsis' }}>{scenarioPkg.package.description.substr(0, 100)}</span>)
         },
         {
           label: 'Homepage',
-          render: (scenarioPkg: IScenarioPackage) => (<a href={scenarioPkg.package.homepage} target='_blank'>{scenarioPkg.package.homepage}</a>)
+          render: (scenarioPkg: IAdvancedScenarioPackage) => (
+            <a href={scenarioPkg.package.homepage} target='_blank' className='scenario-homepage'>
+              {scenarioPkg.package.homepage}
+            </a>
+          )
+        },
+        {
+          label: 'Status',
+          render: (scenarioPkg: IAdvancedScenarioPackage) => (scenarioPkg.status)
+        },
+        {
+          label: 'Actions',
+          render: (scenarioPkg: IAdvancedScenarioPackage) => {
+            switch (scenarioPkg.status) {
+              case ScenarioStatus.AVAILABLE:
+                return <input
+                  id={`install-${scenarioPkg.name}`}
+                  type='button'
+                  className='btn-secondary mr-2'
+                  value='Install'
+                  onClick={() => this.installScenarioPkg(scenarioPkg)}
+                />;
+              case ScenarioStatus.INSTALLED:
+                return <input
+                  id={`uninstall-${scenarioPkg.name}`}
+                  type='button'
+                  className='btn-secondary mr-2'
+                  value='Uninstall'
+                  onClick={() => this.uninstallScenarioPkg(scenarioPkg)}
+                />;
+            }
+          }
         }
       ],
       scenarioPkgs: []
     };
+
+    this.installScenarioPkg = this.installScenarioPkg.bind(this);
+    this.uninstallScenarioPkg = this.uninstallScenarioPkg.bind(this);
   }
 
   componentDidMount() {
@@ -39,15 +83,30 @@ export default class ScenarioList extends React.Component<{}, IState> {
 
   async loadScenarioPackages() {
     // get installed scenario packages
-    const installedPkgs: IScenarioPackage[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioPackage[];
-    const installedPkgNames = installedPkgs.map(pkg => pkg.name);
+    const installedPkgs: IAdvancedScenarioPackage[] = ((await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioPackage[])
+    .map(installedPkg => Object.assign(installedPkg, { status: installedPkg.builtin ? ScenarioStatus.BUILTIN : ScenarioStatus.INSTALLED } as IAdvancedScenarioPackage));
 
     // get available scenario packages, only show the not already installed ones
-    let availablePkgs: IScenarioPackage[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios/available')) as IScenarioPackage[];
-    availablePkgs = availablePkgs.filter(pkg => installedPkgNames.indexOf(pkg.name) === -1);
+    const installedPkgNames = installedPkgs.map(pkg => pkg.name);
+    const availablePkgs: IAdvancedScenarioPackage[] = ((await GsfClient.fetch(HttpMethod.GET, 'scenarios/available')) as IScenarioPackage[])
+    .filter(availablePkg => installedPkgNames.indexOf(availablePkg.name) === -1)
+    .map(availablePkg => Object.assign(availablePkg, { status: ScenarioStatus.AVAILABLE } as IAdvancedScenarioPackage));
 
-    const scenarioPkgs = installedPkgs.concat(availablePkgs);
-    this.setState({ scenarioPkgs });
+    this.setState({ scenarioPkgs: installedPkgs.concat(availablePkgs) });
+  }
+
+  async installScenarioPkg(scenarioPkg) {
+    // save scenario
+    await GsfClient.fetch(HttpMethod.POST, 'scenario', scenarioPkg);
+    // re-load scenario list
+    await this.loadScenarioPackages();
+  }
+
+  async uninstallScenarioPkg(scenarioPkg) {
+    // delete scenario
+    await GsfClient.fetch(HttpMethod.DELETE, 'scenarios', { ids: [scenarioPkg.id] });
+    // re-load scenario list
+    await this.loadScenarioPackages();
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -56,7 +115,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
 
     return (
       <Page
-        title='Available Scenarios'
+        title='Scenarios'
         >
         <Table
           header={this.state.header}

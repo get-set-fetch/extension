@@ -101,3 +101,11 @@ form.form-main {
     font-weight: $font-weight-bold;
   }
 }
+
+a.scenario-homepage {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  max-width: 300px;
+}

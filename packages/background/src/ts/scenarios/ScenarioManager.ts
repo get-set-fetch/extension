@@ -146,6 +146,11 @@ export default class ScenarioManager extends BaseModuleManager {
     return scenarioPackage;
   }
 
+  static async installNpmScenario(npmUrl: string) {
+    const scenarioPkgDef: IScenarioPackage = await ScenarioManager.getNpmScenarioDetails(npmUrl);
+    await ScenarioManager.persistScenarioPackages([new GsfProvider.ScenarioPackage(scenarioPkgDef)]);
+  }
+
   static async getLocalScenarios(): Promise<IScenarioPackage[]> {
     const scenarioDirs = await ScenarioManager.getLocalScenarioDirs('scenarios');
     const scenarioPkgs = Promise.all(
