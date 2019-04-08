@@ -1,24 +1,17 @@
-import JSZip from 'jszip/dist/jszip';
-import queryString from 'query-string';
-import { readFileSync } from 'fs';
 import TestUtils from 'get-set-fetch/test/utils/TestUtils';
 import { assert } from 'chai';
 import { join, resolve } from 'path';
-import BrowserHelper from '../../../utils/BrowserHelper';
+import BrowserHelper from '../../../helpers/BrowserHelper';
+import { Page } from 'puppeteer';
+import CrawlHelper from '../../../helpers/CrawlHelper';
+import ProjectHelper from '../../../helpers/ProjectHelper';
 
 /* eslint-disable no-shadow */
-xdescribe('Project Crawl Extract Resources', () => {
-  let browser = null;
-  let adminPage = null;
+describe('Project Crawl Extract Resources', () => {
+  let browserHelper: BrowserHelper;
+  let page: Page;
 
   const targetDir = join(__dirname, '..', '..', '..', 'tmp');
-
-  const gotoOpts = {
-    timeout: 10 * 1000,
-    waitUntil: 'load'
-  };
-
-  const queryParams = queryString.stringify({ redirectPath: '/projects' });
 
   const actualProject = {
     name: 'projectA',
@@ -41,9 +34,6 @@ xdescribe('Project Crawl Extract Resources', () => {
         }
       },
       {
-        name: 'ExtractTitlePlugin'
-      },
-      {
         name: 'ImageFilterPlugin'
       },
       {
@@ -56,17 +46,16 @@ xdescribe('Project Crawl Extract Resources', () => {
   };
 
   const expectedResources = [
-    { url: 'https://www.sitea.com/index.html', mediaType: 'text/html', info: { title: 'siteA' } },
-    { url: 'https://www.sitea.com/pageA.html', mediaType: 'text/html', info: { title: 'pageA' } },
-    { url: 'https://www.sitea.com/pageB.html', mediaType: 'text/html', info: { title: 'pageB' } },
+    { url: 'https://www.sitea.com/index.html', mediaType: 'text/html', info: {} },
+    { url: 'https://www.sitea.com/pageA.html', mediaType: 'text/html', info: {} },
+    { url: 'https://www.sitea.com/pageB.html', mediaType: 'text/html', info: {} },
     { url: 'https://www.sitea.com/img/imgA-150.png', mediaType: 'image/png', info: { width: 150, height: 150, name: 'imgA-150.png' } },
     { url: 'https://www.sitea.com/img/imgB-850.png', mediaType: 'image/png', info: { width: 850, height: 850, name: 'imgB-850.png' } }
   ];
 
   before(async () => {
-    browser = await BrowserHelper.launch();
-    adminPage = await browser.newPage();
-    await BrowserHelper.waitForDBInitialization(adminPage);
+    browserHelper = await BrowserHelper.launch();
+    page = browserHelper.page;
   });
 
   afterEach(async () => {
@@ -74,17 +63,17 @@ xdescribe('Project Crawl Extract Resources', () => {
     TestUtils.emptyDir(targetDir);
 
     // move to admin page
-    await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/projects');
 
     // delete existing projects
-    const existingProjects = await adminPage.evaluate(() => GsfClient.fetch('GET', 'projects'));
+    const existingProjects = await page.evaluate(() => GsfClient.fetch('GET', 'projects'));
     if (!existingProjects) return;
     const projectIds = existingProjects.map(existingProject => existingProject.id);
-    await adminPage.evaluate(projectIds => GsfClient.fetch('DELETE', 'projects', { ids: projectIds }), projectIds);
+    await page.evaluate(projectIds => GsfClient.fetch('DELETE', 'projects', { ids: projectIds }), projectIds);
   });
 
   after(async () => {
-    await browser.close();
+    await browserHelper.close();
   });
 
   async function waitForCrawlComplete(adminPage, siteId, resolve = null) {
@@ -95,7 +84,7 @@ xdescribe('Project Crawl Extract Resources', () => {
       });
     }
 
-    const notCrawledResources = await adminPage.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/notcrawled`), siteId);
+    const notCrawledResources = await page.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/notcrawled`), siteId);
 
     // crawl complete, there are no more resources to be crawled
     if (notCrawledResources.length === 0) {
@@ -109,108 +98,69 @@ xdescribe('Project Crawl Extract Resources', () => {
   }
 
   async function checkCrawledResources(siteId) {
-    // retrieve crawled resources
-    let actualResources = await adminPage.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/crawled`), siteId);
-
-    // only keep the properties we're interested in
-    actualResources = actualResources.map(({ url, mediaType, info })=> ({ url, mediaType, info }) );
-
-    // check matching
+    const actualResources = await CrawlHelper.getCrawledResources(page, siteId);
     assert.sameDeepMembers(actualResources, expectedResources);
   }
 
-  async function downloadCsv(project) {
-    // open export dropdown
-    const downloadBtn = 'button#export';
-    await adminPage.waitFor(downloadBtn);
-    await adminPage.click(downloadBtn);
-
-    // initiate download
-    const csvLink = `a#csv-${project.id}`;
-    await adminPage.waitFor(csvLink);
-    await adminPage.click(csvLink);
-
-    // wait a bit for file to be generated and saved
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  async function downloadAndCheckCsv(project) {
+    const generated = await ProjectHelper.downloadProjectCsv(page, project, targetDir);
 
     // check file content
-    const expectedHeader = 'url,info.title,mediaType';
+    const expectedHeader = 'url,mediaType';
     const expectedBody: string[] = expectedResources
       .map(
         resource =>
-        [resource.url, resource.info.title ? resource.info.title : '', resource.mediaType].join(',')
+        [resource.url, resource.mediaType].join(',')
       );
 
-    const generatedContent = readFileSync(resolve(targetDir, `${project.name}.csv`), 'utf8');
-    const csvLines = generatedContent.split('\n');
-
-    const generatedHeader = csvLines[0];
-    const generatedBody = csvLines.slice(1);
-
-    assert.strictEqual(generatedHeader, expectedHeader);
-    assert.sameDeepMembers(generatedBody, expectedBody);
+    assert.strictEqual(generated.header, expectedHeader);
+    assert.sameDeepMembers(generated.body, expectedBody);
   }
 
-  async function downloadZip(project) {
-    // open export dropdown
-    const downloadBtn = 'button#export';
-    await adminPage.waitFor(downloadBtn);
-    await adminPage.click(downloadBtn);
-
-    // initiate download
-    const zipLink = `a#zip-${project.id}`;
-    await adminPage.waitFor(zipLink);
-    await adminPage.click(zipLink);
-
-    // wait a bit for file to be generated and saved
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    const generatedContent = readFileSync(resolve(targetDir, `${project.name}.zip`), 'binary');
-    const archive = await JSZip.loadAsync(generatedContent);
-
+  async function downloadAndCheckZip(project) {
+    const actualEntries = await ProjectHelper.downloadProjectZip(page, project, targetDir);
     const expectedEntries = ['imgA-150.png', 'imgB-850.png'];
-    const actualEntries = Object.keys(archive.files).map(name => archive.files[name].name);
     assert.sameDeepMembers(actualEntries, expectedEntries);
   }
 
   it('Test Crawl Project Extract Resources', async () => {
     // open project list
-    await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/projects');
 
     // create project to crawl
-    await adminPage.evaluate(project => GsfClient.fetch('POST', 'project', project), actualProject);
-    const projects = await adminPage.evaluate(() => GsfClient.fetch('GET', 'projects'));
+    await page.evaluate(project => GsfClient.fetch('POST', 'project', project), actualProject);
+    const projects = await page.evaluate(() => GsfClient.fetch('GET', 'projects'));
     assert.strictEqual(1, projects.length);
     const loadedProject = projects[0];
-    const loadedSites = await adminPage.evaluate(projectId => GsfClient.fetch('GET', `sites/${projectId}`), loadedProject.id);
+    const loadedSites = await page.evaluate(projectId => GsfClient.fetch('GET', `sites/${projectId}`), loadedProject.id);
     assert.strictEqual(1, loadedSites.length);
     const loadedSite = loadedSites[0];
 
     // reload project list
-    await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/projects');
     const crawlInputId = `input#crawl-${loadedProject.id}[type=button]`;
-    await adminPage.waitFor(crawlInputId);
+    await page.waitFor(crawlInputId);
 
     // start crawling project
-    await adminPage.click(crawlInputId);
+    await page.click(crawlInputId);
 
     // wait for all resources to be crawled (resource.crawledAt is updated for all resources)
-    await waitForCrawlComplete(adminPage, loadedSite.id);
+    await CrawlHelper.waitForCrawlComplete(page, loadedSite.id);
 
     // check crawled resources
     await checkCrawledResources(loadedSite.id);
 
     // reload project list
-    await adminPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-    adminPage.bringToFront();
+    await browserHelper.goto('/projects');
+    page.bringToFront();
 
     // goto project results page
     const resultsInputId = `input#results-${loadedProject.id}[type=button]`;
-    await adminPage.waitFor(resultsInputId);
-    await adminPage.click(resultsInputId);
+    await page.waitFor(resultsInputId);
+    await page.click(resultsInputId);
 
     // start a CDPSession in order to change download behavior via Chrome Devtools Protocol
-    const client = await adminPage
+    const client = await page
       .target()
       .createCDPSession();
     await client.send('Page.setDownloadBehavior', {
@@ -218,11 +168,11 @@ xdescribe('Project Crawl Extract Resources', () => {
       downloadPath: resolve(targetDir)
     });
 
-    // download csv
-    await downloadCsv(loadedProject);
+    // download and check csv
+    await downloadAndCheckCsv(loadedProject);
 
-    // download zip
-    await downloadZip(loadedProject);
+    // download and check zip
+    await downloadAndCheckZip(loadedProject);
   });
 
 });

@@ -1,31 +1,23 @@
 import { assert } from 'chai';
-import BrowserHelper from '../../utils/BrowserHelper';
+import BrowserHelper from '../../helpers/BrowserHelper';
+import { Page } from 'puppeteer';
 
 describe('Test Extension Popup, ', () => {
-  let browser = null;
-  let page = null;
-
-  const gotoOpts = {
-    timeout: 10 * 1000,
-    waitUntil: 'load'
-  };
+  let browserHelper: BrowserHelper;
+  let page: Page;
 
   before(async () => {
-    // launch chromium
-    browser = await BrowserHelper.launch();
-
-    // open new page
-    page = await browser.newPage();
+    browserHelper = await BrowserHelper.launch();
+    page = browserHelper.page;
   });
 
   after(async () => {
-    // close chromium
-    await browser.close();
+    await browserHelper.close();
   });
 
   it('Test Admin Links', async () => {
     // open extension popup
-    await page.goto(`chrome-extension://${extension.id}/popup/popup.html`, gotoOpts);
+    await page.goto(`chrome-extension://${extension.id}/popup/popup.html`, BrowserHelper.gotoOpts);
 
     // detect links
     const ctx = await page.mainFrame().executionContext();

@@ -1,20 +1,11 @@
-import queryString from 'query-string';
 import { assert } from 'chai';
-import { NavigationOptions } from 'puppeteer';
-import BrowserHelper, { clear } from '../../../utils/BrowserHelper';
+import { Page } from 'puppeteer';
+import BrowserHelper, { clear } from '../../../helpers/BrowserHelper';
 
 /* eslint-disable no-shadow, max-len */
 describe('Project CRUD Pages', () => {
-  let browser = null;
-  let projectPage = null;
-  let projectFrame = null;
-
-  const gotoOpts: NavigationOptions = {
-    timeout: 10 * 1000,
-    waitUntil: ['load']
-  };
-
-  const queryParams = queryString.stringify({ redirectPath: '/projects' });
+  let browserHelper: BrowserHelper;
+  let page: Page;
 
   const expectedProject = {
     name: 'projectA',
@@ -52,51 +43,48 @@ describe('Project CRUD Pages', () => {
   };
 
   before(async () => {
-    browser = await BrowserHelper.launch();
-    projectPage = await browser.newPage();
-    projectFrame = projectPage.mainFrame();
-
-    await BrowserHelper.waitForDBInitialization(projectPage);
+    browserHelper = await BrowserHelper.launch();
+    page = browserHelper.page;
   });
 
   beforeEach(async () => {
     // load project list
-    await projectPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/projects');
   });
 
   afterEach(async () => {
     // delete existing projects
-    const existingProjects = await projectPage.evaluate(() => GsfClient.fetch('GET', 'projects'));
+    const existingProjects = await page.evaluate(() => GsfClient.fetch('GET', 'projects'));
     if (!existingProjects) return;
     const projectIds = existingProjects.map(existingProject => existingProject.id);
-    await projectPage.evaluate(ids => GsfClient.fetch('DELETE', 'projects', { ids }), projectIds);
+    await page.evaluate(ids => GsfClient.fetch('DELETE', 'projects', { ids }), projectIds);
   });
 
   after(async () => {
-    await browser.close();
+    await browserHelper.close();
   });
 
   it('Test Create New Project', async () => {
-    await projectPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/projects');
 
     // open project detail page
-    await projectPage.waitFor('#newproject');
-    await projectPage.click('#newproject');
+    await page.waitFor('#newproject');
+    await page.click('#newproject');
 
     // wait for the project detail page to load, react-json-schema form has its own id generating policy appending 'root_" to 1st level schema properties
-    await projectPage.waitFor('input#root_name');
+    await page.waitFor('input#root_name');
 
     // fill in text input data for a new project
-    await projectFrame.type('input#root_name', expectedProject.name);
-    await projectFrame.type('input#root_description', expectedProject.description);
-    await projectFrame.type('input#root_url', expectedProject.url);
+    await page.type('input#root_name', expectedProject.name);
+    await page.type('input#root_description', expectedProject.description);
+    await page.type('input#root_url', expectedProject.url);
 
     // dropdown scenario is correctly populated
     const expectedScenarioIdOpts = [
       { value: '', label: '' },
       { value: '1', label: 'get-set-fetch-scenario-extract-resources' }
     ];
-    const scenarioIdOpts = await projectPage.evaluate(
+    const scenarioIdOpts = await page.evaluate(
       () =>
       Array.from((document.getElementById('root_scenarioId') as HTMLSelectElement).options)
       .map(
@@ -106,19 +94,19 @@ describe('Project CRUD Pages', () => {
     assert.sameDeepMembers(scenarioIdOpts, expectedScenarioIdOpts);
 
      // fill in dropdown scenario
-    await projectFrame.select('#root_scenarioId', expectedProject.scenarioId.toString());
+    await page.select('#root_scenarioId', expectedProject.scenarioId.toString());
 
     // save the project
-    await projectPage.click('#save');
+    await page.click('#save');
 
     // wait for project to be saved and project list to be available
-    await projectPage.waitFor('table.table-main');
+    await page.waitFor('table.table-main');
 
     // get the newly created project
-    const savedProject = await projectPage.evaluate(name => GsfClient.fetch('GET', `project/${name}`), expectedProject.name);
+    const savedProject = await page.evaluate(name => GsfClient.fetch('GET', `project/${name}`), expectedProject.name);
 
     // get the linked scenario
-    const linkedScenario = await projectPage.evaluate(scenarioId => GsfClient.fetch('GET', `scenario/${scenarioId}`), expectedProject.scenarioId);
+    const linkedScenario = await page.evaluate(scenarioId => GsfClient.fetch('GET', `scenario/${scenarioId}`), expectedProject.scenarioId);
 
     // check newly created project props
     assert.strictEqual(savedProject.name, expectedProject.name);
@@ -128,8 +116,8 @@ describe('Project CRUD Pages', () => {
     assert.sameDeepMembers(savedProject.pluginDefinitions, expectedProject.pluginDefinitions);
 
     // check newly created project presence in project list
-    await projectPage.waitFor(`a[href=\\/project\\/${savedProject.id}`);
-    const projectNameInList = await projectPage.evaluate(
+    await page.waitFor(`a[href=\\/project\\/${savedProject.id}`);
+    const projectNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/project\\/${id}`).innerHTML,
       savedProject.id
     );
@@ -140,37 +128,37 @@ describe('Project CRUD Pages', () => {
     const changedSuffix = '_changed';
 
     // create a new project
-    const projectId = await projectPage.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject);
+    const projectId = await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject);
 
     // reload project list
-    await projectPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/projects');
 
     // open the newly created project
-    await projectPage.waitFor(`a[href=\\/project\\/${projectId}`);
-    await projectPage.click(`a[href=\\/project\\/${projectId}`);
+    await page.waitFor(`a[href=\\/project\\/${projectId}`);
+    await page.click(`a[href=\\/project\\/${projectId}`);
 
     // wait for the project detail page to load
-    await projectPage.waitFor('input#root_name');
+    await page.waitFor('input#root_name');
 
     // change project properties
-    await projectPage.type('input#root_name', changedSuffix);
-    await projectPage.type('input#root_description', changedSuffix);
-    await projectPage.type('input#root_url', changedSuffix);
+    await page.type('input#root_name', changedSuffix);
+    await page.type('input#root_description', changedSuffix);
+    await page.type('input#root_url', changedSuffix);
 
     // change linked scenario properties
     const expectedScenarioExtensionRe = '/png/';
-    await clear(projectPage, '#root_scenarioProps_extensionRe');
-    await projectPage.type('#root_scenarioProps_extensionRe', expectedScenarioExtensionRe);
+    await clear(page, '#root_scenarioProps_extensionRe');
+    await page.type('#root_scenarioProps_extensionRe', expectedScenarioExtensionRe);
 
     const expectedScenarioMaxDepth = '3';
-    await clear(projectPage, '#root_scenarioProps_maxDepth');
-    await projectPage.type('#root_scenarioProps_maxDepth', expectedScenarioMaxDepth);
+    await clear(page, '#root_scenarioProps_maxDepth');
+    await page.type('#root_scenarioProps_maxDepth', expectedScenarioMaxDepth);
 
     // save the project and return to project list page
-    await projectPage.click('#save');
+    await page.click('#save');
 
     // get the updated site
-    const updatedProject = await projectPage.evaluate(id => GsfClient.fetch('GET', `project/${id}`), projectId);
+    const updatedProject = await page.evaluate(id => GsfClient.fetch('GET', `project/${id}`), projectId);
 
     // check newly updated project props
     assert.strictEqual(updatedProject.name, `${expectedProject.name}${changedSuffix}`);
@@ -186,8 +174,8 @@ describe('Project CRUD Pages', () => {
     assert.strictEqual(updatedExtractUrlPlugin.opts.extensionRe, expectedScenarioExtensionRe);
 
     // check updated project presence in project list
-    await projectPage.waitFor(`a[href=\\/project\\/${updatedProject.id}`);
-    const projectNameInList = await projectPage.evaluate(
+    await page.waitFor(`a[href=\\/project\\/${updatedProject.id}`);
+    const projectNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/project\\/${id}`).innerHTML,
       updatedProject.id
     );
@@ -196,44 +184,44 @@ describe('Project CRUD Pages', () => {
 
   it('Test Update and Cancel Existing Project', async () => {
     // create a new project
-    const projectId = await projectPage.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject);
+    const projectId = await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject);
 
     // reload project list
-    await projectPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/projects');
 
     // open the newly created project
-    await projectPage.waitFor(`a[href=\\/project\\/${projectId}`);
-    await projectPage.click(`a[href=\\/project\\/${projectId}`);
+    await page.waitFor(`a[href=\\/project\\/${projectId}`);
+    await page.click(`a[href=\\/project\\/${projectId}`);
 
     // wait for the project detail page to load
-    await projectPage.waitFor('input#root_name');
+    await page.waitFor('input#root_name');
 
     // cancel the update
-    await projectPage.click('#cancel');
+    await page.click('#cancel');
 
     // wait for list redirection, check project presence in project list
-    await projectPage.waitFor(`a[href=\\/project\\/${projectId}`);
+    await page.waitFor(`a[href=\\/project\\/${projectId}`);
   });
 
   it('Test Delete Existing Project', async () => {
    // create a new project
-   const projectId = await projectPage.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject);
+   const projectId = await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject);
 
    // reload project list
-   await projectPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+   await browserHelper.goto('/projects');
 
     // wait for delete button to show up
-   await projectPage.waitFor(`input#delete-${projectId}`);
+   await page.waitFor(`input#delete-${projectId}`);
 
     // delete it
-   await projectPage.click(`input#delete-${projectId}`);
+   await page.click(`input#delete-${projectId}`);
 
     // reload project list
-   await projectPage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-   await projectPage.waitFor('p#no-entries');
+   await browserHelper.goto('/projects');
+   await page.waitFor('p#no-entries');
 
     // check table is no longer present since there are no sites to display
-   const tableCount = await projectPage.evaluate(() => document.querySelectorAll('table').length);
+   const tableCount = await page.evaluate(() => document.querySelectorAll('table').length);
    assert.strictEqual(tableCount, 0);
   });
 

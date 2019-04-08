@@ -1,20 +1,11 @@
-import queryString from 'query-string';
 import { assert } from 'chai';
-import { NavigationOptions } from 'puppeteer';
-import BrowserHelper from '../../../utils/BrowserHelper';
+import { Page } from 'puppeteer';
+import BrowserHelper from '../../../helpers/BrowserHelper';
 
 /* eslint-disable no-shadow, max-len */
 describe('Site CRUD Pages', () => {
-  let browser = null;
-  let sitePage = null;
-  let siteFrame = null;
-
-  const gotoOpts: NavigationOptions = {
-    timeout: 10 * 1000,
-    waitUntil: ['load']
-  };
-
-  const queryParams = queryString.stringify({ redirectPath: '/sites' });
+  let browserHelper: BrowserHelper;
+  let page: Page;
 
   const actualSite = {
     name: 'siteA',
@@ -22,57 +13,54 @@ describe('Site CRUD Pages', () => {
   };
 
   before(async () => {
-    browser = await BrowserHelper.launch();
-    sitePage = await browser.newPage();
-    siteFrame = sitePage.mainFrame();
-
-    await BrowserHelper.waitForDBInitialization(sitePage);
+    browserHelper = await BrowserHelper.launch();
+    page = browserHelper.page;
   });
 
   beforeEach(async () => {
     // load site list
-    await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/sites');
   });
 
   afterEach(async () => {
     // delete existing sites
-    const existingSites = await sitePage.evaluate(() => GsfClient.fetch('GET', 'sites'));
+    const existingSites = await page.evaluate(() => GsfClient.fetch('GET', 'sites'));
     if (!existingSites) return;
     const siteIds = existingSites.map(existingSite => existingSite.id);
-    await sitePage.evaluate(siteIds => GsfClient.fetch('DELETE', 'sites', { ids: siteIds }), siteIds);
+    await page.evaluate(siteIds => GsfClient.fetch('DELETE', 'sites', { ids: siteIds }), siteIds);
   });
 
   after(async () => {
-    await browser.close();
+    await browserHelper.close();
   });
 
   it('Test Create New Site', async () => {
-    await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/sites');
 
     // open site detail page
-    await sitePage.waitFor('#newsite');
-    await sitePage.click('#newsite');
+    await page.waitFor('#newsite');
+    await page.click('#newsite');
 
     // wait for the site detail page to load
-    await sitePage.waitFor('input#name');
+    await page.waitFor('input#name');
 
     // fill in data for a new site
-    await siteFrame.type('input#name', actualSite.name);
-    await siteFrame.type('input#url', actualSite.url);
+    await page.type('input#name', actualSite.name);
+    await page.type('input#url', actualSite.url);
 
     // save the site and return to site list page
-    await sitePage.click('#save');
+    await page.click('#save');
 
     // get the newly created site
-    const savedSite = await sitePage.evaluate(name => GsfClient.fetch('GET', `site/${name}`), actualSite.name);
+    const savedSite = await page.evaluate(name => GsfClient.fetch('GET', `site/${name}`), actualSite.name);
 
     // check newly created site props
     assert.strictEqual(actualSite.name, savedSite.name);
     assert.strictEqual(actualSite.url, savedSite.url);
 
     // check newly created site presence in site list
-    await sitePage.waitFor(`a[href=\\/site\\/${savedSite.id}`);
-    const siteNameInList = await sitePage.evaluate(
+    await page.waitFor(`a[href=\\/site\\/${savedSite.id}`);
+    const siteNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/site\\/${id}`).innerHTML,
       savedSite.id
     );
@@ -83,35 +71,35 @@ describe('Site CRUD Pages', () => {
     const changedSuffix = '_changed';
 
     // create a new site
-    const siteId = await sitePage.evaluate(actualSite => GsfClient.fetch('POST', 'site', actualSite), actualSite);
+    const siteId = await page.evaluate(actualSite => GsfClient.fetch('POST', 'site', actualSite), actualSite);
 
     // reload site list
-    await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/sites');
 
     // open the newly created site
-    await sitePage.waitFor(`a[href=\\/site\\/${siteId}`);
-    await sitePage.click(`a[href=\\/site\\/${siteId}`);
+    await page.waitFor(`a[href=\\/site\\/${siteId}`);
+    await page.click(`a[href=\\/site\\/${siteId}`);
 
     // wait for the site detail page to load
-    await sitePage.waitFor('input#name');
+    await page.waitFor('input#name');
 
     // change name and url properties
-    await siteFrame.type('input#name', changedSuffix);
-    await siteFrame.type('input#url', changedSuffix);
+    await page.type('input#name', changedSuffix);
+    await page.type('input#url', changedSuffix);
 
     // save the site and return to site list page
-    await sitePage.click('#save');
+    await page.click('#save');
 
     // get the updated site
-    const updatedSite = await sitePage.evaluate(siteId => GsfClient.fetch('GET', `site/${siteId}`), siteId);
+    const updatedSite = await page.evaluate(siteId => GsfClient.fetch('GET', `site/${siteId}`), siteId);
 
     // check newly updated site props
     assert.strictEqual(`${actualSite.name}${changedSuffix}`, updatedSite.name);
     assert.strictEqual(`${actualSite.url}${changedSuffix}`, updatedSite.url);
 
     // check updated site presence in site list
-    await sitePage.waitFor(`a[href=\\/site\\/${updatedSite.id}`);
-    const siteNameInList = await sitePage.evaluate(
+    await page.waitFor(`a[href=\\/site\\/${updatedSite.id}`);
+    const siteNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/site\\/${id}`).innerHTML,
       updatedSite.id
     );
@@ -122,35 +110,35 @@ describe('Site CRUD Pages', () => {
     const changedSuffix = '_changed';
 
     // create a new site
-    const siteId = await sitePage.evaluate(actualSite => GsfClient.fetch('POST', 'site', actualSite), actualSite);
+    const siteId = await page.evaluate(actualSite => GsfClient.fetch('POST', 'site', actualSite), actualSite);
 
     // reload site list
-    await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/sites');
 
     // open the newly created site
-    await sitePage.waitFor(`a[href=\\/site\\/${siteId}`);
-    await sitePage.click(`a[href=\\/site\\/${siteId}`);
+    await page.waitFor(`a[href=\\/site\\/${siteId}`);
+    await page.click(`a[href=\\/site\\/${siteId}`);
 
     // wait for the site detail page to load
-    await sitePage.waitFor('input#name');
+    await page.waitFor('input#name');
 
     // change name and url properties
-    await siteFrame.type('input#name', changedSuffix);
-    await siteFrame.type('input#url', changedSuffix);
+    await page.type('input#name', changedSuffix);
+    await page.type('input#url', changedSuffix);
 
     // cancel the update
-    await sitePage.click('#cancel');
+    await page.click('#cancel');
 
     // get the updated site
-    const updatedSite = await sitePage.evaluate(siteId => GsfClient.fetch('GET', `site/${siteId}`), siteId);
+    const updatedSite = await page.evaluate(siteId => GsfClient.fetch('GET', `site/${siteId}`), siteId);
 
     // check newly updated site props
     assert.strictEqual(actualSite.name, updatedSite.name);
     assert.strictEqual(actualSite.url, updatedSite.url);
 
     // check updated site presence in site list
-    await sitePage.waitFor(`a[href=\\/site\\/${updatedSite.id}`);
-    const siteNameInList = await sitePage.evaluate(
+    await page.waitFor(`a[href=\\/site\\/${updatedSite.id}`);
+    const siteNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/site\\/${id}`).innerHTML,
       updatedSite.id
     );
@@ -159,23 +147,23 @@ describe('Site CRUD Pages', () => {
 
   it('Test Delete Existing Site', async () => {
     // create a new site
-    const siteId = await sitePage.evaluate(actualSite => GsfClient.fetch('POST', 'site', actualSite), actualSite);
+    const siteId = await page.evaluate(actualSite => GsfClient.fetch('POST', 'site', actualSite), actualSite);
 
     // reload site list
-    await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/sites');
 
     // wait for delete button to show up
-    await sitePage.waitFor(`input#delete-${siteId}`);
+    await page.waitFor(`input#delete-${siteId}`);
 
     // delete it
-    await sitePage.click(`input#delete-${siteId}`);
+    await page.click(`input#delete-${siteId}`);
 
     // reload site list
-    await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
-    await sitePage.waitFor('p#no-entries');
+    await browserHelper.goto('/sites');
+    await page.waitFor('p#no-entries');
 
     // check table is no longer present since there are no sites to display
-    const tableCount = await sitePage.evaluate(() => document.querySelectorAll('table').length);
+    const tableCount = await page.evaluate(() => document.querySelectorAll('table').length);
     assert.strictEqual(tableCount, 0);
   });
 });

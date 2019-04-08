@@ -1,18 +1,10 @@
-import queryString from 'query-string';
 import { assert } from 'chai';
-import { NavigationOptions } from 'puppeteer';
-import BrowserHelper from '../../../utils/BrowserHelper';
+import { Page } from 'puppeteer';
+import BrowserHelper from '../../../helpers/BrowserHelper';
 
 describe('Site Pages', () => {
-  let browser = null;
-  let sitePage = null;
-
-  const gotoOpts: NavigationOptions = {
-    timeout: 10 * 1000,
-    waitUntil: ['load', 'domcontentloaded', 'networkidle0']
-  };
-
-  const queryParams = queryString.stringify({ redirectPath: '/sites' });
+  let browserHelper: BrowserHelper;
+  let page: Page;
 
   const actualSite = {
     name: 'siteA',
@@ -20,36 +12,35 @@ describe('Site Pages', () => {
   };
 
   before(async () => {
-    browser = await BrowserHelper.launch();
-    sitePage = await browser.newPage();
-    await BrowserHelper.waitForDBInitialization(sitePage);
+    browserHelper = await BrowserHelper.launch();
+    page = browserHelper.page;
   });
 
   afterEach(async () => {
     // move to admin page
-    await sitePage.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, gotoOpts);
+    await browserHelper.goto('/sites');
 
     // delete existing sites
-    const existingSites = await sitePage.evaluate(() => GsfClient.fetch('GET', 'sites'));
+    const existingSites = await page.evaluate(() => GsfClient.fetch('GET', 'sites'));
     if (!existingSites) return;
     const siteIds = existingSites.map(existingSite => existingSite.id);
-    await sitePage.evaluate(siteIds => GsfClient.fetch('DELETE', 'sites', { ids: siteIds }), siteIds);
+    await page.evaluate(siteIds => GsfClient.fetch('DELETE', 'sites', { ids: siteIds }), siteIds);
   });
 
   after(async () => {
-    await browser.close();
+    await browserHelper.close();
   });
 
   it('Test Create New Site', async () => {
     // open stubbed site
-    await sitePage.goto(actualSite.url, gotoOpts);
+    await page.goto(actualSite.url, BrowserHelper.gotoOpts);
 
     // open popup page
-    const popupPage = await browser.newPage();
-    await popupPage.goto(`chrome-extension://${extension.id}/popup/popup.html`, gotoOpts);
+    const popupPage = await browserHelper.browser.newPage();
+    await popupPage.goto(`chrome-extension://${extension.id}/popup/popup.html`, BrowserHelper.gotoOpts);
 
     // move focus to stubbed site
-    await sitePage.bringToFront();
+    await page.bringToFront();
 
     // initiate create new site from the popup page based on currently active tab
     await popupPage.waitFor('a#newsite');
@@ -58,7 +49,7 @@ describe('Site Pages', () => {
     await popupPage.evaluate(anchorId => document.getElementById(anchorId).click(), 'newsite');
 
     // retrieve the newly created admin page
-    const adminPage = await BrowserHelper.waitForPageCreation(browser);
+    const adminPage = await BrowserHelper.waitForPageCreation(browserHelper.browser);
 
     // wait for redirection to "new site" page
     await adminPage.waitFor('#save');
@@ -73,7 +64,7 @@ describe('Site Pages', () => {
     // save site
     await Promise.all([
       adminPage.click('#save'),
-      adminPage.waitForNavigation(gotoOpts)
+      adminPage.waitForNavigation(BrowserHelper.gotoOpts)
     ]);
 
     // check redirection to site list
