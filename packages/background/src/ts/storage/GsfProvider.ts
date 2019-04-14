@@ -372,8 +372,7 @@ export default class GsfProvider {
         switch (true) {
           // scenario
           case /^scenario$/.test(request.resource):
-            const scenarioPkg = new GsfProvider.ScenarioPackage(request.body);
-            reqPromise = scenarioPkg.save();
+            reqPromise = ScenarioManager.installNpmScenario({ pkgDef: request.body });
             break;
           default:
             reqPromise = new Promise(resolve => resolve());

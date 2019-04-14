@@ -32,7 +32,11 @@ export default class ScenarioManager extends BaseModuleManager {
     await this.persistScenarioPackages(scenarioPkgs);
 
     // store plugins embedded with scenarios
-    await Promise.all(
+    await ScenarioManager.storeEmbeddedPlugins(scenarioPkgDefs);
+  }
+
+  static storeEmbeddedPlugins(scenarioPkgDefs: IScenarioPackage[]) {
+    return Promise.all(
       scenarioPkgDefs.map(async (scenarioPkgDef) => {
         Log.info(`Checking ${scenarioPkgDef.name} for embedded plugins`);
         const scenario = await GsfProvider.ScenarioPackage.get(scenarioPkgDef.name);
@@ -98,6 +102,7 @@ export default class ScenarioManager extends BaseModuleManager {
     }
 
     return {
+      code: scenario.code,
       module: { default: embeddedPlugin },
       url: ScenarioManager.cache.get(scenario.name).url
     };
@@ -146,9 +151,15 @@ export default class ScenarioManager extends BaseModuleManager {
     return scenarioPackage;
   }
 
-  static async installNpmScenario(npmUrl: string) {
-    const scenarioPkgDef: IScenarioPackage = await ScenarioManager.getNpmScenarioDetails(npmUrl);
+  static async installNpmScenario({ npmUrl, pkgDef }: {npmUrl?: string, pkgDef?: IScenarioPackage}) {
+    let scenarioPkgDef: IScenarioPackage = pkgDef;
+    if (npmUrl) {
+      scenarioPkgDef = await ScenarioManager.getNpmScenarioDetails(npmUrl);
+    }
     await ScenarioManager.persistScenarioPackages([new GsfProvider.ScenarioPackage(scenarioPkgDef)]);
+
+    // store plugins embedded with scenarios
+    await ScenarioManager.storeEmbeddedPlugins([scenarioPkgDef]);
   }
 
   static async getLocalScenarios(): Promise<IScenarioPackage[]> {

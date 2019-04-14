@@ -4,7 +4,6 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Response } from 'node-fetch';
 import ScenarioManager from '../../src/ts/scenarios/ScenarioManager';
-import { NpmPackage } from 'get-set-fetch-extension-commons';
 import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
 
 describe('Test ScenarioManager', () => {
