@@ -1,6 +1,6 @@
 export default class ActiveTabHelper {
   static executeScript(tabId, details) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       chrome.tabs.executeScript(
         tabId,
         details,
@@ -8,7 +8,7 @@ export default class ActiveTabHelper {
           if (result) {
             resolve(result[0]);
           }
-          else resolve(result);
+          else reject(chrome.runtime.lastError);
         }
       );
     });

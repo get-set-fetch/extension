@@ -240,7 +240,7 @@ export default class IdbSite extends BaseEntity {
           Log.error(
             `Crawl error for site ${this.name}`,
             `${this.plugins[i].constructor.name} ${resource ? resource.url : ''}`,
-            JSON.stringify(err)
+            JSON.stringify(err, Object.getOwnPropertyNames(err))
           );
           reject(err);
           break;
