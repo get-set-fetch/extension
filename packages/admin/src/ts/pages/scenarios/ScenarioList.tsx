@@ -95,7 +95,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
     this.setState({ scenarioPkgs: installedPkgs.concat(availablePkgs) });
   }
 
-  async installScenarioPkg(scenarioPkg) {
+  async installScenarioPkg(scenarioPkg: IScenarioPackage) {
     // save scenario
     await GsfClient.fetch(HttpMethod.POST, 'scenario', scenarioPkg);
     // re-load scenario list

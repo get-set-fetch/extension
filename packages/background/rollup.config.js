@@ -5,45 +5,45 @@ import ignore from 'rollup-plugin-ignore';
 import resolve from 'rollup-plugin-node-resolve';
 import globals from 'rollup-plugin-node-globals';
 import builtins from 'rollup-plugin-node-builtins';
-import tslint from 'rollup-plugin-tslint';
+import { eslint } from 'rollup-plugin-eslint';
 
 const mainConfig = {
   input: [
     'src/ts/background-bundle.ts',
-    'src/ts/background-main.ts'
+    'src/ts/background-main.ts',
   ],
   output: {
     dir: 'dist',
-    format: 'esm'
+    format: 'esm',
   },
   experimentalCodeSplitting: true,
   chunkFileNames: '[name]-1.js',
   sourceMap: true,
   plugins: [
-    ignore(['https', 'http', 'jsdom', 'fs', 'path', 'puppeteer', 'console', 'knex', 'mongodb', '__filename']),
+    ignore([ 'https', 'http', 'jsdom', 'fs', 'path', 'puppeteer', 'console', 'knex', 'mongodb', '__filename' ]),
     typescript(),
     commonjs({
       namedExports: {
-        'pako': [ 'inflate' ]
-      }
+        pako: [ 'inflate' ],
+      },
     }),
     json(),
     resolve({
       browser: true,
       preferBuiltins: true,
-      extensions: ['.js', '.json'],
+      extensions: [ '.js', '.json' ],
       jsnext: true,
       only: [
         'get-set-fetch', 'get-set-fetch-extension-commons',
         'murmurhash-js',
         'url-parse', 'requires-port', 'buffer', 'querystringify',
-        'jszip', 'pako', 'untar.js'
-      ]
+        'jszip', 'pako', 'untar.js',
+      ],
     }),
     globals(),
-    builtins()
-    // tslint(),
-  ]
+    builtins(),
+    // eslint(),
+  ],
 };
 
 const crawlPlugins = [
@@ -57,7 +57,7 @@ const crawlPluginConfig = crawlPlugins.map(plugin => ({
   input: plugin.src,
   output: {
     file: `dist/plugins/${plugin.name}.js`,
-    format: 'es'
+    format: 'es',
   },
   plugins: [
     typescript(),
@@ -65,14 +65,14 @@ const crawlPluginConfig = crawlPlugins.map(plugin => ({
     resolve({
       browser: true,
       preferBuiltins: true,
-      extensions: ['.js', '.json'],
+      extensions: [ '.js', '.json' ],
       jsnext: true,
       only: [
-        'get-set-fetch-extension-commons'
-      ]
-    })
+        'get-set-fetch-extension-commons',
+      ],
+    }),
     // tslint(),
-  ]
+  ],
 }));
 
-export default [mainConfig, ...crawlPluginConfig];
+export default [ mainConfig, ...crawlPluginConfig ];
