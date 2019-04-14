@@ -18,7 +18,7 @@ describe('Scenario List', () => {
   });
 
   after(async () => {
-    // await browserHelper.close();
+    await browserHelper.close();
   });
 
   function getTableScenarios() {
