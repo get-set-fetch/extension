@@ -28,9 +28,6 @@ describe('Project CRUD Pages', () => {
         }
       },
       {
-        name: 'ExtractTitlePlugin'
-      },
-      {
         name: 'ImageFilterPlugin'
       },
       {

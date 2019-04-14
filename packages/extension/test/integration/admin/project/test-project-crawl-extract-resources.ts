@@ -110,7 +110,7 @@ describe('Project Crawl Extract Resources', () => {
     const expectedBody: string[] = expectedResources
       .map(
         resource =>
-        [resource.url, resource.mediaType].join(',')
+        [JSON.stringify(resource.url), JSON.stringify(resource.mediaType)].join(',')
       );
 
     assert.strictEqual(generated.header, expectedHeader);

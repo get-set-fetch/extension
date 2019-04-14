@@ -23,7 +23,7 @@
     "copy:popup:watch": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup --watch",
     "copy:admin:watch": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin --watch",
     "test": "mocha test \"./test/integration/**/*.ts\" --exit",
-    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Project Crawl Extract Html Headings\""
+    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Scenario List\""
   },
   "author": {
 	  "name": "Andrei Sabau"

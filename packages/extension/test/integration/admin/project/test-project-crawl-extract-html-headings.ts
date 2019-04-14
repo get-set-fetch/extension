@@ -1,5 +1,6 @@
 import { assert } from 'chai';
 import { join, resolve } from 'path';
+import TestUtils from 'get-set-fetch/test/utils/TestUtils';
 import BrowserHelper from '../../../helpers/BrowserHelper';
 import { Page } from 'puppeteer';
 import ScenarioHelper from '../../../helpers/ScenarioHelper';
@@ -15,7 +16,7 @@ describe('Project Crawl Extract Html Headings', () => {
   const expectedResources = [
     { url: 'https://www.sitea.com/index.html', mediaType: 'text/html', info: { headings: ['Main Header 1'] } },
     { url: 'https://www.sitea.com/pageA.html', mediaType: 'text/html', info: { headings: ['PageA Heading Level 1', 'PageA Heading Level 2'] } },
-    { url: 'https://www.sitea.com/pageB.html', mediaType: 'text/html', info: { headings: ['PageA Heading Level 1', 'PageA Heading Level 3'] } }
+    { url: 'https://www.sitea.com/pageB.html', mediaType: 'text/html', info: { headings: ['PageB Heading Level 1', 'PageB Heading Level 3'] } }
   ];
 
   before(async () => {
@@ -24,7 +25,6 @@ describe('Project Crawl Extract Html Headings', () => {
   });
 
   afterEach(async () => {
-    /*
     // cleanup fs
     TestUtils.emptyDir(targetDir);
 
@@ -36,11 +36,10 @@ describe('Project Crawl Extract Html Headings', () => {
     if (!existingProjects) return;
     const projectIds = existingProjects.map(existingProject => existingProject.id);
     await page.evaluate(projectIds => GsfClient.fetch('DELETE', 'projects', { ids: projectIds }), projectIds);
-    */
   });
 
   after(async () => {
-    // await browserHelper.close();
+    await browserHelper.close();
   });
 
   async function checkCrawledResources(siteId) {
@@ -52,11 +51,11 @@ describe('Project Crawl Extract Html Headings', () => {
     const generated = await ProjectHelper.downloadProjectCsv(page, project, targetDir);
 
     // check file content
-    const expectedHeader = 'url,mediaType';
+    const expectedHeader = 'url,info.headings';
     const expectedBody: string[] = expectedResources
       .map(
         resource =>
-        [resource.url, resource.mediaType].join(',')
+        [JSON.stringify(resource.url), JSON.stringify(resource.info.headings.toString())].join(',')
       );
 
     assert.strictEqual(generated.header, expectedHeader);
@@ -77,7 +76,7 @@ describe('Project Crawl Extract Html Headings', () => {
     const project = {
       name: 'projA',
       description: 'descriptionA',
-      url: 'https://sitea.com'
+      url: 'https://www.sitea.com/index.html'
     };
     await ProjectHelper.saveProject(browserHelper, project, 'extract-html-headings');
 
@@ -123,9 +122,6 @@ describe('Project Crawl Extract Html Headings', () => {
 
     // download and check csv
     await downloadAndCheckCsv(loadedProject);
-
-    // download and check zip
-    await downloadAndCheckZip(loadedProject);
   });
 
 });
