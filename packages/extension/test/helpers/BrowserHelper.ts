@@ -25,6 +25,7 @@ export default class BrowserHelper {
     });
     const page: Page = await browser.newPage();
     await BrowserHelper.waitForDBInitialization(page);
+    await page.bringToFront();
 
     return new BrowserHelper(browser, page);
   }
