@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension-popup",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "dist/popup.js",
   "files": [
@@ -16,7 +16,7 @@
     "extension"
   ],
   "author": {
-	  "name": "Andrei Sabau"
+    "name": "Andrei Sabau"
   },
   "license": "MIT",
   "bugs": {

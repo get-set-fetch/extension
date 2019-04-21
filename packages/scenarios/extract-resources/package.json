@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-scenario-extract-resources",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Extract Resources scenario is used for extracting various resources from the corresponding sites.",
   "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-resources",
   "main": "dist/ExtractResources.js",
@@ -11,7 +11,7 @@
     "build:dev": "rollup --config rollup.dev.config.js --watch"
   },
   "author": {
-	  "name": "Andrei Sabau"
+    "name": "Andrei Sabau"
   },
   "license": "MIT",
   "devDependencies": {
@@ -39,6 +39,6 @@
     "typescript": "^3.2.4"
   },
   "dependencies": {
-    "get-set-fetch-extension-commons": "^1.0.0"
+    "get-set-fetch-extension-commons": "^0.1.0"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "files": [
     "dist/"
@@ -25,11 +25,11 @@
   "license": "MIT",
   "dependencies": {
     "get-set-fetch": "^0.3.8",
-    "get-set-fetch-extension-background": "1.0.0",
-    "get-set-fetch-extension-popup": "^1.0.0",
-    "get-set-fetch-extension-admin": "^1.0.0",
-    "get-set-fetch-extension-commons": "^1.0.0",
-    "get-set-fetch-scenario-extract-resources": "^1.0.0"
+    "get-set-fetch-extension-background": "0.1.0",
+    "get-set-fetch-extension-popup": "^0.1.0",
+    "get-set-fetch-extension-admin": "^0.1.0",
+    "get-set-fetch-extension-commons": "^0.1.0",
+    "get-set-fetch-scenario-extract-resources": "^0.1.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",

@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension-admin",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "dist/admin.js",
   "types": "dist/index.d.ts",
@@ -19,7 +19,7 @@
     "extension"
   ],
   "author": {
-	  "name": "Andrei Sabau"
+    "name": "Andrei Sabau"
   },
   "license": "MIT",
   "bugs": {
@@ -54,7 +54,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.3.1",
     "bootstrap": "^4.1.1",
-    "get-set-fetch-extension-commons": "1.0.0",
+    "get-set-fetch-extension-commons": "0.1.0",
     "immutable": "^4.0.0-rc.12",
     "indexeddbshim": "^3.6.2",
     "jquery": "^3.3.1",

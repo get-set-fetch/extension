@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension-background",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "dist/background-bundle.js",
   "module": "dist/background-bundle.js",
@@ -74,7 +74,7 @@
   },
   "dependencies": {
     "get-set-fetch": "^0.3.8",
-    "get-set-fetch-extension-commons": "^1.0.0",
+    "get-set-fetch-extension-commons": "^0.1.0",
     "jszip": "^3.2.0",
     "pako": "^1.0.10",
     "untar.js": "^0.3.0",

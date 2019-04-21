@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension-commons",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
   "types": "lib/index.d.ts",
@@ -22,7 +22,7 @@
     "extension"
   ],
   "author": {
-	  "name": "Andrei Sabau"
+    "name": "Andrei Sabau"
   },
   "license": "MIT",
   "bugs": {
