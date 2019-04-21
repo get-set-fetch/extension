@@ -31,7 +31,7 @@
     "eslint-import-resolver-babel-module": "^4.0.0",
     "eslint-plugin-import": "^2.14.0",
     "rollup-plugin-commonjs": "^9.1.0",
-    "rollup-plugin-eslint": "^5.0.0",
+    "rollup-plugin-eslint": "^5.1.0",
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-resolve": "^3.3.0"
   },
