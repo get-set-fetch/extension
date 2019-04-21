@@ -3,7 +3,6 @@ import typescript from 'rollup-plugin-typescript';
 import json from 'rollup-plugin-json';
 import resolve from 'rollup-plugin-node-resolve';
 import globals from 'rollup-plugin-node-globals';
-import builtins from 'rollup-plugin-node-builtins';
 import tslint from 'rollup-plugin-tslint';
 import sass from 'rollup-plugin-sass';
 import url from "rollup-plugin-url";
@@ -63,7 +62,6 @@ export default {
       publicPath: '/admin/images/'
     }),
     globals(),
-    builtins(),
     // tslint(),
   ],
 };
