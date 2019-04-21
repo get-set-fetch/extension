@@ -6,7 +6,13 @@ const Log = Logger.getLogger('background-main');
 
 (async () => {
   try {
-    // 0. handle install / uninstall events
+    // handle toolbar click
+    chrome.browserAction.onClicked.addListener(tab => {
+      const adminUrl = chrome.runtime.getURL('admin/admin.html');
+      chrome.tabs.create({ url: adminUrl });
+    });
+
+    // handle install / uninstall events
     chrome.runtime.onInstalled.addListener(details => {
       chrome.tabs.create({ url: 'https://getsetfetch.org/extension/thank-you-install.html' });
     });
@@ -14,19 +20,19 @@ const Log = Logger.getLogger('background-main');
 
     await GsfProvider.init();
 
-  // 1. populate settings - logLevel - if not present
+    // populate settings - logLevel - if not present
     const storedSettings = await GsfProvider.Setting.getAll();
     let logLevel = storedSettings.find(setting => setting.key === 'logLevel');
     if (!logLevel) {
-    logLevel = new GsfProvider.Setting({ key: 'logLevel', val: LogLevel.WARN.toString() });
-    await logLevel.save();
-  }
+      logLevel = new GsfProvider.Setting({ key: 'logLevel', val: LogLevel.WARN.toString() });
+      await logLevel.save();
+    }
     Logger.setLogLevel(parseInt(logLevel.val, 10));
 
-    // 2. read all builtin plugins, persist them as Plugin
+    // read all builtin plugins, persist them as Plugin
     await PluginManager.discoverLocalPlugins();
 
-    // 3. read all builtin scenarios, persist them as Scenario
+    // read all builtin scenarios, persist them as Scenario
     await ScenarioManager.discoverLocalScenarios();
   }
   catch (err) {
