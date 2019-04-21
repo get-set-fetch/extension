@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/get-set-fetch/extension#readme",
   "devDependencies": {
-    "lerna": "^3.8.0",
+    "lerna": "^3.13.3",
     "rimraf": "^2.6.2"
   }
 }
