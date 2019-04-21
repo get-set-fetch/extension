@@ -11,7 +11,7 @@
     "clean": "rimraf dist",
     "build": "npm run clean && npm run build:dist",
     "build:dist": "rollup --environment NODE_ENV:production --config rollup.config.js && npm run copy:html",
-    "copy:html": "shx cp -R \"src/html\" dist",
+    "copy:html": "shx cp -R src/html/admin.html dist/admin.html",
     "build:dev": "webpack-dev-server --config ./webpack.config.dev.js --mode development"
   },
   "keywords": [
