@@ -6,21 +6,22 @@
     "dist/"
   ],
   "scripts": {
+    "clean": "shx rm -r dist",
     "build": "npm run copy:resources",
-    "copy:resources": "npm run copy:local && npm run update:local && npm run copy:bkg && npm run copy:popup && npm run copy:admin && npm run copy:scenarios",     
-    "copy:local": "cpx \"src/resources/**/*\" dist",
+    "copy:resources": "npm run copy:local && npm run update:local && npm run copy:bkg && npm run copy:popup && npm run copy:admin && npm run copy:scenarios",
+    "copy:local": "shx mkdir dist && shx cp -R src/resources/* dist/",
     "update:local": "cross-var shx sed -i s/{GSF_VERSION}/$npm_package_version/ dist/manifest.json",
-    "copy:bkg": "cpx  \"node_modules/get-set-fetch-extension-background/dist/**/*\" dist/background",
-    "copy:popup": "cpx \"node_modules/get-set-fetch-extension-popup/dist/**/*\" dist/popup",
-    "copy:admin": "cpx \"node_modules/get-set-fetch-extension-admin/dist/**/*\" dist/admin",
-    "copy:scenario-extract-resource-dist": "cpx \"node_modules/get-set-fetch-scenario-extract-resources/dist/**/*\" dist/scenarios/get-set-fetch-scenario-extract-resources/dist",
-    "copy:scenario-extract-resource-pkg": "cpx \"node_modules/get-set-fetch-scenario-extract-resources/package.json\" dist/scenarios/get-set-fetch-scenario-extract-resources",
+    "copy:bkg": "shx mkdir dist/background && shx cp -R node_modules/get-set-fetch-extension-background/dist/* dist/background",
+    "copy:popup": "shx mkdir dist/popup && shx cp -R node_modules/get-set-fetch-extension-popup/dist/* dist/popup",
+    "copy:admin": "shx mkdir dist/admin && shx cp -R node_modules/get-set-fetch-extension-admin/dist/* dist/admin",
+    "copy:scenario-extract-resource-dist": "shx mkdir -p dist/scenarios/get-set-fetch-scenario-extract-resources/dist && shx cp -R node_modules/get-set-fetch-scenario-extract-resources/dist/* dist/scenarios/get-set-fetch-scenario-extract-resources/dist",
+    "copy:scenario-extract-resource-pkg": "shx cp -R node_modules/get-set-fetch-scenario-extract-resources/package.json dist/scenarios/get-set-fetch-scenario-extract-resources",
     "copy:scenarios": "npm run copy:scenario-extract-resource-dist && npm run copy:scenario-extract-resource-pkg",
     "test": "mocha test \"./test/integration/**/*.ts\" --exit",
     "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Scenario List\""
   },
   "author": {
-	  "name": "Andrei Sabau"
+    "name": "Andrei Sabau"
   },
   "license": "MIT",
   "dependencies": {
@@ -43,7 +44,6 @@
     "babel-preset-env": "^1.7.0",
     "chai": "^4.1.2",
     "connect": "^3.6.6",
-    "cpx": "^1.5.0",
     "cross-var": "^1.1.0",
     "jszip": "^3.2.0",
     "mocha": "^5.2.0",
