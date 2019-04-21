@@ -7,7 +7,7 @@ export default class ScenarioHelper {
   static async installScenario(page: Page, scenarioName: string) {
     // load scenario list
     const queryParams = queryString.stringify({ redirectPath: '/scenarios' });
-    await page.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, BrowserHelper.gotoOpts);
+    await page.goto(`chrome-extension://${BrowserHelper.extension.id}/admin/admin.html?${queryParams}`, BrowserHelper.gotoOpts);
 
     // wait for main table to render
     await page.waitFor('table.table-main');
@@ -21,7 +21,7 @@ export default class ScenarioHelper {
   static async uninstallScenario(page: Page, scenarioName: string) {
     // load scenario list
     const queryParams = queryString.stringify({ redirectPath: '/scenarios' });
-    await page.goto(`chrome-extension://${extension.id}/admin/admin.html?${queryParams}`, BrowserHelper.gotoOpts);
+    await page.goto(`chrome-extension://${BrowserHelper.extension.id}/admin/admin.html?${queryParams}`, BrowserHelper.gotoOpts);
 
     // wait for main table to render
     await page.waitFor('table.table-main');

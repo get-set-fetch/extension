@@ -17,7 +17,7 @@ describe('Test Extension Popup, ', () => {
 
   it('Test Admin Links', async () => {
     // open extension popup
-    await page.goto(`chrome-extension://${extension.id}/popup/popup.html`, BrowserHelper.gotoOpts);
+    await page.goto(`chrome-extension://${BrowserHelper.extension.id}/popup/popup.html`, BrowserHelper.gotoOpts);
 
     // detect links
     const ctx = await page.mainFrame().executionContext();
@@ -37,8 +37,8 @@ describe('Test Extension Popup, ', () => {
 
     // check if links are rendered correctly
     const expectedLinks = [
-      { text: 'New Site', href: `chrome-extension://${extension.id}/popup/popup.html#` },
-      { text: 'Admin Area', href: `chrome-extension://${extension.id}/admin/admin.html` }
+      { text: 'New Site', href: `chrome-extension://${BrowserHelper.extension.id}/popup/popup.html#` },
+      { text: 'Admin Area', href: `chrome-extension://${BrowserHelper.extension.id}/admin/admin.html` }
     ];
     assert.sameDeepMembers(detectedlinks, expectedLinks);
   });

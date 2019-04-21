@@ -37,7 +37,7 @@ describe('Site Pages', () => {
 
     // open popup page
     const popupPage = await browserHelper.browser.newPage();
-    await popupPage.goto(`chrome-extension://${extension.id}/popup/popup.html`, BrowserHelper.gotoOpts);
+    await popupPage.goto(`chrome-extension://${BrowserHelper.extension.id}/popup/popup.html`, BrowserHelper.gotoOpts);
 
     // move focus to stubbed site
     await page.bringToFront();
@@ -68,7 +68,7 @@ describe('Site Pages', () => {
     ]);
 
     // check redirection to site list
-    const sitesUrl = `chrome-extension://${extension.id}/sites`;
+    const sitesUrl = `chrome-extension://${BrowserHelper.extension.id}/sites`;
     assert.strictEqual(sitesUrl, adminPage.url());
 
     // check the newly created site is now present in extension IndexedDB
