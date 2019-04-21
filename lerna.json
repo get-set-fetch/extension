@@ -9,8 +9,11 @@
     },
     "bootstrap": {
       "ignore": "component-*",
-      "npmClientArgs": []      
+      "npmClientArgs": []
     }
   },
-  "packages": ["packages/*", "packages/scenarios/**/*"]
+  "packages": [
+    "packages/*",
+    "packages/scenarios/**/*"
+  ]
 }
