@@ -4,7 +4,6 @@ import json from 'rollup-plugin-json';
 import ignore from 'rollup-plugin-ignore';
 import resolve from 'rollup-plugin-node-resolve';
 import globals from 'rollup-plugin-node-globals';
-import builtins from 'rollup-plugin-node-builtins';
 import { eslint } from 'rollup-plugin-eslint';
 
 const mainConfig = {
@@ -41,7 +40,6 @@ const mainConfig = {
       ],
     }),
     globals(),
-    builtins(),
     // eslint(),
   ],
 };
