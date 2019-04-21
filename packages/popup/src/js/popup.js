@@ -1,8 +1,6 @@
 import queryString from 'query-string';
 import ActiveTabHelper from './ActiveTabHelper';
 
-const extensionId = 'cpbaclenlbncmmagcfdlblmmppgmcjfg';
-
 function handleNewSite() {
   document.getElementById('newsite').onclick = async (evt) => {
     evt.preventDefault();
@@ -17,7 +15,7 @@ function handleNewSite() {
       url,
     });
 
-    const adminUrl = `chrome-extension://${extensionId}/admin/admin.html?${queryParams}`;
+    const adminUrl = `admin/admin.html?${queryParams}`;
     chrome.tabs.create({ url: adminUrl });
   };
 }
