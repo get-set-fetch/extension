@@ -26,7 +26,9 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     // stub ExtractUrlPlugin, the only one running in tab via "runInTab"
     sinon.stub(PluginManager, 'runInTab').callsFake((tabId, plugin, site, resource) => {
       plugin.extractResourceUrls = () => [`http://siteA/page-${resource.depth + 1}.html`];
-      return plugin.apply(site, resource);
+      resource.mediaType = 'html';
+      const isApplicable = plugin.test(resource);
+      return isApplicable ? plugin.apply(site, resource) : null;
     });
   });
 
