@@ -1,10 +1,12 @@
 import { assert } from 'chai';
 import IdbStorage from '../../src/ts/storage/IdbStorage';
+import IdbPlugin from '../../src/ts/storage/IdbPlugin';
 
 const conn = { info: 'IndexedDB' };
 
 describe(`Test Storage Plugin - CRUD, using connection ${conn.info}`, () => {
-  let Plugin = null;
+  let Plugin: typeof IdbPlugin;
+
   const expectedPlugin = {
     id: null,
     name: 'pluginA',

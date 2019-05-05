@@ -1,11 +1,13 @@
 import { assert } from 'chai';
 import IdbStorage from '../../src/ts/storage/IdbStorage';
+import IdbProject from '../../src/ts/storage/IdbProject';
+import IdbSite from '../../src/ts/storage/IdbSite';
 
 const conn = { info: 'IndexedDB' };
 
 describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
-  let Site = null;
-  let Project = null;
+  let Site: typeof IdbSite;
+  let Project: typeof IdbProject;
 
   const expectedProject = {
     id: null,

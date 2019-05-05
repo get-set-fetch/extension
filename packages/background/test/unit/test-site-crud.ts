@@ -3,13 +3,16 @@ import ModuleHelper from '../utils/ModuleHelper';
 import IdbStorage from '../../src/ts/storage/IdbStorage';
 import GsfProvider from '../../src/ts/storage/GsfProvider';
 import IdbSite from '../../src/ts/storage/IdbSite';
+import IdbResource from '../../src/ts/storage/IdbResource';
+import IdbPlugin from '../../src/ts/storage/IdbPlugin';
 
 const conn = { info: 'IndexedDB' };
 
 describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
-  let Resource = null;
-  let Site = null;
-  let Plugin = null;
+  let Site: typeof IdbSite;
+  let Resource: typeof IdbResource;
+  let Plugin: typeof IdbPlugin;
+
   const expectedSite: Partial<IdbSite> = {
     id: null,
     projectId: 1,
@@ -118,7 +121,7 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
     assert.isNull(getSite);
 
     // make sure linked resources are also deleted
-    const linkedResources = await Resource.getAll();
+    const linkedResources = await Resource.getAll(expectedSite.id);
     assert.sameDeepMembers(linkedResources, []);
   });
 });

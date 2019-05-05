@@ -10,7 +10,7 @@ export interface IPluginStorage {
 
 export interface IPluginDefinition {
   name: string;
-  opts?: object;
+  opts?: any;
 }
 
 export interface IPlugin {

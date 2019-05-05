@@ -4,14 +4,17 @@ import IdbStorage from '../../src/ts/storage/IdbStorage';
 import PluginManager from '../../src/ts/plugins/PluginManager';
 import ModuleHelper from '../utils/ModuleHelper';
 import GsfProvider from '../../src/ts/storage/GsfProvider';
+import IdbSite from '../../src/ts/storage/IdbSite';
+import IdbResource from '../../src/ts/storage/IdbResource';
+import IdbPlugin from '../../src/ts/storage/IdbPlugin';
 
 const conn = { info: 'IndexedDB' };
 
 describe(`Test Site Crawl, using connection ${conn.info}`, () => {
-  let Site = null;
-  let Resource = null;
-  let Plugin = null;
-  let site;
+  let Site: typeof IdbSite;
+  let Resource: typeof IdbResource;
+  let Plugin: typeof IdbPlugin;
+  let site: IdbSite;
 
   before(async () => {
     // 1. storage init, populate GsfProvider used by some plugin related classes
