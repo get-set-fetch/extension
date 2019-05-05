@@ -17,7 +17,7 @@ export default class BrowserHelper {
   };
 
   // launches a browser instance
-  static async launch() {
+  static async launch(closeExtraPages: boolean = true) {
     BrowserHelper.extension = { path: resolve(__dirname, '..', '..', 'dist') };
 
     const browser = await launch({
@@ -33,7 +33,17 @@ export default class BrowserHelper {
         '--no-sandbox'
       ]
     });
-    const page: Page = await browser.newPage();
+
+    // wait for the extension to be installed and open the thank_you page
+    await BrowserHelper.waitForPageCreation(browser);
+
+    if (closeExtraPages) {
+      await Promise.all(
+        (await browser.pages()).slice(1).map(page => page.close())
+      );
+    }
+
+    const page: Page = (await browser.pages())[0];
     await page.bringToFront();
 
     BrowserHelper.extension.id = await BrowserHelper.getExtensionId(page);
@@ -47,7 +57,7 @@ export default class BrowserHelper {
     await page.goto('chrome://extensions/', BrowserHelper.gotoOpts);
 
     // tslint:disable-next-line
-    const devBtnHandle:any = await page.evaluateHandle('document.querySelector("body > extensions-manager").shadowRoot.querySelector("extensions-toolbar").shadowRoot.querySelector("#devMode").shadowRoot.querySelector("button")');
+    const devBtnHandle:any = await page.evaluateHandle('document.querySelector("body > extensions-manager").shadowRoot.querySelector("extensions-toolbar").shadowRoot.querySelector("#devMode")');
     await devBtnHandle.click();
 
     // tslint:disable-next-line

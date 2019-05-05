@@ -4,13 +4,12 @@ import JSZip from 'jszip/dist/jszip';
 import BrowserHelper from './BrowserHelper';
 
 export default class ProjectHelper {
-
-  static async saveProject(browserHelper: BrowserHelper, project, scenarioName: string) {
+  static async saveProject(browserHelper: BrowserHelper, project, scenarioProps: any) {
     const { page } = browserHelper;
 
     // get scenario id based on name
     const scenarios = await page.evaluate(() => GsfClient.fetch('GET', `scenarios`));
-    const scenarioId = scenarios.find(scenario => scenario.name === scenarioName).id;
+    const scenarioId = scenarios.find(scenario => scenario.name === scenarioProps.name).id;
 
     // go to project list
     await browserHelper.goto('/projects');
@@ -27,8 +26,23 @@ export default class ProjectHelper {
     await page.type('input#root_description', project.description);
     await page.type('input#root_url', project.url);
 
-     // fill in dropdown scenario
+    // fill in dropdown scenario
     await page.select('#root_scenarioId', scenarioId.toString());
+
+    // fill in other scenario props
+    const validPropKeys: string[] = Object.keys(scenarioProps).filter(propKey => propKey !== 'name');
+    for (const propKey of validPropKeys) {
+      const propSelector = `#root_scenarioProps_${propKey}`;
+      await page.evaluate(
+          (propSelector) => {
+            const input: any = document.querySelector(propSelector);
+            input.value = '';
+          },
+          propSelector
+        );
+
+      await page.type(propSelector, scenarioProps[propKey].toString());
+    }
 
     // save the project
     await page.click('#save');
@@ -44,14 +58,14 @@ export default class ProjectHelper {
     await page.click(downloadBtn);
 
     // initiate download
-    const csvLink = `a#csv-${project.id}`;
+    const csvLink = `a#csv-${ project.id }`;
     await page.waitFor(csvLink);
     await page.click(csvLink);
 
     // wait a bit for file to be generated and saved
     await new Promise(res => setTimeout(res, 1000));
 
-    const generatedContent = readFileSync(resolve(targetDir, `${project.name}.csv`), 'utf8');
+    const generatedContent = readFileSync(resolve(targetDir, `${ project.name }.csv`), 'utf8');
     const csvLines = generatedContent.split('\n');
 
     const header = csvLines[0];
@@ -69,14 +83,14 @@ export default class ProjectHelper {
     await page.click(downloadBtn);
 
     // initiate download
-    const zipLink = `a#zip-${project.id}`;
+    const zipLink = `a#zip-${ project.id }`;
     await page.waitFor(zipLink);
     await page.click(zipLink);
 
     // wait a bit for file to be generated and saved
     await new Promise(res => setTimeout(res, 1000));
 
-    const generatedContent = readFileSync(resolve(targetDir, `${project.name}.zip`), 'binary');
+    const generatedContent = readFileSync(resolve(targetDir, `${ project.name }.zip`), 'binary');
     const archive = await JSZip.loadAsync(generatedContent);
 
     return Object.keys(archive.files).map(name => archive.files[name].name);
