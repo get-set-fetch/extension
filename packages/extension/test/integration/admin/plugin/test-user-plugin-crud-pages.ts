@@ -43,7 +43,8 @@ describe('UserPlugin CRUD Pages', () => {
       'InsertResourcePlugin',
       'SelectResourcePlugin',
       'UpdateResourcePlugin',
-      'ImageFilterPlugin'
+      'ImageFilterPlugin',
+      'ExtractHtmlContentPlugin'
     ];
     assert.sameMembers(pluginNames, expectedPluginNames);
   });
