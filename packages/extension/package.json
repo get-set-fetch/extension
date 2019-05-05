@@ -16,9 +16,13 @@
     "copy:admin": "shx mkdir dist/admin && shx cp -R node_modules/get-set-fetch-extension-admin/dist/* dist/admin",
     "copy:scenario-extract-resource-dist": "shx mkdir -p dist/scenarios/get-set-fetch-scenario-extract-resources/dist && shx cp -R node_modules/get-set-fetch-scenario-extract-resources/dist/* dist/scenarios/get-set-fetch-scenario-extract-resources/dist",
     "copy:scenario-extract-resource-pkg": "shx cp -R node_modules/get-set-fetch-scenario-extract-resources/package.json dist/scenarios/get-set-fetch-scenario-extract-resources",
-    "copy:scenarios": "npm run copy:scenario-extract-resource-dist && npm run copy:scenario-extract-resource-pkg",
+    "copy:scenario-extract-resource": "npm run copy:scenario-extract-resource-dist && npm run copy:scenario-extract-resource-pkg",
+    "copy:scenario-extract-html-content-dist": "shx mkdir -p dist/scenarios/get-set-fetch-scenario-extract-html-content/dist && shx cp -R node_modules/get-set-fetch-scenario-extract-html-content/dist/* dist/scenarios/get-set-fetch-scenario-extract-html-content/dist",
+    "copy:scenario-extract-html-content-pkg": "shx cp -R node_modules/get-set-fetch-scenario-extract-html-content/package.json dist/scenarios/get-set-fetch-scenario-extract-html-content",
+    "copy:scenario-extract-html-content": "npm run copy:scenario-extract-html-content-dist && npm run copy:scenario-extract-html-content-pkg",
+    "copy:scenarios": "npm run copy:scenario-extract-resource && npm run copy:scenario-extract-html-content",
     "test": "mocha test \"./test/integration/**/*.ts\" --exit",
-    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Scenario List\""
+    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Test ThankYou Pages\""
   },
   "author": {
     "name": "Andrei Sabau"
@@ -30,7 +34,8 @@
     "get-set-fetch-extension-popup": "^0.1.0",
     "get-set-fetch-extension-admin": "^0.1.0",
     "get-set-fetch-extension-commons": "^0.1.0",
-    "get-set-fetch-scenario-extract-resources": "^0.1.0"
+    "get-set-fetch-scenario-extract-resources": "^0.1.0",
+    "get-set-fetch-scenario-extract-html-content": "^0.1.0"
   },
   "devDependencies": {
     "@types/chai": "^4.1.7",
