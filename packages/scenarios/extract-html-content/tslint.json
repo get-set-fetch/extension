@@ -1,0 +1,35 @@
+{
+  "extends": [
+    "tslint:recommended",
+    "tslint-eslint-rules"
+  ],
+    "defaultSeverity": "warning",
+    "jsRules": {},
+    "rules": {
+      "curly": [true, "ignore-same-line"],
+      "interface-name": [true, "always-prefix"],
+      "max-line-length": [true, 180],
+      "object-literal-sort-keys": false,
+      "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
+      "arrow-parens": false,
+      "member-access": [true, "no-public"],
+      "eofline": false,
+      "whitespace": [false, "check-module"],
+      "no-angle-bracket-type-assertion": false,
+      "ordered-imports": false,
+      "quotemark": [true, "single", "avoid-escape"],
+      "object-curly-spacing":[true, "always"],
+      "one-line": [false, "check-catch", "check-finally", "check-else", "check-open-brace", "check-whitespace"],
+      "brace-style": [
+        true,
+        "stroustrup",
+        {
+          "allowSingleLine": false
+        }
+      ]
+    },
+    "rulesDirectory": [],
+    "linterOptions": {
+      "exclude": ["**/*.json"]
+    }
+}

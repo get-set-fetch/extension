@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "strict": false,
+        "moduleResolution": "node",
+        "module": "esnext",
+    },
+    "newLine": "LF"
+}

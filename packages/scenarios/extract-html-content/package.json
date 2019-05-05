@@ -1,0 +1,43 @@
+{
+  "name": "get-set-fetch-scenario-extract-html-content",
+  "version": "0.1.0",
+  "description": "Extract Html Content scenario is used for extracting html nodes text based on dom selectors.",
+  "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-html-content",
+  "main": "dist/ExtractHtmlContent.js",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && npm run build:dist",
+    "build:dist": "rollup --config rollup.config.js",
+    "build:dev": "rollup --config rollup.dev.config.js --watch"
+  },
+  "author": {
+    "name": "Andrei Sabau"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^16.7.20",
+    "@types/react-dom": "^16.0.11",
+    "bootstrap": "^4.2.1",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "react-jsonschema-form": "^1.2.0",
+    "rimraf": "^2.6.2",
+    "rollup-plugin-commonjs": "^9.2.0",
+    "rollup-plugin-copy": "^0.2.3",
+    "rollup-plugin-json": "^3.1.0",
+    "rollup-plugin-node-globals": "^1.4.0",
+    "rollup-plugin-node-resolve": "^4.0.1",
+    "rollup-plugin-replace": "^2.1.0",
+    "rollup-plugin-serve": "^1.0.0",
+    "rollup-plugin-tslint": "^0.2.2",
+    "rollup-plugin-typescript": "^1.0.0",
+    "rollup-watch": "^4.3.1",
+    "ts-loader": "^5.3.3",
+    "tslint": "^5.12.1",
+    "tslint-eslint-rules": "^5.4.0",
+    "typescript": "^3.2.4"
+  },
+  "dependencies": {
+    "get-set-fetch-extension-commons": "^0.1.0"
+  }
+}
