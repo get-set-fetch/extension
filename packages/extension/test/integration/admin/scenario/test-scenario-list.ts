@@ -47,6 +47,12 @@ describe('Scenario List', () => {
         status: 'Built-in'
       },
       {
+        name: 'get-set-fetch-scenario-extract-html-content',
+        description: 'Extract Html Content scenario is used for extracting html nodes text based on dom selectors.',
+        homepage: 'https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-html-content',
+        status: 'Built-in'
+      },
+      {
         name: 'extract-html-headings',
         description: 'Extract Html Headings description',
         homepage: 'https://github.com/authora/extract-html-headings',
