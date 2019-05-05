@@ -72,13 +72,15 @@ export default class ExtractUrlPlugin implements IPlugin {
   }
 
   test(resource: IResource) {
-    return (/html/i).test(resource.mediaType);
+    // don't extract new resources if the max depth has been reached
+    const maxDepthReached = this.opts.maxDepth === -1 ? false : resource.depth < this.opts.maxDepth;
+
+    // don't extract new resources from non-parsable pages or if the max depth has been reached
+    return (/html/i).test(resource.mediaType) && !maxDepthReached;
   }
 
   apply(site: ISite, resource: IResource) {
-    // don't extract new resources if the max depth has been reached
-    const maxDepthReached = this.opts.maxDepth === resource.depth;
-    return ({ urlsToAdd: maxDepthReached ? [] : this.extractResourceUrls(site, resource) });
+    return ({ urlsToAdd: this.extractResourceUrls(site, resource) });
   }
 
   /*
