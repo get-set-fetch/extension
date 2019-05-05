@@ -24,7 +24,8 @@ export default class ExtractResources implements IScenario {
       {
         name: 'ExtractUrlPlugin',
         opts: {
-          extensionRe: scenarioProps.extensionRe
+          extensionRe: scenarioProps.extensionRe,
+          maxDepth: scenarioProps.maxDepth
         }
       },
       {
