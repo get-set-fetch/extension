@@ -52,11 +52,17 @@ const crawlDefinitions: ICrawlDefinition[] = [
         url: 'https://www.sitea.com/index.html',
         mediaType: 'text/html',
         info: { content: { 'h1': ['Main Header 1'], 'i.classA': ['italics main'] } }
+      },
+      {
+        url: 'https://www.sitea.com/pageA.html',
+        mediaType: 'text/html',
+        info: { content: { 'h1': ['PageA Heading Level 1'], 'i.classA': ['italics A'] } }
       }
     ],
     expectedCsv: `url,info.content
-      "https://www.sitea.com/index.html",{"h1":["Main Header 1"],"i.classA":["italics main"]}`
+      "https://www.sitea.com/index.html",{"h1":["Main Header 1"],"i.classA":["italics main"]}
+      "https://www.sitea.com/pageA.html",{"h1":["PageA Heading Level 1"],"i.classA":["italics A"]}`
   }
 ];
 
-genSuite('Project Crawl Extract Html Content', crawlDefinitions);
+genSuite('Extract Html Content', crawlDefinitions);

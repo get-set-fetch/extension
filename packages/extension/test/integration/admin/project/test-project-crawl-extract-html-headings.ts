@@ -23,4 +23,4 @@ const crawlDefinitions: ICrawlDefinition[] = [
   }
 ];
 
-genSuite('Project Crawl Extract Html Headings', crawlDefinitions);
+genSuite('Extract Html Headings', crawlDefinitions);

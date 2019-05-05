@@ -29,4 +29,4 @@ const crawlDefinitions: ICrawlDefinition[] = [
   }
 ];
 
-genSuite('Project Crawl Extract Resources', crawlDefinitions);
+genSuite('Extract Resources', crawlDefinitions);
