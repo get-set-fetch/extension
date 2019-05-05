@@ -51,7 +51,7 @@ export default class ExportHelper {
             (result: string[], key) => {
               const propPath = key.split('.');
               const val = ExportHelper.getIn(resource, propPath);
-              result.push(JSON.stringify(val ? val.toString() : ''));
+              result.push(JSON.stringify(val ? val : ''));
               return result;
             },
             []
