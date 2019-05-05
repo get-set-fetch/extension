@@ -11,8 +11,8 @@ describe('Project CRUD Pages', () => {
     name: 'projectA',
     description: 'projectA description',
     url: 'http://www.sitea.com/index.html',
+    scenarioId: null,
     opts: {},
-    scenarioId: 2,
     pluginDefinitions: [
       {
         name: 'SelectResourcePlugin'
@@ -42,6 +42,10 @@ describe('Project CRUD Pages', () => {
   before(async () => {
     browserHelper = await BrowserHelper.launch();
     page = browserHelper.page;
+
+    // get expectedProject scenarioId
+    const scenarios = await page.evaluate(() => GsfClient.fetch('GET', `scenarios`));
+    expectedProject.scenarioId = scenarios.find(scenario => scenario.name === 'get-set-fetch-scenario-extract-resources').id;
   });
 
   beforeEach(async () => {
@@ -78,15 +82,15 @@ describe('Project CRUD Pages', () => {
 
     // dropdown scenario is correctly populated
     const expectedScenarioIdOpts = [
-      { value: '', label: '' },
-      { value: '1', label: 'get-set-fetch-scenario-extract-html-content' },
-      { value: '2', label: 'get-set-fetch-scenario-extract-resources' }
+      { label: '' },
+      { label: 'get-set-fetch-scenario-extract-html-content' },
+      { label: 'get-set-fetch-scenario-extract-resources' }
     ];
     const scenarioIdOpts = await page.evaluate(
       () =>
       Array.from((document.getElementById('root_scenarioId') as HTMLSelectElement).options)
       .map(
-        ({ value, label }) => ({ value, label })
+        ({ label }) => ({ label })
       )
     );
     assert.sameDeepMembers(scenarioIdOpts, expectedScenarioIdOpts);
