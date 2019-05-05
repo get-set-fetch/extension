@@ -4,13 +4,12 @@ import { IPluginStorage } from 'get-set-fetch-extension-commons';
 /* eslint-disable class-methods-use-this */
 
 export default class IdbPlugin extends BaseEntity implements IPluginStorage {
-
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'name', 'code', 'scenarioId'];
+    return [ 'id', 'name', 'code', 'scenarioId' ];
   }
 
-  static cache: Map<string,string> = new Map<string, string>();
+  static cache: Map<string, string> = new Map<string, string>();
 
   // get a read transaction
   static rTx() {
@@ -27,7 +26,7 @@ export default class IdbPlugin extends BaseEntity implements IPluginStorage {
       const rTx = IdbPlugin.rTx();
       const readReq = (Number.isInteger(nameOrId as number) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -47,7 +46,7 @@ export default class IdbPlugin extends BaseEntity implements IPluginStorage {
       const rTx = IdbPlugin.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -104,6 +103,7 @@ export default class IdbPlugin extends BaseEntity implements IPluginStorage {
 
   constructor(kwArgs: Partial<IPluginStorage> = {}) {
     super();
+
     for (const key in kwArgs) {
       this[key] = kwArgs[key];
     }
@@ -113,7 +113,7 @@ export default class IdbPlugin extends BaseEntity implements IPluginStorage {
     return new Promise((resolve, reject) => {
       const rwTx = IdbPlugin.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());
-      reqAddResource.onsuccess = (e) => {
+      reqAddResource.onsuccess = e => {
         this.id = e.target.result;
         resolve(this.id);
       };

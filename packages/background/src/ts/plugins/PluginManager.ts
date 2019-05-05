@@ -1,39 +1,38 @@
-import GsfProvider from './../storage/GsfProvider';
+import { IModuleInfo, IPlugin } from 'get-set-fetch-extension-commons';
+import GsfProvider from '../storage/GsfProvider';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 import Logger from '../logger/Logger';
 import BaseModuleManager from './BaseModuleManager';
-import { IModuleInfo } from 'get-set-fetch-extension-commons';
 import ScenarioManager from '../scenarios/ScenarioManager';
 import IdbPlugin from '../storage/IdbPlugin';
 
 const Log = Logger.getLogger('PluginManager');
 
 class PluginManager extends BaseModuleManager {
-
   static cache: Map<string, IModuleInfo> = new Map();
 
   static get DEFAULT_PLUGINS(): string[] {
-    return ['SelectResourcePlugin', 'ExtensionFetchPlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin'];
+    return [ 'SelectResourcePlugin', 'ExtensionFetchPlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin' ];
   }
 
   static persistPlugins(plugins: IdbPlugin[]) {
     return Promise.all(
-      plugins.map(async (plugin) => {
+      plugins.map(async plugin => {
         const storedPlugin = await GsfProvider.Plugin.get(plugin.name);
         if (!storedPlugin) {
           Log.info(`Saving plugin ${plugin.name} to database`);
           await plugin.save();
           Log.info(`Saving plugin ${plugin.name} to database DONE`);
         }
-      })
+      }),
     );
   }
 
- static async discoverLocalPlugins() {
-  const pluginDefinitions = await this.getModulesContent('background/plugins');
-  const plugins = pluginDefinitions.map(moduleDef => new GsfProvider.Plugin(moduleDef));
-  await PluginManager.persistPlugins(plugins);
-}
+  static async discoverLocalPlugins() {
+    const pluginDefinitions = await this.getModulesContent('background/plugins');
+    const plugins = pluginDefinitions.map(moduleDef => new GsfProvider.Plugin(moduleDef));
+    await PluginManager.persistPlugins(plugins);
+  }
 
   static getDefaultPluginDefs() {
     const availablePluginDefs = this.getAvailablePluginDefs();
@@ -43,16 +42,16 @@ class PluginManager extends BaseModuleManager {
   static getAvailablePluginDefs() {
     const pluginKeys = Array.from(PluginManager.cache.keys());
 
-    return pluginKeys.map((pluginKey) => {
-      const classDef = PluginManager.cache.get(pluginKey).module.default;
+    return pluginKeys.map(pluginKey => {
+      const ClassDef = PluginManager.cache.get(pluginKey).module.default;
 
-      const pluginInstance = new (classDef)();
+      const pluginInstance = new (ClassDef)();
 
       // for each plugin, based on its instance, return its name and default options
       return {
         name: pluginInstance.constructor.name,
         opts: pluginInstance.opts || {},
-        schema: pluginInstance.OPTS_SCHEMA
+        schema: pluginInstance.OPTS_SCHEMA,
       };
     });
   }
@@ -69,14 +68,14 @@ class PluginManager extends BaseModuleManager {
     // builtin plugin, not linked to a scenario
     let moduleInfo: IModuleInfo;
     if (!plugin.scenarioId) {
-      const pluginBlob = new Blob([plugin.code], { type: 'text/javascript' });
+      const pluginBlob = new Blob([ plugin.code ], { type: 'text/javascript' });
       const pluginUrl = URL.createObjectURL(pluginBlob);
       const pluginModule = await import(pluginUrl);
 
       moduleInfo = {
         code: plugin.code,
         module: pluginModule,
-        url: pluginUrl
+        url: pluginUrl,
       };
     }
     // plugin linked to a scenario
@@ -87,8 +86,8 @@ class PluginManager extends BaseModuleManager {
     PluginManager.cache.set(name, moduleInfo);
   }
 
-  static async instantiate(pluginDefinitions): Promise<any[]> {
-    const pluginInstances = [];
+  static async instantiate(pluginDefinitions): Promise<IPlugin[]> {
+    const pluginInstances: IPlugin[] = [];
 
     for (const pluginDef of pluginDefinitions) {
       Log.info(`Instantiating plugin ${pluginDef.name}`);
@@ -137,13 +136,13 @@ class PluginManager extends BaseModuleManager {
       // listen for incoming message
       const message = new Promise((resolve, reject) => {
         const listener = msg => {
-            chrome.runtime.onMessage.removeListener(listener);
-            if (msg.resolved) {
-              resolve(msg.result);
-            }
-            else {
-              reject(msg.err);
-            }
+          chrome.runtime.onMessage.removeListener(listener);
+          if (msg.resolved) {
+            resolve(msg.result);
+          }
+          else {
+            reject(msg.err);
+          }
         };
         chrome.runtime.onMessage.addListener(listener);
       });
@@ -169,18 +168,17 @@ class PluginManager extends BaseModuleManager {
             chrome.runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
           }
         })();
-      `});
+      ` });
 
       result = await message;
     }
-    catch(err) {
+    catch (err) {
       Log.error(err);
       throw err;
     }
 
     return result;
   }
-
 }
 
 export default PluginManager;

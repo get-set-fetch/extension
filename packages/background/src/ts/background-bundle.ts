@@ -5,5 +5,5 @@ import ActiveTabHelper from './helpers/ActiveTabHelper';
 export {
   GsfProvider,
   PluginManager,
-  ActiveTabHelper
+  ActiveTabHelper,
 };

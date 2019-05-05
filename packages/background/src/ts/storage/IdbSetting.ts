@@ -23,7 +23,7 @@ export default class IdbSetting extends BaseEntity {
       const rTx = IdbSetting.rTx();
       const readReq = rTx.get(key);
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -43,7 +43,7 @@ export default class IdbSetting extends BaseEntity {
       const rTx = IdbSetting.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -65,6 +65,7 @@ export default class IdbSetting extends BaseEntity {
 
   constructor(kwArgs: Partial<ISetting> = {}) {
     super();
+
     for (const key in kwArgs) {
       this[key] = kwArgs[key];
     }
@@ -74,7 +75,7 @@ export default class IdbSetting extends BaseEntity {
     return new Promise((resolve, reject) => {
       const rwTx = IdbSetting.rwTx();
       const reqAddResource = rwTx.add(this.serialize());
-      reqAddResource.onsuccess = (e) => {
+      reqAddResource.onsuccess = e => {
         this.id = e.target.result;
         resolve(this.id);
       };
@@ -93,6 +94,6 @@ export default class IdbSetting extends BaseEntity {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['key', 'val'];
+    return [ 'key', 'val' ];
   }
 }

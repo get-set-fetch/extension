@@ -25,7 +25,7 @@ export default class GsfProvider {
   static async init() {
     // init extension storage
     const {
-      Site, Project, ScenarioPackage, Resource, Plugin, Log, Setting
+      Site, Project, ScenarioPackage, Resource, Plugin, Log, Setting,
     } = await IdbStorage.init();
     GsfProvider.Site = Site;
     GsfProvider.Project = Project;
@@ -145,7 +145,7 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then((result) => {
+    reqPromise.then(result => {
       sendResponse(result);
     });
   }
@@ -231,7 +231,7 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then((result) => {
+    reqPromise.then(result => {
       sendResponse(result);
     });
   }
@@ -269,7 +269,7 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then((result) => {
+    reqPromise.then(result => {
       sendResponse(result);
     });
   }
@@ -341,7 +341,7 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then((result) => {
+    reqPromise.then(result => {
       sendResponse(result);
     });
   }
@@ -392,7 +392,7 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then((result) => {
+    reqPromise.then(result => {
       sendResponse(result);
     });
   }
@@ -424,7 +424,7 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then((result) => {
+    reqPromise.then(result => {
       sendResponse(result);
     });
   }
@@ -462,7 +462,7 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then((result) => {
+    reqPromise.then(result => {
       sendResponse(result);
     });
   }

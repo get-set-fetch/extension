@@ -10,13 +10,13 @@
   "scripts": {
     "postinstall": "patch-package",
     "clean": "rimraf dist",
-    "lint": "tslint -c tslint.json src/**/*.ts",
+    "lint": "eslint src/**/*.ts",
     "build": "npm run clean && npm run lint && npm run build:dist && npm run copy:resources",
     "build:dist": "rollup --config rollup.config.js",
     "copy:resources": "copyfiles -u 2 src/html/*.html dist",
     "test": "nyc --reporter=lcov mocha test ./test/**/*.ts",
     "test:report": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
-    "test:single": "mocha test ./test/**/*.ts --grep \"Test Storage ScenarioPackage\""
+    "test:single": "mocha test ./test/**/*.ts --grep \"Test Site Crawl\""
   },
   "keywords": [
     "scraper",
@@ -36,8 +36,8 @@
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.12.18",
     "@types/pako": "^1.0.1",
-    "@typescript-eslint/eslint-plugin": "^1.6.0",
-    "@typescript-eslint/parser": "^1.6.0",
+    "@typescript-eslint/eslint-plugin": "^1.7.0",
+    "@typescript-eslint/parser": "^1.7.0",
     "chai": "^4.1.2",
     "copyfiles": "^2.0.0",
     "coveralls": "^3.0.2",
@@ -69,7 +69,7 @@
     "tslint": "^5.12.0",
     "tslint-config-airbnb": "^5.11.1",
     "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.2.2"
+    "typescript": "^3.4.5"
   },
   "dependencies": {
     "get-set-fetch": "^0.3.8",

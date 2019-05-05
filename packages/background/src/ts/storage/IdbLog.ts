@@ -1,7 +1,5 @@
 import { BaseEntity } from 'get-set-fetch';
 
-/* eslint-disable class-methods-use-this */
-
 interface ILog {
   date: Date;
   level: number;
@@ -11,10 +9,9 @@ interface ILog {
   id: number;
 }
 export default class IdbLog extends BaseEntity {
-
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'date', 'level', 'cls', 'msg', 'stack'];
+    return [ 'id', 'date', 'level', 'cls', 'msg', 'stack' ];
   }
 
   // get a read transaction
@@ -32,7 +29,7 @@ export default class IdbLog extends BaseEntity {
       const rTx = IdbLog.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -66,6 +63,7 @@ export default class IdbLog extends BaseEntity {
 
   constructor(kwArgs: Partial<ILog> = {}) {
     super();
+
     for (const key in kwArgs) {
       this[key] = kwArgs[key];
     }
@@ -78,7 +76,7 @@ export default class IdbLog extends BaseEntity {
     return new Promise((resolve, reject) => {
       const rwTx = IdbLog.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());
-      reqAddResource.onsuccess = (e) => {
+      reqAddResource.onsuccess = e => {
         this.id = e.target.result;
         resolve(this.id);
       };

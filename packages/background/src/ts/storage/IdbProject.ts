@@ -10,10 +10,9 @@ const Log = Logger.getLogger('IdbProject');
 /* eslint-disable class-methods-use-this */
 
 export default class IdbProject extends BaseEntity implements IProjectStorage {
-
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'name', 'description', 'url', 'scenarioId', 'scenarioProps', 'pluginDefinitions'];
+    return [ 'id', 'name', 'description', 'url', 'scenarioId', 'scenarioProps', 'pluginDefinitions' ];
   }
 
   // get a read transaction
@@ -31,7 +30,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
       const rTx = IdbProject.rTx();
       const readReq = (Number.isInteger(nameOrId) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -51,7 +50,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
       const rTx = IdbProject.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -72,7 +71,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
       const rTx = IdbProject.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = async (e) => {
+      readReq.onsuccess = async e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -91,7 +90,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
     const sites = await IdbSite.getAll(project.id);
     let resources = [];
 
-    for (let i: number = 0; i < sites.length; i++) {
+    for (let i = 0; i < sites.length; i += 1) {
       const currentResources = await IdbResource.getAll(sites[i].id);
       resources = resources.concat(currentResources);
     }
@@ -114,11 +113,11 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
 
   static async delSome(projectIds) {
     return Promise.all(
-      projectIds.map(async (projectId) => {
+      projectIds.map(async projectId => {
         const siteIds = await IdbSite.getAllIds(projectId);
         await IdbSite.delSome(siteIds);
         await IdbProject.delSingle(projectId);
-      })
+      }),
     );
   }
 
@@ -141,6 +140,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
 
   constructor(kwArgs: Partial<IProjectStorage> = {}) {
     super();
+
     for (const key in kwArgs) {
       this[key] = kwArgs[key];
     }
@@ -150,7 +150,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
     return new Promise((resolve, reject) => {
       const rwTx = IdbProject.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());
-      reqAddResource.onsuccess = async (e) => {
+      reqAddResource.onsuccess = async e => {
         this.id = e.target.result;
 
         // also save the project url as a new site
@@ -183,7 +183,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
         const siteIds = await IdbSite.getAllIds(this.id);
         await IdbSite.delSome(siteIds);
 
-         // delete project
+        // delete project
         await IdbProject.delSingle(this.id);
         resolve();
       }
@@ -197,7 +197,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
     const sites = await IdbSite.getAll(this.id);
 
     // tslint:disable-next-line:prefer-for-of
-    for (let i: number = 0; i < sites.length; i++) {
+    for (let i = 0; i < sites.length; i++) {
       // open a new tab for the current site to be crawled into
       const tab = await ActiveTabHelper.create();
       sites[i].tabId = tab.id;

@@ -3,7 +3,7 @@ import { SchemaHelper, IPlugin, IResource, ISite } from 'get-set-fetch-extension
 
 export default class ExtractTitlePlugin implements IPlugin {
   opts: {
-    runInTab: boolean
+    runInTab: boolean;
   };
 
   constructor(opts) {
@@ -19,9 +19,9 @@ export default class ExtractTitlePlugin implements IPlugin {
       properties: {
         runInTab: {
           type: 'boolean',
-          default: true
-        }
-      }
+          default: true,
+        },
+      },
     };
   }
 
@@ -31,9 +31,9 @@ export default class ExtractTitlePlugin implements IPlugin {
 
   apply(site: ISite, resource: IResource) {
     return {
-      info : {
-        title: document.title
-      }
+      info: {
+        title: document.title,
+      },
     };
   }
 }

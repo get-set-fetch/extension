@@ -6,7 +6,6 @@ import { SchemaHelper, IPlugin, IResource, ISite } from 'get-set-fetch-extension
 
 declare const document;
 export default class ExtractUrlPlugin implements IPlugin {
-
   static get OPTS_SCHEMA() {
     return {
       $id: 'https://getsetfetch.org/extract-url-plugin.schema.json',
@@ -17,21 +16,21 @@ export default class ExtractUrlPlugin implements IPlugin {
         extensionRe: {
           type: 'string',
           subType: 'regexp',
-          default: null
+          default: null,
         },
         allowNoExtension: {
           type: 'boolean',
-          default: true
+          default: true,
         },
         maxDepth: {
           type: 'number',
-          default: '-1'
+          default: '-1',
         },
         runInTab: {
           type: 'boolean',
-          default: true
-        }
-      }
+          default: true,
+        },
+      },
     };
   }
 
@@ -60,11 +59,11 @@ export default class ExtractUrlPlugin implements IPlugin {
   }
 
   opts: {
-    mediaTypeRe: RegExp,
-    extensionRe: RegExp,
-    allowNoExtension: boolean,
-    maxDepth: number,
-    runInTab: boolean
+    mediaTypeRe: RegExp;
+    extensionRe: RegExp;
+    allowNoExtension: boolean;
+    maxDepth: number;
+    runInTab: boolean;
   };
 
   constructor(opts) {
@@ -99,10 +98,10 @@ export default class ExtractUrlPlugin implements IPlugin {
     const partialUrls = anchorHrefs.concat(imgSrcs);
     const validUrls = new Set();
 
-    partialUrls.forEach((partialUrl) => {
+    partialUrls.forEach(partialUrl => {
       // construct resource full URL without #hhtml_fragment_identifiers
       const resourceUrl = new URL(partialUrl, currentUrl);
-      resourceUrl.hash='';
+      resourceUrl.hash = '';
 
       // this.createResourceUrl(currentUrl, partialUrl);
       if (this.isValidResourceUrl(currentUrl, resourceUrl)) {

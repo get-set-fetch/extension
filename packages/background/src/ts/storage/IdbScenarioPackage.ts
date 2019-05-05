@@ -1,15 +1,14 @@
 import { BaseEntity } from 'get-set-fetch';
-import Logger from '../logger/Logger';
 import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
 import { NpmPackage } from 'get-set-fetch-extension-commons';
+import Logger from '../logger/Logger';
 
 const Log = Logger.getLogger('IdbScenario');
 
 export default class IdbScenarioPackage extends BaseEntity implements IScenarioPackage {
-
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'name', 'package', 'code', 'builtin'];
+    return [ 'id', 'name', 'package', 'code', 'builtin' ];
   }
 
   // get a read transaction
@@ -27,7 +26,7 @@ export default class IdbScenarioPackage extends BaseEntity implements IScenarioP
       const rTx = IdbScenarioPackage.rTx();
       const readReq = (Number.isInteger(nameOrId) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -47,7 +46,7 @@ export default class IdbScenarioPackage extends BaseEntity implements IScenarioP
       const rTx = IdbScenarioPackage.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -105,6 +104,7 @@ export default class IdbScenarioPackage extends BaseEntity implements IScenarioP
 
   constructor(kwArgs: Partial<IScenarioPackage> = {}) {
     super();
+
     for (const key in kwArgs) {
       this[key] = kwArgs[key];
     }
@@ -114,7 +114,7 @@ export default class IdbScenarioPackage extends BaseEntity implements IScenarioP
     return new Promise((resolve, reject) => {
       const rwTx = IdbScenarioPackage.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());
-      reqAddResource.onsuccess = (e) => {
+      reqAddResource.onsuccess = e => {
         this.id = e.target.result;
         resolve(this.id);
       };

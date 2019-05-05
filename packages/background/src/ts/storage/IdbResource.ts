@@ -15,7 +15,7 @@ export default class IdbResource extends BaseResource {
 
   static parseResult(result) {
     return {
-      crawlInProgress: result.crawlInProgress === 1
+      crawlInProgress: result.crawlInProgress === 1,
     };
   }
 
@@ -24,7 +24,7 @@ export default class IdbResource extends BaseResource {
       const rTx = IdbResource.rTx();
       const readReq = (Number.isInteger(urlOrId) ? rTx.get(urlOrId) : rTx.index('url').get(urlOrId));
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -42,15 +42,15 @@ export default class IdbResource extends BaseResource {
 
   static getAllCrawled(siteId: number) {
     const idbKey = IDBKeyRange.bound(
-      [siteId, 0, new Date(1)],
-      [siteId, 0, new Date(Date.now())]
+      [ siteId, 0, new Date(1) ],
+      [ siteId, 0, new Date(Date.now()) ],
     );
 
     return this.getAll(siteId, idbKey);
   }
 
   static getAllNotCrawled(siteId: number) {
-    const idbKey = IDBKeyRange.only([siteId, 0, new Date(0)]);
+    const idbKey = IDBKeyRange.only([ siteId, 0, new Date(0) ]);
     return this.getAll(siteId, idbKey);
   }
 
@@ -59,7 +59,7 @@ export default class IdbResource extends BaseResource {
       const rTx = IdbResource.rTx();
       const readReq = idbKey ? rTx.index('getResourceToCrawl').getAll(idbKey) : rTx.index('siteId').getAll(siteId);
 
-      readReq.onsuccess = (e) => {
+      readReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -88,7 +88,7 @@ export default class IdbResource extends BaseResource {
       const rTx = IdbResource.rTx();
       const readReq = rTx.index('siteId').getAll(siteId);
 
-      readReq.onsuccess = async (e) => {
+      readReq.onsuccess = async e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -108,7 +108,7 @@ export default class IdbResource extends BaseResource {
       const rwTx = IdbResource.rwTx();
       const getReq = rwTx.index('getResourceToCrawl').get(idbKey);
 
-      getReq.onsuccess = (e) => {
+      getReq.onsuccess = e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -121,21 +121,21 @@ export default class IdbResource extends BaseResource {
           reqUpdateResource.onerror = () => reject(new Error(`could not update crawlInProgress for resource: ${resource.url}`));
         }
       };
-      getReq.onerror = (err) => {
-        reject(new Error('could not read resource to crawl: ' + err.message));
+      getReq.onerror = err => {
+        reject(new Error(`could not read resource to crawl: ${err.message}`));
       };
     });
   }
 
   static async getResourceToCrawl(siteId, crawlFrequency) {
     // try to find a resource matching {siteId, crawlInProgress : false, crawledAt: null}
-    let resource = await this.getResourceToCrawlWithKey(IDBKeyRange.only([siteId, 0, new Date(0)]));
+    let resource = await this.getResourceToCrawlWithKey(IDBKeyRange.only([ siteId, 0, new Date(0) ]));
 
     // try to find a resource matching {siteId, crawlInProgress : false, crawledAt: older than crawlFrequency}
     if (!resource && crawlFrequency >= 0) {
       resource = await this.getResourceToCrawlWithKey(IDBKeyRange.bound(
-        [siteId, 0, new Date(0)],
-        [siteId, 0, new Date(Date.now() - (crawlFrequency * 60 * 60 * 1000))]
+        [ siteId, 0, new Date(0) ],
+        [ siteId, 0, new Date(Date.now() - (crawlFrequency * 60 * 60 * 1000)) ],
       ));
     }
 
@@ -198,7 +198,7 @@ export default class IdbResource extends BaseResource {
     return new Promise((resolve, reject) => {
       const rwTx = IdbResource.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());
-      reqAddResource.onsuccess = (e) => {
+      reqAddResource.onsuccess = e => {
         this.id = e.target.result;
         resolve(this.id);
       };
@@ -228,7 +228,7 @@ export default class IdbResource extends BaseResource {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return ['id', 'siteId', 'url', 'depth', 'info', 'crawledAt', 'crawlInProgress', 'blob', 'mediaType'];
+    return [ 'id', 'siteId', 'url', 'depth', 'info', 'crawledAt', 'crawlInProgress', 'blob', 'mediaType' ];
   }
 
   serialize(): any {

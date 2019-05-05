@@ -5,7 +5,7 @@ import { SchemaHelper, IPlugin } from 'get-set-fetch-extension-commons';
  */
 export default class SelectResourcePlugin implements IPlugin {
   opts: {
-    crawlFrequency: number
+    crawlFrequency: number;
   };
 
   constructor(opts) {
@@ -22,9 +22,9 @@ export default class SelectResourcePlugin implements IPlugin {
         crawlFrequency: {
           type: 'number',
           default: '-1',
-          help: 'How often a resource should be re-crawled (hours), enter -1 to never re-crawl'
-        }
-      }
+          help: 'How often a resource should be re-crawled (hours), enter -1 to never re-crawl',
+        },
+      },
     };
   }
 

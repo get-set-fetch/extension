@@ -1,4 +1,4 @@
-import { IPluginDefinition, ISite  } from 'get-set-fetch-extension-commons';
+import { IPluginDefinition, ISite } from 'get-set-fetch-extension-commons';
 import { BaseEntity, BloomFilter } from 'get-set-fetch';
 import IdbResource from './IdbResource';
 import PluginManager from '../plugins/PluginManager';
@@ -9,10 +9,9 @@ const Log = Logger.getLogger('IdbSite');
 
 /* eslint-disable class-methods-use-this */
 export default class IdbSite extends BaseEntity {
-
   // IndexedDB can't do partial update, define all site properties to be stored
   get props() {
-    return ['id', 'projectId', 'name', 'url', 'opts', 'robotsTxt', 'pluginDefinitions', 'resourceFilter'];
+    return [ 'id', 'projectId', 'name', 'url', 'opts', 'robotsTxt', 'pluginDefinitions', 'resourceFilter' ];
   }
 
   // get a read transaction
@@ -35,7 +34,7 @@ export default class IdbSite extends BaseEntity {
       const rTx = IdbSite.rTx();
       const readReq = (Number.isInteger(nameOrId as number) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
-      readReq.onsuccess = async (e) => {
+      readReq.onsuccess = async e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -54,7 +53,7 @@ export default class IdbSite extends BaseEntity {
       const rTx = IdbSite.rTx();
       const readReq = projectId ? rTx.index('projectId').getAll(projectId) : rTx.getAll();
 
-      readReq.onsuccess = async (e) => {
+      readReq.onsuccess = async e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -81,7 +80,7 @@ export default class IdbSite extends BaseEntity {
       const rTx = IdbSite.rTx();
       const readReq = projectId ? rTx.index('projectId').getAll(projectId) : rTx.getAll();
 
-      readReq.onsuccess = async (e) => {
+      readReq.onsuccess = async e => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -110,11 +109,11 @@ export default class IdbSite extends BaseEntity {
 
   static async delSome(siteIds: number[]) {
     return Promise.all(
-      siteIds.map(async (siteId) => {
+      siteIds.map(async siteId => {
         const resourcesIds = await IdbResource.getAllIds(siteId);
         await IdbResource.delSome(resourcesIds);
         await IdbSite.delSingle(siteId);
-      })
+      }),
     );
   }
 
@@ -137,15 +136,15 @@ export default class IdbSite extends BaseEntity {
   plugins: any;
 
   crawlOpts: {
-    maxResources: number,
-    delay: number
+    maxResources: number;
+    delay: number;
   };
 
   storageOpts: {
     resourceFilter: {
-      maxEntries: number,
-      probability: number
-    }
+      maxEntries: number;
+      probability: number;
+    };
   };
 
   constructor(kwArgs: Partial<ISite> = {}) {
@@ -158,7 +157,7 @@ export default class IdbSite extends BaseEntity {
     if (!kwArgs.crawlOpts) {
       this.crawlOpts = {
         maxResources: 500,
-        delay: 1000
+        delay: 1000,
       };
     }
 
@@ -166,8 +165,8 @@ export default class IdbSite extends BaseEntity {
       this.storageOpts = {
         resourceFilter: {
           maxEntries: 5000,
-          probability: 0.01
-        }
+          probability: 0.01,
+        },
       };
     }
 
@@ -240,7 +239,7 @@ export default class IdbSite extends BaseEntity {
           Log.error(
             `Crawl error for site ${this.name}`,
             `${this.plugins[i].constructor.name} ${resource ? resource.url : ''}`,
-            JSON.stringify(err, Object.getOwnPropertyNames(err))
+            JSON.stringify(err, Object.getOwnPropertyNames(err)),
           );
           reject(err);
           break;
@@ -259,7 +258,7 @@ export default class IdbSite extends BaseEntity {
     Log.info(
       `Executing plugin ${plugin.constructor.name} `,
       `using options ${JSON.stringify(plugin.opts)} `,
-      `against resource ${JSON.stringify(resource)}`
+      `against resource ${JSON.stringify(resource)}`,
     );
 
     if (plugin.opts && plugin.opts.runInTab) {
@@ -281,12 +280,12 @@ export default class IdbSite extends BaseEntity {
       const rwTx = IdbSite.rwTx();
       // save the site and wait for the return result containing the new inserted id
       const reqAddSite = rwTx.add(this.serializeWithoutId());
-      reqAddSite.onsuccess = async (e) => {
+      reqAddSite.onsuccess = async e => {
         this.id = e.target.result;
 
         // also save the site url as the first site resource at depth 0
         try {
-          await this.saveResources([this.url], 0);
+          await this.saveResources([ this.url ], 0);
           resolve(this.id);
         }
         catch (err) {
@@ -294,7 +293,7 @@ export default class IdbSite extends BaseEntity {
         }
       };
 
-      reqAddSite.onerror = (err) => {
+      reqAddSite.onerror = err => {
         reject(new Error(`could not add site: ${this.url} - ${err}`));
       };
     });
@@ -303,18 +302,18 @@ export default class IdbSite extends BaseEntity {
   saveResources(urls, depth) {
     return new Promise((resolve, reject) => {
       // need a transaction across multiple stores
-      const tx = IdbSite.db.transaction(['Sites', 'Resources'], 'readwrite');
+      const tx = IdbSite.db.transaction([ 'Sites', 'Resources' ], 'readwrite');
 
       // read the latest resource filter bitset
       const reqReadSite = tx.objectStore('Sites').get(this.id);
-      reqReadSite.onsuccess = (e) => {
+      reqReadSite.onsuccess = e => {
         const latestSite = e.target.result;
         const { maxEntries, probability } = this.storageOpts.resourceFilter;
         const bloomFilter = BloomFilter.create(maxEntries, probability, latestSite.resourceFilter);
 
         // create new resources
         const resources = [];
-        urls.forEach((url) => {
+        urls.forEach(url => {
           if (bloomFilter.test(url) === false) {
             resources.push(new IdbResource({ siteId: this.id, url, depth }).serializeWithoutId());
             bloomFilter.add(url);
@@ -368,7 +367,7 @@ export default class IdbSite extends BaseEntity {
         const resourceIds = await IdbResource.getAllIds(this.id);
         await IdbResource.delSome(resourceIds);
 
-         // delete site
+        // delete site
         await IdbSite.delSingle(this.id);
         resolve();
       }

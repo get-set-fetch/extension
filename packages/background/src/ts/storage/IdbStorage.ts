@@ -9,13 +9,13 @@ import IdbScenarioPackage from './IdbScenarioPackage';
 
 export default class IdbStorage {
   static init(): Promise<{
-    Site: typeof IdbSite,
-    Project: typeof IdbProject,
-    ScenarioPackage: typeof IdbScenarioPackage,
-    Resource: typeof IdbResource,
-    Plugin: typeof IdbPlugin,
-    Log: typeof IdbLog,
-    Setting: typeof IdbSetting
+    Site: typeof IdbSite;
+    Project: typeof IdbProject;
+    ScenarioPackage: typeof IdbScenarioPackage;
+    Resource: typeof IdbResource;
+    Plugin: typeof IdbPlugin;
+    Log: typeof IdbLog;
+    Setting: typeof IdbSetting;
   }> {
     return new Promise((resolve, reject) => {
       const openRequest = indexedDB.open('gsf_db', 1);
@@ -49,7 +49,7 @@ export default class IdbStorage {
           resourceStore.createIndex('siteId', 'siteId', { unique: false });
 
           /* create a compound index for getResourceToCrawl */
-          resourceStore.createIndex('getResourceToCrawl', ['siteId', 'crawlInProgress', 'crawledAt'], { unique: false });
+          resourceStore.createIndex('getResourceToCrawl', [ 'siteId', 'crawlInProgress', 'crawledAt' ], { unique: false });
         }
 
         if (!db.objectStoreNames.contains('Plugins')) {
@@ -77,9 +77,8 @@ export default class IdbStorage {
           Resource: IdbResource,
           Plugin: IdbPlugin,
           Log: IdbLog,
-          Setting: IdbSetting
+          Setting: IdbSetting,
         });
-
       };
 
       openRequest.onerror = () => {

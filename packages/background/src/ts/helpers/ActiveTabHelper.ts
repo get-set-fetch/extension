@@ -4,49 +4,49 @@ export default class ActiveTabHelper {
       chrome.tabs.executeScript(
         tabId,
         details,
-        (result) => {
+        result => {
           if (result) {
             resolve(result[0]);
           }
           else reject(chrome.runtime.lastError);
-        }
+        },
       );
     });
   }
 
   static getCurrent() {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       chrome.tabs.query(
         { active: true },
-        (tabs) => {
+        tabs => {
           resolve(tabs[0]);
-        }
+        },
       );
     });
   }
 
-  static create(createProperties = {}): any {
-    return new Promise((resolve) => {
+  static create(createProperties = {}) {
+    return new Promise(resolve => {
       chrome.tabs.create(
         createProperties || {},
-        (tab) => {
+        tab => {
           /*
           make sure listners on targetcreated event with target.type() === 'page' are invoked before the page is further modified
           delay returning the newly created tab
           */
           const resolveFnc = () => resolve(tab);
           setTimeout(resolveFnc, 1000);
-        }
+        },
       );
     });
   }
 
   static update(tabId, updateProperties) {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       chrome.tabs.update(
         tabId,
         updateProperties || {},
-        (tab) => {
+        tab => {
           // wait for the tab update to be completed, executeScript may throw errors otherwise
           const updateHandler = (updatedTabId, changeInfo) => {
             if (tabId === updatedTabId && changeInfo.status === 'complete') {
@@ -55,7 +55,7 @@ export default class ActiveTabHelper {
             }
           };
           chrome.tabs.onUpdated.addListener(updateHandler);
-        }
+        },
       );
     });
   }

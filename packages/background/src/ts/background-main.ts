@@ -38,5 +38,4 @@ const Log = Logger.getLogger('background-main');
   catch (err) {
     Log.error(err);
   }
-
 })();

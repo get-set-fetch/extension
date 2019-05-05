@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import IdbLog from '../storage/IdbLog';
 
 export enum LogLevel {
@@ -10,7 +9,6 @@ export enum LogLevel {
 }
 
 export default class Logger {
-
   static logLevel: LogLevel = LogLevel.INFO;
 
   static getLogger(cls: string) {

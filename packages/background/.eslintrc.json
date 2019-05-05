@@ -11,12 +11,29 @@
     "useJSXTextNode": true,
     "project": "./tsconfig.json"
   },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".ts", ".d.ts"]
+      }
+    }
+  },
+  "env": {
+    "browser": true
+  },
+  "globals": {
+    "chrome": true
+  },
   "rules": {
+    "max-len": ["error", { "code": 150 }],
     "linebreak-style": ["error", "unix"],
     "array-bracket-spacing": ["error", "always"],
+    "class-methods-use-this":"off",
     "curly": ["error"],
+    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
     "max-line-length": [true, 180],
     "object-literal-sort-keys": false,
+    "object-curly-newline": ["error", { "ImportDeclaration": "never", "ExportDeclaration": "always" }],
     "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
     "arrow-parens": ["error", "as-needed"],
     "member-access": [true, "no-public"],
@@ -31,6 +48,8 @@
 
     "@typescript-eslint/indent": ["error", 2],
     "@typescript-eslint/interface-name-prefix": ["error", "always"],
-    "@typescript-eslint/no-angle-bracket-type-assertion": ["error"]
+    "@typescript-eslint/no-angle-bracket-type-assertion": ["error"],
+    "@typescript-eslint/explicit-member-accessibility": ["off"],
+    "@typescript-eslint/explicit-function-return-type": ["off"]
   }
 }

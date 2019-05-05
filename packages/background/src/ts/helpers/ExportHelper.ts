@@ -3,7 +3,6 @@ import { IExportOpt, IExportResult, ExportType, IResource } from 'get-set-fetch-
 
 export default class ExportHelper {
   static export(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
-
     if (resources.length === 0) throw new Error('Nothing to export. No resources crawled or with valid content');
 
     switch (opts.type) {
@@ -11,11 +10,13 @@ export default class ExportHelper {
         return ExportHelper.exportZIP(resources, opts);
       case ExportType.CSV:
         return ExportHelper.exportCSV(resources, opts);
+      default:
+        throw new Error(`Invalid export type ${opts}.type`);
     }
   }
 
   static exportZIP(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
-    return new Promise(async (resolve) => {
+    return new Promise(async resolve => {
       const blobCol: string = opts.cols && opts.cols.length === 1 ? opts.cols[0] : null;
       if (!blobCol) throw new Error('Expecting a single column for blob content');
 
@@ -28,8 +29,8 @@ export default class ExportHelper {
       });
 
       const content = await zip.generateAsync({
-        type:'blob',
-        compression: 'STORE'
+        type: 'blob',
+        compression: 'STORE',
       });
 
       resolve({ url: URL.createObjectURL(content) });
@@ -37,7 +38,7 @@ export default class ExportHelper {
   }
 
   static exportCSV(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
-    return new Promise(async (resolve) => {
+    return new Promise(async resolve => {
       const csvCols: string[] = opts.cols;
       if (!csvCols || csvCols.length === 0) throw new Error('Expecting at least one column for csv content');
 
@@ -51,17 +52,17 @@ export default class ExportHelper {
             (result: string[], key) => {
               const propPath = key.split('.');
               const val = ExportHelper.getIn(resource, propPath);
-              result.push(JSON.stringify(val ? val : ''));
+              result.push(JSON.stringify(val || ''));
               return result;
             },
-            []
+            [],
           );
           return row.join(fieldSeparator);
         })
         .join(lineSeparator);
 
       const content = `${header}${lineSeparator}${body}`;
-      const contentBlob = new Blob([content], { type: 'text/csv' });
+      const contentBlob = new Blob([ content ], { type: 'text/csv' });
 
       resolve({ url: URL.createObjectURL(contentBlob) });
     });
@@ -69,8 +70,7 @@ export default class ExportHelper {
 
   static getIn(nestedObj, path) {
     return path.reduce(
-      (obj, key) =>
-      (obj && obj[key] !== 'undefined') ? obj[key] : undefined, nestedObj
+      (obj, key) => ((obj && obj[key] !== 'undefined') ? obj[key] : undefined), nestedObj,
     );
   }
 }
