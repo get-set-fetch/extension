@@ -25,7 +25,7 @@ export default class ImageFilterPlugin implements IPlugin {
   }
 
   test(resource: IResource) {
-    return resource.mediaType.indexOf('image') !== -1;
+    return (/image/i).test(resource.mediaType);
   }
 
   apply(site: ISite, resource: IResource) {
