@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension-commons",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "dist/index.js",
   "types": "lib/index.d.ts",
@@ -46,6 +46,5 @@
     "tslint-config-airbnb": "^5.11.1",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.2.2"
-  },
-  "dependencies": {}
+  }
 }
