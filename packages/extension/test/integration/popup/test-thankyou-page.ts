@@ -9,7 +9,7 @@ describe('Test ThankYou Pages', () => {
   });
 
   after(async () => {
-    // await browserHelper.close();
+    await browserHelper.close();
   });
 
   it('install page', async () => {
