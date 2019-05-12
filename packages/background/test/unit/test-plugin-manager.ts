@@ -28,7 +28,7 @@ describe('Test PluginManager', () => {
         opts: undefined,
       },
       {
-        name: 'ExtractUrlPlugin',
+        name: 'ExtractUrlsPlugin',
         opts: {
           allowNoExtension: true,
           extensionRe: null,

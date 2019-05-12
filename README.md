@@ -45,6 +45,6 @@ You can find technical tidbits in each sub-package readme file.
 
 # Medium-Term Roadmap
 - add column filter capability when exporting resources as csv
-- add granularity to ExtractUrlPlugin maxDepth option in order to accommodate both internal and external links relative to the site being scraped
+- add granularity to ExtractUrlsPlugin maxDepth option in order to accommodate both internal and external links relative to the site being scraped
 - add import / export database capabilities
 - add log export capability

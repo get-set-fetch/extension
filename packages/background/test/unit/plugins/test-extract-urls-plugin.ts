@@ -1,11 +1,11 @@
 import { assert } from 'chai';
 import { createSandbox } from 'sinon';
-import ExtractUrlPlugin from '../../../src/ts/plugins/builtin/ExtractUrlPlugin';
+import ExtractUrlsPlugin from '../../../src/ts/plugins/builtin/ExtractUrlsPlugin';
 
-describe('Test Extract Url Plugin', () => {
+describe('Test Extract Urls Plugin', () => {
   let sandbox;
   let stubDocument;
-  let extractUrlPlugin;
+  let extractUrlsPlugin;
 
   beforeEach(() => {
     sandbox = createSandbox();
@@ -17,13 +17,13 @@ describe('Test Extract Url Plugin', () => {
   });
 
   it('test media type - default options', () => {
-    extractUrlPlugin = new ExtractUrlPlugin({});
-    assert.isTrue(extractUrlPlugin.test({ mediaType: 'text/html' }));
-    assert.isFalse(extractUrlPlugin.test({ mediaType: 'text/plain' }));
+    extractUrlsPlugin = new ExtractUrlsPlugin({});
+    assert.isTrue(extractUrlsPlugin.test({ mediaType: 'text/html' }));
+    assert.isFalse(extractUrlsPlugin.test({ mediaType: 'text/plain' }));
   });
 
   it('extract unique urls - default options', () => {
-    extractUrlPlugin = new ExtractUrlPlugin({});
+    extractUrlsPlugin = new ExtractUrlsPlugin({});
 
     stubDocument.withArgs('a').returns([
       { href: 'http://sitea.com/page1.html' },
@@ -40,12 +40,12 @@ describe('Test Extract Url Plugin', () => {
     const expectedValidUrls = [
       'http://sitea.com/page1.html'
     ];
-    const { urlsToAdd } = extractUrlPlugin.apply(null, { url: 'http://sitea.com/index.html', depth: 1 });
+    const { urlsToAdd } = extractUrlsPlugin.apply(null, { url: 'http://sitea.com/index.html', depth: 1 });
     assert.sameMembers(urlsToAdd, expectedValidUrls);
   });
 
   it('extract unique urls - include images', () => {
-    extractUrlPlugin = new ExtractUrlPlugin({ extensionRe: '/^(html|png)$/i' });
+    extractUrlsPlugin = new ExtractUrlsPlugin({ extensionRe: '/^(html|png)$/i' });
 
     stubDocument.withArgs('a').returns([
       { href: 'http://sitea.com/page1.html' },
@@ -61,7 +61,7 @@ describe('Test Extract Url Plugin', () => {
       'http://sitea.com/page1.html',
        'http://sitea.com/img1.png'
     ];
-    const { urlsToAdd } = extractUrlPlugin.apply(null, { url: 'http://sitea.com/index.html', depth: 1 });
+    const { urlsToAdd } = extractUrlsPlugin.apply(null, { url: 'http://sitea.com/index.html', depth: 1 });
     assert.sameMembers(urlsToAdd, expectedValidUrls);
   });
 

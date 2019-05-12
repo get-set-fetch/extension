@@ -12,7 +12,7 @@ class PluginManager extends BaseModuleManager {
   static cache: Map<string, IModuleInfo> = new Map();
 
   static get DEFAULT_PLUGINS(): string[] {
-    return [ 'SelectResourcePlugin', 'FetchPlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin' ];
+    return [ 'SelectResourcePlugin', 'FetchPlugin', 'ExtractUrlsPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin' ];
   }
 
   static persistPlugins(plugins: IdbPlugin[]) {
@@ -62,6 +62,7 @@ class PluginManager extends BaseModuleManager {
 
     const plugin = await GsfProvider.Plugin.get(name);
     if (!plugin) {
+      Log.error(`could not find plugin ${name}`);
       throw new Error(`could not find plugin ${name}`);
     }
 

@@ -5,12 +5,12 @@ import { SchemaHelper, IPlugin, IResource, ISite } from 'get-set-fetch-extension
  */
 
 declare const document;
-export default class ExtractUrlPlugin implements IPlugin {
+export default class ExtractUrlsPlugin implements IPlugin {
   static get OPTS_SCHEMA() {
     return {
       $id: 'https://getsetfetch.org/extract-url-plugin.schema.json',
       $schema: 'http://json-schema.org/draft-07/schema#',
-      title: 'ExtractUrlPlugin',
+      title: 'ExtractUrlsPlugin',
       type: 'object',
       properties: {
         extensionRe: {
@@ -67,7 +67,7 @@ export default class ExtractUrlPlugin implements IPlugin {
   };
 
   constructor(opts) {
-    this.opts = SchemaHelper.instantiate(ExtractUrlPlugin.OPTS_SCHEMA, opts);
+    this.opts = SchemaHelper.instantiate(ExtractUrlsPlugin.OPTS_SCHEMA, opts);
   }
 
   test(resource: IResource) {
@@ -120,7 +120,7 @@ export default class ExtractUrlPlugin implements IPlugin {
     }
     else {
       // relative path
-      resourceUrl = new URL(ExtractUrlPlugin.absoluteUrl(currentUrl.pathname, partialUrl));
+      resourceUrl = new URL(ExtractUrlsPlugin.absoluteUrl(currentUrl.pathname, partialUrl));
     }
 
     resourceUrl.protocol = resourceUrl.protocol && resourceUrl.protocol.length > 0 ? resourceUrl.protocol : currentUrl.protocol;

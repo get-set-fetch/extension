@@ -22,7 +22,7 @@ xdescribe('Site Crawl Extract Images', () => {
         name: 'FetchPlugin'
       },
       {
-        name: 'ExtractUrlPlugin',
+        name: 'ExtractUrlsPlugin',
         opts: {
           extensionRe: '/^(html|htm|php|png)$/i'
         }

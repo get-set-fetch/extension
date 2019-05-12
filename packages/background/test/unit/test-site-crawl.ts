@@ -26,7 +26,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     // discover, register builtin plugins
     await ModuleHelper.init();
 
-    // stub ExtractUrlPlugin, the only one running in tab via "runInTab"
+    // stub ExtractUrlsPlugin, the only one running in tab via "runInTab"
     sinon.stub(PluginManager, 'runInTab').callsFake((tabId, plugin, site, resource) => {
       plugin.extractResourceUrls = () => [ `http://siteA/page-${resource.depth + 1}.html` ];
       resource.mediaType = 'html';
@@ -40,7 +40,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     await Site.delAll();
 
     // save site
-    const testPlugins = [ 'SelectResourcePlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin' ];
+    const testPlugins = [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin' ];
     const pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(pluginDef => testPlugins.indexOf(pluginDef.name) !== -1);
     site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions });
     await site.save();
@@ -69,7 +69,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
   it('crawl until maxDepth is reached', async () => {
     const maxDepth = 3;
-    const extractUrlPlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlPlugin');
+    const extractUrlPlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlsPlugin');
     extractUrlPlugDef.opts.maxDepth = maxDepth;
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
@@ -85,7 +85,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     site.crawlOpts.maxResources = maxResources;
 
     // make sure maxDepth is not reached before reaching maxResources threshold
-    const extractUrlPlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlPlugin');
+    const extractUrlPlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlsPlugin');
     extractUrlPlugDef.opts.maxDepth = 100;
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');

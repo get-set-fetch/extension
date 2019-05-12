@@ -21,7 +21,7 @@ describe('Project CRUD Pages', () => {
         name: 'FetchPlugin'
       },
       {
-        name: 'ExtractUrlPlugin',
+        name: 'ExtractUrlsPlugin',
         opts: {
           extensionRe: '/^(gif|png|jpg|jpeg)$/i',
           maxDepth: '1'
@@ -172,8 +172,8 @@ describe('Project CRUD Pages', () => {
     assert.strictEqual(updatedProject.scenarioProps.maxDepth, expectedScenarioMaxDepth);
 
     // check plugin definitions
-    const updatedExtractUrlPlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlPlugin');
-    assert.strictEqual(updatedExtractUrlPlugin.opts.extensionRe, expectedScenarioExtensionRe);
+    const updatedExtractUrlsPlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlsPlugin');
+    assert.strictEqual(updatedExtractUrlsPlugin.opts.extensionRe, expectedScenarioExtensionRe);
 
     // check updated project presence in project list
     await page.waitFor(`a[href=\\/project\\/${updatedProject.id}`);
