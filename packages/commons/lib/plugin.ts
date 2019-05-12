@@ -14,6 +14,7 @@ export interface IPluginDefinition {
 }
 
 export interface IPlugin {
+  opts?: any;
   test(resource: IResource): boolean;
   apply(site: ISite, resource: IResource): any;
 }
