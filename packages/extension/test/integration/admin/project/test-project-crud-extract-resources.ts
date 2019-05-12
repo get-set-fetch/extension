@@ -18,7 +18,7 @@ describe('Project CRUD Pages', () => {
         name: 'SelectResourcePlugin'
       },
       {
-        name: 'ExtensionFetchPlugin'
+        name: 'FetchPlugin'
       },
       {
         name: 'ExtractUrlPlugin',

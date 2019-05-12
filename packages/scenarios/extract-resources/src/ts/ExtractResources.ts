@@ -19,7 +19,7 @@ export default class ExtractResources implements IScenario {
         name: 'SelectResourcePlugin'
       },
       {
-        name: 'ExtensionFetchPlugin'
+        name: 'FetchPlugin'
       },
       {
         name: 'ExtractUrlPlugin',

@@ -38,7 +38,7 @@ Handles the crawling and scraping logic.
       name: "SelectResourcePlugin"
     },
     {
-      name: "ExtensionFetchPlugin"
+      name: "FetchPlugin"
     },
     {
       name: "ExtractUrlPlugin",
@@ -78,7 +78,7 @@ These settings are used by the scenario to generate partial pluginDefinitions.
       name: "SelectResourcePlugin"
     },
     {
-      name: "ExtensionFetchPlugin"
+      name: "FetchPlugin"
     },
     {
       name: "ExtractUrlPlugin",
@@ -117,7 +117,7 @@ Resource filter is a bloom filter used for detecting duplicate urls.
       }
     },
     {
-      name: "ExtensionFetchPlugin"
+      name: "FetchPlugin"
     },
     {
       name: "ExtractUrlPlugin",
@@ -149,7 +149,7 @@ Resource filter is a bloom filter used for detecting duplicate urls.
   - SelectResourcePlugin
     - selects an un-crawled / expired resource from the database
     - crawlFrequency: how often a resource should be re-crawled in hours. A value of -1 will never re-crawl an already crawled resource.
-  - ExtensionFetchPlugin
+  - FetchPlugin
     - opens html resources in a new tab or dowloads binary ones.
   - ExtractUrlPlugin
     - runInTab = true : whether or not resources the plugin should be executed in the browser tab context where the current resource is opened.

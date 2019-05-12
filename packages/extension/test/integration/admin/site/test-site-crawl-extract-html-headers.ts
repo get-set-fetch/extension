@@ -21,7 +21,7 @@ xdescribe('Site Crawl Extract HTML Headers', () => {
         name: 'SelectResourcePlugin'
       },
       {
-        name: 'ExtensionFetchPlugin'
+        name: 'FetchPlugin'
       },
       {
         name: 'ExtractUrlPlugin'

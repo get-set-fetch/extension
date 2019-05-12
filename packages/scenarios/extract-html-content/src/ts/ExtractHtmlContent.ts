@@ -19,7 +19,7 @@ export default class ExtractHtmlContent implements IScenario {
         name: 'SelectResourcePlugin'
       },
       {
-        name: 'ExtensionFetchPlugin'
+        name: 'FetchPlugin'
       },
       {
         name: 'ExtractUrlPlugin',

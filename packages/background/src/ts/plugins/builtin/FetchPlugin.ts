@@ -2,7 +2,7 @@ import URL from 'url-parse';
 import { IPlugin, IResource, ISite } from 'get-set-fetch-extension-commons';
 import ActiveTabHelper from '../../helpers/ActiveTabHelper';
 
-export default class ExtensionFetchPlugin implements IPlugin {
+export default class FetchPlugin implements IPlugin {
   test(resource: IResource) {
     const { protocol } = new URL(resource.url);
     return protocol === 'http:' || protocol === 'https:';

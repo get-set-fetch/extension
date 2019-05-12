@@ -19,7 +19,7 @@ xdescribe('Site Crawl Extract Images', () => {
         name: 'SelectResourcePlugin'
       },
       {
-        name: 'ExtensionFetchPlugin'
+        name: 'FetchPlugin'
       },
       {
         name: 'ExtractUrlPlugin',

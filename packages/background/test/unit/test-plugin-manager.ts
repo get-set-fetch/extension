@@ -24,7 +24,7 @@ describe('Test PluginManager', () => {
         },
       },
       {
-        name: 'ExtensionFetchPlugin',
+        name: 'FetchPlugin',
         opts: undefined,
       },
       {
