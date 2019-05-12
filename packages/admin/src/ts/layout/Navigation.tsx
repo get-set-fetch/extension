@@ -5,13 +5,13 @@ import gsfLogo from '../../images/gsf-logo.png';
 export default class Navigation extends React.Component {
   render() {
     return ([
-      <div className='row'>
+      <div key="logo" className='row'>
         <div className='col text-right mr-2'>
           <img src={gsfLogo} alt='get-set-fetch'/>
         </div>
       </div>,
 
-      <div className='row'>
+      <div key="menu" className='row'>
         <div className='col'>
           <nav className='nav flex-column text-right ml-4'>
             <br/>
@@ -29,7 +29,7 @@ export default class Navigation extends React.Component {
             <a className='nav-link' href='#'>Github</a>
           </nav>
         </div>
-    </div>
+      </div>,
     ]);
   }
 }

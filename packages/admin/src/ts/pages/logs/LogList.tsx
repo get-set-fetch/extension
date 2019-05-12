@@ -1,7 +1,7 @@
 import * as React from 'react';
-import Table, { IHeaderCol } from '../../components/Table';
+import { HttpMethod, IHeaderCol } from 'get-set-fetch-extension-commons';
+import Table from '../../components/Table';
 import GsfClient from '../../components/GsfClient';
-import { HttpMethod } from 'get-set-fetch-extension-commons';
 import ILog from './model/Log';
 import Page from '../../layout/Page';
 
@@ -18,19 +18,19 @@ export default class LogList extends React.Component<{}, IState> {
       header: [
         {
           label: 'Level',
-          render: (log:ILog) => log.level,
+          render: (log: ILog) => log.level,
         },
         {
           label: 'Date',
-          render: (log:ILog) => log.date.toString(),
+          render: (log: ILog) => log.date.toString(),
         },
         {
           label: 'Class',
-          render: (log:ILog) => log.cls,
+          render: (log: ILog) => log.cls,
         },
         {
           label: 'Message',
-          render: (log:ILog) => (<span style={{ textOverflow: 'ellipsis' }}>{log.msg.substr(0, 100)}</span>),
+          render: (log: ILog) => (<span style={{ textOverflow: 'ellipsis' }}>{log.msg.substr(0, 100)}</span>),
         },
       ],
       data: [],
@@ -44,7 +44,7 @@ export default class LogList extends React.Component<{}, IState> {
   }
 
   async loadLogs() {
-    const data:ILog[] = (await GsfClient.fetch(HttpMethod.GET, 'logs')) as ILog[];
+    const data: ILog[] = (await GsfClient.fetch(HttpMethod.GET, 'logs')) as ILog[];
     this.setState({ data });
   }
 
@@ -54,21 +54,18 @@ export default class LogList extends React.Component<{}, IState> {
       await GsfClient.fetch(HttpMethod.DELETE, 'logs');
     }
     catch (err) {
-      console.log('error deleting logs');
+      console.error('error deleting logs');
     }
 
     this.loadLogs();
   }
 
-  // eslint-disable-next-line class-methods-use-this
   render() {
     return (
-      <Page
-        title="Logs"
-        >
+      <Page title="Logs">
         <Table
           header={this.state.header}
-          data={this.state.data}          
+          data={this.state.data}
         />
       </Page>
     );

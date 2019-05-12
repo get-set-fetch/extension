@@ -15,12 +15,8 @@ export default class Table extends React.Component<IProps, {}> {
     header: [],
     data: [],
     emptyTableMsg: 'No entries found',
-    ahref: null
+    ahref: null,
   };
-
-  constructor(props) {
-    super(props);
-  }
 
   render() {
     if (!this.props.data || this.props.data.length === 0) {
@@ -62,15 +58,14 @@ export default class Table extends React.Component<IProps, {}> {
   }
 
   renderTdCell(row, col, idx) {
-    return <td  key={idx}>{this.renderCellContent(row, col)}</td>;
+    return <td key={idx}>{this.renderCellContent(row, col)}</td>;
   }
 
   renderCellContent(row, col) {
-    if (typeof this.props.rowLink !== 'function' || col.renderLink === false ) {
+    if (typeof this.props.rowLink !== 'function' || col.renderLink === false) {
       return col.render(row);
     }
-    else {
-      return <NavLink to={this.props.rowLink(row)} className='btn-block'>{col.render(row)}</NavLink>;
-    }
+
+    return <NavLink to={this.props.rowLink(row)} className='btn-block'>{col.render(row)}</NavLink>;
   }
 }

@@ -1,9 +1,7 @@
 import * as React from 'react';
 
-const ScenarioHomepage = (props) => {
-  return (
-    <a href={props.value} target='_blank'>{props.value}</a>
-  );
-};
+const ScenarioHomepage = props => (
+  <a href={props.value} target='_blank' rel="noopener noreferrer" >{props.value}</a>
+);
 
 export default ScenarioHomepage;

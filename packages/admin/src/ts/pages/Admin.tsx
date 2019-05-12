@@ -50,13 +50,12 @@ export default class Admin extends React.Component {
 
                 <Route path='/'
                   exact={false}
-                  component={(props) => {
-                  // redirect to redirectPath param, pass the others to the new location
-                  const queryParams = queryString.parse(props.location.search);
-                  const redirectPath = queryParams.redirectPath ? queryParams.redirectPath : '/projects';
-                  delete queryParams.redirectPath;
-                  const redirectQueryParams = queryString.stringify(queryParams);
-                  return <Redirect from='/' to={`${redirectPath}?${redirectQueryParams}`} />;
+                  component={props => {
+                    // redirect to redirectPath param, pass the others to the new location
+                    const queryParams = queryString.parse(props.location.search);
+                    const redirectPath = queryParams.redirectPath ? queryParams.redirectPath : '/projects';
+                    const redirectQueryParams = queryString.stringify(Object.assign(queryParams, { redirectPath: null }));
+                    return <Redirect from='/' to={`${redirectPath}?${redirectQueryParams}`} />;
                   }}
                 />
               </Switch>

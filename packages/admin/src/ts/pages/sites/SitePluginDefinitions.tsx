@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavLink } from 'react-router-dom';
+import { IHeaderCol } from 'get-set-fetch-extension-commons';
 import Table from '../../components/Table';
 import PluginDefinition from './model/PluginDefinition';
 
@@ -9,7 +9,7 @@ interface IProps {
 }
 
 interface IState {
-  header: any[];
+  header: IHeaderCol[];
   availablePlugins: PluginDefinition[];
 }
 
@@ -26,8 +26,8 @@ export default class SitePluginDefinitions extends React.Component<IProps, IStat
         {
           label: 'Options',
           render: pluginDef => (
-            Object.keys(pluginDef.opts).length > 0 ?
-              Object.keys(pluginDef.opts).map(optKey => (
+            Object.keys(pluginDef.opts).length > 0
+              ? Object.keys(pluginDef.opts).map(optKey => (
                 <div className="form-group row" key={optKey}>
                   <label htmlFor={optKey} className="col-sm-2 col-form-label">{optKey}</label>
                   <div className="col-sm-10">
@@ -38,8 +38,7 @@ export default class SitePluginDefinitions extends React.Component<IProps, IStat
                   </div>
                 </div>
               ))
-              :
-              <p>No options available</p>
+              : <p>No options available</p>
           ),
         },
       ],
@@ -64,13 +63,10 @@ export default class SitePluginDefinitions extends React.Component<IProps, IStat
   changeHandler(evt) {
     const val = evt.target.value;
     const prop = evt.target.id;
-    console.log(`${prop} : ${val}`);
   }
 
   addPlugin(pluginId) {
-
   }
-
 
   render() {
     const notUsedPlugins = this.getNotUsedPluginDefinitions();
@@ -78,29 +74,29 @@ export default class SitePluginDefinitions extends React.Component<IProps, IStat
     return ([
       <Table key="pluginDefList"
         header={this.state.header} data={this.props.pluginDefinitions}
-         />,
+      />,
 
 
-            <div className="row" key="ctrl">
-              <div className="btn-group">
-                <button
-                  type="button" className="btn btn-primary dropdown-toggle"
-                  data-toggle="dropdown"
-                  aria-haspopup="true" aria-expanded="false"
-                  disabled={notUsedPlugins.length === 0}>
+      <div className="row" key="ctrl">
+        <div className="btn-group">
+          <button
+            type="button" className="btn btn-primary dropdown-toggle"
+            data-toggle="dropdown"
+            aria-haspopup="true" aria-expanded="false"
+            disabled={notUsedPlugins.length === 0}>
                   Add Plugin
-                </button>
-                <div className="dropdown-menu">
-                  {
-                    notUsedPlugins.map(plugin => (
-                      <a key={plugin.id} className="dropdown-item" href="#" onClick={() => this.addPlugin(plugin.id)}>
-                        {plugin.name}
-                      </a>
-                    ))
-                  }
-                </div>
-              </div>
-            </div>,
+          </button>
+          <div className="dropdown-menu">
+            {
+              notUsedPlugins.map(plugin => (
+                <a key={plugin.id} className="dropdown-item" href="#" onClick={() => this.addPlugin(plugin.id)}>
+                  {plugin.name}
+                </a>
+              ))
+            }
+          </div>
+        </div>
+      </div>,
 
 
     ]);

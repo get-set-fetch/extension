@@ -1,3 +1,4 @@
+/* eslint-disable no-shadow */
 // https://codesandbox.io/s/32yrn7nj6p
 
 import * as React from 'react';
@@ -23,9 +24,9 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 
 interface IProps {
   pluginDefinitions: PluginDefinition[];
-  reorderPluginDef: (result: any) => void;
-  changePluginDef: (evt:any) => void;
-  removePluginDef: (evt:any) => void;
+  reorderPluginDef: (result) => void;
+  changePluginDef: (evt) => void;
+  removePluginDef: (evt) => void;
 }
 
 export default class SiteDetailPlugins extends React.Component<IProps, {}> {
@@ -44,30 +45,30 @@ export default class SiteDetailPlugins extends React.Component<IProps, {}> {
           </tr>
         </thead>
 
-          <DragDropContext onDragEnd={this.props.reorderPluginDef}>
-            <Droppable droppableId="droppable">
-              {provided => (
-                <tbody ref={provided.innerRef}>
-                  {this.props.pluginDefinitions.map((pluginDef, index) => (
-                      <Draggable key={pluginDef.name} draggableId={pluginDef.name} index={index}>
-                        {(provided, snapshot) => (
-                          <tr
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
-                            className="row"
-                            >
+        <DragDropContext onDragEnd={this.props.reorderPluginDef}>
+          <Droppable droppableId="droppable">
+            {provided => (
+              <tbody ref={provided.innerRef}>
+                {this.props.pluginDefinitions.map((pluginDef, index) => (
+                  <Draggable key={pluginDef.name} draggableId={pluginDef.name} index={index}>
+                    {(provided, snapshot) => (
+                      <tr
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        style={getItemStyle(snapshot.isDragging, provided.draggableProps.style)}
+                        className="row"
+                      >
 
-                            <td className="col-4">
-                              {pluginDef.name}
-                            </td>
-                            <td className="col-7">
+                        <td className="col-4">
+                          {pluginDef.name}
+                        </td>
+                        <td className="col-7">
                           {
                             //! snapshot.isDragging &&
                             (
-                              pluginDef.opts && Object.keys(pluginDef.opts).length > 0 ?
-                                Object.keys(pluginDef.opts).map(optKey => (
+                              pluginDef.opts && Object.keys(pluginDef.opts).length > 0
+                                ? Object.keys(pluginDef.opts).map(optKey => (
                                   <div className="form-group row" key={optKey}>
                                     <label htmlFor={optKey} className="col-sm-2 col-form-label">{optKey}</label>
                                     <div className="col-sm-10">
@@ -79,27 +80,31 @@ export default class SiteDetailPlugins extends React.Component<IProps, {}> {
                                     </div>
                                   </div>
                                 ))
-                                :
-                                <p>No options available</p>
+                                : <p>No options available</p>
                             )
                           }
                         </td>
                         <td className="col-1">
                           {
-                            !snapshot.isDragging &&
-                            <i data-plugin-name={pluginDef.name} onClick={this.props.removePluginDef} className="table-hover-icon far fa-trash-alt"></i>
+                            !snapshot.isDragging
+                            && <i
+                              data-plugin-name={pluginDef.name}
+                              onClick={this.props.removePluginDef}
+                              className="table-hover-icon far fa-trash-alt"
+                            >
+                            </i>
                           }
 
                         </td>
-                          </tr>
-                        )}
-                      </Draggable>
-                    ))}
-                  {provided.placeholder}
-                </tbody>
-              )}
-            </Droppable>
-          </DragDropContext>
+                      </tr>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </tbody>
+            )}
+          </Droppable>
+        </DragDropContext>
 
       </table>
     );

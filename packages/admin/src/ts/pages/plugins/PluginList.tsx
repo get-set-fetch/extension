@@ -20,7 +20,7 @@ export default class PluginList extends React.Component<{}, IState> {
       header: [
         {
           label: 'Name',
-          render: (plugin: Plugin) => plugin.name
+          render: (plugin: Plugin) => plugin.name,
         },
         {
           label: 'Code',
@@ -28,24 +28,25 @@ export default class PluginList extends React.Component<{}, IState> {
             <span style={{ textOverflow: 'ellipsis' }}>
               {!plugin.scenarioId ? plugin.code.substr(0, 100) : 'embedded plugin'}
             </span>
-          )
+          ),
         },
         {
           label: 'Actions',
           renderLink: false,
           render: (plugin: Plugin) => ([
-              <input
-                id={`delete-${plugin.id}`}
-                type='button'
-                className='btn-secondary'
-                value='Delete'
-                onClick={evt => this.deletePlugin(plugin)}
-              />
-          ])
-        }
+            <input
+              key={`delete-${plugin.id}`}
+              id={`delete-${plugin.id}`}
+              type='button'
+              className='btn-secondary'
+              value='Delete'
+              onClick={() => this.deletePlugin(plugin)}
+            />,
+          ]),
+        },
       ],
       data: [],
-      selectedRows: []
+      selectedRows: [],
     };
 
     this.deletePlugin = this.deletePlugin.bind(this);
@@ -63,13 +64,13 @@ export default class PluginList extends React.Component<{}, IState> {
   async deletePlugin(plugin: Plugin) {
     try {
       // remove plugins
-      await GsfClient.fetch(HttpMethod.DELETE, 'plugins', { ids: [plugin.id] });
+      await GsfClient.fetch(HttpMethod.DELETE, 'plugins', { ids: [ plugin.id ] });
 
       // clear row selection
       this.setState({ selectedRows: [] });
     }
     catch (err) {
-      console.log('error deleting plugins');
+      console.error('error deleting plugins');
     }
 
     this.loadPlugins();
@@ -81,9 +82,9 @@ export default class PluginList extends React.Component<{}, IState> {
       <Page
         title='Available Plugins'
         actions={[
-          <NavLink id='newplugin' to='/plugin/' className='btn btn-secondary float-right'>New Plugin</NavLink>
+          <NavLink key='newplugin' id='newplugin' to='/plugin/' className='btn btn-secondary float-right'>New Plugin</NavLink>,
         ]}
-        >
+      >
         <Table
           header={this.state.header}
           rowLink={this.rowLink}

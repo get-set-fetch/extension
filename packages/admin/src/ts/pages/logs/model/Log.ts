@@ -3,4 +3,5 @@ export default interface ILog {
   date: Date;
   cls: string;
   msg: string;
+// eslint-disable-next-line semi
 }

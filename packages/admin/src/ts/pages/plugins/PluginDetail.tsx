@@ -1,35 +1,25 @@
 import * as React from 'react';
 import { setIn } from 'immutable';
-import GsfClient from '../../components/GsfClient';
-import {HttpMethod} from 'get-set-fetch-extension-commons';
-import { History } from 'history';
-import { match } from 'react-router';
+import { HttpMethod } from 'get-set-fetch-extension-commons';
+import { NavLink, RouteComponentProps } from 'react-router-dom';
 import Plugin from './model/Plugin';
 import Page from '../../layout/Page';
-import { NavLink } from 'react-router-dom';
-
-interface IProps {
-  pluginId: string;
-  history: History;
-  match: match<{
-    pluginId: string;
-  }>
-}
+import GsfClient from '../../components/GsfClient';
 
 interface IState {
   plugin: Plugin;
 }
 
-export default class PluginDetail extends React.Component<IProps, IState> {
+export default class PluginDetail extends React.Component<RouteComponentProps<{pluginId: string}>, IState> {
   static defaultProps = {
-    pluginId: null
+    pluginId: null,
   }
 
   constructor(props) {
     super(props);
 
     this.state = {
-      plugin: null
+      plugin: null,
     };
 
     this.changeHandler = this.changeHandler.bind(this);
@@ -38,16 +28,16 @@ export default class PluginDetail extends React.Component<IProps, IState> {
 
   async componentDidMount() {
     const { pluginId } = this.props.match.params;
-    let plugin:Plugin;
+    let plugin: Plugin;
 
     // existing plugin
     if (this.props.match.params.pluginId) {
       try {
-        let pluginData:object = await GsfClient.fetch(HttpMethod.GET, `plugin/${pluginId}`);
+        const pluginData: object = await GsfClient.fetch(HttpMethod.GET, `plugin/${pluginId}`);
         plugin = new Plugin(pluginData);
       }
       catch (err) {
-        console.log('error loading plugin');
+        console.error('error loading plugin');
       }
     }
     // new plugin
@@ -61,7 +51,7 @@ export default class PluginDetail extends React.Component<IProps, IState> {
   changeHandler(evt) {
     const val = evt.target.value;
     const prop = evt.target.id;
-    this.setState({ plugin: setIn(this.state.plugin, [prop], val) });
+    this.setState({ plugin: setIn(this.state.plugin, [ prop ], val) });
   }
 
   async submitHandler(evt) {
@@ -77,7 +67,7 @@ export default class PluginDetail extends React.Component<IProps, IState> {
       this.props.history.push('/plugins');
     }
     catch (err) {
-      console.log('error saving plugin');
+      console.error('error saving plugin');
     }
   }
 
@@ -86,18 +76,18 @@ export default class PluginDetail extends React.Component<IProps, IState> {
 
     return (
       <Page
-        title={this.state.plugin.name ? this.state.plugin.name : "New Plugin"}
-        >
+        title={this.state.plugin.name ? this.state.plugin.name : 'New Plugin'}
+      >
         <form className="form-main" onSubmit={this.submitHandler}>
           <div className="form-group row">
-              <label htmlFor="name" className="col-sm-2 col-form-label text-right">Name</label>
-              <div className="col-sm-5">
-                <input
-                  id="name" type="text" className="form-control"
-                  value={this.state.plugin.name}
-                  onChange={this.changeHandler}/>
-              </div>
+            <label htmlFor="name" className="col-sm-2 col-form-label text-right">Name</label>
+            <div className="col-sm-5">
+              <input
+                id="name" type="text" className="form-control"
+                value={this.state.plugin.name}
+                onChange={this.changeHandler}/>
             </div>
+          </div>
           <div className="form-group row">
             <label htmlFor="code" className="col-sm-2 col-form-label text-right">Source Code</label>
             <div className="col-sm-5">

@@ -13,6 +13,6 @@ export default class Plugin extends Record(defaultPluginProps) implements IModul
   readonly code: string;
 
   constructor(values?: Partial<IModuleDefinition>) {
-    values ? super(values) : super();
+    super(values || {});
   }
 }

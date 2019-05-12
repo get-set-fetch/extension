@@ -8,7 +8,7 @@ const defaultProjectProps: IProjectStorage = {
   url: null,
   scenarioId: null,
   scenarioProps: {},
-  pluginDefinitions: []
+  pluginDefinitions: [],
 };
 
 export default class Project extends Record(defaultProjectProps) implements IProjectStorage {
@@ -17,9 +17,9 @@ export default class Project extends Record(defaultProjectProps) implements IPro
   readonly description: string;
   readonly url: string;
   readonly scenarioId: number;
-  readonly scenarioProps: any;
+  readonly scenarioProps;
 
   constructor(values?: Partial<IProjectStorage>) {
-    values ? super(values) : super();
+    super(values || {});
   }
 }

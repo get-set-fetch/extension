@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { setIn } from 'immutable';
-import {HttpMethod} from 'get-set-fetch-extension-commons';
+import { HttpMethod } from 'get-set-fetch-extension-commons';
 import GsfClient from '../../components/GsfClient';
 import Setting from './model/Setting';
 import Page from '../../layout/Page';
@@ -26,7 +26,7 @@ export default class SettingList extends React.Component<{}, IState> {
   }
 
   async loadSettings() {
-    const settings:Setting[] = (await GsfClient.fetch(HttpMethod.GET, 'settings')) as Setting[];
+    const settings: Setting[] = (await GsfClient.fetch(HttpMethod.GET, 'settings')) as Setting[];
     this.setState({ settings });
   }
 
@@ -39,19 +39,19 @@ export default class SettingList extends React.Component<{}, IState> {
       val = parseInt(val, 10);
     }
 
-    const idx = this.state.settings.findIndex(entry => entry.key === key)
-    this.setState({ settings: setIn(this.state.settings, [idx], {key, val}) });
+    const idx = this.state.settings.findIndex(entry => entry.key === key);
+    this.setState({ settings: setIn(this.state.settings, [ idx ], { key, val }) });
   }
 
   async submitHandler(evt) {
     evt.preventDefault();
 
-    this.state.settings.forEach(async (entry:Setting) => {
+    this.state.settings.forEach(async (entry: Setting) => {
       try {
         await GsfClient.fetch(HttpMethod.PUT, 'setting', { key: entry.key, val: entry.val });
       }
       catch (err) {
-        console.log(`error saving setting ${entry.key}`);
+        console.error(`error saving setting ${entry.key}`);
       }
     });
   }
@@ -67,12 +67,12 @@ export default class SettingList extends React.Component<{}, IState> {
           <div className="form-group row">
             <label htmlFor="name" className="col-sm-2 col-form-label text-right">Log Level</label>
             <div className="col-sm-5">
-            <select
-              id="logLevel"
-              className="custom-select mr-sm-2"
-              data-type="int"
-              onChange={this.changeHandler}
-              value={this.state.settings.find(entry => entry.key === "logLevel").val}
+              <select
+                id="logLevel"
+                className="custom-select mr-sm-2"
+                data-type="int"
+                onChange={this.changeHandler}
+                value={this.state.settings.find(entry => entry.key === 'logLevel').val}
               >
                 <option value="0">TRACE</option>
                 <option value="1">DEBUG</option>
@@ -89,9 +89,9 @@ export default class SettingList extends React.Component<{}, IState> {
               <a id="save" className="btn btn-secondary" href="#" role="button" onClick={this.submitHandler}>Save</a>
             </div>
           </div>
-         
+
         </form>
-       
+
       </Page>
     );
   }

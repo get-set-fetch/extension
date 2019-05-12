@@ -1,8 +1,5 @@
-import { ADDITIONAL_PROPERTY_FLAG } from 'react-jsonschema-form/lib/utils';
-import IconButton from 'react-jsonschema-form/lib/components/IconButton';
-import * as React from 'react';
-
-import {
+/* eslint-disable no-underscore-dangle */
+import { ADDITIONAL_PROPERTY_FLAG,
   isMultiSelect,
   isSelect,
   retrieveSchema,
@@ -12,8 +9,11 @@ import {
   getUiOptions,
   isFilesArray,
   deepEquals,
-  getSchemaType
-} from 'react-jsonschema-form/lib/utils';
+  getSchemaType } from 'react-jsonschema-form/lib/utils';
+import IconButton from 'react-jsonschema-form/lib/components/IconButton';
+import * as React from 'react';
+
+
 import UnsupportedField from 'react-jsonschema-form/lib/components/fields/UnsupportedField';
 import { FieldProps } from 'react-jsonschema-form';
 
@@ -26,7 +26,7 @@ const COMPONENT_TYPES = {
   integer: 'NumberField',
   number: 'NumberField',
   object: 'ObjectField',
-  string: 'StringField'
+  string: 'StringField',
 };
 
 function getFieldComponent(schema, uiSchema, idSchema, fields) {
@@ -48,15 +48,14 @@ function getFieldComponent(schema, uiSchema, idSchema, fields) {
 
   return componentName in fields
     ? fields[componentName]
-    : () => {
-        return (
-          <UnsupportedField
-            schema={schema}
-            idSchema={idSchema}
-            reason={`Unknown field type ${schema.type}`}
-          />
-        );
-      };
+    // eslint-disable-next-line react/display-name
+    : () => (
+      <UnsupportedField
+        schema={schema}
+        idSchema={idSchema}
+        reason={`Unknown field type ${schema.type}`}
+      />
+    );
 }
 
 function Label(props) {
@@ -120,12 +119,13 @@ function DefaultTemplate(props) {
     required,
     displayLabel,
     onKeyChange,
-    onDropPropertyClick
+    onDropPropertyClick,
   } = props;
   if (hidden) {
     return <div className='hidden'>{children}</div>;
   }
 
+  // eslint-disable-next-line no-prototype-builtins
   const additional = props.schema.hasOwnProperty(ADDITIONAL_PROPERTY_FLAG);
   const keyLabel = `${label} Key`;
 
@@ -176,7 +176,7 @@ DefaultTemplate.defaultProps = {
   hidden: false,
   readonly: false,
   required: false,
-  displayLabel: true
+  displayLabel: true,
 };
 
 function SchemaFieldRender(props) {
@@ -189,19 +189,19 @@ function SchemaFieldRender(props) {
     onKeyChange,
     onDropPropertyClick,
     required,
-    registry = getDefaultRegistry()
+    registry = getDefaultRegistry(),
   } = props;
   const {
     definitions,
     fields,
     formContext,
-    FieldTemplate = DefaultTemplate
+    FieldTemplate = DefaultTemplate,
   } = registry;
-  let idSchema = props.idSchema;
+  let { idSchema } = props;
   const schema = retrieveSchema(props.schema, definitions, formData);
   idSchema = mergeObjects(
     toIdSchema(schema, null, definitions, formData, idPrefix),
-    idSchema
+    idSchema,
   );
   const FieldComponent = getFieldComponent(schema, uiSchema, idSchema, fields);
   const { DescriptionField } = fields;
@@ -217,9 +217,8 @@ function SchemaFieldRender(props) {
   const uiOptions = getUiOptions(uiSchema);
   let { label: displayLabel = true } = uiOptions;
   if (schema.type === 'array') {
-    displayLabel =
-      isMultiSelect(schema, definitions) ||
-      isFilesArray(schema, uiSchema, definitions);
+    displayLabel = isMultiSelect(schema, definitions)
+      || isFilesArray(schema, uiSchema, definitions);
   }
   if (schema.type === 'object') {
     displayLabel = false;
@@ -251,12 +250,10 @@ function SchemaFieldRender(props) {
 
   const { type } = schema;
   const id = idSchema.$id;
-  const label =
-    uiSchema['ui:title'] || props.schema.title || schema.title || name;
-  const description =
-    uiSchema['ui:description'] ||
-    props.schema.description ||
-    schema.description;
+  const label = uiSchema['ui:title'] || props.schema.title || schema.title || name;
+  const description = uiSchema['ui:description']
+    || props.schema.description
+    || schema.description;
   const errors = __errors;
   const help = uiSchema['ui:help'];
   const hidden = uiSchema['ui:widget'] === 'hidden';
@@ -265,7 +262,7 @@ function SchemaFieldRender(props) {
     'field',
     `field-${type}`,
     errors && errors.length > 0 ? 'field-error has-error has-danger' : '',
-    uiSchema.classNames
+    uiSchema.classNames,
   ]
     .join(' ')
     .trim();
@@ -273,7 +270,7 @@ function SchemaFieldRender(props) {
   const fieldProps = {
     description: (
       <DescriptionField
-        id={id + '__description'}
+        id={`${id}__description`}
         description={description}
         formContext={formContext}
       />
@@ -296,7 +293,7 @@ function SchemaFieldRender(props) {
     formContext,
     fields,
     schema,
-    uiSchema
+    uiSchema,
   };
 
   const _AnyOfField = registry.fields.AnyOfField;
@@ -350,7 +347,7 @@ function SchemaFieldRender(props) {
   );
 }
 
-class SchemaField extends React.Component<FieldProps, any> {
+class SchemaField extends React.Component<FieldProps> {
   static defaultProps = {
     uiSchema: {},
     errorSchema: {},
@@ -360,12 +357,12 @@ class SchemaField extends React.Component<FieldProps, any> {
     autofocus: false,
   };
 
-  shouldComponentUpdate(nextProps, nextState) {
+  shouldComponentUpdate(nextProps) {
     // if schemas are equal idSchemas will be equal as well,
     // so it is not necessary to compare
     return !deepEquals(
       { ...this.props, idSchema: undefined },
-      { ...nextProps, idSchema: undefined }
+      { ...nextProps, idSchema: undefined },
     );
   }
 

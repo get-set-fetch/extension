@@ -1,9 +1,9 @@
 import * as React from 'react';
-import GsfClient from '../../components/GsfClient';
 import { HttpMethod, IHeaderCol } from 'get-set-fetch-extension-commons';
+import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
+import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
 import Table from '../../components/Table';
-import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
 
 enum ScenarioStatus {
   INSTALLED = 'Installed',
@@ -28,23 +28,27 @@ export default class ScenarioList extends React.Component<{}, IState> {
       header: [
         {
           label: 'Name',
-          render: (scenarioPkg: IAdvancedScenarioPackage) => (scenarioPkg.name)
+          render: (scenarioPkg: IAdvancedScenarioPackage) => (scenarioPkg.name),
         },
         {
           label: 'Description',
-          render: (scenarioPkg: IAdvancedScenarioPackage) => (<span style={{ textOverflow: 'ellipsis' }}>{scenarioPkg.package.description.substr(0, 100)}</span>)
+          render: (scenarioPkg: IAdvancedScenarioPackage) => (
+            <span style={{ textOverflow: 'ellipsis' }}>
+              {scenarioPkg.package.description.substr(0, 100)}
+            </span>
+          ),
         },
         {
           label: 'Homepage',
           render: (scenarioPkg: IAdvancedScenarioPackage) => (
-            <a href={scenarioPkg.package.homepage} target='_blank' className='scenario-homepage'>
+            <a href={scenarioPkg.package.homepage} target='_blank' rel="noopener noreferrer" className='scenario-homepage'>
               {scenarioPkg.package.homepage}
             </a>
-          )
+          ),
         },
         {
           label: 'Status',
-          render: (scenarioPkg: IAdvancedScenarioPackage) => (scenarioPkg.status)
+          render: (scenarioPkg: IAdvancedScenarioPackage) => (scenarioPkg.status),
         },
         {
           label: 'Actions',
@@ -66,11 +70,13 @@ export default class ScenarioList extends React.Component<{}, IState> {
                   value='Uninstall'
                   onClick={() => this.uninstallScenarioPkg(scenarioPkg)}
                 />;
+              default:
+                return null;
             }
-          }
-        }
+          },
+        },
       ],
-      scenarioPkgs: []
+      scenarioPkgs: [],
     };
 
     this.installScenarioPkg = this.installScenarioPkg.bind(this);
@@ -84,13 +90,20 @@ export default class ScenarioList extends React.Component<{}, IState> {
   async loadScenarioPackages() {
     // get installed scenario packages
     const installedPkgs: IAdvancedScenarioPackage[] = ((await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioPackage[])
-    .map(installedPkg => Object.assign(installedPkg, { status: installedPkg.builtin ? ScenarioStatus.BUILTIN : ScenarioStatus.INSTALLED } as IAdvancedScenarioPackage));
+      .map(
+        installedPkg => Object.assign(
+          installedPkg,
+          {
+            status: installedPkg.builtin ? ScenarioStatus.BUILTIN : ScenarioStatus.INSTALLED,
+          },
+        ),
+      );
 
     // get available scenario packages, only show the not already installed ones
     const installedPkgNames = installedPkgs.map(pkg => pkg.name);
     const availablePkgs: IAdvancedScenarioPackage[] = ((await GsfClient.fetch(HttpMethod.GET, 'scenarios/available')) as IScenarioPackage[])
-    .filter(availablePkg => installedPkgNames.indexOf(availablePkg.name) === -1)
-    .map(availablePkg => Object.assign(availablePkg, { status: ScenarioStatus.AVAILABLE } as IAdvancedScenarioPackage));
+      .filter(availablePkg => installedPkgNames.indexOf(availablePkg.name) === -1)
+      .map(availablePkg => Object.assign(availablePkg, { status: ScenarioStatus.AVAILABLE }));
 
     this.setState({ scenarioPkgs: installedPkgs.concat(availablePkgs) });
   }
@@ -104,7 +117,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
 
   async uninstallScenarioPkg(scenarioPkg) {
     // delete scenario
-    await GsfClient.fetch(HttpMethod.DELETE, 'scenarios', { ids: [scenarioPkg.id] });
+    await GsfClient.fetch(HttpMethod.DELETE, 'scenarios', { ids: [ scenarioPkg.id ] });
     // re-load scenario list
     await this.loadScenarioPackages();
   }
@@ -116,7 +129,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
     return (
       <Page
         title='Scenarios'
-        >
+      >
         <Table
           header={this.state.header}
           data={this.state.scenarioPkgs}

@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-shadow */
 import * as React from 'react';
 
 function BaseInput(props) {
@@ -14,21 +16,16 @@ function BaseInput(props) {
     onBlur,
     onFocus,
     options,
-    schema,
-    formContext,
-    registry,
     rawErrors,
     ...inputProps
   } = props;
 
   inputProps.type = options.inputType || inputProps.type || 'text';
-  const _onChange = ({ target: { value } }) => {
-    return props.onChange(value === '' ? options.emptyValue : value);
-  };
+  const _onChange = ({ target: { value } }) => props.onChange(value === '' ? options.emptyValue : value);
 
   return (
     <input
-      className={['form-control', rawErrors && rawErrors.length > 0 ? 'is-invalid': ''].join(' ')}
+      className={[ 'form-control', rawErrors && rawErrors.length > 0 ? 'is-invalid' : '' ].join(' ')}
       readOnly={readonly}
       disabled={disabled}
       autoFocus={autofocus}
@@ -46,7 +43,7 @@ BaseInput.defaultProps = {
   required: false,
   disabled: false,
   readonly: false,
-  autofocus: false
+  autofocus: false,
 };
 
 export default BaseInput;

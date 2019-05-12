@@ -1,30 +1,30 @@
-import { Record } from "immutable";
-import PluginDefinition from "./PluginDefinition";
+import { Record } from 'immutable';
+import PluginDefinition from './PluginDefinition';
 
-interface CrawlOptions {
-  delay:number;
-  maxResources:number;
+interface ICrawlOptions {
+  delay: number;
+  maxResources: number;
 }
 
-interface ResourceFilterOptions {
+interface IResourceFilterOptions {
   maxEntries: number;
   probability: number;
 }
 
-interface SiteOptions {
-  crawl:CrawlOptions;
-  resourceFilter:ResourceFilterOptions;
+interface ISiteOptions {
+  crawl: ICrawlOptions;
+  resourceFilter: IResourceFilterOptions;
 }
 
-interface SiteProps {
+interface ISiteProps {
   id: string;
   name: string;
   url: string;
   pluginDefinitions: PluginDefinition[];
-  opts: SiteOptions;
+  opts: ISiteOptions;
 }
 
-const defaultSiteProps: SiteProps = {
+const defaultSiteProps: ISiteProps = {
   id: null,
   name: null,
   url: null,
@@ -32,21 +32,21 @@ const defaultSiteProps: SiteProps = {
   opts: {
     crawl: {
       delay: 200,
-      maxResources: -1
+      maxResources: -1,
     },
     resourceFilter: {
       maxEntries: 5000,
       probability: 0.01,
     },
-  }
-}
+  },
+};
 
-export default class Site extends Record(defaultSiteProps) implements SiteProps {
+export default class Site extends Record(defaultSiteProps) implements ISiteProps {
   public readonly id: string;
   public readonly name: string;
   public readonly url: string;
 
-  public constructor(values?: Partial<SiteProps>) {
-    values ? super(values) : super()
+  public constructor(values?: Partial<ISiteProps>) {
+    super(values || {});
   }
 }

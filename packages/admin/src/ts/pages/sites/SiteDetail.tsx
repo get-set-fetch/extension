@@ -1,32 +1,20 @@
 import * as React from 'react';
-import { History, Location } from 'history';
-import { match } from 'react-router';
 import { setIn, removeIn } from 'immutable';
 import * as queryString from 'query-string';
+import { HttpMethod } from 'get-set-fetch-extension-commons';
+import { NavLink, RouteComponentProps } from 'react-router-dom';
 import GsfClient from '../../components/GsfClient';
-import {HttpMethod} from 'get-set-fetch-extension-commons';
 import SiteDetailPlugins from './SiteDetailPlugins';
 import Site from './model/Site';
 import PluginDefinition from './model/PluginDefinition';
 import Page from '../../layout/Page';
-import { NavLink } from 'react-router-dom';
-
-
-interface IProps {
-  siteId: string;
-  history: History;
-  location: Location;
-  match: match<{
-    siteId: string;
-  }>
-}
 
 interface IState {
-  site:Site;
-  availablePluginDefinitions:PluginDefinition[];
+  site: Site;
+  availablePluginDefinitions: PluginDefinition[];
 }
 
-export default class SiteDetail extends React.Component<IProps, IState> {
+export default class SiteDetail extends React.Component<RouteComponentProps<{siteId: string}>, IState> {
   constructor(props) {
     super(props);
     this.state = {
@@ -45,7 +33,7 @@ export default class SiteDetail extends React.Component<IProps, IState> {
 
   async componentDidMount() {
     const { siteId } = this.props.match.params;
-    let site:Site;
+    let site: Site;
 
     // existing site
     if (this.props.match.params.siteId) {
@@ -54,7 +42,7 @@ export default class SiteDetail extends React.Component<IProps, IState> {
         site = new Site(data);
       }
       catch (err) {
-        console.log('error loading site');
+        console.error('error loading site');
       }
     }
     // new site
@@ -67,13 +55,13 @@ export default class SiteDetail extends React.Component<IProps, IState> {
     }
     this.setState({ site });
 
-    const availablePluginDefinitions:PluginDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'plugindefs/available')) as PluginDefinition[];
+    const availablePluginDefinitions: PluginDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'plugindefs/available')) as PluginDefinition[];
     this.setState({ availablePluginDefinitions });
 
     // default plugins for a new site
     if (!this.props.match.params.siteId) {
       const defaultPluginDefinition = await GsfClient.fetch(HttpMethod.GET, 'plugindefs/default');
-      this.setState({ site: setIn(this.state.site, ['pluginDefinitions'], defaultPluginDefinition) });
+      this.setState({ site: setIn(this.state.site, [ 'pluginDefinitions' ], defaultPluginDefinition) });
     }
   }
 
@@ -96,7 +84,7 @@ export default class SiteDetail extends React.Component<IProps, IState> {
       this.props.history.push('/sites');
     }
     catch (err) {
-      console.log('error saving site');
+      console.error('error saving site');
     }
   }
 
@@ -106,7 +94,7 @@ export default class SiteDetail extends React.Component<IProps, IState> {
       name: pluginToBeAdded.name,
       opts: pluginToBeAdded.opts,
     });
-    this.setState({ site: setIn(this.state.site, ['pluginDefinitions'], newPluginDefinitions) });
+    this.setState({ site: setIn(this.state.site, [ 'pluginDefinitions' ], newPluginDefinitions) });
   }
 
   removePluginDef(evt) {
@@ -115,9 +103,7 @@ export default class SiteDetail extends React.Component<IProps, IState> {
     const pluginName = evt.target.getAttribute('data-plugin-name');
     const pluginIdx = this.state.site.pluginDefinitions.findIndex(pluginDef => pluginDef.name === pluginName);
 
-    const newsite = removeIn(this.state.site, ['pluginDefinitions', pluginIdx]);
-    console.log(newsite);
-
+    const newsite = removeIn(this.state.site, [ 'pluginDefinitions', pluginIdx ]);
     this.setState({ site: newsite });
   }
 
@@ -127,7 +113,7 @@ export default class SiteDetail extends React.Component<IProps, IState> {
     const pluginName = evt.target.getAttribute('data-plugin-name');
     const pluginIdx = this.state.site.pluginDefinitions.findIndex(pluginDef => pluginDef.name === pluginName);
 
-    this.setState({ site: setIn(this.state.site, ['pluginDefinitions', pluginIdx, 'opts', optKey], optVal) });
+    this.setState({ site: setIn(this.state.site, [ 'pluginDefinitions', pluginIdx, 'opts', optKey ], optVal) });
   }
 
   reorderPluginDef(result) {
@@ -137,10 +123,10 @@ export default class SiteDetail extends React.Component<IProps, IState> {
     }
 
     const newPluginDefinitions = this.state.site.pluginDefinitions.slice();
-    const [removed] = newPluginDefinitions.splice(result.source.index, 1);
+    const [ removed ] = newPluginDefinitions.splice(result.source.index, 1);
     newPluginDefinitions.splice(result.destination.index, 0, removed);
 
-    this.setState({ site: setIn(this.state.site, ['pluginDefinitions'], newPluginDefinitions) });
+    this.setState({ site: setIn(this.state.site, [ 'pluginDefinitions' ], newPluginDefinitions) });
   }
 
   getNotUsedPluginDefinitions() {
@@ -156,18 +142,18 @@ export default class SiteDetail extends React.Component<IProps, IState> {
 
     return (
       <Page
-        title={this.state.site.name ? this.state.site.name : "New Site"}
+        title={this.state.site.name ? this.state.site.name : 'New Site'}
       >
         <form className="form-main">
           <div className="form-group row">
-              <label htmlFor="name" className="col-sm-2 col-form-label text-right">Name</label>
-              <div className="col-sm-5">
-                <input
-                  id="name" type="text" className="form-control"
-                  value={this.state.site.name}
-                  onChange={this.changeHandler.bind(this)}/>
-              </div>
+            <label htmlFor="name" className="col-sm-2 col-form-label text-right">Name</label>
+            <div className="col-sm-5">
+              <input
+                id="name" type="text" className="form-control"
+                value={this.state.site.name}
+                onChange={this.changeHandler.bind(this)}/>
             </div>
+          </div>
           <div className="form-group row">
             <label htmlFor="url" className="col-sm-2 col-form-label text-right">URL</label>
             <div className="col-sm-5">
@@ -227,28 +213,28 @@ export default class SiteDetail extends React.Component<IProps, IState> {
                 reorderPluginDef={this.reorderPluginDef}
                 changePluginDef={this.changePluginDef}
                 removePluginDef={this.removePluginDef}
-                />
+              />
 
-                <div className="row" key="ctrl">
-                  <div className="btn-group">
-                    <button
-                      type="button" className="btn btn-primary dropdown-toggle"
-                      data-toggle="dropdown"
-                      aria-haspopup="true" aria-expanded="false"
-                      disabled={notUsedPluginDefs.length === 0}>
+              <div className="row" key="ctrl">
+                <div className="btn-group">
+                  <button
+                    type="button" className="btn btn-primary dropdown-toggle"
+                    data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false"
+                    disabled={notUsedPluginDefs.length === 0}>
                       Add Plugin
-                    </button>
-                    <div className="dropdown-menu">
-                      {
-                        notUsedPluginDefs.map(pluginDef => (
-                          <a key={pluginDef.name} className="dropdown-item" href="#" onClick={() => this.addPluginDef(pluginDef.name)}>
-                            {pluginDef.name}
-                          </a>
-                        ))
-                      }
-                    </div>
+                  </button>
+                  <div className="dropdown-menu">
+                    {
+                      notUsedPluginDefs.map(pluginDef => (
+                        <a key={pluginDef.name} className="dropdown-item" href="#" onClick={() => this.addPluginDef(pluginDef.name)}>
+                          {pluginDef.name}
+                        </a>
+                      ))
+                    }
                   </div>
                 </div>
+              </div>
             </div>
           </div>
 
