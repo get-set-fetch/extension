@@ -28,7 +28,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // stub ExtractUrlPlugin, the only one running in tab via "runInTab"
     sinon.stub(PluginManager, 'runInTab').callsFake((tabId, plugin, site, resource) => {
-      plugin.extractResourceUrls = () => [`http://siteA/page-${resource.depth + 1}.html`];
+      plugin.extractResourceUrls = () => [ `http://siteA/page-${resource.depth + 1}.html` ];
       resource.mediaType = 'html';
       const isApplicable = plugin.test(resource);
       return isApplicable ? plugin.apply(site, resource) : null;
@@ -40,7 +40,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     await Site.delAll();
 
     // save site
-    const testPlugins = ['SelectResourcePlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin'];
+    const testPlugins = [ 'SelectResourcePlugin', 'ExtractUrlPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin' ];
     const pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(pluginDef => testPlugins.indexOf(pluginDef.name) !== -1);
     site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions });
     await site.save();
@@ -53,7 +53,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
   it('crawl all available resources', async () => {
     const maxResources = 5;
     site.pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
-      pluginDef => ['SelectResourcePlugin', 'UpdateResourcePlugin'].indexOf(pluginDef.name) !== -1
+      pluginDef => [ 'SelectResourcePlugin', 'UpdateResourcePlugin' ].indexOf(pluginDef.name) !== -1,
     );
 
     // save 4 additional resources, an initial resource is created when the site is created
@@ -102,7 +102,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // keep the plugins to a minimum
     site.pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
-      pluginDef => ['SelectResourcePlugin', 'UpdateResourcePlugin'].indexOf(pluginDef.name) !== -1
+      pluginDef => [ 'SelectResourcePlugin', 'UpdateResourcePlugin' ].indexOf(pluginDef.name) !== -1,
     );
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');

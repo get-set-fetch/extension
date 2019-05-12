@@ -1,7 +1,4 @@
 import { IModuleDefinition } from 'get-set-fetch-extension-commons';
-import Logger from '../logger/Logger';
-
-const Log = Logger.getLogger('BaseModuleManager');
 
 export default class BaseModuleManager {
   static getFileContent(fileEntry: FileEntry): Promise<string> {
@@ -29,7 +26,8 @@ export default class BaseModuleManager {
                 moduleFileEntries.map(async moduleFileEntry => {
                   const code = await BaseModuleManager.getFileContent(moduleFileEntry);
                   const name = moduleFileEntry.name.match(/^(\w+).js$/)[1];
-                  return { name, code } as IModuleDefinition;
+                  const moduleDef: IModuleDefinition = { name, code };
+                  return moduleDef;
                 }),
               );
 

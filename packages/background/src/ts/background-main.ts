@@ -7,13 +7,13 @@ const Log = Logger.getLogger('background-main');
 (async () => {
   try {
     // handle toolbar click
-    chrome.browserAction.onClicked.addListener(tab => {
+    chrome.browserAction.onClicked.addListener(() => {
       const adminUrl = chrome.runtime.getURL('admin/admin.html');
       chrome.tabs.create({ url: adminUrl });
     });
 
     // handle install / uninstall events
-    chrome.runtime.onInstalled.addListener(details => {
+    chrome.runtime.onInstalled.addListener(() => {
       chrome.tabs.create({ url: 'https://getsetfetch.org/extension/thank-you-install.html' });
     });
     chrome.runtime.setUninstallURL('https://getsetfetch.org/extension/thank-you-uninstall.html');

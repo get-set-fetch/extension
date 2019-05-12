@@ -20,12 +20,12 @@ describe('Test PluginManager', () => {
       {
         name: 'SelectResourcePlugin',
         opts: {
-          crawlFrequency: -1
-        }
+          crawlFrequency: -1,
+        },
       },
       {
         name: 'ExtensionFetchPlugin',
-        opts: undefined
+        opts: undefined,
       },
       {
         name: 'ExtractUrlPlugin',
@@ -33,17 +33,17 @@ describe('Test PluginManager', () => {
           allowNoExtension: true,
           extensionRe: null,
           maxDepth: -1,
-          runInTab: true
-        }
+          runInTab: true,
+        },
       },
       {
         name: 'UpdateResourcePlugin',
-        opts: undefined
+        opts: undefined,
       },
       {
         name: 'InsertResourcePlugin',
-        opts: undefined
-      }
+        opts: undefined,
+      },
     ];
     const actualPlugins = await PluginManager.instantiate(PluginManager.getDefaultPluginDefs());
     const actualPluginInfo = actualPlugins.map(plugin => ({ name: plugin.constructor.name, opts: plugin.opts }));

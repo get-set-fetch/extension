@@ -9,11 +9,11 @@ define global browser window and register indexeddbshim under it with no window.
 global.window = global;
 setGlobalVars(global.window, {
   checkOrigin: false,
-  memoryDatabase: ':memory:'
+  memoryDatabase: ':memory:',
 });
 
 // init jsdom environment for testing plugins running in browser
-const dom = new JSDOM(`<!DOCTYPE html><p>Hello world</p>`);
+const dom = new JSDOM('<!DOCTYPE html><p>Hello world</p>');
 global.window.document = dom.window.document;
 
 // "polyfill" fetch in order to have something to stub

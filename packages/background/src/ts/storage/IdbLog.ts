@@ -64,9 +64,9 @@ export default class IdbLog extends BaseEntity {
   constructor(kwArgs: Partial<ILog> = {}) {
     super();
 
-    for (const key in kwArgs) {
-      this[key] = kwArgs[key];
-    }
+    Object.keys(kwArgs).forEach(kwArgKey => {
+      this[kwArgKey] = kwArgs[kwArgKey];
+    });
 
     this.date = kwArgs.date ? kwArgs.date : new Date();
   }

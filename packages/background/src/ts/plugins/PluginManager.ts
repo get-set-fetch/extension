@@ -87,19 +87,20 @@ class PluginManager extends BaseModuleManager {
   }
 
   static async instantiate(pluginDefinitions): Promise<IPlugin[]> {
-    const pluginInstances: IPlugin[] = [];
+    return Promise.all(
+      pluginDefinitions.map(async pluginDef => {
+        Log.info(`Instantiating plugin ${pluginDef.name}`);
 
-    for (const pluginDef of pluginDefinitions) {
-      Log.info(`Instantiating plugin ${pluginDef.name}`);
+        if (!PluginManager.cache.get(pluginDef.name)) {
+          await PluginManager.register(pluginDef.name);
+        }
 
-      if (!PluginManager.cache.get(pluginDef.name)) {
-        await PluginManager.register(pluginDef.name);
-      }
+        const ClassDef = PluginManager.cache.get(pluginDef.name).module.default;
+        const pluginInstance = new (ClassDef)(pluginDef.opts);
 
-      const classDef = PluginManager.cache.get(pluginDef.name).module.default;
-      const pluginInstance = new (classDef)(pluginDef.opts);
-      pluginInstances.push(pluginInstance);
-    }
+        return pluginInstance;
+      }),
+    );
 
     /*
     to do: handle missing plugin definitions
@@ -107,13 +108,10 @@ class PluginManager extends BaseModuleManager {
     Log.warn(`pluginDefinition for ${pluginDefinition.name} not found`);
     return null;
     */
-
-    return pluginInstances;
   }
 
   static async runInTab(tabId, pluginInstance, site, resource) {
     const pluginName = pluginInstance.constructor.name;
-
     const pluginInfo = PluginManager.cache.get(pluginName);
 
     /*
@@ -125,6 +123,7 @@ class PluginManager extends BaseModuleManager {
      */
     const moduleClasses = pluginInfo.code.match(/(class \w+ {([\s\S](?!(class \w+ {)|export .*))+)/gm);
     for (let i = 0; i < moduleClasses.length; i += 1) {
+      // eslint-disable-next-line no-await-in-loop
       await ActiveTabHelper.executeScript(tabId, { code: moduleClasses[i] });
     }
 

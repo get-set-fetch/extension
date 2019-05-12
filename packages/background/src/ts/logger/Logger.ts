@@ -74,7 +74,6 @@ export default class Logger {
       logEntry.msg = Logger.stringifyArgs(args);
     }
 
-    console.log(logEntry);
     logEntry.save();
   }
 }

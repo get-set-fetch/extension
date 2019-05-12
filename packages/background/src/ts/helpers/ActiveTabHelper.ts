@@ -25,7 +25,7 @@ export default class ActiveTabHelper {
     });
   }
 
-  static create(createProperties = {}) {
+  static create(createProperties = {}): Promise<chrome.tabs.Tab> {
     return new Promise(resolve => {
       chrome.tabs.create(
         createProperties || {},

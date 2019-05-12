@@ -8,7 +8,6 @@ import IdbResource from './IdbResource';
 const Log = Logger.getLogger('IdbProject');
 
 /* eslint-disable class-methods-use-this */
-
 export default class IdbProject extends BaseEntity implements IProjectStorage {
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
@@ -88,12 +87,11 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
   static async getAllResources(projectId: number): Promise<IdbResource[]> {
     const project = await IdbProject.get(projectId);
     const sites = await IdbSite.getAll(project.id);
-    let resources = [];
 
-    for (let i = 0; i < sites.length; i += 1) {
-      const currentResources = await IdbResource.getAll(sites[i].id);
-      resources = resources.concat(currentResources);
-    }
+    const nestedResources = await Promise.all(
+      sites.map(site => IdbResource.getAll(site.id)),
+    );
+    const resources = nestedResources.reduce((acc, val) => acc.concat(val), []);
 
     return resources;
   }
@@ -141,9 +139,9 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
   constructor(kwArgs: Partial<IProjectStorage> = {}) {
     super();
 
-    for (const key in kwArgs) {
-      this[key] = kwArgs[key];
-    }
+    Object.keys(kwArgs).forEach(kwArgKey => {
+      this[kwArgKey] = kwArgs[kwArgKey];
+    });
   }
 
   save(): Promise<number> {
@@ -196,15 +194,17 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
   async crawl() {
     const sites = await IdbSite.getAll(this.id);
 
-    // tslint:disable-next-line:prefer-for-of
-    for (let i = 0; i < sites.length; i++) {
-      // open a new tab for the current site to be crawled into
-      const tab = await ActiveTabHelper.create();
-      sites[i].tabId = tab.id;
+    return Promise.all(
+      sites.map(async site => {
+        // open a new tab for the current site to be crawled into
+        const tab = await ActiveTabHelper.create();
+        // eslint-disable-next-line no-param-reassign
+        site.tabId = tab.id;
 
-      // start crawling
-      sites[i].crawl();
-    }
+        // start crawling
+        site.crawl();
+      }),
+    );
   }
 
   serializeWithoutId() {

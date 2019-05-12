@@ -57,19 +57,15 @@
     "puppeteer": "^1.12.2",
     "rimraf": "^2.6.2",
     "rollup-plugin-commonjs": "9.1.4",
-    "rollup-plugin-eslint": "^5.1.0",
     "rollup-plugin-ignore": "^1.0.3",
     "rollup-plugin-json": "^3.0.0",
     "rollup-plugin-node-globals": "^1.2.1",
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-plugin-typescript": "^1.0.0",
     "sinon": "^6.1.4",
-    "ts-node": "^7.0.1",
+    "ts-node": "^8.1.0",
     "tslib": "^1.9.3",
-    "tslint": "^5.12.0",
-    "tslint-config-airbnb": "^5.11.1",
-    "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.2.2"
   },
   "dependencies": {
     "get-set-fetch": "^0.3.8",

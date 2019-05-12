@@ -1,5 +1,5 @@
 
-import { SchemaHelper, IPlugin, IResource, ISite } from 'get-set-fetch-extension-commons';
+import { SchemaHelper, IPlugin, IResource } from 'get-set-fetch-extension-commons';
 
 export default class ExtractTitlePlugin implements IPlugin {
   opts: {
@@ -29,7 +29,7 @@ export default class ExtractTitlePlugin implements IPlugin {
     return resource.mediaType.indexOf('html') !== -1;
   }
 
-  apply(site: ISite, resource: IResource) {
+  apply() {
     return {
       info: {
         title: document.title,

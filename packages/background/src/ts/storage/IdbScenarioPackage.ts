@@ -85,7 +85,7 @@ export default class IdbScenarioPackage extends BaseEntity implements IScenarioP
       return null;
     }
 
-    // tslint:disable-next-line:no-shadowed-variable
+    // eslint-disable-next-line no-shadow
     return new Promise((resolve, reject) => {
       if (ids && ids.length > 0) {
         this.delSome(ids, resolve, reject);
@@ -105,9 +105,9 @@ export default class IdbScenarioPackage extends BaseEntity implements IScenarioP
   constructor(kwArgs: Partial<IScenarioPackage> = {}) {
     super();
 
-    for (const key in kwArgs) {
-      this[key] = kwArgs[key];
-    }
+    Object.keys(kwArgs).forEach(kwArgKey => {
+      this[kwArgKey] = kwArgs[kwArgKey];
+    });
   }
 
   save(): Promise<number> {

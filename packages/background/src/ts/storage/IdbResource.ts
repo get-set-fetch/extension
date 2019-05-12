@@ -165,7 +165,7 @@ export default class IdbResource extends BaseResource {
       return null;
     }
 
-    // tslint:disable-next-line:no-shadowed-variable
+    // eslint-disable-next-line no-shadow
     return new Promise((resolve, reject) => {
       if (ids && ids.length > 0) {
         this.delSome(ids, resolve, reject);
@@ -188,9 +188,11 @@ export default class IdbResource extends BaseResource {
 
   constructor(kwArgs: Partial<IResource> = {}) {
     super(kwArgs.siteId, kwArgs.url, kwArgs.depth);
-    for (const key in kwArgs) {
-      this[key] = kwArgs[key];
-    }
+
+    Object.keys(kwArgs).forEach(kwArgKey => {
+      this[kwArgKey] = kwArgs[kwArgKey];
+    });
+
     this.crawledAt = kwArgs.crawledAt ? kwArgs.crawledAt : new Date(0);
   }
 

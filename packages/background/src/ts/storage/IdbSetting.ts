@@ -66,9 +66,9 @@ export default class IdbSetting extends BaseEntity {
   constructor(kwArgs: Partial<ISetting> = {}) {
     super();
 
-    for (const key in kwArgs) {
-      this[key] = kwArgs[key];
-    }
+    Object.keys(kwArgs).forEach(kwArgKey => {
+      this[kwArgKey] = kwArgs[kwArgKey];
+    });
   }
 
   save(): Promise<number> {

@@ -1,11 +1,11 @@
-// tslint:disable:no-var-requires
+import { IModuleDefinition, IModuleInfo } from 'get-set-fetch-extension-commons';
+import GsfProvider from '../../src/ts/storage/GsfProvider';
+
+import PluginManager from '../../src/ts/plugins/PluginManager';
+import IdbPlugin from '../../src/ts/storage/IdbPlugin';
+
 const fs = require('fs');
 const path = require('path');
-
-import GsfProvider from '../../src/ts/storage/GsfProvider';
-import PluginManager from '../../src/ts/plugins/PluginManager';
-import { IModuleDefinition, IModuleInfo } from 'get-set-fetch-extension-commons';
-import IdbPlugin from '../../src/ts/storage/IdbPlugin';
 
 declare global {
   namespace NodeJS {
@@ -32,7 +32,7 @@ export default class ModuleHelper {
       moduleInfo = {
         code: plugin.code,
         module: pluginModule,
-        url: null
+        url: null,
       };
 
       PluginManager.cache.set(name, moduleInfo);
@@ -50,7 +50,7 @@ export default class ModuleHelper {
 
     // register them in PluginManager.cache
     await Promise.all(
-      PluginManager.DEFAULT_PLUGINS.map(defaultPluginName => PluginManager.register(defaultPluginName))
+      PluginManager.DEFAULT_PLUGINS.map(defaultPluginName => PluginManager.register(defaultPluginName)),
     );
   }
 
@@ -65,7 +65,7 @@ export default class ModuleHelper {
         const pluginName = pluginDirent.name.match(/^(\w+).js$/)[1];
         modules.push({
           name: pluginName,
-          code: pluginContent
+          code: pluginContent,
         });
       }
 

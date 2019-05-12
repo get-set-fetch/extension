@@ -9,7 +9,7 @@ import Logger from '../logger/Logger';
 import IdbPlugin from '../storage/IdbPlugin';
 import IdbScenarioPackage from '../storage/IdbScenarioPackage';
 
-const Log = Logger.getLogger('PluginManager');
+const Log = Logger.getLogger('ScenarioManager');
 export default class ScenarioManager extends BaseModuleManager {
   static cache: Map<string, IModuleInfo> = new Map();
 

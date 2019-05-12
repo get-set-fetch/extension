@@ -61,6 +61,7 @@ export default class IdbSite extends BaseEntity {
         else {
           try {
             for (let i = 0; i < result.length; i += 1) {
+              // eslint-disable-next-line no-await-in-loop
               Object.assign(result[i], (await this.parseResult(result[i])));
               result[i] = new IdbSite(result[i]);
             }
@@ -150,9 +151,9 @@ export default class IdbSite extends BaseEntity {
   constructor(kwArgs: Partial<ISite> = {}) {
     super();
 
-    for (const key in kwArgs) {
-      this[key] = kwArgs[key];
-    }
+    Object.keys(kwArgs).forEach(kwArgKey => {
+      this[kwArgKey] = kwArgs[kwArgKey];
+    });
 
     if (!kwArgs.crawlOpts) {
       this.crawlOpts = {
@@ -187,8 +188,11 @@ export default class IdbSite extends BaseEntity {
     let resourcesNo = (await IdbSite.getAllIds()).length;
     let resource;
     do {
+      // eslint-disable-next-line no-await-in-loop
       await new Promise(resolve => setTimeout(resolve, this.crawlOpts.delay));
+
       try {
+        // eslint-disable-next-line no-await-in-loop
         resource = await this.crawlResource();
       }
       catch (err) {
@@ -209,7 +213,9 @@ export default class IdbSite extends BaseEntity {
       let resource = null;
       for (let i = 0; i < this.plugins.length; i += 1) {
         try {
+          // eslint-disable-next-line no-await-in-loop
           const result = await this.executePlugin(this.plugins[i], resource);
+
           if (resource === null) {
             resource = result;
           }
@@ -262,14 +268,14 @@ export default class IdbSite extends BaseEntity {
     );
 
     if (plugin.opts && plugin.opts.runInTab) {
-      return await PluginManager.runInTab(this.tabId, plugin, this, resource);
+      return PluginManager.runInTab(this.tabId, plugin, this, resource);
     }
 
     // test if plugin is aplicable
     const isApplicable = await plugin.test(resource);
 
     if (isApplicable) {
-      return await plugin.apply(this, resource);
+      return plugin.apply(this, resource);
     }
 
     return null;
