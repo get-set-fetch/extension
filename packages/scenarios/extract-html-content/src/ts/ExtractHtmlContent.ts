@@ -22,10 +22,7 @@ export default class ExtractHtmlContent implements IScenario {
         name: 'FetchPlugin'
       },
       {
-        name: 'ExtractUrlsPlugin',
-        opts: {
-          maxDepth: scenarioProps.maxDepth
-        }
+        name: 'ExtractUrlsPlugin'
       },
       {
         name: 'ExtractHtmlContentPlugin',

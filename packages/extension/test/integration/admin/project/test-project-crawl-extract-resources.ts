@@ -6,12 +6,14 @@ const crawlDefinitions: ICrawlDefinition[] = [
     project: {
       name: 'projA',
       description: 'descriptionA',
-      url: 'https://www.sitea.com/index.html'
+      url: 'https://www.sitea.com/index.html',
+      crawlOpts: {
+        maxDepth: -1
+      }
     },
     scenarioProps: {
       name: 'get-set-fetch-scenario-extract-resources',
       extensionRe: '/^(html|htm|php|png)$/i',
-      maxDepth: -1
     },
     expectedResources: [
       { url: 'https://www.sitea.com/index.html', mediaType: 'text/html', info: {} },

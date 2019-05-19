@@ -12,7 +12,12 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
   const expectedProject = {
     id: null,
     name: 'projectA',
-    url: 'http://siteA'
+    url: 'http://siteA',
+    crawlOpts: {
+      maxDepth: 11,
+      maxResources: 101,
+      crawlDelay: 1001,
+    },
   };
 
   before(async () => {
@@ -24,7 +29,7 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     await Project.delAll();
 
     // save project
-    const project = new Project({ name: expectedProject.name, url: expectedProject.url });
+    const project = new Project(expectedProject);
     await project.save();
     assert.isNotNull(project.id);
     expectedProject.id = project.id;
@@ -40,12 +45,14 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     assert.instanceOf(projectById, Project);
     assert.strictEqual(expectedProject.name, projectById.name);
     assert.strictEqual(expectedProject.url, projectById.url);
+    assert.deepEqual(expectedProject.crawlOpts, projectById.crawlOpts);
 
     // get project by name
     const projectByName = await Project.get(expectedProject.name);
     assert.instanceOf(projectByName, Project);
     assert.strictEqual(String(expectedProject.id), String(projectByName.id));
     assert.strictEqual(expectedProject.url, projectByName.url);
+    assert.deepEqual(expectedProject.crawlOpts, projectByName.crawlOpts);
 
     // get corresponding site
     const projectSite = await Site.get(`${expectedProject.name}-1`);
@@ -58,12 +65,14 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     const updateProject = await Project.get(expectedProject.id);
     updateProject.name = 'projectA_updated';
     updateProject.url = 'http://siteA/updated';
+    updateProject.crawlOpts.maxDepth = 21;
     await updateProject.update();
 
     // get and compare
     const getProject = await Project.get(expectedProject.id);
     assert.strictEqual(updateProject.name, getProject.name);
     assert.strictEqual(updateProject.url, getProject.url);
+    assert.strictEqual(updateProject.crawlOpts.maxDepth, getProject.crawlOpts.maxDepth);
   });
 
   it('delete', async () => {

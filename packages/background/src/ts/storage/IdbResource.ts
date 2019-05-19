@@ -185,6 +185,7 @@ export default class IdbResource extends BaseResource {
   info: any;
   blob: any;
   mediaType: string;
+  urlsToAdd: string[];
 
   constructor(kwArgs: Partial<IResource> = {}) {
     super(kwArgs.siteId, kwArgs.url, kwArgs.depth);

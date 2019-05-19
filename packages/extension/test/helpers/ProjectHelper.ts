@@ -26,6 +26,21 @@ export default class ProjectHelper {
     await page.type('input#root_description', project.description);
     await page.type('input#root_url', project.url);
 
+    if (project.crawlOpts && project.crawlOpts.maxDepth) {
+      await page.evaluate( () => (document.getElementById('root_crawlOpts_maxDepth') as HTMLInputElement).value = '');
+      await page.type('input#root_crawlOpts_maxDepth', project.crawlOpts.maxDepth.toString());
+    }
+
+    if (project.crawlOpts && project.crawlOpts.maxResources) {
+      await page.evaluate( () => (document.getElementById('root_crawlOpts_maxResources') as HTMLInputElement).value = '');
+      await page.type('input#root_crawlOpts_maxResources', project.crawlOpts.maxResources.toString());
+    }
+
+    if (project.crawlOpts && project.crawlOpts.crawlDelay) {
+      await page.evaluate( () => (document.getElementById('root_crawlOpts_crawlDelay') as HTMLInputElement).value = '');
+      await page.type('input#root_crawlOpts_crawlDelay', project.crawlOpts.crawlDelay.toString());
+    }
+
     // fill in dropdown scenario
     await page.select('#root_scenarioId', scenarioId.toString());
 

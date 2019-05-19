@@ -34,8 +34,6 @@ export default class ExtractHtmlContentPlugin implements IPlugin {
   }
 
   apply(site: ISite, resource: IResource) {
-    console.log('this.opts.selectors');
-    console.log(this.opts.selectors);
     const selectors: string[] = this.opts.selectors.split('\n');
     const textResult = selectors.reduce(
       (result, selector) => {

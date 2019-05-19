@@ -59,6 +59,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     // save 4 additional resources, an initial resource is created when the site is created
     for (let i = 1; i < maxResources - 1; i += 1) {
       const resource = new Resource({ siteId: site.id, url: `url-${i}`, depth: 1 });
+      // eslint-disable-next-line no-await-in-loop
       await resource.save();
     }
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
@@ -82,28 +83,34 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
   it('crawl until maxResources is reached', async () => {
     // define maxResources threshold
     const maxResources = 7;
-    site.crawlOpts.maxResources = maxResources;
 
     // make sure maxDepth is not reached before reaching maxResources threshold
-    const extractUrlPlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlsPlugin');
-    extractUrlPlugDef.opts.maxDepth = 100;
+    const extractUrlsPlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlsPlugin');
+    extractUrlsPlugDef.opts.maxDepth = 100;
+
+    const insertResourcePlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'InsertResourcePlugin');
+    insertResourcePlugDef.opts.maxResources = maxResources;
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
     await site.crawl();
 
-    // when saving a new site, a resource with the same url is automatically created, deduct it
-    sinon.assert.callCount(crawlResourceSpy, maxResources - 1);
+    // one crawlResource invocation for each resource, +1 for the last invocation returning no resources to crawl
+    sinon.assert.callCount(crawlResourceSpy, maxResources + 1);
   });
 
   it('check crawl delay', async () => {
     // define crawl delay
     const delay = 500;
-    site.crawlOpts.delay = delay;
 
     // keep the plugins to a minimum
     site.pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
       pluginDef => [ 'SelectResourcePlugin', 'UpdateResourcePlugin' ].indexOf(pluginDef.name) !== -1,
     );
+
+    // adjust crawl delay
+    const selectResourceDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'SelectResourcePlugin');
+    selectResourceDef.opts.crawlDelay = delay;
+
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
 

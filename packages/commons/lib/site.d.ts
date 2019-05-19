@@ -10,11 +10,6 @@ export interface ISite {
   pluginDefinitions: IPluginDefinition[];
   plugins: any;
 
-  crawlOpts: {
-    maxResources: number,
-    delay: number
-  },
-
   storageOpts: {
     resourceFilter: {
       maxEntries: number,

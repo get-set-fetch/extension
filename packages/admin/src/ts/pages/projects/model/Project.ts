@@ -6,6 +6,7 @@ const defaultProjectProps: IProjectStorage = {
   name: null,
   description: null,
   url: null,
+  crawlOpts: {},
   scenarioId: null,
   scenarioProps: {},
   pluginDefinitions: [],
@@ -16,6 +17,7 @@ export default class Project extends Record(defaultProjectProps) implements IPro
   readonly name: string;
   readonly description: string;
   readonly url: string;
+  readonly crawlOpts;
   readonly scenarioId: number;
   readonly scenarioProps;
 

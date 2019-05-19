@@ -11,7 +11,7 @@ const Log = Logger.getLogger('IdbSite');
 export default class IdbSite extends BaseEntity {
   // IndexedDB can't do partial update, define all site properties to be stored
   get props() {
-    return [ 'id', 'projectId', 'name', 'url', 'opts', 'robotsTxt', 'pluginDefinitions', 'resourceFilter' ];
+    return [ 'id', 'projectId', 'name', 'url', 'robotsTxt', 'pluginDefinitions', 'resourceFilter' ];
   }
 
   // get a read transaction
@@ -136,11 +136,6 @@ export default class IdbSite extends BaseEntity {
   pluginDefinitions: IPluginDefinition[];
   plugins: any;
 
-  crawlOpts: {
-    maxResources: number;
-    delay: number;
-  };
-
   storageOpts: {
     resourceFilter: {
       maxEntries: number;
@@ -148,19 +143,14 @@ export default class IdbSite extends BaseEntity {
     };
   };
 
+  resourcesNo: number;
+
   constructor(kwArgs: Partial<ISite> = {}) {
     super();
 
     Object.keys(kwArgs).forEach(kwArgKey => {
       this[kwArgKey] = kwArgs[kwArgKey];
     });
-
-    if (!kwArgs.crawlOpts) {
-      this.crawlOpts = {
-        maxResources: 500,
-        delay: 1000,
-      };
-    }
 
     if (!kwArgs.storageOpts) {
       this.storageOpts = {
@@ -184,13 +174,10 @@ export default class IdbSite extends BaseEntity {
 
   async crawl() {
     this.plugins = await PluginManager.instantiate(this.pluginDefinitions);
+    this.resourcesNo = (await IdbSite.getAllIds()).length;
 
-    let resourcesNo = (await IdbSite.getAllIds()).length;
     let resource;
     do {
-      // eslint-disable-next-line no-await-in-loop
-      await new Promise(resolve => setTimeout(resolve, this.crawlOpts.delay));
-
       try {
         // eslint-disable-next-line no-await-in-loop
         resource = await this.crawlResource();
@@ -198,11 +185,8 @@ export default class IdbSite extends BaseEntity {
       catch (err) {
         // todo: if resource in status "crawling", reset it, or try another crawlResource a fixed number of times
       }
-      finally {
-        resourcesNo += 1;
-      }
     }
-    while (resource && resourcesNo < this.crawlOpts.maxResources);
+    while (resource);
   }
 
   /**
@@ -242,6 +226,7 @@ export default class IdbSite extends BaseEntity {
           */
         }
         catch (err) {
+          console.log(err);
           Log.error(
             `Crawl error for site ${this.name}`,
             `${this.plugins[i].constructor.name} ${resource ? resource.url : ''}`,

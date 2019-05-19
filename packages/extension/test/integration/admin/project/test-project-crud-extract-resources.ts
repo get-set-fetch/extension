@@ -11,11 +11,19 @@ describe('Project CRUD Pages', () => {
     name: 'projectA',
     description: 'projectA description',
     url: 'http://www.sitea.com/index.html',
+    crawlOpts: {
+      maxDepth: 11,
+      maxResources: 101,
+      crawlDelay: 1001
+    },
     scenarioId: null,
     opts: {},
     pluginDefinitions: [
       {
-        name: 'SelectResourcePlugin'
+        name: 'SelectResourcePlugin',
+        opts: {
+          crawlDelay: 1001
+        }
       },
       {
         name: 'FetchPlugin'
@@ -24,7 +32,7 @@ describe('Project CRUD Pages', () => {
         name: 'ExtractUrlsPlugin',
         opts: {
           extensionRe: '/^(gif|png|jpg|jpeg)$/i',
-          maxDepth: '1'
+          maxDepth: 11
         }
       },
       {
@@ -34,7 +42,10 @@ describe('Project CRUD Pages', () => {
         name: 'UpdateResourcePlugin'
       },
       {
-        name: 'InsertResourcePlugin'
+        name: 'InsertResourcePlugin',
+        opts: {
+          maxResources: 101
+        }
       }
     ]
   };
@@ -80,6 +91,15 @@ describe('Project CRUD Pages', () => {
     await page.type('input#root_description', expectedProject.description);
     await page.type('input#root_url', expectedProject.url);
 
+    await page.evaluate( () => (document.getElementById('root_crawlOpts_maxDepth') as HTMLInputElement).value = '');
+    await page.type('input#root_crawlOpts_maxDepth', expectedProject.crawlOpts.maxDepth.toString());
+
+    await page.evaluate( () => (document.getElementById('root_crawlOpts_maxResources') as HTMLInputElement).value = '');
+    await page.type('input#root_crawlOpts_maxResources', expectedProject.crawlOpts.maxResources.toString());
+
+    await page.evaluate( () => (document.getElementById('root_crawlOpts_crawlDelay') as HTMLInputElement).value = '');
+    await page.type('input#root_crawlOpts_crawlDelay', expectedProject.crawlOpts.crawlDelay.toString());
+
     // dropdown scenario is correctly populated
     const expectedScenarioIdOpts = [
       { label: '' },
@@ -115,6 +135,7 @@ describe('Project CRUD Pages', () => {
     assert.strictEqual(savedProject.description, expectedProject.description);
     assert.strictEqual(savedProject.url, expectedProject.url);
     assert.strictEqual(savedProject.scenarioId, expectedProject.scenarioId);
+    assert.deepEqual(savedProject.crawlOpts, expectedProject.crawlOpts);
     assert.sameDeepMembers(savedProject.pluginDefinitions, expectedProject.pluginDefinitions);
 
     // check newly created project presence in project list
@@ -147,14 +168,19 @@ describe('Project CRUD Pages', () => {
     await page.type('input#root_description', changedSuffix);
     await page.type('input#root_url', changedSuffix);
 
+    await page.evaluate( () => (document.getElementById('root_crawlOpts_maxDepth') as HTMLInputElement).value = '');
+    await page.type('input#root_crawlOpts_maxDepth', (expectedProject.crawlOpts.maxDepth + 1).toString());
+
+    await page.evaluate( () => (document.getElementById('root_crawlOpts_maxResources') as HTMLInputElement).value = '');
+    await page.type('input#root_crawlOpts_maxResources', (expectedProject.crawlOpts.maxResources + 1).toString());
+
+    await page.evaluate( () => (document.getElementById('root_crawlOpts_crawlDelay') as HTMLInputElement).value = '');
+    await page.type('input#root_crawlOpts_crawlDelay', (expectedProject.crawlOpts.crawlDelay + 1).toString());
+
     // change linked scenario properties
     const expectedScenarioExtensionRe = '/png/';
     await clear(page, '#root_scenarioProps_extensionRe');
     await page.type('#root_scenarioProps_extensionRe', expectedScenarioExtensionRe);
-
-    const expectedScenarioMaxDepth = '3';
-    await clear(page, '#root_scenarioProps_maxDepth');
-    await page.type('#root_scenarioProps_maxDepth', expectedScenarioMaxDepth);
 
     // save the project and return to project list page
     await page.click('#save');
@@ -167,13 +193,23 @@ describe('Project CRUD Pages', () => {
     assert.strictEqual(updatedProject.description, `${expectedProject.description}${changedSuffix}`);
     assert.strictEqual(updatedProject.url, `${expectedProject.url}${changedSuffix}`);
 
+    assert.strictEqual(updatedProject.crawlOpts.maxDepth, expectedProject.crawlOpts.maxDepth + 1);
+    assert.strictEqual(updatedProject.crawlOpts.maxResources, expectedProject.crawlOpts.maxResources + 1);
+    assert.strictEqual(updatedProject.crawlOpts.crawlDelay, expectedProject.crawlOpts.crawlDelay + 1);
+
     // check scenario opts
     assert.strictEqual(updatedProject.scenarioProps.extensionRe, expectedScenarioExtensionRe);
-    assert.strictEqual(updatedProject.scenarioProps.maxDepth, expectedScenarioMaxDepth);
 
     // check plugin definitions
     const updatedExtractUrlsPlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlsPlugin');
     assert.strictEqual(updatedExtractUrlsPlugin.opts.extensionRe, expectedScenarioExtensionRe);
+    assert.strictEqual(updatedExtractUrlsPlugin.opts.maxDepth, expectedProject.crawlOpts.maxDepth + 1);
+
+    const insertResourcePlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'InsertResourcePlugin');
+    assert.strictEqual(insertResourcePlugin.opts.maxResources, expectedProject.crawlOpts.maxResources + 1);
+
+    const selectResourcePlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'SelectResourcePlugin');
+    assert.strictEqual(selectResourcePlugin.opts.crawlDelay, expectedProject.crawlOpts.crawlDelay + 1);
 
     // check updated project presence in project list
     await page.waitFor(`a[href=\\/project\\/${updatedProject.id}`);

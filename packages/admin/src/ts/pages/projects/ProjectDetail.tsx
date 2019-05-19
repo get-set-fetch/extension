@@ -211,6 +211,11 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
     }
   }
 
+  updatePluginDefOpts(pluginDefinitions, pluginName, pluginOpts) {
+    const extractUrlsPlugins = pluginDefinitions.find(pluginDef => pluginDef.name === pluginName);
+    extractUrlsPlugins.opts = Object.assign(extractUrlsPlugins.opts || {}, pluginOpts);
+  }
+
   async submitHandler() {
     // validate form
     const { errors } = this.state.formRef.validate(this.state.formRef.state.formData);
@@ -220,6 +225,9 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
 
     // add plugable pluginDefinitions to current project
     const pluginDefinitions = this.state.scenario.getPluginDefinitions(this.state.project.scenarioProps);
+    this.updatePluginDefOpts(pluginDefinitions, 'SelectResourcePlugin', { crawlDelay: this.state.project.crawlOpts.crawlDelay });
+    this.updatePluginDefOpts(pluginDefinitions, 'ExtractUrlsPlugin', { maxDepth: this.state.project.crawlOpts.maxDepth });
+    this.updatePluginDefOpts(pluginDefinitions, 'InsertResourcePlugin', { maxResources: this.state.project.crawlOpts.maxResources });
 
     const finalProject = setIn(this.state.project, [ 'pluginDefinitions' ], pluginDefinitions);
 
@@ -238,7 +246,6 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
   }
 
   validate(formData, errors) {
-    // errors.fieldA.addError('fieldA invalid');
     return errors;
   }
 

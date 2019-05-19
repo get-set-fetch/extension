@@ -21,6 +21,7 @@ describe('Test PluginManager', () => {
         name: 'SelectResourcePlugin',
         opts: {
           crawlFrequency: -1,
+          crawlDelay: 1000,
         },
       },
       {
@@ -42,7 +43,9 @@ describe('Test PluginManager', () => {
       },
       {
         name: 'InsertResourcePlugin',
-        opts: undefined,
+        opts: {
+          maxResources: 100,
+        },
       },
     ];
     const actualPlugins = await PluginManager.instantiate(PluginManager.getDefaultPluginDefs());

@@ -18,25 +18,21 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
     projectId: 1,
     name: 'siteA',
     url: 'http://siteA',
-    crawlOpts: {
-      maxResources: 10,
-      delay: 100
-    },
     storageOpts: {
       resourceFilter: {
         maxEntries: 5000,
-        probability: 0.01
-      }
-    }
+        probability: 0.01,
+      },
+    },
   };
 
   before(async () => {
-     // 1. storage init, populate GsfProvider used by some plugin related classes
+    // 1. storage init, populate GsfProvider used by some plugin related classes
     ({ Site, Plugin, Resource } = await IdbStorage.init());
     GsfProvider.Plugin = Plugin;
     global.GsfProvider = { Plugin };
 
-       // discover, register builtin plugins
+    // discover, register builtin plugins
     await ModuleHelper.init();
   });
 
@@ -71,7 +67,7 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
     // retrieve all sites for project 2
     const proj2Sites = await Site.getAll(2);
     assert.strictEqual(proj2Sites.length, 2);
-    const expectedSiteNames = ['siteB', 'siteC'];
+    const expectedSiteNames = [ 'siteB', 'siteC' ];
     const actualSiteNames = proj2Sites.map(site => site.name);
     assert.sameMembers(actualSiteNames, expectedSiteNames);
   });
@@ -84,7 +80,6 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
     assert.strictEqual(expectedSite.name, siteById.name);
     assert.strictEqual(expectedSite.url, siteById.url);
     assert.deepEqual(expectedSite.storageOpts, expectedSite.storageOpts);
-    assert.deepEqual(expectedSite.crawlOpts, expectedSite.crawlOpts);
 
     // get site by name
     const siteByName = await Site.get(expectedSite.name);
@@ -109,7 +104,7 @@ describe(`Test Storage Site - CRUD, using connection ${conn.info}`, () => {
 
   it('delete', async () => {
     // link a 2nd resource to site
-    const resource =  new Resource({ siteId: expectedSite.id, url: expectedSite.url });
+    const resource = new Resource({ siteId: expectedSite.id, url: expectedSite.url });
     await resource.save();
 
     // delete site

@@ -1,5 +1,5 @@
 {
-  "title": "A registration form",
+  "title": "Project Details",
   "type": "object",
   "required": ["name", "url", "scenarioId"],
   "properties": {
@@ -13,14 +13,39 @@
     },
     "url": {
       "type": "string",
-      "title": "URL"
+      "title": "Start URL"
     },
+
+    "crawlOpts": {
+      "title": "Crawl Options",
+      "type": "object",
+      "required": ["maxDepth", "maxResources", "crawlDelay"],
+      "properties": {
+        "maxDepth": {
+          "type": "number",
+          "title": "Maximum crawl depth",
+          "default": -1
+        },
+        "maxResources": {
+          "type": "number",
+          "title": "Maximum resources",
+          "default": 100
+        },
+        "crawlDelay": {
+          "type": "number",
+          "title": "Crawl delay",
+          "default": 1000
+        }
+      }
+    },
+
     "scenarioId": {
       "type": "number",
       "title": "Crawl Scenario",
       "enum": [],
       "enumNames": []
     },
+
     "scenarioProps": {
       "type": "object",
       "title": "",

@@ -6,12 +6,14 @@ const crawlDefinitions: ICrawlDefinition[] = [
     project: {
       name: 'projA',
       description: 'descriptionA',
-      url: 'https://www.sitea.com/index.html'
+      url: 'https://www.sitea.com/index.html',
+      crawlOpts: {
+        maxDepth: -1
+      }
     },
     scenarioProps: {
       name: 'get-set-fetch-scenario-extract-html-content',
       selectors: 'h1\ni.classA',
-      maxDepth: -1
     },
     expectedResources: [
       {
@@ -40,12 +42,14 @@ const crawlDefinitions: ICrawlDefinition[] = [
     project: {
       name: 'projA',
       description: 'descriptionA',
-      url: 'https://www.sitea.com/index.html'
+      url: 'https://www.sitea.com/index.html',
+      crawlOpts: {
+        maxDepth: 1
+      }
     },
     scenarioProps: {
       name: 'get-set-fetch-scenario-extract-html-content',
-      selectors: 'h1\ni.classA',
-      maxDepth: 1
+      selectors: 'h1\ni.classA'
     },
     expectedResources: [
       {

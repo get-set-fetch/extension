@@ -13,6 +13,7 @@ export interface ICrawlDefinition {
     name: string;
     description: string;
     url: string;
+    crawlOpts?: any;
   };
   scenarioProps: any;
   expectedResources: Array<{

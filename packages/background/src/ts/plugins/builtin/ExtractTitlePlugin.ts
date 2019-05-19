@@ -12,7 +12,7 @@ export default class ExtractTitlePlugin implements IPlugin {
 
   static get OPTS_SCHEMA() {
     return {
-      $id: 'https://getsetfetch.org/extract-url-plugin.schema.json',
+      $id: 'https://getsetfetch.org/extract-title-plugin.schema.json',
       $schema: 'http://json-schema.org/draft-07/schema#',
       title: 'ExtractTitlePlugin',
       type: 'object',

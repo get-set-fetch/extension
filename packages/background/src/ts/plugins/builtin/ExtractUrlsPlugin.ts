@@ -8,7 +8,7 @@ declare const document;
 export default class ExtractUrlsPlugin implements IPlugin {
   static get OPTS_SCHEMA() {
     return {
-      $id: 'https://getsetfetch.org/extract-url-plugin.schema.json',
+      $id: 'https://getsetfetch.org/extract-urls-plugin.schema.json',
       $schema: 'http://json-schema.org/draft-07/schema#',
       title: 'ExtractUrlsPlugin',
       type: 'object',
@@ -59,7 +59,6 @@ export default class ExtractUrlsPlugin implements IPlugin {
   }
 
   opts: {
-    mediaTypeRe: RegExp;
     extensionRe: RegExp;
     allowNoExtension: boolean;
     maxDepth: number;
@@ -85,7 +84,7 @@ export default class ExtractUrlsPlugin implements IPlugin {
   /*
   scan for resources in <a href />, <img src />
   */
-  extractResourceUrls(site, resource) {
+  extractResourceUrls(site, resource): string[] {
     const doc = window.document;
     const currentUrl = new URL(resource.url);
 
