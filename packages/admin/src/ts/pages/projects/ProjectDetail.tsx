@@ -160,7 +160,7 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
 
     // merge scenario schema into the base one
     const mergedUiSchema = setIn(
-      this.state.baseProjectSchema,
+      this.state.baseProjectUiSchema,
       [ 'scenarioProps' ],
       scenarioUiSchema,
     );
@@ -247,7 +247,7 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
 
     return (
       <Page
-        title={this.state.project.name ? this.state.project.name : 'New Project'}
+        title={this.state.project.id ? this.state.project.name : 'New Project'}
       >
         <Form
           className='form-main'

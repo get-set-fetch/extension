@@ -142,7 +142,7 @@ export default class SiteDetail extends React.Component<RouteComponentProps<{sit
 
     return (
       <Page
-        title={this.state.site.name ? this.state.site.name : 'New Site'}
+        title={this.state.site.id ? this.state.site.name : 'New Site'}
       >
         <form className="form-main">
           <div className="form-group row">

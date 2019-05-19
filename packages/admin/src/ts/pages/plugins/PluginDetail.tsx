@@ -76,7 +76,7 @@ export default class PluginDetail extends React.Component<RouteComponentProps<{p
 
     return (
       <Page
-        title={this.state.plugin.name ? this.state.plugin.name : 'New Plugin'}
+        title={this.state.plugin.id ? this.state.plugin.name : 'New Plugin'}
       >
         <form className="form-main" onSubmit={this.submitHandler}>
           <div className="form-group row">
