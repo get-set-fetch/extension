@@ -11,27 +11,27 @@ export default class ExtractResources implements IScenario {
   getPluginDefinitions(scenarioProps) {
     const pluginDefinitions: IPluginDefinition[] = [
       {
-        name: 'SelectResourcePlugin'
+        name: 'SelectResourcePlugin',
       },
       {
-        name: 'FetchPlugin'
+        name: 'FetchPlugin',
       },
       {
         name: 'ExtractUrlsPlugin',
         opts: {
           extensionRe: scenarioProps.extensionRe,
-          maxDepth: scenarioProps.maxDepth
-        }
+          maxDepth: scenarioProps.maxDepth,
+        },
       },
       {
-        name: 'ImageFilterPlugin'
+        name: 'ImageFilterPlugin',
       },
       {
-        name: 'UpdateResourcePlugin'
+        name: 'UpdateResourcePlugin',
       },
       {
-        name: 'InsertResourcePlugin'
-      }
+        name: 'InsertResourcePlugin',
+      },
     ];
 
     return pluginDefinitions;
@@ -41,16 +41,16 @@ export default class ExtractResources implements IScenario {
     return [
       {
         label: 'Title',
-        render: (row) => (row.info ? row.info.title: '')
+        render: row => (row.info ? row.info.title : ''),
       },
       {
         label: 'Type',
-        render: (row) => (row.mediaType)
+        render: row => (row.mediaType),
       },
       {
         label: 'URL',
-        render: (row) => (row.url)
-      }
+        render: row => (row.url),
+      },
     ];
   }
 
@@ -58,18 +58,18 @@ export default class ExtractResources implements IScenario {
     return [
       {
         type: ExportType.CSV,
-        cols: ['url', 'mediaType'],
+        cols: [ 'url', 'mediaType' ],
         fieldSeparator: ',',
-        lineSeparator: '\n'
+        lineSeparator: '\n',
       },
       {
         type: ExportType.ZIP,
-        cols: ['blob']
-      }
+        cols: [ 'blob' ],
+      },
     ];
   }
 }
 
 export const embeddedPlugins = {
-  ImageFilterPlugin
+  ImageFilterPlugin,
 };

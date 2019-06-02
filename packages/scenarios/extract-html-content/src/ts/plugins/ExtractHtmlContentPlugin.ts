@@ -2,8 +2,8 @@ import { SchemaHelper, IPlugin, ISite, IResource } from 'get-set-fetch-extension
 
 export default class ExtractHtmlContentPlugin implements IPlugin {
   opts: {
-    runInTab: boolean,
-    selectors: string
+    runInTab: boolean;
+    selectors: string;
   };
 
   constructor(opts) {
@@ -19,13 +19,13 @@ export default class ExtractHtmlContentPlugin implements IPlugin {
       properties: {
         runInTab: {
           type: 'boolean',
-          default: true
+          default: true,
         },
         selectors: {
           type: 'string',
-          default: 'h1\nh2'
-        }
-      }
+          default: 'h1\nh2',
+        },
+      },
     };
   }
 
@@ -36,22 +36,19 @@ export default class ExtractHtmlContentPlugin implements IPlugin {
   apply(site: ISite, resource: IResource) {
     const selectors: string[] = this.opts.selectors.split('\n');
     const textResult = selectors.reduce(
-      (result, selector) => {
-        return Object.assign(
-          result,
-          {
-            [selector.toString()] : Array.from(document.querySelectorAll(selector)).map(elm => elm.innerText)
-          }
-        );
-      },
-      {}
+      (result, selector) => Object.assign(
+        result,
+        {
+          [selector.toString()]: Array.from(document.querySelectorAll(selector)).map(elm => (elm as HTMLElement).innerText),
+        },
+      ),
+      {},
     );
 
     return {
-      info : {
-        content: textResult
-      }
+      info: {
+        content: textResult,
+      },
     };
-
   }
 }

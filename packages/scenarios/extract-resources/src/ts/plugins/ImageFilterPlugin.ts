@@ -2,7 +2,7 @@ import { SchemaHelper, IPlugin, ISite, IResource } from 'get-set-fetch-extension
 
 export default class ImageFilterPlugin implements IPlugin {
   opts: {
-    runInTab: boolean
+    runInTab: boolean;
   };
 
   constructor(opts) {
@@ -18,9 +18,9 @@ export default class ImageFilterPlugin implements IPlugin {
       properties: {
         runInTab: {
           type: 'boolean',
-          default: false
-        }
-      }
+          default: false,
+        },
+      },
     };
   }
 
@@ -37,11 +37,11 @@ export default class ImageFilterPlugin implements IPlugin {
           info: {
             width: img.naturalWidth,
             height: img.naturalHeight,
-            name: resource.url.split('/').pop().split('#')[0].split('?')[0]
-          }
+            name: resource.url.split('/').pop().split('#')[0].split('?')[0],
+          },
         });
       };
-      img.onerror = () => reject('could not load image: ' + img.src);
+      img.onerror = () => reject(new Error(`could not load image: ${img.src}`));
       img.src = window.URL.createObjectURL(resource.blob);
     });
   }

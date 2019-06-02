@@ -1,6 +1,6 @@
 export default {
   type: 'object',
-  required: ['selectors'],
+  required: [ 'selectors' ],
   properties: {
     selectors: {
       type: 'string',
@@ -9,8 +9,8 @@ export default {
       default: 'h1\nh2\nh3',
       ui: {
         customField: 'LongTextField',
-        rows: 4
-      }
-    }
-  }
+        rows: 4,
+      },
+    },
+  },
 };

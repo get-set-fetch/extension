@@ -11,26 +11,26 @@ export default class ExtractHtmlContent implements IScenario {
   getPluginDefinitions(scenarioProps) {
     const pluginDefinitions: IPluginDefinition[] = [
       {
-        name: 'SelectResourcePlugin'
+        name: 'SelectResourcePlugin',
       },
       {
-        name: 'FetchPlugin'
+        name: 'FetchPlugin',
       },
       {
-        name: 'ExtractUrlsPlugin'
+        name: 'ExtractUrlsPlugin',
       },
       {
         name: 'ExtractHtmlContentPlugin',
         opts: {
-          selectors: scenarioProps.selectors
-        }
+          selectors: scenarioProps.selectors,
+        },
       },
       {
-        name: 'UpdateResourcePlugin'
+        name: 'UpdateResourcePlugin',
       },
       {
-        name: 'InsertResourcePlugin'
-      }
+        name: 'InsertResourcePlugin',
+      },
     ];
 
     return pluginDefinitions;
@@ -40,12 +40,12 @@ export default class ExtractHtmlContent implements IScenario {
     return [
       {
         label: 'Html Content',
-        render: (row) => (row.info ? JSON.stringify(row.info.content): '')
+        render: row => (row.info ? JSON.stringify(row.info.content) : ''),
       },
       {
         label: 'URL',
-        render: (row) => (row.url)
-      }
+        render: row => (row.url),
+      },
     ];
   }
 
@@ -53,18 +53,18 @@ export default class ExtractHtmlContent implements IScenario {
     return [
       {
         type: ExportType.CSV,
-        cols: ['url', 'info.content'],
+        cols: [ 'url', 'info.content' ],
         fieldSeparator: ',',
-        lineSeparator: '\n'
+        lineSeparator: '\n',
       },
       {
         type: ExportType.ZIP,
-        cols: ['blob']
-      }
+        cols: [ 'blob' ],
+      },
     ];
   }
 }
 
 export const embeddedPlugins = {
-  ExtractHtmlContentPlugin
+  ExtractHtmlContentPlugin,
 };

@@ -1,7 +1,6 @@
 import commonjs from 'rollup-plugin-commonjs';
 import typescript from 'rollup-plugin-typescript';
 import resolve from 'rollup-plugin-node-resolve';
-import tslint from 'rollup-plugin-tslint';
 
 export default {
   input: 'src/ts/ExtractResources.ts',
@@ -18,6 +17,5 @@ export default {
       extensions: ['.js', '.json', '.ts', '.tsx'],
       jsnext: false,
     }),
-   // tslint(),
   ],
 }
