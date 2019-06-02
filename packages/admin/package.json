@@ -29,10 +29,10 @@
   "homepage": "https://github.com/get-set-fetch/extension#readme",
   "devDependencies": {
     "@types/chrome": "0.0.77",
+    "@types/is-my-json-valid": "0.0.20",
     "@types/query-string": "^6.2.0",
     "@types/react": "^16.7.19",
     "@types/react-beautiful-dnd": "^10.0.1",
-    "@types/react-jsonschema-form": "^1.0.13",
     "@types/react-router-dom": "^4.3.1",
     "@typescript-eslint/eslint-plugin": "^1.7.0",
     "@typescript-eslint/parser": "^1.7.0",
@@ -56,15 +56,20 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.3.1",
     "bootstrap": "^4.1.1",
+    "classnames": "^2.2.6",
     "get-set-fetch-extension-commons": "^0.1.1",
     "immutable": "^4.0.0-rc.12",
+    "is-my-json-valid": "^2.20.0",
     "jquery": "^3.3.1",
     "popper.js": "^1.14.3",
     "query-string": "^6.1.0",
     "react": "^16.4.0",
     "react-beautiful-dnd": "^10.0.4",
     "react-dom": "^16.4.0",
-    "react-jsonschema-form": "^1.2.0",
-    "react-router-dom": "^4.3.1"
+    "react-router-dom": "^4.3.1",
+    "uniforms": "^2.0.0-alpha.1",
+    "uniforms-bootstrap4": "^2.0.0-alpha.1",
+    "uniforms-bridge-json-schema": "^2.0.0-alpha.1",
+    "util": "^0.12.0"
   }
 }

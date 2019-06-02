@@ -19,6 +19,7 @@ export default {
       jsnext: true,
       main: true,
       browser: true,
+      preferBuiltins: false,
     }),
     commonjs({
       include: [
@@ -45,6 +46,15 @@ export default {
         ],
         'react-is': [
           'isValidElementType',
+        ],
+        uniforms: [
+          'BaseField',
+        ],
+        'uniforms-bootstrap4': [
+          'AutoForm', 'AutoField', 'RadioField', 'SelectField', 'DateField', 'ListField', 'NumField', 'TextField', 'LongTextField', 'BoolField', 'wrapField', 'SubmitField',
+        ],
+        'uniforms-bridge-json-schema': [
+          'JSONSchemaBridge',
         ],
       },
     }),
