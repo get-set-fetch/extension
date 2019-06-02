@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "clean": "shx rm -rf dist",
-    "lint": "eslint src/**/*.ts{,x}",
+    "lint": "eslint \"src/**/*.ts{,x}\"",
     "build": "npm run clean && npm run lint && npm run build:dist",
     "build:dist": "rollup --environment NODE_ENV:production --config rollup.config.js && npm run copy:html",
     "copy:html": "shx cp -R src/html/admin.html dist/admin.html",
