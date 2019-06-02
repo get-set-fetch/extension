@@ -14,7 +14,7 @@ The most common use cases are handled by builtin scenarios:
 - extract-resources
 
 You can also install community based scenarios:
-- extract-html-headings: a "hello world" example of writing a scenario
+- [Extract Html Headings](https://registry.npmjs.org/gsf-ext-extract-html-headings/0.1.0) : "hello world" example of writing a scenario 
 
 If you wrote a scraping scenario and want to share it, update the above list and make a pull request.
 
