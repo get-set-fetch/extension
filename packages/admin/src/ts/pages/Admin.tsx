@@ -14,6 +14,7 @@ import ProjectDetail from './projects/ProjectDetail';
 
 import Navigation from '../layout/Navigation';
 import ProjectResults from './projects/ProjectResults';
+import GettingStarted from './start/GettingStarted';
 
 export default class Admin extends React.Component {
   render() {
@@ -46,14 +47,14 @@ export default class Admin extends React.Component {
                 <Route path='/logs' component={LogList} />
                 <Route path='/settings' component={SettingList} />
 
-                <Route path='/help' component={Help} />
+                <Route path='/start' component={GettingStarted} />
 
                 <Route path='/'
                   exact={false}
                   component={props => {
                     // redirect to redirectPath param, pass the others to the new location
                     const queryParams = queryString.parse(props.location.search);
-                    const redirectPath = queryParams.redirectPath ? queryParams.redirectPath : '/projects';
+                    const redirectPath = queryParams.redirectPath ? queryParams.redirectPath : '/start';
                     const redirectQueryParams = queryString.stringify(Object.assign(queryParams, { redirectPath: null }));
                     return <Redirect from='/' to={`${redirectPath}?${redirectQueryParams}`} />;
                   }}
