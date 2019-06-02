@@ -1,19 +1,22 @@
 {
   "title": "Project Details",
   "type": "object",
-  "required": ["name", "url", "scenarioId"],
+  "required": ["name", "url", "crawlOpts", "scenarioOpts"],
   "properties": {
     "name": {
       "type": "string",
-      "title": "Name"
+      "title": "Name",
+      "minLength": 1
     },
     "description": {
       "type": "string",
-      "title": "Description"
+      "title": "Description",
+      "default": ""
     },
     "url": {
       "type": "string",
-      "title": "Start URL"
+      "title": "Start URL",
+      "format": "uri"
     },
 
     "crawlOpts": {
@@ -24,38 +27,54 @@
         "maxDepth": {
           "type": "number",
           "title": "Maximum crawl depth",
-          "default": -1
+          "description": "Start URL has depth 0. All resources linked from it have depth 1 and so on.",
+          "default": -1,
+          "ui": {
+            "step": 1
+          }
         },
         "maxResources": {
           "type": "number",
           "title": "Maximum resources",
-          "default": 100
+          "description": "Maximum number of resources to be crawled per each individual site.",
+          "default": 100,
+          "ui": {
+            "step": 1
+          }
         },
         "crawlDelay": {
           "type": "number",
           "title": "Crawl delay",
-          "default": 1000
+          "description": "Delay in miliseconds between fetching two consecutive resources.",
+          "default": 1000,
+          "ui": {
+            "step": 1
+          }
         }
       }
     },
 
-    "scenarioId": {
-      "type": "number",
-      "title": "Crawl Scenario",
-      "enum": [],
-      "enumNames": []
-    },
-
-    "scenarioProps": {
+    "scenarioOpts": {
       "type": "object",
-      "title": "",
+      "title": "Scenario Options",
+      "required": ["scenarioId"],
       "properties": {
+        "scenarioId": {
+          "type": "number",
+          "title": "Crawl Scenario"
+        },
         "description": {
-          "type": "string"
+          "type": "string",
+          "ui": {
+            "customField": "ScenarioDescription"
+          }
         },
         "homepage": {
           "type": "string",
-          "format": "uri"
+          "format": "uri",
+          "ui": {
+            "customField": "ScenarioLink"
+          }
         }
       }
     }

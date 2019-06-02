@@ -1,14 +1,18 @@
 import { Record } from 'immutable';
-import { IProjectStorage } from 'get-set-fetch-extension-commons';
+import { IProjectStorage, IProjectCrawlOpts } from 'get-set-fetch-extension-commons';
+import { IProjectScenarioOpts } from 'get-set-fetch-extension-commons/lib/project';
 
 const defaultProjectProps: IProjectStorage = {
   id: null,
   name: null,
-  description: null,
+  description: '',
   url: null,
-  crawlOpts: {},
-  scenarioId: null,
-  scenarioProps: {},
+  crawlOpts: {
+    maxDepth: -1,
+    maxResources: 100,
+    crawlDelay: 1000,
+  },
+  scenarioOpts: {},
   pluginDefinitions: [],
 };
 
@@ -17,9 +21,8 @@ export default class Project extends Record(defaultProjectProps) implements IPro
   readonly name: string;
   readonly description: string;
   readonly url: string;
-  readonly crawlOpts;
-  readonly scenarioId: number;
-  readonly scenarioProps;
+  readonly crawlOpts: IProjectCrawlOpts;
+  readonly scenarioOpts: IProjectScenarioOpts;
 
   constructor(values?: Partial<IProjectStorage>) {
     super(values || {});

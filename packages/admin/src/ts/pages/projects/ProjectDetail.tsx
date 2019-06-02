@@ -1,20 +1,18 @@
+/* eslint-disable no-console */
 /* eslint-disable no-shadow */
 import * as React from 'react';
-import { setIn, getIn } from 'immutable';
+import { setIn, getIn, removeIn } from 'immutable';
 import { HttpMethod, IEnhancedJSONSchema, IScenario } from 'get-set-fetch-extension-commons';
-import Form, { UiSchema } from 'react-jsonschema-form';
 import { NavLink, RouteComponentProps } from 'react-router-dom';
 import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
 import GsfClient from '../../components/GsfClient';
 import ScenarioHelper from '../scenarios/model/ScenarioHelper';
 import Project from './model/Project';
 import BaseFormSchema from './schema/project-form-schema.json';
-import BaseFormUiSchema from './schema/project-form-ui-schema.json';
-import SchemaField from '../../components/react-jsonschema-form/SchemaField';
-import BaseInput from '../../components/react-jsonschema-form/widgets/BaseInput';
-import ScenarioDescription from '../../components/react-jsonschema-form/widgets/ScenarioDescription';
-import ScenarioHomepage from '../../components/react-jsonschema-form/widgets/ScenarioHomepage';
 import Page from '../../layout/Page';
+import GsfForm from '../../components/uniforms/GsfForm';
+import GsfBridge from '../../components/uniforms/bridge/GsfBridge';
+import SchemaBridgeHelper from '../../components/uniforms/bridge/GsfBridgeHelper';
 
 interface IState {
   scenarioPkgs: IScenarioPackage[];
@@ -22,16 +20,9 @@ interface IState {
   project: Project;
   scenario: IScenario;
 
-  // schemas defining project props without plugable scenario props
+  // schema defining project props without plugable scenario props
   baseProjectSchema: IEnhancedJSONSchema;
-  baseProjectUiSchema: UiSchema;
-
-  // schemas defining project props combined with plugable scenario props
-  mergedSchema: IEnhancedJSONSchema;
-  mergedUiSchema: UiSchema;
-
-  // reference to form element
-  formRef;
+  bridge: GsfBridge;
 }
 
 export default class ProjectDetail extends React.Component<RouteComponentProps<{projectId: string}>, IState> {
@@ -49,12 +40,7 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
       scenario: null,
 
       baseProjectSchema: BaseFormSchema as IEnhancedJSONSchema,
-      baseProjectUiSchema: BaseFormUiSchema,
-
-      mergedSchema: BaseFormSchema as IEnhancedJSONSchema,
-      mergedUiSchema: BaseFormUiSchema,
-
-      formRef: null,
+      bridge: null,
     };
 
     this.changeHandler = this.changeHandler.bind(this);
@@ -71,160 +57,101 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
     const scenarioPkgs: IScenarioPackage[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioPackage[];
 
     // compute new baseProjectSchema for scenario dropdown
-    const scenarioIdProp = Object.assign({}, this.state.baseProjectSchema.properties.scenarioId);
+    const scenarioIdProp = Object.assign({}, this.state.baseProjectSchema.properties.scenarioOpts.properties.scenarioId);
     scenarioIdProp.enum = scenarioPkgs.map(pkg => pkg.id);
-    scenarioIdProp.enumNames = scenarioPkgs.map(pkg => pkg.name);
-    const baseProjectSchema = setIn(this.state.baseProjectSchema, [ 'properties', 'scenarioId' ], scenarioIdProp);
+    scenarioIdProp.ui = { enumNames: scenarioPkgs.map(pkg => pkg.name) };
+    const baseProjectSchema = setIn(this.state.baseProjectSchema, [ 'properties', 'scenarioOpts', 'properties', 'scenarioId' ], scenarioIdProp);
 
-    let scenario;
-    let mergedSchema;
-    let mergedUiSchema;
+    this.setState(
+      { scenarioPkgs, baseProjectSchema },
+      () => this.scenarioChangeHandler(project),
+    );
+  }
 
-    // a scenario is already selected
-    if (project.scenarioId) {
-      // get scenario package and update corresponding project fields
-      const scenarioPkg = scenarioPkgs.find(scenarioPkg => scenarioPkg.id === project.scenarioId);
-      project.scenarioProps.description = scenarioPkg.package.description;
-      project.scenarioProps.homepage = scenarioPkg.package.homepage;
+  async scenarioChangeHandler(project: Project) {
+    const scenario: IScenario = project.scenarioOpts.scenarioId ? await ScenarioHelper.instantiate(project.scenarioOpts.scenarioId) : null;
 
-      // instantiate scenario
-      scenario = await ScenarioHelper.instantiate(project.scenarioId);
+    const mergedSchema = this.getMergedSchema(scenario);
 
-      // further update the merged schemas
-      mergedSchema = this.getMergedSchema(scenario);
-      mergedSchema = setIn(mergedSchema, [ 'properties', 'scenarioId' ], scenarioIdProp);
-      mergedUiSchema = this.getMergedUiSchema(scenario);
-    }
-    else {
-      mergedSchema = setIn(baseProjectSchema, [ 'properties', 'scenarioId' ], scenarioIdProp);
-      mergedUiSchema = this.state.baseProjectUiSchema;
+    let newProject = project;
+    if (scenario) {
+      const scenarioPkg = this.state.scenarioPkgs.find(scenarioPkg => scenarioPkg.id === project.scenarioOpts.scenarioId);
+      newProject = setIn(newProject, [ 'scenarioOpts', 'description' ], scenarioPkg.package.description);
+      newProject = setIn(newProject, [ 'scenarioOpts', 'homepage' ], scenarioPkg.package.homepage);
     }
 
-    // update state
-    this.setState({ scenarioPkgs, scenario, project, baseProjectSchema, mergedSchema, mergedUiSchema });
+    const bridge = SchemaBridgeHelper.createBridge(mergedSchema);
+    console.log(JSON.stringify(mergedSchema));
+    console.log((bridge as any).schema);
+
+
+    this.setState({
+      project: newProject,
+      scenario,
+      bridge,
+    });
   }
 
   getMergedSchema(scenario: IScenario): IEnhancedJSONSchema {
-    // start from the scenario schema
-    let scenarioSchema = scenario.getConfigFormSchema();
+    // no scenario selected, remove scenario related props
+    if (!scenario) {
+      let mergedSchema = removeIn(this.state.baseProjectSchema, [ 'properties', 'scenarioOpts', 'properties', 'homepage' ]);
+      mergedSchema = removeIn(mergedSchema, [ 'properties', 'scenarioOpts', 'properties', 'description' ]);
+      return mergedSchema;
+    }
 
-    // add scenario description, homepage to it
-    scenarioSchema = setIn(
-      scenarioSchema,
-      [ 'properties', 'homepage' ],
-      getIn(this.state.baseProjectSchema, [ 'properties', 'scenarioProps', 'properties', 'homepage' ], {}),
-    );
-    scenarioSchema = setIn(
-      scenarioSchema,
-      [ 'properties', 'description' ],
-      getIn(this.state.baseProjectSchema, [ 'properties', 'scenarioProps', 'properties', 'description' ], {}),
-    );
+    // scenario selected, populate scenario related props from scenario schema
+    const scenarioSchema = scenario.getConfigFormSchema();
+    let orderedSchema = getIn(this.state.baseProjectSchema, [ 'properties', 'scenarioOpts' ], {});
 
-    // scenarioProps subtitle should be empty
-    scenarioSchema = setIn(scenarioSchema, [ 'title' ], '');
+    Object.keys(scenarioSchema.properties)
+      .filter(scenarioKey => ![ 'scenarioId', 'description', 'homepage' ].includes(scenarioKey))
+      .forEach(scenarioKey => {
+        orderedSchema = setIn(orderedSchema, [ 'properties', scenarioKey ], scenarioSchema.properties[scenarioKey]);
+      });
+
+    orderedSchema.required = scenarioSchema.required;
 
     // merge scenario schema into the base one
     const mergedSchema = setIn(
       this.state.baseProjectSchema,
-      [ 'properties', 'scenarioProps' ],
-      scenarioSchema,
+      [ 'properties', 'scenarioOpts' ],
+      orderedSchema,
     );
 
     return mergedSchema;
   }
 
-  getMergedUiSchema(scenario: IScenario): UiSchema {
-    // start from the scenario schema
-    let scenarioUiSchema = scenario.getConfigFormUISchema();
 
-    // add scenario description, homepage to it
-    scenarioUiSchema = setIn(
-      scenarioUiSchema,
-      [ 'homepage' ],
-      getIn(this.state.baseProjectUiSchema, [ 'scenarioProps', 'homepage' ], {}),
-    );
-    scenarioUiSchema = setIn(
-      scenarioUiSchema,
-      [ 'description' ],
-      getIn(this.state.baseProjectUiSchema, [ 'scenarioProps', 'description' ], {}),
-    );
-
-    // update scenario ui order to include the newly added fields
-    const scenarioUiOrder = getIn(scenarioUiSchema, [ 'ui:order' ], []);
-
-    scenarioUiSchema = setIn(
-      scenarioUiSchema,
-      [ 'ui:order' ],
-      [ 'description', 'homepage' ].concat(scenarioUiOrder),
-    );
-
-    // merge scenario schema into the base one
-    const mergedUiSchema = setIn(
-      this.state.baseProjectUiSchema,
-      [ 'scenarioProps' ],
-      scenarioUiSchema,
-    );
-
-    return mergedUiSchema;
-  }
-
-  async changeHandler({ formData }) {
-    const newScenarioId = formData.scenarioId;
-    const currentScenarioId = this.state.project.scenarioId;
-    const scenarioChanged = newScenarioId !== currentScenarioId;
+  async changeHandler(key, value) {
+    console.log(`changeHandler ${key} - ${value}`);
+    console.log(this.state.project);
 
     // scenario option changed
-    if (scenarioChanged) {
-      // no scenario selected
-      if (!newScenarioId) {
-        this.setState({
-          project: new Project(formData),
-          scenario: null,
-          mergedSchema: setIn(this.state.baseProjectSchema, [ 'properties', 'scenarioProps', 'properties' ], {}),
-          mergedUiSchema: setIn(this.state.baseProjectUiSchema, [ 'scenarioProps' ], {}),
-        });
-      }
-      // new scenario selected
-      else {
-        const scenario: IScenario = await ScenarioHelper.instantiate(newScenarioId);
-        const mergedSchema = this.getMergedSchema(scenario);
-        const mergedUiSchema = this.getMergedUiSchema(scenario);
-
-        // update form data with scenario info
-        const scenarioPkg = this.state.scenarioPkgs.find(scenarioPkg => scenarioPkg.id === newScenarioId);
-        let updatedFormData = setIn(formData, [ 'scenarioProps', 'description' ], scenarioPkg.package.description);
-        updatedFormData = setIn(updatedFormData, [ 'scenarioProps', 'homepage' ], scenarioPkg.package.homepage);
-
-        this.setState({
-          project: new Project(updatedFormData),
-          scenario,
-          mergedSchema,
-          mergedUiSchema,
-        });
-      }
+    if (key === 'scenarioOpts.scenarioId') {
+      const newProject = setIn(this.state.project, key.split('.'), parseInt(value, 10));
+      this.scenarioChangeHandler(newProject);
     }
     // base property other than scenarioId has changed
     else {
       this.setState({
-        project: new Project(formData),
+        project: setIn(this.state.project, key.split('.'), value),
       });
     }
   }
 
   updatePluginDefOpts(pluginDefinitions, pluginName, pluginOpts) {
-    const extractUrlsPlugins = pluginDefinitions.find(pluginDef => pluginDef.name === pluginName);
-    extractUrlsPlugins.opts = Object.assign(extractUrlsPlugins.opts || {}, pluginOpts);
+    const pluginDef = pluginDefinitions.find(pluginDef => pluginDef.name === pluginName);
+    if (pluginDef) {
+      pluginDef.opts = Object.assign(pluginDef.opts || {}, pluginOpts);
+    }
   }
 
   async submitHandler() {
-    // validate form
-    const { errors } = this.state.formRef.validate(this.state.formRef.state.formData);
-
-    // only proceed to saving if no validation errors are present
-    if (errors.length !== 0) return;
-
+    console.log('submitHandler');
+    console.log(this.state.project);
     // add plugable pluginDefinitions to current project
-    const pluginDefinitions = this.state.scenario.getPluginDefinitions(this.state.project.scenarioProps);
+    const pluginDefinitions = this.state.scenario.getPluginDefinitions(this.state.project.scenarioOpts);
     this.updatePluginDefOpts(pluginDefinitions, 'SelectResourcePlugin', { crawlDelay: this.state.project.crawlOpts.crawlDelay });
     this.updatePluginDefOpts(pluginDefinitions, 'ExtractUrlsPlugin', { maxDepth: this.state.project.crawlOpts.maxDepth });
     this.updatePluginDefOpts(pluginDefinitions, 'InsertResourcePlugin', { maxResources: this.state.project.crawlOpts.maxResources });
@@ -256,34 +183,21 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
       <Page
         title={this.state.project.id ? this.state.project.name : 'New Project'}
       >
-        <Form
-          className='form-main'
-          ref={form => {
-            if (!this.state.formRef) {
-              this.setState({ formRef: form });
-            }
-          }}
-          fields={{ SchemaField }}
-          widgets={{ BaseInput, ScenarioDescription, ScenarioHomepage }}
-
-          schema={this.state.mergedSchema}
-          uiSchema={this.state.mergedUiSchema}
-
-          liveValidate={true}
-          validate={this.validate}
-          showErrorList={false}
-
-          formData={this.state.project.toJS()}
+        <GsfForm
+          schema={this.state.bridge}
+          model={this.state.project.toJS()}
           onChange={this.changeHandler}
+          onSubmit={this.submitHandler}
+          validate="onChangeAfterSubmit"
+          showInlineError={true}
+          validator={{ clean: true }}
         >
-          <div className='form-group row'>
-            <div className='col-sm-2'/>
-            <div className='col-sm-5'>
-              <a id='save' className='btn btn-secondary' href='#' role='button' onClick={this.submitHandler}>Save</a>
-              <NavLink id='cancel' to='/projects' className='btn btn-light ml-4'>Cancel</NavLink>
-            </div>
+          <div className="form-group">
+            <input id="save" className="btn btn-secondary" type="submit" value="Save"/>
+            <NavLink id="cancel" to="/projects" className="btn btn-light ml-4">Cancel</NavLink>
           </div>
-        </Form>
+        </GsfForm>
+
       </Page>
     );
   }
