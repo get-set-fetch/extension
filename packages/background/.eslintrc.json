@@ -46,6 +46,7 @@
     "one-line": [false, "check-catch", "check-finally", "check-else", "check-open-brace", "check-whitespace"],
     "brace-style": ["error", "stroustrup", { "allowSingleLine": false }],
     "forin": false,
+    "no-shadow": "off",
 
     "@typescript-eslint/indent": ["error", 2],
     "@typescript-eslint/interface-name-prefix": ["error", "always"],
