@@ -17,7 +17,7 @@ The most common use cases are handled by builtin scenarios:
 
 You can also install community based scenarios:
 
-- [Extract Html Headings](https://github.com/a1sabau/gsf-extension-extract-html-headings) - [v0.1.0](https://registry.npmjs.org/gsf-ext-extract-html-headings/0.1.0) 
+- [Extract Html Headings](https://github.com/a1sabau/gsf-extension-extract-html-headings) - [v0.1.1](https://registry.npmjs.org/gsf-extension-extract-html-headings/0.1.1) 
   - "Hello World" example of writing a scenario
 
 
