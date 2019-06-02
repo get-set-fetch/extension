@@ -5,7 +5,12 @@ export default {
     selectors: {
       type: 'string',
       title: 'Html Selector(s)',
-      default: 'h1\nh2\nh3'
+      description: 'Selectors used for selecting html nodes via document.querySelectorAll. Enter one selector per line.',
+      default: 'h1\nh2\nh3',
+      ui: {
+        customField: 'LongTextField',
+        rows: 4
+      }
     }
   }
 };
