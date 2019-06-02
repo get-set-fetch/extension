@@ -24,9 +24,9 @@ Handles the crawling and scraping logic.
   name: "projectA",
   description: "projectA description",
   url: "https://root-url.com",
-
-  scenarioId: 1,
-  scenarioProps: {
+  
+  scenarioOpts: {
+    scenarioId: 1,
     description: "Extract Html Content scenario is used for extracting html nodes text based on dom selectors."
     homepage: "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-html-content"
     maxDepth: "1"
@@ -63,7 +63,7 @@ Handles the crawling and scraping logic.
 ```
 
 ## Project Entity Notes
-scenarioProps field represents the user defined settings for the project selected scenario extract-html-content.
+scenarioOpts field contains the user defined settings for the project selected scenario extract-html-content.
 These settings are used by the scenario to generate partial pluginDefinitions.
 
 # Site Entity Example

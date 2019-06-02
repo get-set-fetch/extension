@@ -6,13 +6,16 @@ interface IProjectCrawlOpts {
   crawlDelay?: number;
 }
 
+interface IProjectScenarioOpts {
+  scenarioId?: number;
+}
+
 interface IProjectStorage {
   id: number;
   name: string;
   description: string;
   url: string;
   crawlOpts:  IProjectCrawlOpts;
-  scenarioId: number;
-  scenarioProps: object;
+  scenarioOpts: IProjectScenarioOpts;
   pluginDefinitions: IPluginDefinition[];
 }
