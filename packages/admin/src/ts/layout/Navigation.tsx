@@ -16,6 +16,9 @@ export default class Navigation extends React.Component {
           <nav className='nav flex-column text-right ml-4'>
             <br/>
 
+            <NavLink to='/start' className='nav-link'>Getting Started</NavLink>
+            <br/>
+
             <NavLink to='/projects' className='nav-link'>Projects</NavLink>
             <NavLink to='/sites' className='nav-link'>Sites</NavLink>
             <NavLink to='/scenarios' className='nav-link'>Scenarios</NavLink>
