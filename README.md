@@ -10,11 +10,16 @@
 # Browser Extension
 get-set, Fetch! is a Chrome extension for scraping sites through out a series of parametrizable scraping scenarios.
 The most common use cases are handled by builtin scenarios:
-- extract-html-content:
-- extract-resources
+- [Extract Html Content](https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-html-content)
+  - Scraps text representation of html nodes
+- [Extract Resources](https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-resources)
+  - Extracts binary content (images, pdfs, ...)
 
 You can also install community based scenarios:
-- [Extract Html Headings](https://registry.npmjs.org/gsf-ext-extract-html-headings/0.1.0) : "hello world" example of writing a scenario 
+
+- [Extract Html Headings](https://github.com/a1sabau/gsf-extension-extract-html-headings) - [v0.1.0](https://registry.npmjs.org/gsf-ext-extract-html-headings/0.1.0) 
+  - "Hello World" example of writing a scenario
+
 
 If you wrote a scraping scenario and want to share it, update the above list and make a pull request.
 

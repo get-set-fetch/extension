@@ -121,10 +121,15 @@ export default class ScenarioManager extends BaseModuleManager {
     const readmeResponse = await window.fetch(readmeUrl, { method: 'GET' });
     const readmeText = await readmeResponse.text();
 
-    const scenarioSection = readmeText.match(/^### List of available scenarios\s([\s\S]+?)^###/gm)[0];
-    const scenarioUrls = scenarioSection.match(/\(.+\)/g).map(fullMatch => fullMatch.substr(1, fullMatch.length - 2));
+    const scenarioSection = readmeText.match(/^You can also install community based scenarios:\s([\s\S]+?)^###/gm)[0];
+    const npmLinkRegExp = /\[npm registry link\]\((?<link>.+)\)/g;
+    let npmLinkMatches;
+    const npmLinks = [];
+    while ((npmLinkMatches = npmLinkRegExp.exec(scenarioSection))) {
+      npmLinks.push(npmLinkMatches.groups.link);
+    }
 
-    return scenarioUrls;
+    return npmLinks;
   }
 
   static async getNpmScenarioDetails(npmUrl: string): Promise<IScenarioPackage> {

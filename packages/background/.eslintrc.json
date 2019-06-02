@@ -47,6 +47,7 @@
     "brace-style": ["error", "stroustrup", { "allowSingleLine": false }],
     "forin": false,
     "no-shadow": "off",
+    "no-cond-assign": ["error", "except-parens"],
 
     "@typescript-eslint/indent": ["error", 2],
     "@typescript-eslint/interface-name-prefix": ["error", "always"],
