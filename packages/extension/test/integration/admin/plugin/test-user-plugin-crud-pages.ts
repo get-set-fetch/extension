@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import BrowserHelper from '../../../helpers/BrowserHelper';
+import BrowserHelper, { clear } from '../../../helpers/BrowserHelper';
 import { Page } from 'puppeteer';
 
 /* eslint-disable no-shadow, max-len */
@@ -99,9 +99,12 @@ describe('UserPlugin CRUD Pages', () => {
     // wait for the plugin detail page to load
     await page.waitFor('input#name');
 
-    // change name and code properties
+    // change name property
     await page.type('input#name', changedSuffix);
-    await page.type('textarea#code', changedSuffix);
+
+    // change code property, type for textarea positions the cursor at the begining, use below alternative
+    await page.evaluate( () => (document.getElementById('code') as HTMLTextAreaElement).value = '');
+    await page.type('textarea#code', `${actualPlugin.code}${changedSuffix}`);
 
     // save the plugin and return to plugin list page
     await page.click('#save');
@@ -141,9 +144,12 @@ describe('UserPlugin CRUD Pages', () => {
     // wait for the plugin detail page to load
     await page.waitFor('input#name');
 
-    // change name and code properties
+    // change name property
     await page.type('input#name', changedSuffix);
-    await page.type('textarea#code', changedSuffix);
+    
+    // change code property, type for textarea positions the cursor at the begining, use below alternative
+    await page.evaluate( () => (document.getElementById('code') as HTMLTextAreaElement).value = '');
+    await page.type('textarea#code', `${actualPlugin.code}${changedSuffix}`);
 
     // cancel the update
     await page.click('#cancel');

@@ -11,7 +11,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         maxDepth: -1
       }
     },
-    scenarioProps: {
+    scenarioOpts: {
       name: 'get-set-fetch-scenario-extract-resources',
       extensionRe: '/^(html|htm|php|png)$/i',
     },

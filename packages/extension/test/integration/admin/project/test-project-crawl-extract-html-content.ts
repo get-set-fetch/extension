@@ -11,7 +11,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         maxDepth: -1
       }
     },
-    scenarioProps: {
+    scenarioOpts: {
       name: 'get-set-fetch-scenario-extract-html-content',
       selectors: 'h1\ni.classA',
     },
@@ -47,7 +47,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         maxDepth: 1
       }
     },
-    scenarioProps: {
+    scenarioOpts: {
       name: 'get-set-fetch-scenario-extract-html-content',
       selectors: 'h1\ni.classA'
     },

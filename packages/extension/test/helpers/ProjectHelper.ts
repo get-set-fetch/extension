@@ -4,12 +4,12 @@ import JSZip from 'jszip/dist/jszip';
 import BrowserHelper from './BrowserHelper';
 
 export default class ProjectHelper {
-  static async saveProject(browserHelper: BrowserHelper, project, scenarioProps: any) {
+  static async saveProject(browserHelper: BrowserHelper, project, scenarioOpts: any) {
     const { page } = browserHelper;
 
     // get scenario id based on name
     const scenarios = await page.evaluate(() => GsfClient.fetch('GET', `scenarios`));
-    const scenarioId = scenarios.find(scenario => scenario.name === scenarioProps.name).id;
+    const scenarioId = scenarios.find(scenario => scenario.name === scenarioOpts.name).id;
 
     // go to project list
     await browserHelper.goto('/projects');
@@ -18,36 +18,36 @@ export default class ProjectHelper {
     await page.waitFor('#newproject');
     await page.click('#newproject');
 
-    // wait for the project detail page to load, react-json-schema form has its own id generating policy appending 'root_" to 1st level schema properties
-    await page.waitFor('input#root_name');
+    // wait for the project detail page to load
+    await page.waitFor('input#name');
 
     // fill in text input data for the new project
-    await page.type('input#root_name', project.name);
-    await page.type('input#root_description', project.description);
-    await page.type('input#root_url', project.url);
+    await page.type('input#name', project.name);
+    await page.type('input#description', project.description);
+    await page.type('input#url', project.url);
 
     if (project.crawlOpts && project.crawlOpts.maxDepth) {
-      await page.evaluate( () => (document.getElementById('root_crawlOpts_maxDepth') as HTMLInputElement).value = '');
-      await page.type('input#root_crawlOpts_maxDepth', project.crawlOpts.maxDepth.toString());
+      await page.evaluate( () => (document.getElementById('crawlOpts.maxDepth') as HTMLInputElement).value = '');
+      await page.type('input[id="crawlOpts.maxDepth"]', project.crawlOpts.maxDepth.toString());
     }
 
     if (project.crawlOpts && project.crawlOpts.maxResources) {
-      await page.evaluate( () => (document.getElementById('root_crawlOpts_maxResources') as HTMLInputElement).value = '');
-      await page.type('input#root_crawlOpts_maxResources', project.crawlOpts.maxResources.toString());
+      await page.evaluate( () => (document.getElementById('crawlOpts.maxResources') as HTMLInputElement).value = '');
+      await page.type('input[id="crawlOpts.maxResources"]', project.crawlOpts.maxResources.toString());
     }
 
     if (project.crawlOpts && project.crawlOpts.crawlDelay) {
-      await page.evaluate( () => (document.getElementById('root_crawlOpts_crawlDelay') as HTMLInputElement).value = '');
-      await page.type('input#root_crawlOpts_crawlDelay', project.crawlOpts.crawlDelay.toString());
+      await page.evaluate( () => (document.getElementById('crawlOpts.crawlDelay') as HTMLInputElement).value = '');
+      await page.type('input[id="crawlOpts.crawlDelay"]', project.crawlOpts.crawlDelay.toString());
     }
 
     // fill in dropdown scenario
-    await page.select('#root_scenarioId', scenarioId.toString());
+    await page.select('select[id="scenarioOpts.scenarioId"]', scenarioId.toString());
 
     // fill in other scenario props
-    const validPropKeys: string[] = Object.keys(scenarioProps).filter(propKey => propKey !== 'name');
+    const validPropKeys: string[] = Object.keys(scenarioOpts).filter(propKey => propKey !== 'name');
     for (const propKey of validPropKeys) {
-      const propSelector = `#root_scenarioProps_${propKey}`;
+      const propSelector = `[id="scenarioOpts.${propKey}"]`;
       await page.evaluate(
           (propSelector) => {
             const input: any = document.querySelector(propSelector);
@@ -56,7 +56,7 @@ export default class ProjectHelper {
           propSelector
         );
 
-      await page.type(propSelector, scenarioProps[propKey].toString());
+      await page.type(propSelector, scenarioOpts[propKey].toString());
     }
 
     // save the project

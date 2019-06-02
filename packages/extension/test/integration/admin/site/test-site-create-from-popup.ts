@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import { Page } from 'puppeteer';
 import BrowserHelper from '../../../helpers/BrowserHelper';
 
-describe('Site Pages', () => {
+xdescribe('Site Pages', () => {
   let browserHelper: BrowserHelper;
   let page: Page;
 

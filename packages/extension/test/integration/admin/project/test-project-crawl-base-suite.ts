@@ -15,7 +15,7 @@ export interface ICrawlDefinition {
     url: string;
     crawlOpts?: any;
   };
-  scenarioProps: any;
+  scenarioOpts: any;
   expectedResources: Array<{
     url: string;
     mediaType: string;
@@ -67,17 +67,17 @@ const genSuite = (title, crawlDefinitions) => describe(`Project Crawl ${title}`,
 
   function crawlProjectIt(crawlDefinition) {
     return it(crawlDefinition.title, async () => {
-      const { project, scenarioProps } = crawlDefinition;
+      const { project, scenarioOpts } = crawlDefinition;
 
       // install scenario if not present
       const scenarios = await page.evaluate(() => GsfClient.fetch('GET', `scenarios`));
-      const scenario = scenarios.find(scenario => scenario.name === scenarioProps.name);
+      const scenario = scenarios.find(scenario => scenario.name === scenarioOpts.name);
       if (!scenario) {
-        await ScenarioHelper.installScenario(page, scenarioProps.name);
+        await ScenarioHelper.installScenario(page, scenarioOpts.name);
       }
 
       // save new project
-      await ProjectHelper.saveProject(browserHelper, project, scenarioProps);
+      await ProjectHelper.saveProject(browserHelper, project, scenarioOpts);
 
       // verify project has been saved
       const projects = await page.evaluate(() => GsfClient.fetch('GET', 'projects'));

@@ -16,8 +16,9 @@ describe('Project CRUD Pages', () => {
       maxResources: 101,
       crawlDelay: 1001
     },
-    scenarioId: null,
-    opts: {},
+    scenarioOpts: {
+      scenarioId: null
+    },
     pluginDefinitions: [
       {
         name: 'SelectResourcePlugin',
@@ -56,7 +57,7 @@ describe('Project CRUD Pages', () => {
 
     // get expectedProject scenarioId
     const scenarios = await page.evaluate(() => GsfClient.fetch('GET', `scenarios`));
-    expectedProject.scenarioId = scenarios.find(scenario => scenario.name === 'get-set-fetch-scenario-extract-resources').id;
+    expectedProject.scenarioOpts.scenarioId = scenarios.find(scenario => scenario.name === 'get-set-fetch-scenario-extract-resources').id;
   });
 
   beforeEach(async () => {
@@ -83,32 +84,32 @@ describe('Project CRUD Pages', () => {
     await page.waitFor('#newproject');
     await page.click('#newproject');
 
-    // wait for the project detail page to load, react-json-schema form has its own id generating policy appending 'root_" to 1st level schema properties
-    await page.waitFor('input#root_name');
+    // wait for the project detail page to load
+    await page.waitFor('input#name');
 
     // fill in text input data for a new project
-    await page.type('input#root_name', expectedProject.name);
-    await page.type('input#root_description', expectedProject.description);
-    await page.type('input#root_url', expectedProject.url);
+    await page.type('input#name', expectedProject.name);
+    await page.type('input#description', expectedProject.description);
+    await page.type('input#url', expectedProject.url);
 
-    await page.evaluate( () => (document.getElementById('root_crawlOpts_maxDepth') as HTMLInputElement).value = '');
-    await page.type('input#root_crawlOpts_maxDepth', expectedProject.crawlOpts.maxDepth.toString());
+    await page.evaluate( () => (document.getElementById('crawlOpts.maxDepth') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.maxDepth"]', expectedProject.crawlOpts.maxDepth.toString());
 
-    await page.evaluate( () => (document.getElementById('root_crawlOpts_maxResources') as HTMLInputElement).value = '');
-    await page.type('input#root_crawlOpts_maxResources', expectedProject.crawlOpts.maxResources.toString());
+    await page.evaluate( () => (document.getElementById('crawlOpts.maxResources') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.maxResources"]', expectedProject.crawlOpts.maxResources.toString());
 
-    await page.evaluate( () => (document.getElementById('root_crawlOpts_crawlDelay') as HTMLInputElement).value = '');
-    await page.type('input#root_crawlOpts_crawlDelay', expectedProject.crawlOpts.crawlDelay.toString());
+    await page.evaluate( () => (document.getElementById('crawlOpts.crawlDelay') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.crawlDelay"]', expectedProject.crawlOpts.crawlDelay.toString());
 
-    // dropdown scenario is correctly populated
+    // dropdown scenario is correctly populated#
     const expectedScenarioIdOpts = [
-      { label: '' },
+      { label: 'Crawl Scenario' },
       { label: 'get-set-fetch-scenario-extract-html-content' },
       { label: 'get-set-fetch-scenario-extract-resources' }
     ];
     const scenarioIdOpts = await page.evaluate(
       () =>
-      Array.from((document.getElementById('root_scenarioId') as HTMLSelectElement).options)
+      Array.from((document.getElementById('scenarioOpts.scenarioId') as HTMLSelectElement).options)
       .map(
         ({ label }) => ({ label })
       )
@@ -116,7 +117,7 @@ describe('Project CRUD Pages', () => {
     assert.sameDeepMembers(scenarioIdOpts, expectedScenarioIdOpts);
 
      // fill in dropdown scenario
-    await page.select('#root_scenarioId', expectedProject.scenarioId.toString());
+    await page.select('select[id="scenarioOpts.scenarioId"]', expectedProject.scenarioOpts.scenarioId.toString());
 
     // save the project
     await page.click('#save');
@@ -128,13 +129,13 @@ describe('Project CRUD Pages', () => {
     const savedProject = await page.evaluate(name => GsfClient.fetch('GET', `project/${name}`), expectedProject.name);
 
     // get the linked scenario
-    const linkedScenario = await page.evaluate(scenarioId => GsfClient.fetch('GET', `scenario/${scenarioId}`), expectedProject.scenarioId);
+    const linkedScenario = await page.evaluate(scenarioId => GsfClient.fetch('GET', `scenario/${scenarioId}`), expectedProject.scenarioOpts.scenarioId);
 
     // check newly created project props
     assert.strictEqual(savedProject.name, expectedProject.name);
     assert.strictEqual(savedProject.description, expectedProject.description);
     assert.strictEqual(savedProject.url, expectedProject.url);
-    assert.strictEqual(savedProject.scenarioId, expectedProject.scenarioId);
+    assert.strictEqual(savedProject.scenarioOpts.scenarioId, expectedProject.scenarioOpts.scenarioId);
     assert.deepEqual(savedProject.crawlOpts, expectedProject.crawlOpts);
     assert.sameDeepMembers(savedProject.pluginDefinitions, expectedProject.pluginDefinitions);
 
@@ -161,26 +162,26 @@ describe('Project CRUD Pages', () => {
     await page.click(`a[href=\\/project\\/${projectId}`);
 
     // wait for the project detail page to load
-    await page.waitFor('input#root_name');
+    await page.waitFor('input#name');
 
     // change project properties
-    await page.type('input#root_name', changedSuffix);
-    await page.type('input#root_description', changedSuffix);
-    await page.type('input#root_url', changedSuffix);
+    await page.type('input#name', changedSuffix);
+    await page.type('input#description', changedSuffix);
+    await page.type('input#url', changedSuffix);
 
-    await page.evaluate( () => (document.getElementById('root_crawlOpts_maxDepth') as HTMLInputElement).value = '');
-    await page.type('input#root_crawlOpts_maxDepth', (expectedProject.crawlOpts.maxDepth + 1).toString());
+    await page.evaluate( () => (document.getElementById('crawlOpts.maxDepth') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.maxDepth"]', (expectedProject.crawlOpts.maxDepth + 1).toString());
 
-    await page.evaluate( () => (document.getElementById('root_crawlOpts_maxResources') as HTMLInputElement).value = '');
-    await page.type('input#root_crawlOpts_maxResources', (expectedProject.crawlOpts.maxResources + 1).toString());
+    await page.evaluate( () => (document.getElementById('crawlOpts.maxResources') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.maxResources"]', (expectedProject.crawlOpts.maxResources + 1).toString());
 
-    await page.evaluate( () => (document.getElementById('root_crawlOpts_crawlDelay') as HTMLInputElement).value = '');
-    await page.type('input#root_crawlOpts_crawlDelay', (expectedProject.crawlOpts.crawlDelay + 1).toString());
+    await page.evaluate( () => (document.getElementById('crawlOpts.crawlDelay') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.crawlDelay"]', (expectedProject.crawlOpts.crawlDelay + 1).toString());
 
     // change linked scenario properties
     const expectedScenarioExtensionRe = '/png/';
-    await clear(page, '#root_scenarioProps_extensionRe');
-    await page.type('#root_scenarioProps_extensionRe', expectedScenarioExtensionRe);
+    await clear(page, 'input[id="scenarioOpts.extensionRe"]');
+    await page.type('input[id="scenarioOpts.extensionRe"]', expectedScenarioExtensionRe);
 
     // save the project and return to project list page
     await page.click('#save');
@@ -198,7 +199,7 @@ describe('Project CRUD Pages', () => {
     assert.strictEqual(updatedProject.crawlOpts.crawlDelay, expectedProject.crawlOpts.crawlDelay + 1);
 
     // check scenario opts
-    assert.strictEqual(updatedProject.scenarioProps.extensionRe, expectedScenarioExtensionRe);
+    assert.strictEqual(updatedProject.scenarioOpts.extensionRe, expectedScenarioExtensionRe);
 
     // check plugin definitions
     const updatedExtractUrlsPlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlsPlugin');
@@ -232,7 +233,7 @@ describe('Project CRUD Pages', () => {
     await page.click(`a[href=\\/project\\/${projectId}`);
 
     // wait for the project detail page to load
-    await page.waitFor('input#root_name');
+    await page.waitFor('input#name');
 
     // cancel the update
     await page.click('#cancel');

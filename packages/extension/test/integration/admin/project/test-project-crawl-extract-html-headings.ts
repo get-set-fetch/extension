@@ -8,7 +8,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html'
     },
-    scenarioProps: {
+    scenarioOpts: {
       name: 'extract-html-headings'
     },
     expectedResources: [

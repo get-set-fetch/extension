@@ -3,7 +3,7 @@ import { Page } from 'puppeteer';
 import BrowserHelper from '../../../helpers/BrowserHelper';
 
 /* eslint-disable no-shadow, max-len */
-describe('Site CRUD Pages', () => {
+xdescribe('Site CRUD Pages', () => {
   let browserHelper: BrowserHelper;
   let page: Page;
 
