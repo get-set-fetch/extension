@@ -1,12 +1,18 @@
+/* eslint-disable no-console */
 import * as React from 'react';
 import { setIn } from 'immutable';
 import { HttpMethod } from 'get-set-fetch-extension-commons';
 import { NavLink, RouteComponentProps } from 'react-router-dom';
+import PluginSchema from './model/plugin-schema.json';
 import Plugin from './model/Plugin';
 import Page from '../../layout/Page';
 import GsfClient from '../../components/GsfClient';
+import GsfForm from '../../components/uniforms/GsfForm';
+import SchemaBridgeHelper from '../../components/uniforms/bridge/GsfBridgeHelper';
+import GsfBridge from '../../components/uniforms/bridge/GsfBridge';
 
 interface IState {
+  bridge: GsfBridge;
   plugin: Plugin;
 }
 
@@ -19,6 +25,7 @@ export default class PluginDetail extends React.Component<RouteComponentProps<{p
     super(props);
 
     this.state = {
+      bridge: SchemaBridgeHelper.createBridge(PluginSchema),
       plugin: null,
     };
 
@@ -48,15 +55,11 @@ export default class PluginDetail extends React.Component<RouteComponentProps<{p
     this.setState({ plugin });
   }
 
-  changeHandler(evt) {
-    const val = evt.target.value;
-    const prop = evt.target.id;
-    this.setState({ plugin: setIn(this.state.plugin, [ prop ], val) });
+  changeHandler(key, value) {
+    this.setState({ plugin: setIn(this.state.plugin, [ key ], value) });
   }
 
-  async submitHandler(evt) {
-    evt.preventDefault();
-
+  async submitHandler() {
     try {
       if (this.state.plugin.id) {
         await GsfClient.fetch(HttpMethod.PUT, 'plugin', this.state.plugin);
@@ -78,34 +81,20 @@ export default class PluginDetail extends React.Component<RouteComponentProps<{p
       <Page
         title={this.state.plugin.id ? this.state.plugin.name : 'New Plugin'}
       >
-        <form className="form-main" onSubmit={this.submitHandler}>
-          <div className="form-group row">
-            <label htmlFor="name" className="col-sm-2 col-form-label text-right">Name</label>
-            <div className="col-sm-5">
-              <input
-                id="name" type="text" className="form-control"
-                value={this.state.plugin.name}
-                onChange={this.changeHandler}/>
-            </div>
+        <GsfForm
+          schema={this.state.bridge}
+          model={this.state.plugin.toJS()}
+          onChange={this.changeHandler}
+          onSubmit={this.submitHandler}
+          validate="onChangeAfterSubmit"
+          showInlineError={true}
+          validator={{ clean: true }}
+        >
+          <div className="form-group">
+            <input id="save" className="btn btn-secondary" type="submit" value="Save"/>
+            <NavLink id="cancel" to="/plugins" className="btn btn-light ml-4">Cancel</NavLink>
           </div>
-          <div className="form-group row">
-            <label htmlFor="code" className="col-sm-2 col-form-label text-right">Source Code</label>
-            <div className="col-sm-5">
-              <textarea
-                id="code" className="form-control"
-                value={this.state.plugin.code}
-                onChange={this.changeHandler}/>
-            </div>
-          </div>
-
-          <div className="form-group row">
-            <div className="col-sm-2"/>
-            <div className="col-sm-5">
-              <a id="save" className="btn btn-secondary" href="#" role="button" onClick={this.submitHandler}>Save</a>
-              <NavLink id="cancel" to="/plugins" className="btn btn-light ml-4">Cancel</NavLink>
-            </div>
-          </div>
-        </form>
+        </GsfForm>
       </Page>
     );
   }

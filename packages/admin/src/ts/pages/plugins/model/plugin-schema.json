@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": ["name", "code"],
+  "properties": {
+    "name": {
+      "title": "Name",
+      "type": "string",
+      "default": null
+    },
+    "code": {
+      "title": "Code",
+      "type": "string",
+      "default": null,
+      "ui": {
+        "customField": "CodeEditor",
+        "rows": 8
+      }
+    }
+  }
+}
