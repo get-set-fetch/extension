@@ -110,13 +110,9 @@ export default class SiteList extends React.Component<{}, IState> {
     return (
       <Page
         title='Sites'
-        actions={[
-          <NavLink key='newsite' id='newsite' to='/site/' className='btn btn-secondary float-right'>New Site</NavLink>,
-        ]}
       >
         <Table
           header={this.state.header}
-          rowLink={this.rowLink}
           data={this.state.data}
         />
       </Page>
