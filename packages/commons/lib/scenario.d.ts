@@ -20,8 +20,7 @@ export interface IScenarioLink {
 
 export interface IScenario {
   id?: string;
-  getConfigFormSchema: () => object;
-  getConfigFormUISchema: () => object;
+  getConfigFormSchema: () => IEnhancedJSONSchema;
   getPluginDefinitions: (data:any) => IPluginDefinition[];
   getResultTableHeaders(): IHeaderCol[];
   getResultExportOpts(): IExportOpt[];
@@ -43,5 +42,7 @@ export interface IEnhancedJSONSchema extends JSONSchema6 {
   properties?: {
     [k: string]: IEnhancedJSONSchema;
   };
-  enumNames?: string[];
+  ui?: {
+    enumNames?: string[];
+  }
 }
