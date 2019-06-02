@@ -109,3 +109,7 @@ a.scenario-homepage {
   display: inline-block;
   max-width: 300px;
 }
+
+select.form-control.is-invalid {
+  background-image: none;
+}
