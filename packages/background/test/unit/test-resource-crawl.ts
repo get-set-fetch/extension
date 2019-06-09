@@ -1,5 +1,6 @@
 import { assert } from 'chai';
 import IdbStorage from '../../src/ts/storage/IdbStorage';
+
 const conn = { info: 'IndexedDB' };
 
 async function updateCrawledAt(IdbResource, resourceId, deltaHours) {

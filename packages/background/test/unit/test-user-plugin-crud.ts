@@ -10,7 +10,7 @@ describe(`Test Storage Plugin - CRUD, using connection ${conn.info}`, () => {
   const expectedPlugin = {
     id: null,
     name: 'pluginA',
-    code: 'codeA'
+    code: 'codeA',
   };
 
   before(async () => {
@@ -78,7 +78,7 @@ describe(`Test Storage Plugin - CRUD, using connection ${conn.info}`, () => {
     await pluginC.save();
 
     // remove pluginA, pluginB
-    await Plugin.delSome([expectedPlugin.id, pluginB.id]);
+    await Plugin.delSome([ expectedPlugin.id, pluginB.id ]);
 
     // retrieve and compare remaining plugin
     const remainingPlugins = await Plugin.getAll();

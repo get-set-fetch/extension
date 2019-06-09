@@ -3,8 +3,8 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Response } from 'node-fetch';
-import ScenarioManager from '../../src/ts/scenarios/ScenarioManager';
 import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
+import ScenarioManager from '../../src/ts/scenarios/ScenarioManager';
 
 describe('Test ScenarioManager', () => {
   let sandbox;
@@ -16,33 +16,33 @@ describe('Test ScenarioManager', () => {
 
     // stub gsf readme.md
     fetchStub.withArgs('https://raw.githubusercontent.com/get-set-fetch/extension/master/README.md', sinon.match.any)
-    .returns(
-      new Promise((resolve) => {
-        const readme = fs.readFileSync(path.join(__dirname, '..', 'resources', 'scenarios', 'gsf-readme.md'));
-        const response = new Response(readme);
-        resolve(response);
-      })
-    );
+      .returns(
+        new Promise(resolve => {
+          const readme = fs.readFileSync(path.join(__dirname, '..', 'resources', 'scenarios', 'gsf-readme.md'));
+          const response = new Response(readme);
+          resolve(response);
+        }),
+      );
 
     // stub scenario-a package json
     fetchStub.withArgs('https://registry.npmjs.org/scenario-a/0.1.5', sinon.match.any)
-    .returns(
-      new Promise((resolve) => {
-        const readme = fs.readFileSync(path.join(__dirname, '..', 'resources', 'scenarios', 'scenario-a-package.json'));
-        const response = new Response(readme);
-        resolve(response);
-      })
-    );
+      .returns(
+        new Promise(resolve => {
+          const readme = fs.readFileSync(path.join(__dirname, '..', 'resources', 'scenarios', 'scenario-a-package.json'));
+          const response = new Response(readme);
+          resolve(response);
+        }),
+      );
 
     // stub scenario-a tarball
     fetchStub.withArgs('https://registry.npmjs.org/scenario-a/-/scenario-a-0.1.5.tgz', sinon.match.any)
-    .returns(
-      new Promise((resolve) => {
-        const readme = fs.readFileSync(path.join(__dirname, '..', 'resources', 'scenarios', 'scenario-a.tgz'));
-        const response = new Response(readme);
-        resolve(response);
-      })
-    );
+      .returns(
+        new Promise(resolve => {
+          const readme = fs.readFileSync(path.join(__dirname, '..', 'resources', 'scenarios', 'scenario-a.tgz'));
+          const response = new Response(readme);
+          resolve(response);
+        }),
+      );
   });
 
   after(() => {
@@ -53,7 +53,7 @@ describe('Test ScenarioManager', () => {
     const actualScenarios = await ScenarioManager.getNpmScenarioUrls();
     const expectedScenarios: string[] = [
       'https://registry.npmjs.org/scenario-a/0.1.5',
-      'https://registry.npmjs.org/scenario-b/2.3.0'
+      'https://registry.npmjs.org/scenario-b/2.3.0',
     ];
 
     assert.sameDeepOrderedMembers(actualScenarios, expectedScenarios);
@@ -70,10 +70,10 @@ describe('Test ScenarioManager', () => {
         main: 'dist/scenario-a.js',
         author: 'Author A',
         license: 'MIT',
-        homepage: 'https://github.com/scenario-a/scenario-a#readme'
+        homepage: 'https://github.com/scenario-a/scenario-a#readme',
       },
       code: 'scenario a code',
-      builtin: false
+      builtin: false,
     };
     assert.deepEqual(actualDetails, expectedDetails);
   });

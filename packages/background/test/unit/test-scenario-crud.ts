@@ -1,6 +1,6 @@
 import { assert } from 'chai';
-import IdbStorage from '../../src/ts/storage/IdbStorage';
 import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
+import IdbStorage from '../../src/ts/storage/IdbStorage';
 
 const conn = { info: 'IndexedDB' };
 
@@ -19,8 +19,8 @@ describe(`Test Storage ScenarioPackage - CRUD, using connection ${conn.info}`, (
       main: 'dist/scenario-a.js',
       author: 'Author A',
       license: 'MIT',
-      homepage: 'https://github.com/scenario-a/scenario-a#readme'
-    }
+      homepage: 'https://github.com/scenario-a/scenario-a#readme',
+    },
   };
 
   before(async () => {
@@ -75,5 +75,4 @@ describe(`Test Storage ScenarioPackage - CRUD, using connection ${conn.info}`, (
     const getScenarioPkg = await ScenarioPackage.get(expectedScenarioPkg.id);
     assert.isNull(getScenarioPkg);
   });
-
 });
