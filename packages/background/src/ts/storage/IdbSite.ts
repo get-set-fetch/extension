@@ -8,7 +8,7 @@ import Logger from '../logger/Logger';
 const Log = Logger.getLogger('IdbSite');
 
 /* eslint-disable class-methods-use-this */
-export default class IdbSite extends BaseEntity {
+export default class IdbSite extends BaseEntity implements ISite {
   // IndexedDB can't do partial update, define all site properties to be stored
   get props() {
     return [ 'id', 'projectId', 'name', 'url', 'robotsTxt', 'pluginDefinitions', 'resourceFilter' ];
@@ -194,7 +194,7 @@ export default class IdbSite extends BaseEntity {
    */
   crawlResource() {
     return new Promise(async (resolve, reject) => {
-      let resource = null;
+      let resource: IdbResource = null;
       for (let i = 0; i < this.plugins.length; i += 1) {
         try {
           // eslint-disable-next-line no-await-in-loop

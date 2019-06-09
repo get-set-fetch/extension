@@ -10,9 +10,6 @@ export default class SchemaBridgeHelper {
       validate(model);
 
       if (validate.errors) {
-        // eslint-disable-next-line no-console
-        console.log(validate.errors);
-
         validate.errors.forEach(error => {
           if (error.message === 'is the wrong type') {
             // eslint-disable-next-line no-param-reassign

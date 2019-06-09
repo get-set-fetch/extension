@@ -2,7 +2,7 @@ import { BaseResource } from 'get-set-fetch';
 import { IResource } from 'get-set-fetch-extension-commons';
 
 /* eslint-disable class-methods-use-this */
-export default class IdbResource extends BaseResource {
+export default class IdbResource extends BaseResource implements IResource {
   // get a read transaction
   static rTx() {
     return IdbResource.db.transaction('Resources').objectStore('Resources');
