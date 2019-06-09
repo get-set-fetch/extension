@@ -1,4 +1,4 @@
-import URL from 'url-parse';
+import Url from 'url-parse';
 import { IPlugin, IResource, ISite } from 'get-set-fetch-extension-commons';
 import ActiveTabHelper from '../../helpers/ActiveTabHelper';
 
@@ -13,8 +13,8 @@ export default class FetchPlugin implements IPlugin {
     if (this.probableHtmlMimeType(resource.url)) {
       return this.openInTab(site, resource);
     }
-    // url appears to be a non html mime type, download it and store it as blob
 
+    // url appears to be a non html mime type, download it and store it as blob
     return this.fetch(resource);
   }
 
@@ -83,6 +83,7 @@ export default class FetchPlugin implements IPlugin {
   openInTab(site: ISite, resource: IResource) {
     return new Promise(async (resolve, reject) => {
       let statusCode = null;
+      let redirectUrl = null;
 
       const reqHandler = request => {
         ({ statusCode } = request);
@@ -90,27 +91,40 @@ export default class FetchPlugin implements IPlugin {
         chrome.webRequest.onCompleted.removeListener(reqHandler);
       };
 
+      // https://developer.chrome.com/extensions/webRequest#event-onBeforeRedirect
+      const redirectHandler = details => {
+        ({ statusCode, redirectUrl } = details);
+        chrome.webRequest.onBeforeRedirect.removeListener(redirectHandler);
+      };
+
+      // https://developer.chrome.com/extensions/match_patterns, path is required, make sure it at least '/'
+      const { pathname } = new Url(resource.url);
+      const urlFilters = pathname.length === 0 ? [ `${resource.url}/` ] : [ resource.url ];
+
       // register request listers responsible for resolving or rejecting this plugin's apply fnc
-      chrome.webRequest.onErrorOccurred.addListener(reqHandler, { urls: [ resource.url ], tabId: site.tabId });
-      chrome.webRequest.onCompleted.addListener(reqHandler, { urls: [ resource.url ], tabId: site.tabId });
+      chrome.webRequest.onErrorOccurred.addListener(reqHandler, { urls: urlFilters, tabId: site.tabId });
+      chrome.webRequest.onCompleted.addListener(reqHandler, { urls: urlFilters, tabId: site.tabId });
+      chrome.webRequest.onBeforeRedirect.addListener(redirectHandler, { urls: urlFilters, tabId: site.tabId });
 
       // load the new resource
       await ActiveTabHelper.update(site.tabId, { url: resource.url });
 
-      // url request error
-      if (statusCode < 200 || statusCode > 299) {
-        reject(new Error(`onErrorOccurred: ${statusCode}`));
-      }
-      // url request succesfully completed
-      else {
+      // url request succesfully completed with (3xx) or without (2xx) redirection
+      if (/^(2|3)\d{2}$/.test(statusCode)) {
         const mediaType = await ActiveTabHelper.executeScript(site.tabId, { code: 'document.contentType' });
         resolve({ mediaType });
+      }
+      // url request error
+      else {
+        reject(new Error(`onErrorOccurred: ${statusCode}`));
       }
     });
   }
 
-  probableHtmlMimeType(url) {
-    const extensionMatch = /^.*\.(.+)$/.exec(url);
+  probableHtmlMimeType(urlStr: string) {
+    const { pathname } = new Url(urlStr);
+    const extensionMatch = /^.*\.(.+)$/.exec(pathname);
+
     // no extension found, most probably html
     if (!extensionMatch) {
       return true;

@@ -23,6 +23,7 @@ const mainConfig = {
     commonjs({
       namedExports: {
         pako: [ 'inflate' ],
+        'url-parse': [ 'Url' ],
       },
     }),
     json(),
