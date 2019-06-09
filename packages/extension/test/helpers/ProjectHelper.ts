@@ -26,7 +26,7 @@ export default class ProjectHelper {
     await page.type('input#description', project.description);
     await page.type('input#url', project.url);
 
-    if (project.crawlOpts && project.crawlOpts.maxDepth) {
+    if (project.crawlOpts && project.crawlOpts.maxDepth !== undefined) {
       await page.evaluate( () => (document.getElementById('crawlOpts.maxDepth') as HTMLInputElement).value = '');
       await page.type('input[id="crawlOpts.maxDepth"]', project.crawlOpts.maxDepth.toString());
     }
