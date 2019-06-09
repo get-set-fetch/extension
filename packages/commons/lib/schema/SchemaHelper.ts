@@ -56,10 +56,10 @@ export class SchemaHelper {
   }
 
   static parseNumber(schema, data) {
-    return parseInt(data || schema.default, 10);
+    return parseInt(typeof data === 'undefined' ? schema.default : data, 10);
   }
 
   static parseBoolean(schema, data) {
-    return (data || schema.default) === true;
+    return typeof data === 'undefined' ? schema.default : JSON.parse(data);
   }
 }

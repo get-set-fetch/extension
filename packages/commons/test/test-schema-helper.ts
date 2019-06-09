@@ -40,6 +40,9 @@ describe('Test Schema Helper', () => {
 
     inst = SchemaHelper.instantiate(schema, '5');
     assert.strictEqual(inst, 5);
+
+    inst = SchemaHelper.instantiate(schema, 0);
+    assert.strictEqual(inst, 0);
   });
 
   it('parse boolean', async () => {
@@ -53,6 +56,15 @@ describe('Test Schema Helper', () => {
 
     inst = SchemaHelper.instantiate(schema, 'false');
     assert.strictEqual(inst, false);
+
+    inst = SchemaHelper.instantiate(schema, false);
+    assert.strictEqual(inst, false);
+
+    inst = SchemaHelper.instantiate(schema, 'true');
+    assert.strictEqual(inst, true);
+
+    inst = SchemaHelper.instantiate(schema, true);
+    assert.strictEqual(inst, true);
   });
 
   it('parse object', async () => {
