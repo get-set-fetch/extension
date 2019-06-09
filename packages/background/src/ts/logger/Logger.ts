@@ -1,12 +1,5 @@
+import { LogLevel } from 'get-set-fetch-extension-commons';
 import IdbLog from '../storage/IdbLog';
-
-export enum LogLevel {
-  TRACE = 0,
-  DEBUG = 1,
-  INFO = 2,
-  WARN = 3,
-  ERROR = 4
-}
 
 export default class Logger {
   static logLevel: LogLevel = LogLevel.INFO;
@@ -20,7 +13,20 @@ export default class Logger {
   }
 
   static stringifyArgs(args) {
-    return args.length > 1 ? JSON.stringify(args) : args[0];
+    const compactArgs = args.map(arg => {
+      // arg is object, usefull for serializing errors
+      if (arg === Object(arg)) {
+        return Object.getOwnPropertyNames(arg).reduce(
+          (compactArg, propName) => Object.assign(compactArg, { [propName]: arg[propName] }),
+          {},
+        );
+      }
+
+      // arg is literal
+      return arg;
+    });
+
+    return compactArgs;
   }
 
   static setLogLevel(logLevel: LogLevel) {
@@ -64,16 +70,7 @@ export default class Logger {
 
   error(...args) {
     if (Logger.logLevel > 4) return;
-    const logEntry = new IdbLog({ level: LogLevel.ERROR, cls: this.cls });
-    if (args.length === 1 && args[0] instanceof Error) {
-      const err: Error = args[0] as Error;
-      logEntry.msg = err.message;
-      logEntry.stack = err.stack;
-    }
-    else {
-      logEntry.msg = Logger.stringifyArgs(args);
-    }
-
+    const logEntry = new IdbLog({ level: LogLevel.ERROR, cls: this.cls, msg: Logger.stringifyArgs(args) });
     logEntry.save();
   }
 }

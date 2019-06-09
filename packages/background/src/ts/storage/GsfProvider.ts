@@ -11,6 +11,7 @@ import IdbProject from './IdbProject';
 import IdbScenarioPackage from './IdbScenarioPackage';
 import ExportHelper from '../helpers/ExportHelper';
 import ScenarioManager from '../scenarios/ScenarioManager';
+import Logger from '../logger/Logger';
 
 /* eslint-disable no-case-declarations */
 export default class GsfProvider {
@@ -165,7 +166,7 @@ export default class GsfProvider {
           case /^project\/export\/[0-9]+$/.test(request.resource):
             projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
             const resources = await GsfProvider.Project.getAllResources(projectId);
-            reqPromise = ExportHelper.export(resources, request.body);
+            reqPromise = ExportHelper.exportResources(resources, request.body);
             break;
           // project/:projectId
           case /^project\/[0-9]+$/.test(request.resource):
@@ -406,6 +407,11 @@ export default class GsfProvider {
           case /^logs$/.test(request.resource):
             reqPromise = GsfProvider.Log.getAll();
             break;
+          // project/export/:projectId
+          case /^logs\/export$/.test(request.resource):
+            const logEntries = await GsfProvider.Log.getAll();
+            reqPromise = ExportHelper.exportLogs(logEntries);
+            break;
           default:
             reqPromise = new Promise(resolve => resolve());
         }
@@ -452,6 +458,11 @@ export default class GsfProvider {
           // settings
           case /^setting$/.test(request.resource):
             const setting = new GsfProvider.Setting(request.body);
+
+            // immediately propagate settings changes
+            if (setting.key === 'logLevel') {
+              Logger.setLogLevel(setting.val);
+            }
             reqPromise = setting.update();
             break;
           default:

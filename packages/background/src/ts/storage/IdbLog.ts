@@ -1,17 +1,10 @@
 import { BaseEntity } from 'get-set-fetch';
+import { ILog } from 'get-set-fetch-extension-commons';
 
-interface ILog {
-  date: Date;
-  level: number;
-  cls: string;
-  msg: string;
-  stack?: string;
-  id: number;
-}
-export default class IdbLog extends BaseEntity {
+export default class IdbLog extends BaseEntity implements ILog {
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return [ 'id', 'date', 'level', 'cls', 'msg', 'stack' ];
+    return [ 'id', 'date', 'level', 'cls', 'msg' ];
   }
 
   // get a read transaction
@@ -57,8 +50,7 @@ export default class IdbLog extends BaseEntity {
   date: Date;
   level: number;
   cls: string;
-  msg: string;
-  stack: string;
+  msg: string[];
   id: number;
 
   constructor(kwArgs: Partial<ILog> = {}) {
