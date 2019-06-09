@@ -1,13 +1,8 @@
 import { BaseEntity } from 'get-set-fetch';
+import { ISetting } from 'get-set-fetch-extension-commons';
 
 /* eslint-disable class-methods-use-this */
-interface ISetting {
-  id: number;
-  key: string;
-  val: string;
-}
-
-export default class IdbSetting extends BaseEntity {
+export default class IdbSetting extends BaseEntity implements ISetting {
   // get a read transaction
   static rTx() {
     return IdbSetting.db.transaction('Settings').objectStore('Settings');
@@ -61,7 +56,7 @@ export default class IdbSetting extends BaseEntity {
 
   id: number;
   key: string;
-  val: string;
+  val;
 
   constructor(kwArgs: Partial<ISetting> = {}) {
     super();
