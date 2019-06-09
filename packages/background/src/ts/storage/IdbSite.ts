@@ -228,10 +228,17 @@ export default class IdbSite extends BaseEntity implements ISite {
         catch (err) {
           console.log(err);
           Log.error(
-            `Crawl error for site ${this.name}`,
-            `${this.plugins[i].constructor.name} ${resource ? resource.url : ''}`,
-            JSON.stringify(err, Object.getOwnPropertyNames(err)),
+            `Crawl error for site ${this.name}, Plugin ${this.plugins[i].constructor.name} against resource ${resource ? resource.url : ''}`,
+            err,
           );
+
+          // reset the crawlInProgress flag, next crawl operation will attempt to crawl it again
+          if (resource) {
+            resource.crawlInProgress = false;
+            // eslint-disable-next-line no-await-in-loop
+            await resource.update(false);
+          }
+
           reject(err);
           break;
         }
@@ -247,9 +254,7 @@ export default class IdbSite extends BaseEntity implements ISite {
 
   async executePlugin(plugin, resource) {
     Log.info(
-      `Executing plugin ${plugin.constructor.name} `,
-      `using options ${JSON.stringify(plugin.opts)} `,
-      `against resource ${JSON.stringify(resource)}`,
+      `Executing plugin ${plugin.constructor.name} using options ${JSON.stringify(plugin.opts)} against resource ${JSON.stringify(resource)}`,
     );
 
     if (plugin.opts && plugin.opts.runInTab) {

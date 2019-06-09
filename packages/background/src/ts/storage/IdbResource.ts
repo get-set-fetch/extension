@@ -209,16 +209,19 @@ export default class IdbResource extends BaseResource implements IResource {
     });
   }
 
-  update() {
+  update(includeCrawledAt: boolean = true) {
     return new Promise((resolve, reject) => {
       const rwTx = IdbResource.rwTx();
-      this.crawledAt = new Date();
+      if (includeCrawledAt) {
+        this.crawledAt = new Date();
+      }
       this.crawlInProgress = false;
       const reqUpdateResource = rwTx.put(this.serialize());
       reqUpdateResource.onsuccess = () => resolve();
       reqUpdateResource.onerror = () => reject(new Error(`could not update resource: ${this.url}`));
     });
   }
+
 
   del() {
     return new Promise((resolve, reject) => {
