@@ -81,9 +81,6 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
     }
 
     const bridge = SchemaBridgeHelper.createBridge(mergedSchema);
-    console.log(JSON.stringify(mergedSchema));
-    console.log((bridge as any).schema);
-
 
     this.setState({
       project: newProject,
@@ -124,9 +121,6 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
 
 
   async changeHandler(key, value) {
-    console.log(`changeHandler ${key} - ${value}`);
-    console.log(this.state.project);
-
     // scenario option changed
     if (key === 'scenarioOpts.scenarioId') {
       const newProject = setIn(this.state.project, key.split('.'), parseInt(value, 10));
@@ -148,8 +142,6 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
   }
 
   async submitHandler() {
-    console.log('submitHandler');
-    console.log(this.state.project);
     // add plugable pluginDefinitions to current project
     const pluginDefinitions = this.state.scenario.getPluginDefinitions(this.state.project.scenarioOpts);
     this.updatePluginDefOpts(pluginDefinitions, 'SelectResourcePlugin', { crawlDelay: this.state.project.crawlOpts.crawlDelay });
