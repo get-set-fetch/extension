@@ -14,7 +14,7 @@
     "scraper"
   ],
   "author": {
-	  "name": "Andrei Sabau"
+    "name": "Andrei Sabau"
   },
   "license": "MIT",
   "bugs": {
@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/get-set-fetch/extension#readme",
   "devDependencies": {
-    "lerna": "^3.13.3",
+    "lerna": "^3.15.0",
     "rimraf": "^2.6.2"
   }
 }
