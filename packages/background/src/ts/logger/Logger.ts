@@ -1,4 +1,4 @@
-import { LogLevel } from 'get-set-fetch-extension-commons';
+import { LogLevel, ILog } from 'get-set-fetch-extension-commons';
 import IdbLog from '../storage/IdbLog';
 
 export default class Logger {
@@ -44,33 +44,40 @@ export default class Logger {
     this.cls = cls;
   }
 
-  trace(...args) {
-    if (Logger.logLevel > 0) return;
+  trace(...args): Promise<number> {
+    if (Logger.logLevel > 0) return Promise.resolve(null);
     const logEntry = new IdbLog({ level: LogLevel.TRACE, cls: this.cls, msg: Logger.stringifyArgs(args) });
-    logEntry.save();
+    return logEntry.save();
   }
 
-  debug(...args) {
-    if (Logger.logLevel > 1) return;
+  debug(...args): Promise<number> {
+    if (Logger.logLevel > 1) return Promise.resolve(null);
     const logEntry = new IdbLog({ level: LogLevel.DEBUG, cls: this.cls, msg: Logger.stringifyArgs(args) });
-    logEntry.save();
+    return logEntry.save();
   }
 
-  info(...args) {
-    if (Logger.logLevel > 2) return;
+  info(...args): Promise<number> {
+    if (Logger.logLevel > 2) return Promise.resolve(null);
     const logEntry = new IdbLog({ level: LogLevel.INFO, cls: this.cls, msg: Logger.stringifyArgs(args) });
-    logEntry.save();
+    return logEntry.save();
   }
 
-  warn(...args) {
-    if (Logger.logLevel > 3) return;
+  warn(...args): Promise<number> {
+    if (Logger.logLevel > 3) return Promise.resolve(null);
     const logEntry = new IdbLog({ level: LogLevel.WARN, cls: this.cls, msg: Logger.stringifyArgs(args) });
-    logEntry.save();
+    return logEntry.save();
   }
 
-  error(...args) {
-    if (Logger.logLevel > 4) return;
+  error(...args): Promise<number> {
+    if (Logger.logLevel > 4) return Promise.resolve(null);
     const logEntry = new IdbLog({ level: LogLevel.ERROR, cls: this.cls, msg: Logger.stringifyArgs(args) });
-    logEntry.save();
+    return logEntry.save();
+  }
+
+  generic(logEntry: ILog): Promise<number> {
+    if (Logger.logLevel > logEntry.level) return Promise.resolve(null);
+
+    const idbLogEntry = new IdbLog(logEntry);
+    return idbLogEntry.save();
   }
 }

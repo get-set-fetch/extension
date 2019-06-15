@@ -13,6 +13,8 @@ import ExportHelper from '../helpers/ExportHelper';
 import ScenarioManager from '../scenarios/ScenarioManager';
 import Logger from '../logger/Logger';
 
+const Log = Logger.getLogger('GsfProvider');
+
 /* eslint-disable no-case-declarations */
 export default class GsfProvider {
   static Site: typeof IdbSite;
@@ -411,6 +413,15 @@ export default class GsfProvider {
           case /^logs\/export$/.test(request.resource):
             const logEntries = await GsfProvider.Log.getAll();
             reqPromise = ExportHelper.exportLogs(logEntries);
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      case 'POST':
+        switch (true) {
+          case /^logs$/.test(request.resource):
+            reqPromise = Log.generic(request.body);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
