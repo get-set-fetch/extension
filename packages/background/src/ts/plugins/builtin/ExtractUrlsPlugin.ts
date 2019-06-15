@@ -95,7 +95,7 @@ export default class ExtractUrlsPlugin implements IPlugin {
     const imgSrcs = Array.from(new Set(Object.keys(imgs).map(key => imgs[key].src)));
 
     const partialUrls = anchorHrefs.concat(imgSrcs);
-    const validUrls = new Set();
+    const validUrls = new Set<string>();
 
     partialUrls.forEach(partialUrl => {
       // construct resource full URL without #hhtml_fragment_identifiers
