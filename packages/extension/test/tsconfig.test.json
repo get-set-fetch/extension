@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "strict": false,
+        "moduleResolution": "node",
+        "module": "commonjs",
+        "typeRoots": [
+            "../typings",
+            "../node_modules/@types"
+        ],
+        "allowJs": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop":true
+    },
+    "newLine": "LF",
+    "include": [
+        "../typings/global.d.ts",
+    ],
+}
