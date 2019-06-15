@@ -37,65 +37,181 @@ export default class ExportHelper {
     });
   }
 
-  static exportResourcesCSV(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
-    return new Promise(async resolve => {
-      const csvCols: string[] = opts.cols;
-      if (!csvCols || csvCols.length === 0) throw new Error('Expecting at least one column for csv content');
+  static getRowDetailCols(row: object, props: string[]): string[] {
+    return props.reduce(
+      (detailCols, rootKey) => {
+        const val = ExportHelper.nestedGetIn(row, rootKey);
 
-      const fieldSeparator = opts.fieldSeparator ? opts.fieldSeparator : ',';
-      const lineSeparator = opts.lineSeparator ? opts.lineSeparator : '\n';
+        // val is literal
+        if (val.constructor === String || val.constructor === Number || val.constructor === Boolean) {
+          detailCols.push(rootKey);
+          return detailCols;
+        }
 
-      const header = csvCols.join(fieldSeparator);
-      const body = resources
-        .map(resource => {
-          const row = csvCols.reduce(
-            (result: string[], key) => {
-              const propPath = key.split('.');
-              const val = ExportHelper.getIn(resource, propPath);
-              result.push(JSON.stringify(val || ''));
-              return result;
-            },
-            [],
-          );
-          return row.join(fieldSeparator);
-        })
-        .join(lineSeparator);
+        // val is array, assume each arr element is literal, doesn't contain objects
+        if (Array.isArray(val)) {
+          const arrCols = val.map((entry, idx) => `${rootKey}.${idx}`);
+          return detailCols.concat(arrCols);
+        }
 
-      const content = `${header}${lineSeparator}${body}`;
-      const contentBlob = new Blob([ content ], { type: 'text/csv' });
+        // val is object, each property may contain sub.objects
+        if (val.constructor === Object) {
+          const objProps = Object.keys(val).map(key => `${rootKey}.${key}`);
+          const objCols = ExportHelper.getRowDetailCols(row, objProps);
+          return detailCols.concat(objCols);
+        }
 
-      resolve({ url: URL.createObjectURL(contentBlob) });
-    });
+        return detailCols;
+      },
+      [],
+    );
   }
 
-  static exportLogs(logEntries: ILog[]): Promise<IExportResult> {
+  static exportCSV(data: object[], opts: IExportOpt): string {
+    const rootCols: string[] = opts.cols;
+    if (!rootCols || rootCols.length === 0) throw new Error('Expecting at least one column for csv content');
+
+    const fieldSeparator = opts.fieldSeparator ? opts.fieldSeparator : ',';
+    const lineSeparator = opts.lineSeparator ? opts.lineSeparator : '\n';
+
+    /*
+    get expanded cols
+    if rootCol points to an array, expandedCols will resolve to rootCol.0, rootCol.1, ...
+    if rootCol points to an object, expandedCols will resolve to rootCol.propA, rootCol.propB, ...
+    if rootCol points to a literal, expandedCols will resolve to rootCol
+
+    assumptations:
+      - array elements can only be literals
+      - obj properties can be literals, array, sub.objects
+    */
+    const globalCols = new Set<string>();
+    data.forEach(row => {
+      const detailCols = ExportHelper.getRowDetailCols(row, rootCols);
+      const diffCols = detailCols.filter(col => !globalCols.has(col));
+      if (diffCols.length > 0) {
+        diffCols.forEach(diffCol => globalCols.add(diffCol));
+      }
+    });
+
+    // order expanded globalCols based on rootCols
+    const orderedGlobalCols = Array.from(globalCols).sort((colA, colB) => {
+      const rootAIdx = rootCols.findIndex(rootCol => colA.indexOf(rootCol) === 0);
+      const rootBIdx = rootCols.findIndex(rootCol => colB.indexOf(rootCol) === 0);
+
+      return (rootAIdx === rootBIdx) ? colA.localeCompare(colB) : rootAIdx - rootBIdx;
+    });
+    const csvHeader = orderedGlobalCols.join(fieldSeparator);
+
+    // TO DO: one time propPaths generation, skipping the rather complicated getIn logic
+    // const propPaths = orderedGlobalCols.map(col => col.split('.'));
+
+    // map each data row to the expanded globalCols
+    const csvBody = data.map(
+      dataRow => {
+        const dataRowElms = orderedGlobalCols.reduce(
+          (elms, orderedGlobalCol) => {
+            const val = ExportHelper.nestedGetIn(dataRow, orderedGlobalCol);
+
+            if (val === undefined) {
+              elms.push('""');
+            }
+            else {
+              /*
+              RFC-4180 "If double-quotes are used to enclose fields,
+              then a double-quote appearing inside a field must be escaped by preceding it with another double quote."
+              */
+              const quotedVal = val.replace(/"/g, '""');
+              elms.push(`"${quotedVal}"`);
+            }
+
+            return elms;
+          },
+          [],
+        );
+
+        return dataRowElms.join(fieldSeparator);
+      },
+    ).join(lineSeparator);
+
+    const content = `${csvHeader}${lineSeparator}${csvBody}`;
+    return content;
+  }
+
+
+  static async exportResourcesCSV(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
+    if (resources.length === 0) throw new Error('Nothing to export. No resources found.');
+
+    const content = ExportHelper.exportCSV(resources, opts);
+    const contentBlob = new Blob([ content ], { type: 'text/csv' });
+    return { url: URL.createObjectURL(contentBlob) };
+  }
+
+  static async exportLogs(logEntries: ILog[]): Promise<IExportResult> {
     if (logEntries.length === 0) throw new Error('Nothing to export. No log entries found.');
 
-    return new Promise(async resolve => {
-      const csvCols = [ 'level', 'date', 'class', 'msg' ];
-      const fieldSeparator = ', ';
-      const lineSeparator = '\n';
-
-      const header = csvCols.join(fieldSeparator);
-      const body = logEntries
-        .map(logEntry => {
-          const { msg } = logEntry;
-          const msgContent = msg.map(msg => JSON.stringify(msg)).join(' , ');
-          const row = [ LogLevel[logEntry.level], logEntry.date, logEntry.cls, msgContent ];
-          return row.join(fieldSeparator);
-        })
-        .join(lineSeparator);
-
-      const content = `${header}${lineSeparator}${body}`;
-      const contentBlob = new Blob([ content ], { type: 'text/csv' });
-
-      resolve({ url: URL.createObjectURL(contentBlob) });
-    });
+    const content = ExportHelper.exportLogContent(logEntries);
+    const contentBlob = new Blob([ content ], { type: 'text/csv' });
+    return { url: URL.createObjectURL(contentBlob) };
   }
 
-  static getIn(nestedObj, path) {
+  static exportLogContent(logEntries: ILog[]): string {
+    const fieldSeparator = ', ';
+    const lineSeparator = '\n';
+
+    const content = logEntries
+      .map(logEntry => {
+        const { msg } = logEntry;
+        const msgContent = msg.map(msg => JSON.stringify(msg)).join(' , ');
+        const row = [ LogLevel[logEntry.level], logEntry.date.toISOString(), logEntry.cls, msgContent ];
+        return row.join(fieldSeparator);
+      })
+      .join(lineSeparator);
+
+    return content;
+  }
+
+  static getIn2(nestedObj, path: string[]) {
     return path.reduce(
       (obj, key) => ((obj && obj[key] !== 'undefined') ? obj[key] : undefined), nestedObj,
     );
+  }
+
+  /*
+    generally subobjects are detected by spliting the path against '.'
+    but this is not always the case
+    resource example:
+    info: {
+      content: {
+        h1: '...'
+        i.classA: [ ...]
+      }
+    }
+
+    info.content.h1 exists
+    info.content.i doesn't exists
+    info.content.i.classA exists
+    info.content.i.classA.0 exists
+  */
+  static nestedGetIn(nestedObj, path: string) {
+    const pathSegments = path.split('.');
+
+    let accPath: string[] = [];
+    let accProp: string;
+
+    const val = pathSegments.reduce(
+      (obj, key) => {
+        accPath.push(key);
+        accProp = accPath.join('.');
+        if (Object.keys(obj).includes(accProp)) {
+          accPath = [];
+          return obj[accProp];
+        }
+        return obj;
+      },
+      nestedObj,
+    );
+
+    // if the accumulated path is not resolved till the end, the path is non-existent
+    return accPath.length > 0 ? undefined : val;
   }
 }

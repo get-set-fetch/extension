@@ -32,10 +32,10 @@ const crawlDefinitions: ICrawlDefinition[] = [
         info: { content: { 'h1': ['PageB Heading Level 1'], 'i.classA': ['italics B1', 'italics B2'] } }
       }
     ],
-    expectedCsv: `url,info.content
-      "https://www.sitea.com/index.html",{"h1":["Main Header 1"],"i.classA":["italics main"]}
-      "https://www.sitea.com/pageA.html",{"h1":["PageA Heading Level 1"],"i.classA":["italics A"]}
-      "https://www.sitea.com/pageB.html",{"h1":["PageB Heading Level 1"],"i.classA":["italics B1","italics B2"]}`
+    expectedCsv: `url,info.content.h1.0,info.content.i.classA.0,info.content.i.classA.1
+      "https://www.sitea.com/index.html","Main Header 1","italics main",""
+      "https://www.sitea.com/pageA.html","PageA Heading Level 1","italics A",""
+      "https://www.sitea.com/pageB.html","PageB Heading Level 1","italics B1","italics B2"`
   },
   {
     title: 'maxDepth = 0',
@@ -58,8 +58,8 @@ const crawlDefinitions: ICrawlDefinition[] = [
         info: { content: { 'h1': ['Main Header 1'], 'i.classA': ['italics main'] } }
       }
     ],
-    expectedCsv: `url,info.content
-      "https://www.sitea.com/index.html",{"h1":["Main Header 1"],"i.classA":["italics main"]}`
+    expectedCsv: `url,info.content.h1.0,info.content.i.classA.0
+      "https://www.sitea.com/index.html","Main Header 1","italics main"`
   },
   {
     title: 'maxDepth = 1',
@@ -87,9 +87,9 @@ const crawlDefinitions: ICrawlDefinition[] = [
         info: { content: { 'h1': ['PageA Heading Level 1'], 'i.classA': ['italics A'] } }
       }
     ],
-    expectedCsv: `url,info.content
-      "https://www.sitea.com/index.html",{"h1":["Main Header 1"],"i.classA":["italics main"]}
-      "https://www.sitea.com/pageA.html",{"h1":["PageA Heading Level 1"],"i.classA":["italics A"]}`
+    expectedCsv: `url,info.content.h1.0,info.content.i.classA.0
+      "https://www.sitea.com/index.html","Main Header 1","italics main"
+      "https://www.sitea.com/pageA.html","PageA Heading Level 1","italics A"`
   }
 ];
 
