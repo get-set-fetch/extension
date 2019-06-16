@@ -33,6 +33,14 @@ a.nav-link {
   }
 }
 
+a.inner-nav-link {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+h5.inner {
+  color: green;
+}
 
 div.card-main {
   & .card-header {
