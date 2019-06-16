@@ -6,7 +6,6 @@ interface IProps {
 }
 
 export default class Page extends React.Component<IProps> {
-  //  <a className="btn btn-secondary float-right" href="#" role="button">New Project</a>
   render() {
     return ([
       // card header
