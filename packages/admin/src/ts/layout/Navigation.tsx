@@ -27,9 +27,10 @@ export default class Navigation extends React.Component {
             <NavLink to='/settings' className='nav-link'>Settings</NavLink>
             <br/>
 
-            <NavLink to='/help' className='nav-link'>Help</NavLink>
-            <a className='nav-link' href='#'>Blog/Posts</a>
-            <a className='nav-link' href='#'>Github</a>
+            <a className='nav-link' href='https://getsetfetch.org/extension' target="_blank"
+              rel="noopener noreferrer">Help</a>
+            <a className='nav-link' href='https://github.com/get-set-fetch/extension' target="_blank"
+              rel="noopener noreferrer">Github</a>
           </nav>
         </div>
       </div>,
