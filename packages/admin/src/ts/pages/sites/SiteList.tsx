@@ -39,7 +39,7 @@ export default class SiteList extends React.Component<{}, IState> {
               id={`crawl-${site.id}`}
               type='button'
               className='btn-secondary mr-2'
-              value='Crawl'
+              value='Scrape'
               onClick={() => this.crawlSite(site)}
             />,
             <input
