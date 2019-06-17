@@ -162,7 +162,8 @@ export default class ExportHelper {
       .map(logEntry => {
         const { msg } = logEntry;
         const msgContent = msg.map(msg => JSON.stringify(msg)).join(' , ');
-        const row = [ LogLevel[logEntry.level], logEntry.date.toISOString(), logEntry.cls, msgContent ];
+
+        const row = [ LogLevel[logEntry.level], new Date(logEntry.date).toISOString(), logEntry.cls, msgContent ];
         return row.join(fieldSeparator);
       })
       .join(lineSeparator);
