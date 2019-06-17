@@ -43,6 +43,10 @@ export class SchemaHelper {
         if (patternAndFlags) {
           regexp = new RegExp(patternAndFlags[1], patternAndFlags[2]);
         }
+        // could not construct regexp
+        else {
+          throw new Error(`Invalid regexp ${pattern}`);
+        }
       }
 
       // make sure regexp is serialized to its string representation
