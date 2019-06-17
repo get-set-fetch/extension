@@ -24,11 +24,6 @@ export default class IdbSite extends BaseEntity implements ISite {
     return IdbSite.db.transaction('Sites', 'readwrite').objectStore('Sites');
   }
 
-  static async parseResult(result) {
-    const plugins = await PluginManager.instantiate(result.pluginDefinitions);
-    return { plugins };
-  }
-
   static get(nameOrId: number|string): Promise<IdbSite> {
     return new Promise((resolve, reject) => {
       const rTx = IdbSite.rTx();
@@ -40,7 +35,6 @@ export default class IdbSite extends BaseEntity implements ISite {
           resolve(null);
         }
         else {
-          Object.assign(result, (await this.parseResult(result)));
           resolve(new IdbSite(result));
         }
       };
@@ -61,8 +55,6 @@ export default class IdbSite extends BaseEntity implements ISite {
         else {
           try {
             for (let i = 0; i < result.length; i += 1) {
-              // eslint-disable-next-line no-await-in-loop
-              Object.assign(result[i], (await this.parseResult(result[i])));
               result[i] = new IdbSite(result[i]);
             }
             resolve(result);
@@ -174,7 +166,7 @@ export default class IdbSite extends BaseEntity implements ISite {
 
   async crawl() {
     try {
-    this.plugins = await PluginManager.instantiate(this.pluginDefinitions);
+      this.plugins = await PluginManager.instantiate(this.pluginDefinitions);
     }
     catch (err) {
       Log.error(
