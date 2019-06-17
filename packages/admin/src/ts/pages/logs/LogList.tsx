@@ -39,7 +39,7 @@ export default class LogList extends React.Component<{}, IState> {
         {
           label: 'Message',
           render: (log: ILog) => {
-            const msgs = log.msg.map(msg => {
+            const msgs = log.msg ? log.msg.map(msg => {
               // msg is object, usefull for serializing errors
               if (msg === Object(msg)) {
                 return Object.getOwnPropertyNames(msg).map(propName => msg[propName]).join(' , ');
@@ -47,7 +47,7 @@ export default class LogList extends React.Component<{}, IState> {
 
               // arg is literal
               return msg;
-            });
+            }) : null;
 
             return msgs.map((msg, idx) => <span key={idx} style={{ display: 'block' }}>{msg}</span>);
           },
