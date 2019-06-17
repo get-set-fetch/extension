@@ -173,7 +173,15 @@ export default class IdbSite extends BaseEntity implements ISite {
   }
 
   async crawl() {
+    try {
     this.plugins = await PluginManager.instantiate(this.pluginDefinitions);
+    }
+    catch (err) {
+      Log.error(
+        `Error instantiating plugin definitions for site ${this.name}`,
+        err,
+      );
+    }
     this.resourcesNo = (await IdbSite.getAllIds()).length;
 
     let resource;
