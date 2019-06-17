@@ -11,7 +11,7 @@ const defaultProjectProps: IProjectStorage = {
     maxDepth: -1,
     maxResources: 100,
     crawlDelay: 1000,
-    pathnameRe: null,
+    pathnameRe: '',
   },
   scenarioOpts: {},
   pluginDefinitions: [],
