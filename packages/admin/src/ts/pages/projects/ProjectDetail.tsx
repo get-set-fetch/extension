@@ -144,9 +144,16 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
   async submitHandler() {
     // add plugable pluginDefinitions to current project
     const pluginDefinitions = this.state.scenario.getPluginDefinitions(this.state.project.scenarioOpts);
-    this.updatePluginDefOpts(pluginDefinitions, 'SelectResourcePlugin', { crawlDelay: this.state.project.crawlOpts.crawlDelay });
-    this.updatePluginDefOpts(pluginDefinitions, 'ExtractUrlsPlugin', { maxDepth: this.state.project.crawlOpts.maxDepth });
-    this.updatePluginDefOpts(pluginDefinitions, 'InsertResourcePlugin', { maxResources: this.state.project.crawlOpts.maxResources });
+    this.updatePluginDefOpts(pluginDefinitions, 'SelectResourcePlugin', {
+      crawlDelay: this.state.project.crawlOpts.crawlDelay,
+    });
+    this.updatePluginDefOpts(pluginDefinitions, 'ExtractUrlsPlugin', {
+      maxDepth: this.state.project.crawlOpts.maxDepth,
+      pathnameRe: this.state.project.crawlOpts.pathnameRe,
+    });
+    this.updatePluginDefOpts(pluginDefinitions, 'InsertResourcePlugin', {
+      maxResources: this.state.project.crawlOpts.maxResources,
+    });
 
     const finalProject = setIn(this.state.project, [ 'pluginDefinitions' ], pluginDefinitions);
 

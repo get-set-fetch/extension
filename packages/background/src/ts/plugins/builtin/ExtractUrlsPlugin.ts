@@ -13,14 +13,10 @@ export default class ExtractUrlsPlugin implements IPlugin {
       title: 'ExtractUrlsPlugin',
       type: 'object',
       properties: {
-        extensionRe: {
+        pathnameRe: {
           type: 'string',
           subType: 'regexp',
           default: null,
-        },
-        allowNoExtension: {
-          type: 'boolean',
-          default: true,
         },
         maxDepth: {
           type: 'number',
@@ -59,8 +55,7 @@ export default class ExtractUrlsPlugin implements IPlugin {
   }
 
   opts: {
-    extensionRe: RegExp;
-    allowNoExtension: boolean;
+    pathnameRe: RegExp;
     maxDepth: number;
     runInTab: boolean;
   };
@@ -146,21 +141,12 @@ export default class ExtractUrlsPlugin implements IPlugin {
       return false;
     }
 
-    // check extension (valid one or not an extension at all)
-    const extIdx = resourceUrl.pathname.lastIndexOf('.');
-    if (extIdx !== -1) {
-      const extVal = resourceUrl.pathname.substr(extIdx + 1);
-
-      // always add html looking resources to crawl
-      if (/htm/.test(extVal) || /php/.test(extVal)) {
-        return true;
-      }
-
-      // only add non html loooking resources if they match the extensionRe option
-      return extVal.match(this.opts.extensionRe) !== null;
+    // if no pathname regexp is defined, add all urls
+    if (!this.opts.pathnameRe) {
+      return true;
     }
 
-    // resource has no extension, return valid resource only if no extension flag allows it
-    return this.opts.allowNoExtension;
+    // only add the newly found urls matching the pathname regex
+    return resourceUrl.pathname.match(this.opts.pathnameRe);
   }
 }

@@ -4,6 +4,7 @@ interface IProjectCrawlOpts {
   maxDepth?: number;
   maxResources?: number;
   crawlDelay?: number;
+  pathnameRe?: string;
 }
 
 interface IProjectScenarioOpts {

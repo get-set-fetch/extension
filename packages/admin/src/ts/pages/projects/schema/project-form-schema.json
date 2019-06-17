@@ -50,6 +50,12 @@
           "ui": {
             "step": 1
           }
+        },
+        "pathnameRe": {
+          "type": "string",
+          "title": "Pathname regexp",
+          "description": "Only urls with a pathname matching the regexp will be scraped. Leave empty to add all links.",
+          "default": null
         }
       }
     },
