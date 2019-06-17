@@ -29,7 +29,7 @@ export default class Admin extends React.Component {
 
           {/* page content */}
           <div className='col-10 col-xl-9 pl-0'>
-            <div className='card card-main shadow-sm text-primary bg-white h-100'>
+            <div className='card card-main shadow-sm text-primary bg-white'>
 
               <Switch>
                 <Route path='/projects' component={ProjectList} />
