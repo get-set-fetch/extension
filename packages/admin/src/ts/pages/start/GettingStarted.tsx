@@ -18,7 +18,7 @@ export default class GettingStarted extends React.Component {
           <p>
             You can see the newly created project in the <NavLink to='/projects' className='inner-nav-link'>project list page</NavLink>.
             Clicking &quot;scrape&quot; from the action column will start the scraping process.
-            Urls to be scrapped will sequentially open in an additional tab with a delay defined at project creation.
+            Urls to be scraped will sequentially open in an additional tab with a delay defined at project creation.
           </p>
           <p>
             You can end the scrapping process at any time by closing the browser.
