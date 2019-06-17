@@ -170,7 +170,23 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
     return new Promise((resolve, reject) => {
       const rwTx = IdbProject.rwTx();
       const reqUpdateResource = rwTx.put(this.serialize());
-      reqUpdateResource.onsuccess = () => resolve();
+      reqUpdateResource.onsuccess = async e => {
+        this.id = e.target.result;
+
+        // also update the corresponding site(s)
+        try {
+          const sites = await IdbSite.getAll(this.id);
+          await Promise.all(sites.map(async site => {
+            Object.assign(site, { url: this.url, pluginDefinitions: this.pluginDefinitions });
+            await site.update();
+          }));
+
+          resolve(this.id);
+        }
+        catch (err) {
+          reject(err);
+        }
+      };
       reqUpdateResource.onerror = () => reject(new Error(`could not update project: ${this.name}`));
     });
   }
