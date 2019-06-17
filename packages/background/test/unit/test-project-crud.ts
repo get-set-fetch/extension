@@ -9,7 +9,7 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
   let Site: typeof IdbSite;
   let Project: typeof IdbProject;
 
-  const expectedProject = {
+  const expectedProject: Partial<IdbProject> = {
     id: null,
     name: 'projectA',
     url: 'http://siteA',
@@ -17,6 +17,7 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
       maxDepth: 11,
       maxResources: 101,
       crawlDelay: 1001,
+      pathnameRe: null,
     },
   };
 
