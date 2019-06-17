@@ -1,13 +1,16 @@
 {
 
   "manifest_version": 2,
-  "name": "Get Set Fetch",
+  "name": "get-set, Fetch! web scraper",
   "version": "{GSF_VERSION}",
 
-  "description": "Get Set Fetch",
+  "description": "Open source data scraper with csv, zip export capabilities. Provides scraping scenarios for fast, minimal configuration scraping.",
 
   "icons": {
-    "32": "icons/gsf_32x32.png"
+    "16": "icons/gsf_32x32.png",
+    "32": "icons/gsf_32x32.png",
+    "48": "icons/gsf_32x32.png",
+    "128": "icons/gsf_32x32.png"
   },
 
   "background": {
