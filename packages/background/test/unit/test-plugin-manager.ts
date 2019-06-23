@@ -20,7 +20,7 @@ describe('Test PluginManager', () => {
       {
         name: 'SelectResourcePlugin',
         opts: {
-          crawlFrequency: -1,
+          frequency: -1,
           delay: 1000,
         },
       },

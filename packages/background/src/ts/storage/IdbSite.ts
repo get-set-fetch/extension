@@ -160,8 +160,8 @@ export default class IdbSite extends BaseEntity implements ISite {
     this.tabId = null;
   }
 
-  getResourceToCrawl(crawlFrequency) {
-    return IdbResource.getResourceToCrawl(this.id, crawlFrequency);
+  getResourceToCrawl(frequency) {
+    return IdbResource.getResourceToCrawl(this.id, frequency);
   }
 
   async crawl() {

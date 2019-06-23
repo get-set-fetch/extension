@@ -50,7 +50,7 @@ describe(`Test Storage Resource - Crawl, using connection ${conn.info}`, () => {
     await IdbStorage.close();
   });
 
-  it('getResourceToCrawl without crawlFrequency', async () => {
+  it('getResourceToCrawl without frequency', async () => {
     const resourceUrl = 'http://siteA/resourceA';
 
     // save a not crawled resource
@@ -73,7 +73,7 @@ describe(`Test Storage Resource - Crawl, using connection ${conn.info}`, () => {
     assert.isNull(notCrawledResource);
   });
 
-  it('getResourceToCrawl with crawlFrequency', async () => {
+  it('getResourceToCrawl with frequency', async () => {
     const resourceUrl = 'http://siteA/resourceA';
 
     // save a not crawled resource

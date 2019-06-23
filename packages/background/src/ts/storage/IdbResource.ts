@@ -127,15 +127,15 @@ export default class IdbResource extends BaseResource implements IResource {
     });
   }
 
-  static async getResourceToCrawl(siteId, crawlFrequency) {
+  static async getResourceToCrawl(siteId, frequency) {
     // try to find a resource matching {siteId, crawlInProgress : false, crawledAt: null}
     let resource = await this.getResourceToCrawlWithKey(IDBKeyRange.only([ siteId, 0, new Date(0) ]));
 
-    // try to find a resource matching {siteId, crawlInProgress : false, crawledAt: older than crawlFrequency}
-    if (!resource && crawlFrequency >= 0) {
+    // try to find a resource matching {siteId, crawlInProgress : false, crawledAt: older than frequency}
+    if (!resource && frequency >= 0) {
       resource = await this.getResourceToCrawlWithKey(IDBKeyRange.bound(
         [ siteId, 0, new Date(0) ],
-        [ siteId, 0, new Date(Date.now() - (crawlFrequency * 60 * 60 * 1000)) ],
+        [ siteId, 0, new Date(Date.now() - (frequency * 60 * 60 * 1000)) ],
       ));
     }
 
