@@ -36,7 +36,7 @@ export class SchemaHelper {
         const pattern = data || schema.default;
 
         // no pattern to construct
-        if (!pattern) return null;
+        if (!pattern || pattern.length === 0) return null;
 
         const patternAndFlags = pattern.match(/^\/(.+)\/([gim]*)$/);
         // valid regexp identified
