@@ -109,7 +109,6 @@ export default class ExtractUrlsPlugin implements IPlugin {
       const resourceUrl = new URL(partialUrl, currentUrl);
       resourceUrl.hash = '';
 
-      // this.createResourceUrl(currentUrl, partialUrl);
       if (this.isValidResourceUrl(currentUrl, resourceUrl)) {
         validUrls.add(resourceUrl.toString());
       }
@@ -118,47 +117,63 @@ export default class ExtractUrlsPlugin implements IPlugin {
     return Array.from(validUrls);
   }
 
-  createResourceUrl(currentUrl, partialUrl) {
-    let resourceUrl = null;
-    // absolute path starting with "/" or http://, https://
-    if (partialUrl.indexOf('/') === 0 || partialUrl.match(/^(http:\/\/|https:\/\/)/i)) {
-      resourceUrl = new URL(partialUrl);
-    }
-    else {
-      // relative path
-      resourceUrl = new URL(ExtractUrlsPlugin.absoluteUrl(currentUrl.pathname, partialUrl));
-    }
-
-    resourceUrl.protocol = resourceUrl.protocol && resourceUrl.protocol.length > 0 ? resourceUrl.protocol : currentUrl.protocol;
-    resourceUrl.host = resourceUrl.host && resourceUrl.host.length > 0 ? resourceUrl.host : currentUrl.host;
-    resourceUrl.hostname = resourceUrl.hostname && resourceUrl.hostname.length > 0 ? resourceUrl.hostname : currentUrl.hostname;
-    resourceUrl.port = resourceUrl.port && resourceUrl.port.length > 0 ? resourceUrl.port : currentUrl.port;
-
-    return resourceUrl;
-  }
-
   isValidResourceUrl(currentUrl, resourceUrl) {
     // check valid protocol
     if (resourceUrl.protocol.match(/^(http:|https:)$/) === null) {
       return false;
     }
 
-    // check if internal
-    if (resourceUrl.hostname !== currentUrl.hostname) {
-      return false;
+    // check hostname matches regexp
+    if (this.opts.hostnameRe) {
+      if (!this.opts.hostnameRe.test(resourceUrl.hostname)) return false;
     }
+    // check hostname matches at domain level
+    else if (!this.sameDomainHostnames(resourceUrl.hostname, currentUrl.hostname)) return false;
 
     // check valid pathname
     if (resourceUrl.pathname === null) {
       return false;
     }
 
-    // if no pathname regexp is defined, add all urls
-    if (!this.opts.pathnameRe) {
-      return true;
+    /*
+    based on pathname decide if the resource is html or not
+    if no extension is found, resource is probably html
+    if an extension is found, test it against /htm|php/
+    */
+    const extensionRegExpArr = /^.*\.(.+)$/.exec(resourceUrl.pathname);
+    const isHtml = extensionRegExpArr ? /htm|php/.test(extensionRegExpArr[1]) : true;
+
+    // html resource found, filter which html pages should be queued for scraping
+    if (isHtml) {
+      // if no html regexp is defined ? add all urls : otherwise add only those matching the regexp
+      return this.opts.pathnameRe ? this.opts.pathnameRe.test(resourceUrl.pathname) : true;
     }
 
-    // only add the newly found urls matching the pathname regex
-    return resourceUrl.pathname.match(this.opts.pathnameRe);
+    /*
+    non html resource found
+    if no non-html regexp is defined ? skip all urls : otherwise add only those matching the regexp
+    */
+    return this.opts.resourcePathnameRe ? this.opts.resourcePathnameRe.test(resourceUrl.pathname) : false;
+  }
+
+  sameDomainHostnames(hostname: string, targetHostname: string): boolean {
+    const hostnameParts = hostname.split('.').reverse();
+    let commonHostname = '';
+
+    hostnameParts.forEach((hostnamePart, idx) => {
+      const cummulatedHostname = hostnameParts.slice(0, idx + 1).reverse().join('.');
+      if (targetHostname.endsWith(cummulatedHostname)) {
+        commonHostname = cummulatedHostname;
+      }
+    });
+
+    /*
+    something ending in:
+    - one extension (2 or more letters): .com, .info, ...
+    - two extensions (2-4 letters, 2 or more letters): co.uk, com.ro
+    the domain without extension has to be 4 letters or more, testing bla.com will fail
+    for now this is an acceptable compromise
+    */
+    return /[\w-]{4,}\.[\w-]{2,}$|[\w-]+\.[\w-]{2,4}\.[\w-]{2,}$/.test(commonHostname);
   }
 }
