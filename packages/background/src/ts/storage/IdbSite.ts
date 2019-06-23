@@ -322,6 +322,7 @@ export default class IdbSite extends BaseEntity implements ISite {
             // keep saving new resources
             if (resources.length > 0) {
               const resource = resources.pop();
+              Log.info(`saving resource: ${resource.url}`);
               const reqAddResource = tx.objectStore('Resources').add(resource);
               reqAddResource.onsuccess = successHandler;
               reqAddResource.onerror = () => reject(new Error(`could not add resource: ${resource.url}`));
