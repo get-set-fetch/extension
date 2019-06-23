@@ -68,12 +68,12 @@
 
     "scenarioOpts": {
       "type": "object",
-      "title": "Scenario Options",
+      "title": "Scrape Scenario Options",
       "required": ["scenarioId"],
       "properties": {
         "scenarioId": {
           "type": "number",
-          "title": "Crawl Scenario"
+          "title": "Scrape Scenario"
         },
         "description": {
           "type": "string",

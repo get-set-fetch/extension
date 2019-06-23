@@ -21,7 +21,7 @@ export default class GettingStarted extends React.Component {
             Urls to be scraped will sequentially open in an additional tab with a delay defined at project creation.
           </p>
           <p>
-            You can end the scrapping process at any time by closing the browser.
+            You can end the scrapping process at any time by closing the responsible browser tab.
             Next time you start scraping, the process will resume from where it was interrupted.
           </p>
 
