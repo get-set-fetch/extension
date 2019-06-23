@@ -114,7 +114,7 @@ describe('Project CRUD Pages', () => {
 
     // dropdown scenario is correctly populated#
     const expectedScenarioIdOpts = [
-      { label: 'Crawl Scenario' },
+      { label: 'Scrape Scenario' },
       { label: 'get-set-fetch-scenario-extract-html-content' },
       { label: 'get-set-fetch-scenario-extract-resources' }
     ];
