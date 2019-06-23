@@ -10,7 +10,8 @@ const defaultProjectProps: IProjectStorage = {
   crawlOpts: {
     maxDepth: -1,
     maxResources: 100,
-    crawlDelay: 1000,
+    delay: 1000,
+    hostnameRe: '',
     pathnameRe: '',
   },
   scenarioOpts: {},

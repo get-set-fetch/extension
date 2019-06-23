@@ -13,10 +13,20 @@ export default class ExtractUrlsPlugin implements IPlugin {
       title: 'ExtractUrlsPlugin',
       type: 'object',
       properties: {
+        hostnameRe: {
+          type: 'string',
+          subType: 'regexp',
+          default: '',
+        },
         pathnameRe: {
           type: 'string',
           subType: 'regexp',
-          default: null,
+          default: '',
+        },
+        resourcePathnameRe: {
+          type: 'string',
+          subType: 'regexp',
+          default: '',
         },
         maxDepth: {
           type: 'number',
@@ -55,7 +65,9 @@ export default class ExtractUrlsPlugin implements IPlugin {
   }
 
   opts: {
+    hostnameRe: RegExp;
     pathnameRe: RegExp;
+    resourcePathnameRe: RegExp;
     maxDepth: number;
     runInTab: boolean;
   };

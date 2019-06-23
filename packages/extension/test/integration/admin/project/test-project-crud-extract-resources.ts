@@ -1,20 +1,23 @@
 import { assert } from 'chai';
 import { Page } from 'puppeteer';
 import BrowserHelper, { clear } from '../../../helpers/BrowserHelper';
+import { IProjectStorage } from 'get-set-fetch-extension-commons';
 
 /* eslint-disable no-shadow, max-len */
 describe('Project CRUD Pages', () => {
   let browserHelper: BrowserHelper;
   let page: Page;
 
-  const expectedProject = {
+  const expectedProject: Partial<IProjectStorage> = {
     name: 'projectA',
     description: 'projectA description',
     url: 'http://www.sitea.com/index.html',
     crawlOpts: {
       maxDepth: 11,
       maxResources: 101,
-      crawlDelay: 1001
+      delay: 1001,
+      hostnameRe: '/hostname/',
+      pathnameRe: '/pathname/'
     },
     scenarioOpts: {
       scenarioId: null
@@ -23,7 +26,7 @@ describe('Project CRUD Pages', () => {
       {
         name: 'SelectResourcePlugin',
         opts: {
-          crawlDelay: 1001
+          delay: 1001
         }
       },
       {
@@ -32,7 +35,9 @@ describe('Project CRUD Pages', () => {
       {
         name: 'ExtractUrlsPlugin',
         opts: {
-          extensionRe: '/^(gif|png|jpg|jpeg)$/i',
+          hostnameRe: '/hostname/',
+          pathnameRe: '/pathname/',
+          resourcePathnameRe: '/(gif|png|jpg|jpeg)$/i',
           maxDepth: 11
         }
       },
@@ -98,8 +103,14 @@ describe('Project CRUD Pages', () => {
     await page.evaluate( () => (document.getElementById('crawlOpts.maxResources') as HTMLInputElement).value = '');
     await page.type('input[id="crawlOpts.maxResources"]', expectedProject.crawlOpts.maxResources.toString());
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.crawlDelay') as HTMLInputElement).value = '');
-    await page.type('input[id="crawlOpts.crawlDelay"]', expectedProject.crawlOpts.crawlDelay.toString());
+    await page.evaluate( () => (document.getElementById('crawlOpts.delay') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.delay"]', expectedProject.crawlOpts.delay.toString());
+
+    await page.evaluate( () => (document.getElementById('crawlOpts.hostnameRe') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.hostnameRe"]', expectedProject.crawlOpts.hostnameRe.toString());
+
+    await page.evaluate( () => (document.getElementById('crawlOpts.pathnameRe') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.pathnameRe"]', expectedProject.crawlOpts.pathnameRe.toString());
 
     // dropdown scenario is correctly populated#
     const expectedScenarioIdOpts = [
@@ -152,7 +163,7 @@ describe('Project CRUD Pages', () => {
     const changedSuffix = '_changed';
 
     // create a new project
-    const projectId = await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject);
+    const projectId = await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject as any);
 
     // reload project list
     await browserHelper.goto('/projects');
@@ -175,13 +186,19 @@ describe('Project CRUD Pages', () => {
     await page.evaluate( () => (document.getElementById('crawlOpts.maxResources') as HTMLInputElement).value = '');
     await page.type('input[id="crawlOpts.maxResources"]', (expectedProject.crawlOpts.maxResources + 1).toString());
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.crawlDelay') as HTMLInputElement).value = '');
-    await page.type('input[id="crawlOpts.crawlDelay"]', (expectedProject.crawlOpts.crawlDelay + 1).toString());
+    await page.evaluate( () => (document.getElementById('crawlOpts.delay') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.delay"]', (expectedProject.crawlOpts.delay + 1).toString());
+
+    await page.evaluate( () => (document.getElementById('crawlOpts.hostnameRe') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.hostnameRe"]', '/hostname_changed/');
+
+    await page.evaluate( () => (document.getElementById('crawlOpts.pathnameRe') as HTMLInputElement).value = '');
+    await page.type('input[id="crawlOpts.pathnameRe"]', '/pathname_changed/');
 
     // change linked scenario properties
-    const expectedScenarioExtensionRe = '/png/';
-    await clear(page, 'input[id="scenarioOpts.extensionRe"]');
-    await page.type('input[id="scenarioOpts.extensionRe"]', expectedScenarioExtensionRe);
+    const expectedScenarioresourcePathnameRe = '/png/';
+    await clear(page, 'input[id="scenarioOpts.resourcePathnameRe"]');
+    await page.type('input[id="scenarioOpts.resourcePathnameRe"]', expectedScenarioresourcePathnameRe);
 
     // save the project and return to project list page
     await page.click('#save');
@@ -196,21 +213,24 @@ describe('Project CRUD Pages', () => {
 
     assert.strictEqual(updatedProject.crawlOpts.maxDepth, expectedProject.crawlOpts.maxDepth + 1);
     assert.strictEqual(updatedProject.crawlOpts.maxResources, expectedProject.crawlOpts.maxResources + 1);
-    assert.strictEqual(updatedProject.crawlOpts.crawlDelay, expectedProject.crawlOpts.crawlDelay + 1);
+    assert.strictEqual(updatedProject.crawlOpts.delay, expectedProject.crawlOpts.delay + 1);
+
+    assert.strictEqual(updatedProject.crawlOpts.hostnameRe, '/hostname_changed/');
+    assert.strictEqual(updatedProject.crawlOpts.pathnameRe, '/pathname_changed/');
 
     // check scenario opts
-    assert.strictEqual(updatedProject.scenarioOpts.extensionRe, expectedScenarioExtensionRe);
+    assert.strictEqual(updatedProject.scenarioOpts.resourcePathnameRe, expectedScenarioresourcePathnameRe);
 
     // check plugin definitions
     const updatedExtractUrlsPlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlsPlugin');
-    assert.strictEqual(updatedExtractUrlsPlugin.opts.extensionRe, expectedScenarioExtensionRe);
+    assert.strictEqual(updatedExtractUrlsPlugin.opts.resourcePathnameRe, expectedScenarioresourcePathnameRe);
     assert.strictEqual(updatedExtractUrlsPlugin.opts.maxDepth, expectedProject.crawlOpts.maxDepth + 1);
 
     const insertResourcePlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'InsertResourcePlugin');
     assert.strictEqual(insertResourcePlugin.opts.maxResources, expectedProject.crawlOpts.maxResources + 1);
 
     const selectResourcePlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'SelectResourcePlugin');
-    assert.strictEqual(selectResourcePlugin.opts.crawlDelay, expectedProject.crawlOpts.crawlDelay + 1);
+    assert.strictEqual(selectResourcePlugin.opts.delay, expectedProject.crawlOpts.delay + 1);
 
     // check updated project presence in project list
     await page.waitFor(`a[href=\\/project\\/${updatedProject.id}`);
@@ -223,7 +243,7 @@ describe('Project CRUD Pages', () => {
 
   it('Test Update and Cancel Existing Project', async () => {
     // create a new project
-    const projectId = await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject);
+    const projectId = await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject as any);
 
     // reload project list
     await browserHelper.goto('/projects');
@@ -244,7 +264,7 @@ describe('Project CRUD Pages', () => {
 
   it('Test Delete Existing Project', async () => {
    // create a new project
-   const projectId = await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject);
+   const projectId = await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject as any);
 
    // reload project list
    await browserHelper.goto('/projects');

@@ -145,10 +145,11 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
     // add plugable pluginDefinitions to current project
     const pluginDefinitions = this.state.scenario.getPluginDefinitions(this.state.project.scenarioOpts);
     this.updatePluginDefOpts(pluginDefinitions, 'SelectResourcePlugin', {
-      crawlDelay: this.state.project.crawlOpts.crawlDelay,
+      delay: this.state.project.crawlOpts.delay,
     });
     this.updatePluginDefOpts(pluginDefinitions, 'ExtractUrlsPlugin', {
       maxDepth: this.state.project.crawlOpts.maxDepth,
+      hostnameRe: this.state.project.crawlOpts.hostnameRe,
       pathnameRe: this.state.project.crawlOpts.pathnameRe,
     });
     this.updatePluginDefOpts(pluginDefinitions, 'InsertResourcePlugin', {

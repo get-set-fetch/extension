@@ -3,8 +3,11 @@ import { IPluginDefinition } from './plugin';
 interface IProjectCrawlOpts {
   maxDepth?: number;
   maxResources?: number;
-  crawlDelay?: number;
+  delay?: number;
+  hostnameRe?: string;
   pathnameRe?: string;
+  resourceHostnameRe? : string;
+  resourcePathnameRe?: string;
 }
 
 interface IProjectScenarioOpts {

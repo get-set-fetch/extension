@@ -6,7 +6,7 @@ import { SchemaHelper, IPlugin } from 'get-set-fetch-extension-commons';
 export default class SelectResourcePlugin implements IPlugin {
   opts: {
     crawlFrequency: number;
-    crawlDelay: number;
+    delay: number;
   };
 
   static get OPTS_SCHEMA() {
@@ -21,7 +21,7 @@ export default class SelectResourcePlugin implements IPlugin {
           default: '-1',
           help: 'How often a resource should be re-crawled (hours), enter -1 to never re-crawl.',
         },
-        crawlDelay: {
+        delay: {
           type: 'number',
           default: '1000',
           help: 'Delay in miliseconds between fetching two consecutive resources.',
@@ -39,7 +39,7 @@ export default class SelectResourcePlugin implements IPlugin {
   }
 
   async apply(site) {
-    await new Promise(resolve => setTimeout(resolve, this.opts.crawlDelay));
+    await new Promise(resolve => setTimeout(resolve, this.opts.delay));
     return site.getResourceToCrawl(this.opts.crawlFrequency);
   }
 }

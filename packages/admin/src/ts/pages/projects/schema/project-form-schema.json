@@ -22,7 +22,7 @@
     "crawlOpts": {
       "title": "Crawl Options",
       "type": "object",
-      "required": ["maxDepth", "maxResources", "crawlDelay"],
+      "required": ["maxDepth", "maxResources", "delay"],
       "properties": {
         "maxDepth": {
           "type": "number",
@@ -42,7 +42,7 @@
             "step": 1
           }
         },
-        "crawlDelay": {
+        "delay": {
           "type": "number",
           "title": "Crawl delay",
           "description": "Delay in miliseconds between fetching two consecutive resources.",
@@ -51,10 +51,16 @@
             "step": 1
           }
         },
+        "hostnameRe": {
+          "type": "string",
+          "title": "Domain regexp filter",
+          "description": "Based on URL hostname, filter which html pages should be queued for scraping. Leave empty to only add resources from the same domain (including subdomains). Ex: /\\.org$/ only links from .org domains will be scraped.",
+          "default": ""
+        },
         "pathnameRe": {
           "type": "string",
-          "title": "Pathname regexp",
-          "description": "Only urls with a pathname matching the regexp will be scraped. Leave empty to add all links.",
+          "title": "Pathname regexp filter",
+          "description": "Based on URL pathname, filter which html pages should be queued for scraping. Leave empty to add all links. Ex: /product/ - only links like extra-product-extra.html will be scraped. Ex: /category\\/product/ - only links like extra-category/product-extra.html will be scraped.",
           "default": ""
         }
       }

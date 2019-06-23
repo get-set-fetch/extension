@@ -109,7 +109,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // adjust crawl delay
     const selectResourceDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'SelectResourcePlugin');
-    selectResourceDef.opts.crawlDelay = delay;
+    selectResourceDef.opts.delay = delay;
 
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');

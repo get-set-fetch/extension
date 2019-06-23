@@ -13,7 +13,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     },
     scenarioOpts: {
       name: 'get-set-fetch-scenario-extract-resources',
-      extensionRe: '/^(html|htm|php|png)$/i',
+      resourcePathnameRe: '/(png)$/i'
     },
     expectedResources: [
       { url: 'https://www.sitea.com/index.html', mediaType: 'text/html', info: {} },

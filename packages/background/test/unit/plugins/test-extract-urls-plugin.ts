@@ -45,7 +45,7 @@ describe('Test Extract Urls Plugin', () => {
   });
 
   it('extract unique urls - include images', () => {
-    extractUrlsPlugin = new ExtractUrlsPlugin({ extensionRe: '/^(html|png)$/i' });
+    extractUrlsPlugin = new ExtractUrlsPlugin({ resourcePathnameRe: '/(jpg|png)$/i' });
 
     stubDocument.withArgs('a').returns([
       { href: 'http://sitea.com/page1.html' },

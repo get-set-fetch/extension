@@ -36,9 +36,9 @@ export default class ProjectHelper {
       await page.type('input[id="crawlOpts.maxResources"]', project.crawlOpts.maxResources.toString());
     }
 
-    if (project.crawlOpts && project.crawlOpts.crawlDelay) {
-      await page.evaluate( () => (document.getElementById('crawlOpts.crawlDelay') as HTMLInputElement).value = '');
-      await page.type('input[id="crawlOpts.crawlDelay"]', project.crawlOpts.crawlDelay.toString());
+    if (project.crawlOpts && project.crawlOpts.delay) {
+      await page.evaluate( () => (document.getElementById('crawlOpts.delay') as HTMLInputElement).value = '');
+      await page.type('input[id="crawlOpts.delay"]', project.crawlOpts.delay.toString());
     }
 
     // fill in dropdown scenario

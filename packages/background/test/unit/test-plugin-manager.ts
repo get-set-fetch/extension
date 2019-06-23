@@ -21,7 +21,7 @@ describe('Test PluginManager', () => {
         name: 'SelectResourcePlugin',
         opts: {
           crawlFrequency: -1,
-          crawlDelay: 1000,
+          delay: 1000,
         },
       },
       {
@@ -31,7 +31,9 @@ describe('Test PluginManager', () => {
       {
         name: 'ExtractUrlsPlugin',
         opts: {
+          hostnameRe: null,
           pathnameRe: null,
+          resourcePathnameRe: null,
           maxDepth: -1,
           runInTab: true,
         },

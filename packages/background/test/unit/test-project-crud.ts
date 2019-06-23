@@ -16,8 +16,9 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     crawlOpts: {
       maxDepth: 11,
       maxResources: 101,
-      crawlDelay: 1001,
+      delay: 1001,
       pathnameRe: null,
+      resourcePathnameRe: null,
     },
   };
 

@@ -1,13 +1,13 @@
 export default {
   type: 'object',
-  required: [ 'extensionRe' ],
+  required: [ 'resourcePathnameRe' ],
   properties: {
-    extensionRe: {
+    resourcePathnameRe: {
       type: 'string',
       subType: 'regexp',
-      title: 'Extensions',
-      description: 'File extensions you want to save.',
-      default: '/^(gif|png|jpg|jpeg)$/i',
+      title: 'Resource regexp filter',
+      description: 'Filter which resources you want to save.',
+      default: '/(gif|png|jpg|jpeg)$/i',
     },
   },
 };
