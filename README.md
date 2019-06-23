@@ -8,7 +8,10 @@
 [![Coverage Status](https://coveralls.io/repos/github/get-set-fetch/extension/badge.svg?branch=master)](https://coveralls.io/github/get-set-fetch/extension?branch=master)
 
 # Browser Extension
-get-set, Fetch! is a Chrome extension for scraping sites through out a series of parametrizable scraping scenarios.
+get-set, Fetch! is a browser extension for scraping sites through out a series of parametrizable scraping scenarios.
+
+Currently supported browsers: Chrome.
+
 The most common use cases are handled by builtin scenarios:
 - [Extract Html Content](https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-html-content)
   - Scraps text representation of html nodes
@@ -18,10 +21,10 @@ The most common use cases are handled by builtin scenarios:
 You can also install community based scenarios:
 
 - [Extract Html Headings](https://github.com/a1sabau/gsf-extension-extract-html-headings) - [v0.1.1](https://registry.npmjs.org/gsf-extension-extract-html-headings/0.1.1) 
-  - "Hello World" example of writing a scenario
+  - "Hello World" example of writing a scrape scenario
 
 
-If you wrote a scraping scenario and want to share it, update the above list and make a pull request.
+If you wrote a scraping scenario and want to share it, please update the above list and make a pull request.
 
 The extension is structured as a monorepo with the following sub-packages:
 - commons: mostly typescript definitions
@@ -37,19 +40,19 @@ In time, a more detailed documentation with lots of examples will be available a
 You can find technical tidbits in each sub-package readme file.
 
 # Short-Term Roadmap
-## v.0.1.1
-  - add crawl delay as a SelectResourcePlugin option
-  - add crawl maxResources as a SelectResourcePlugin option
-  - add resourceFilter options as an InsertResourcePlugin option  
 
 ## v.0.1.2
-  - create a scraping template format starting from { scenarioName, scenarioOpts, ... }
+  - add resourceFilter options as an InsertResourcesPlugin option  
+  - create a scraping template format starting from { crawlOpts, scenarioName, scenarioOpts, ... }
   - load templates from arbitrary URIs
   - use templates to simplify the creation of scrape projects by automatically populating most of the scraping parameters
   - add template based, getting-started examples
 
+## v.0.1.3
+  - add column filter capability when exporting resources as csv
+  - add import / export database capabilities
+
 # Medium-Term Roadmap
-- add column filter capability when exporting resources as csv
-- add granularity to ExtractUrlsPlugin maxDepth option in order to accommodate both internal and external links relative to the site being scraped
-- add import / export database capabilities
-- add log export capability
+  - add Firefox support
+  - add additional scraping scenarios
+

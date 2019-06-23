@@ -4,13 +4,15 @@ React based frontend communicating with the backend (extension background script
 Bundled as a single page app with the help of react-router-dom.
 
 The following sections are available, either static or based on json-schemas:
-- settings
-- logs
-- plugins
-- scenarios
-- sites
+- getting-started
 - projects
+- sites
+- scenarios
+- plugins
+- logs
+- settings
+
 
 ## Roadmap
-- add a "Getting Started" section with out-of-the-box working examples
+- update the "Getting Started" section with out-of-the-box, template based examples
 - internationalization
