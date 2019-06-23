@@ -39,7 +39,7 @@ export default class InsertResourcePlugin implements IPlugin {
     const maxAllowedResourceNo = this.opts.maxResources - site.resourcesNo;
 
     if (maxAllowedResourceNo > 0) {
-      const resourcesToInsert = resource.urlsToAdd.slice(0, maxAllowedResourceNo + 1);
+      const resourcesToInsert = resource.urlsToAdd.slice(0, maxAllowedResourceNo);
 
       // eslint-disable-next-line no-param-reassign
       site.resourcesNo += resourcesToInsert.length;
