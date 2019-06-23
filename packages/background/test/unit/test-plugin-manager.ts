@@ -43,7 +43,7 @@ describe('Test PluginManager', () => {
         opts: undefined,
       },
       {
-        name: 'InsertResourcePlugin',
+        name: 'InsertResourcesPlugin',
         opts: {
           maxResources: 100,
         },

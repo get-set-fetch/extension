@@ -37,7 +37,7 @@ xdescribe('Site Crawl Extract Images', () => {
         name: 'UpdateResourcePlugin'
       },
       {
-        name: 'InsertResourcePlugin'
+        name: 'InsertResourcesPlugin'
       }
     ]
   };

@@ -40,7 +40,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     await Site.delAll();
 
     // save site
-    const testPlugins = [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin' ];
+    const testPlugins = [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'UpdateResourcePlugin', 'InsertResourcesPlugin' ];
     const pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(pluginDef => testPlugins.indexOf(pluginDef.name) !== -1);
     site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions });
     await site.save();
@@ -88,7 +88,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     const extractUrlsPlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlsPlugin');
     extractUrlsPlugDef.opts.maxDepth = 100;
 
-    const insertResourcePlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'InsertResourcePlugin');
+    const insertResourcePlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'InsertResourcesPlugin');
     insertResourcePlugDef.opts.maxResources = maxResources;
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');

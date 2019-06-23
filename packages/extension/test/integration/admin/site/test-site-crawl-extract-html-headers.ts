@@ -33,7 +33,7 @@ xdescribe('Site Crawl Extract HTML Headers', () => {
         name: 'UpdateResourcePlugin'
       },
       {
-        name: 'InsertResourcePlugin'
+        name: 'InsertResourcesPlugin'
       }
     ]
   };

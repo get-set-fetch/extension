@@ -12,7 +12,7 @@ class PluginManager extends BaseModuleManager {
   static cache: Map<string, IModuleInfo> = new Map();
 
   static get DEFAULT_PLUGINS(): string[] {
-    return [ 'SelectResourcePlugin', 'FetchPlugin', 'ExtractUrlsPlugin', 'UpdateResourcePlugin', 'InsertResourcePlugin' ];
+    return [ 'SelectResourcePlugin', 'FetchPlugin', 'ExtractUrlsPlugin', 'UpdateResourcePlugin', 'InsertResourcesPlugin' ];
   }
 
   static persistPlugins(plugins: IdbPlugin[]) {

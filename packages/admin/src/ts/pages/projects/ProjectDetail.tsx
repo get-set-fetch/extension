@@ -152,7 +152,7 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
       hostnameRe: this.state.project.crawlOpts.hostnameRe,
       pathnameRe: this.state.project.crawlOpts.pathnameRe,
     });
-    this.updatePluginDefOpts(pluginDefinitions, 'InsertResourcePlugin', {
+    this.updatePluginDefOpts(pluginDefinitions, 'InsertResourcesPlugin', {
       maxResources: this.state.project.crawlOpts.maxResources,
     });
 

@@ -48,7 +48,7 @@ describe('Project CRUD Pages', () => {
         name: 'UpdateResourcePlugin'
       },
       {
-        name: 'InsertResourcePlugin',
+        name: 'InsertResourcesPlugin',
         opts: {
           maxResources: 101
         }
@@ -226,8 +226,8 @@ describe('Project CRUD Pages', () => {
     assert.strictEqual(updatedExtractUrlsPlugin.opts.resourcePathnameRe, expectedScenarioresourcePathnameRe);
     assert.strictEqual(updatedExtractUrlsPlugin.opts.maxDepth, expectedProject.crawlOpts.maxDepth + 1);
 
-    const insertResourcePlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'InsertResourcePlugin');
-    assert.strictEqual(insertResourcePlugin.opts.maxResources, expectedProject.crawlOpts.maxResources + 1);
+    const InsertResourcesPlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'InsertResourcesPlugin');
+    assert.strictEqual(InsertResourcesPlugin.opts.maxResources, expectedProject.crawlOpts.maxResources + 1);
 
     const selectResourcePlugin = updatedProject.pluginDefinitions.find(pluginDef => pluginDef.name === 'SelectResourcePlugin');
     assert.strictEqual(selectResourcePlugin.opts.delay, expectedProject.crawlOpts.delay + 1);

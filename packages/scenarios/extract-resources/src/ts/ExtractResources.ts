@@ -29,7 +29,7 @@ export default class ExtractResources implements IScenario {
         name: 'UpdateResourcePlugin',
       },
       {
-        name: 'InsertResourcePlugin',
+        name: 'InsertResourcesPlugin',
       },
     ];
 

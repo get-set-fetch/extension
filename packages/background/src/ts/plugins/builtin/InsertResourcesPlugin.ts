@@ -5,7 +5,7 @@ import IdbResource from '../../storage/IdbResource';
 /**
  * Plugin responsible for saving new resources within the current site.
  */
-export default class InsertResourcePlugin implements IPlugin {
+export default class InsertResourcesPlugin implements IPlugin {
   opts: {
     maxResources: number;
   };
@@ -14,7 +14,7 @@ export default class InsertResourcePlugin implements IPlugin {
     return {
       $id: 'https://getsetfetch.org/insert-resources-plugin.schema.json',
       $schema: 'http://json-schema.org/draft-07/schema#',
-      title: 'InsertResourcePlugin',
+      title: 'InsertResourcesPlugin',
       type: 'object',
       properties: {
         maxResources: {
@@ -27,7 +27,7 @@ export default class InsertResourcePlugin implements IPlugin {
   }
 
   constructor(opts) {
-    this.opts = SchemaHelper.instantiate(InsertResourcePlugin.OPTS_SCHEMA, opts);
+    this.opts = SchemaHelper.instantiate(InsertResourcesPlugin.OPTS_SCHEMA, opts);
   }
 
   test(resource: IResource&IdbResource) {
