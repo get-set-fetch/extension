@@ -9,7 +9,9 @@
     "test:report": "lerna run test:report",
     "patch": "patch-package",
     "symlink": "node ./scripts/symlink.js",
-    "build": "lerna run build"
+    "build": "lerna run build",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "keywords": [
     "scraper"
@@ -118,6 +120,8 @@
     "get-set-fetch-extension-commons": "file:packages/commons",
     "get-set-fetch-extension-popup": "file:packages/popup",
     "get-set-fetch-scenario-extract-html-content": "file:packages/scenarios/extract-html-content",
-    "get-set-fetch-scenario-extract-resources": "file:packages/scenarios/extract-resources"
-  }
+    "get-set-fetch-scenario-extract-resources": "file:packages/scenarios/extract-resources",
+    "snyk": "^1.192.3"
+  },
+  "snyk": true
 }

@@ -1,0 +1,44 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.13.5
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-450202:
+    - get-set-fetch-extension-admin > uniforms-bootstrap4 > uniforms > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - uniforms-bridge-json-schema > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - uniforms-bootstrap4 > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension-admin > uniforms-bridge-json-schema > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - uniforms-bootstrap4 > uniforms > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - uniforms-bridge-json-schema > uniforms > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension-admin > uniforms-bootstrap4 > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension-admin > uniforms > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension-admin > uniforms-bridge-json-schema > uniforms > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - uniforms > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension > get-set-fetch-extension-admin > uniforms-bootstrap4 > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension > get-set-fetch-extension-admin > uniforms-bridge-json-schema > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension > get-set-fetch-extension-admin > uniforms > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension > get-set-fetch-extension-admin > uniforms-bridge-json-schema > uniforms > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension > get-set-fetch-extension-admin > uniforms-bootstrap4 > uniforms > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch > jsdom > request-promise-native > request-promise-core > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension-background > get-set-fetch > jsdom > request-promise-native > request-promise-core > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension > get-set-fetch > jsdom > request-promise-native > request-promise-core > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
+    - get-set-fetch-extension > get-set-fetch-extension-background > get-set-fetch > jsdom > request-promise-native > request-promise-core > lodash:
+        patched: '2019-07-06T19:10:34.837Z'
