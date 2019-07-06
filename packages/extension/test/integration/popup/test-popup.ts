@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import BrowserHelper from '../../helpers/BrowserHelper';
 import { Page } from 'puppeteer';
 
-describe('Test Extension Popup, ', () => {
+describe('Test Extension Popup', () => {
   let browserHelper: BrowserHelper;
   let page: Page;
 
