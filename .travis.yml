@@ -13,5 +13,5 @@ script:
   - npm run build
   - npm run test  
 after_script:
-  - npm run test:report
+#  - npm run test:report
   - npm run clean
