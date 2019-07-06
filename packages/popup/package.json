@@ -7,9 +7,10 @@
     "dist/"
   ],
   "scripts": {
+    "clean": "shx rm -rf dist",
     "build": "npm run build:dist && npm run copy:resources",
     "build:dist": "rollup --config rollup.config.js",
-    "copy:resources": "copyfiles -u 2 src/html/*.html dist"
+    "copy:resources": "shx cp -R src/html/*.html dist"
   },
   "keywords": [
     "scraper",
@@ -23,18 +24,6 @@
     "url": "https://github.com/get-set-fetch/extension/issues"
   },
   "homepage": "https://github.com/get-set-fetch/extension#readme",
-  "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-plugin-module-resolver": "^3.1.1",
-    "copyfiles": "^2.0.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-import-resolver-babel-module": "^4.0.0",
-    "eslint-plugin-import": "^2.14.0",
-    "rollup-plugin-commonjs": "^9.1.0",
-    "rollup-plugin-eslint": "^5.1.0",
-    "rollup-plugin-json": "^3.0.0",
-    "rollup-plugin-node-resolve": "^3.3.0"
-  },
   "dependencies": {
     "query-string": "^6.1.0"
   }

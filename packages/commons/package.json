@@ -9,12 +9,12 @@
     "dist"
   ],
   "scripts": {
-    "clean": "rimraf dist",
+    "clean": "shx rm -rf dist",
     "lint": "tslint -c tslint.json src/**/*.ts",
     "build": "npm run clean && npm run lint && npm run build:dist",
     "build:dist": "rollup --config rollup.config.js",
     "test": "nyc --reporter=lcov mocha test ./test/**/*.ts",
-    "test:report": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "test:report": "cat ./coverage/lcov.info | ../../node_modules/coveralls/bin/coveralls.js",
     "test:single": "mocha test ./test/**/*.ts --grep \"Test Schema Helper\""
   },
   "keywords": [
@@ -28,23 +28,5 @@
   "bugs": {
     "url": "https://github.com/get-set-fetch/extension/issues"
   },
-  "homepage": "https://github.com/get-set-fetch/extension#readme",
-  "devDependencies": {
-    "@types/json-schema": "^7.0.3",
-    "@types/mocha": "^5.2.5",
-    "@types/node": "^10.12.18",
-    "chai": "^4.1.2",
-    "coveralls": "^3.0.2",
-    "mocha": "^5.2.0",
-    "nyc": "^13.1.0",
-    "rimraf": "^2.6.2",
-    "rollup-plugin-tslint": "^0.1.38",
-    "rollup-plugin-typescript": "^1.0.0",
-    "ts-node": "^7.0.1",
-    "tslib": "^1.9.3",
-    "tslint": "^5.12.0",
-    "tslint-config-airbnb": "^5.11.1",
-    "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.2.2"
-  }
+  "homepage": "https://github.com/get-set-fetch/extension#readme"
 }
