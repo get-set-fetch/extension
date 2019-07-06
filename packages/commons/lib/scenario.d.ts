@@ -5,7 +5,7 @@ import { IPluginDefinition, IPlugin } from './plugin';
 import { IModuleDefinition } from './storage';
 import { NpmPackage } from './npm';
 
-interface IScenarioPackage {
+export interface IScenarioPackage {
   id?: number;
   name: string;
   package: NpmPackage;
