@@ -21,17 +21,18 @@ const mainConfig = {
     ignore([ 'https', 'http', 'jsdom', 'fs', 'path', 'puppeteer', 'console', 'knex', 'mongodb', '__filename' ]),
     typescript(),
     commonjs({
+      include: /node_modules/,
       namedExports: {
-        pako: [ 'inflate' ],
-        'url-parse': [ 'Url' ],
+        '../../node_modules/pako': [ 'inflate' ],
+        '../../node_modules/url-parse': [ 'Url' ],
       },
+      ignore: [ 'util' ],
     }),
     json(),
     resolve({
       browser: true,
-      preferBuiltins: true,
-      extensions: [ '.js', '.json' ],
-      jsnext: true,
+      preferBuiltins: false,
+      extensions: [ '.js', '.json', '.ts' ],
       only: [
         'get-set-fetch', 'get-set-fetch-extension-commons',
         'murmurhash-js',
@@ -61,9 +62,8 @@ const crawlPluginConfig = crawlPlugins.map(plugin => ({
     commonjs(),
     resolve({
       browser: true,
-      preferBuiltins: true,
+      preferBuiltins: false,
       extensions: [ '.js', '.json' ],
-      jsnext: true,
       only: [
         'get-set-fetch-extension-commons',
       ],

@@ -3,8 +3,9 @@ import typescript from 'rollup-plugin-typescript';
 import json from 'rollup-plugin-json';
 import resolve from 'rollup-plugin-node-resolve';
 import globals from 'rollup-plugin-node-globals';
-import sass from 'rollup-plugin-sass';
+import scss from 'rollup-plugin-scss';
 import url from 'rollup-plugin-url';
+import builtins from 'rollup-plugin-node-builtins';
 
 export default {
   input: './src/ts/admin.ts',
@@ -16,17 +17,13 @@ export default {
   sourceMap: true,
   plugins: [
     resolve({
-      jsnext: true,
-      main: true,
       browser: true,
       preferBuiltins: false,
     }),
     commonjs({
-      include: [
-        'node_modules/**/*',
-      ],
+      include: /node_modules/,
       namedExports: {
-        react: [
+        '../../node_modules/react': [
           'Children',
           'Component',
           'PureComponent',
@@ -40,28 +37,30 @@ export default {
           'createContext',
           'isValidElement',
         ],
-        'react-dom': [
+        '../../node_modules/react-dom': [
           'render',
           'hydrate',
         ],
-        'react-is': [
+        '../../node_modules/react-is': [
           'isValidElementType',
         ],
-        uniforms: [
+        '../../node_modules/uniforms': [
           'BaseField',
         ],
-        'uniforms-bootstrap4': [
+        '../../node_modules/uniforms-bootstrap4': [
           'AutoForm', 'AutoField', 'RadioField', 'SelectField', 'DateField', 'ListField', 'NumField', 'TextField', 'LongTextField', 'BoolField', 'wrapField', 'SubmitField',
         ],
-        'uniforms-bridge-json-schema': [
+        '../../node_modules/uniforms-bridge-json-schema': [
           'JSONSchemaBridge',
         ],
       },
     }),
+    builtins(),
     typescript(),
     json(),
-    sass({
+    scss({
       output: 'dist/admin.css',
+      runtime: 'node-sass',
     }),
     url({
       limit: 0,
