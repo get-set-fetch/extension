@@ -78,19 +78,29 @@ export default class BrowserHelper {
 
   /*
   scenario plugins are the last to be discovered and imported,
-  once scenarios are present it means all db initial operations are complete
+  once all scenarios are present it means all db initial operations are complete
+  currently number of builtin installed scenarios: 2
   */
   static async waitForDBInitialization(browserPage) {
+    // wait for the scenario page to load, have access to GsfClient
     const queryParams = stringify({ redirectPath: '/scenarios' });
-    // wait for main table to load, refresh page on 1st timeout
-    try {
-      await browserPage.goto(`chrome-extension://${BrowserHelper.extension.id}/admin/admin.html?${queryParams}`, BrowserHelper.gotoOpts);
-      await browserPage.waitFor('table.table-main', { timeout: 2 * 1000 });
+    await browserPage.goto(`chrome-extension://${BrowserHelper.extension.id}/admin/admin.html?${queryParams}`, BrowserHelper.gotoOpts);
+
+    const scenarioNo = 2;
+    let tryNo = 0;
+    let scenarios = [];
+    while (tryNo < 10 && scenarios.length < scenarioNo) {
+      scenarios = await browserPage.evaluate(() => GsfClient.fetch('GET', 'scenarios'));
+      tryNo += 1;
+      await new Promise(resolve => setTimeout(resolve, 1000));
     }
-    catch (err) {
-      await browserPage.goto(`chrome-extension://${BrowserHelper.extension.id}/admin/admin.html?${queryParams}`, BrowserHelper.gotoOpts);
-      await browserPage.waitFor('table.table-main', { timeout: 1 * 1000 });
+
+    if (scenarios.length !== scenarioNo) {
+      throw new Error(`could not get all ${scenarioNo} scenarios`);
     }
+
+    // wait for main table to load,
+    await browserPage.waitFor('table.table-main', { timeout: 4 * 1000 });
   }
 
   browser: Browser;
