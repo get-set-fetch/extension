@@ -4,12 +4,13 @@
   "description": "",
   "scripts": {
     "clean": "lerna run clean",
+    "patch": "patch-package",
+    "symlink": "node ./scripts/symlink.js",
+    "build": "lerna run build",
     "build:dist": "lerna run build:dist",
     "test": "lerna run test",
     "test:report": "lerna run test:report",
-    "patch": "patch-package",
-    "symlink": "node ./scripts/symlink.js",
-    "build": "lerna run build"
+    "publish:minor": "lerna publish from-package --exact && lerna version minor"
   },
   "keywords": [
     "scraper"
