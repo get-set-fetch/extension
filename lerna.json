@@ -1,9 +1,11 @@
 {
   "version": "0.1.1",
   "command": {
+    "version": {
+      "message": "version update: %s"
+    },
     "publish": {
       "ignoreChanges": [
-        "ignored-file",
         "*.md"
       ]
     },
