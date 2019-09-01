@@ -115,18 +115,8 @@ class PluginManager extends BaseModuleManager {
     const pluginName = pluginInstance.constructor.name;
     const pluginInfo = PluginManager.cache.get(pluginName);
 
-    /*
-      - load each class separately, some utility classes may have already been loaded by other already loaded modules
-      if a class is already declared in the current tab, re-loading it fails with
-      "Uncaught SyntaxError: Identifier 'ClassName' has already been declared at "
-      but the other classes present in module will still load
-      - use negative lookahead (?!) to match anyting starting with a class definition but not containing another class definition
-     */
-    const moduleClasses = pluginInfo.code.match(/(class \w+ {([\s\S](?!(class \w+ {)|export .*))+)/gm);
-    for (let i = 0; i < moduleClasses.length; i += 1) {
-      // eslint-disable-next-line no-await-in-loop
-      await ActiveTabHelper.executeScript(tabId, { code: moduleClasses[i] });
-    }
+    const codeWithoutExport = pluginInfo.code.replace(/^export .+$/gm, '');
+    Log.debug(`injecting in browser tab: ${codeWithoutExport}`);
 
     let result = {};
     try {
@@ -147,27 +137,35 @@ class PluginManager extends BaseModuleManager {
         chrome.runtime.onMessage.addListener(listener);
       });
 
-      // async run the plugin and sends the result as message once completed
+      /*
+      async run the plugin and sends the result as message once completed
+      use a block declaration in order not to polute the global namespace
+      avoiding conflicts, thus redeclaration errors
+      */
       await ActiveTabHelper.executeScript(tabId, { code: `
-        (async function() {
-          try {
-            // instantiate plugin instance
-            const ${pluginInstanceName} = new ${pluginDeff}(${JSON.stringify(pluginInstance.opts)})
+        {
+          ${codeWithoutExport}
 
-            // execute plugin
-            let result = null;
-            const isApplicable = ${pluginInstanceName}.test(${JSON.stringify(resource)});
-            if (isApplicable) {
-              result = await ${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)});
+          (async function() {
+            try {
+              // instantiate plugin instance
+              const ${pluginInstanceName} = new ${pluginDeff}(${JSON.stringify(pluginInstance.opts)})
+
+              // execute plugin
+              let result = null;
+              const isApplicable = ${pluginInstanceName}.test(${JSON.stringify(resource)});
+              if (isApplicable) {
+                result = await ${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)});
+              }
+
+              // send the result back via messaging as the promise content will just be serialized to {}
+              chrome.runtime.sendMessage({resolved: true, result});
             }
-
-            // send the result back via messaging as the promise content will just be serialized to {}
-            chrome.runtime.sendMessage({resolved: true, result});
-          }
-          catch(err) {
-            chrome.runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
-          }
-        })();
+            catch(err) {
+              chrome.runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
+            }
+          })();
+        }
       ` });
 
       result = await message;
