@@ -5,7 +5,8 @@
   "scripts": {
     "clean": "lerna run clean",
     "patch": "patch-package",
-    "symlink": "node ./scripts/symlink.js",
+    "symlink:create": "node ./scripts/symlink.js create",
+    "symlink:delete": "node ./scripts/symlink.js delete",
     "build": "lerna run build",
     "build:dist": "lerna run build:dist",
     "test": "lerna run test",
