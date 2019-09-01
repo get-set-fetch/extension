@@ -10,7 +10,9 @@
     "build:dist": "lerna run build:dist",
     "test": "lerna run test",
     "test:report": "lerna run test:report",
-    "publish:minor": "lerna publish from-package --exact && lerna version minor"
+    "publish:patch": "lerna publish from-package --exact && lerna version patch",
+    "publish:minor": "lerna publish from-package --exact && lerna version minor",
+    "publish:major": "lerna publish from-package --exact && lerna version major"
   },
   "keywords": [
     "scraper"
