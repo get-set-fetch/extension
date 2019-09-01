@@ -42,8 +42,8 @@ export default class ExportHelper {
       (detailCols, rootKey) => {
         const val = ExportHelper.nestedGetIn(row, rootKey);
 
-        // val is literal
-        if (val.constructor === String || val.constructor === Number || val.constructor === Boolean) {
+        // val is either null or literal
+        if (val === null || val.constructor === String || val.constructor === Number || val.constructor === Boolean) {
           detailCols.push(rootKey);
           return detailCols;
         }
