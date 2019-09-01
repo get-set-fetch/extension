@@ -1,14 +1,18 @@
 import { assert } from 'chai';
-import BrowserHelper from '../../../helpers/BrowserHelper';
+import { resolve } from 'path';
 import { Page } from 'puppeteer';
+import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
+
 
 describe('Settings Update Page', () => {
   let browserHelper: BrowserHelper;
   let page: Page;
 
   before(async () => {
-    browserHelper = await BrowserHelper.launch();
-    page = browserHelper.page;
+    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    await browserHelper.launch();
+    ({ page } = browserHelper as { page: Page });
   });
 
   beforeEach(async () => {
@@ -29,15 +33,15 @@ describe('Settings Update Page', () => {
         const selectedOption = selectLogLevel.options[selectLogLevel.selectedIndex];
         return {
           label: selectedOption.innerHTML,
-          value: selectedOption.value
+          value: selectedOption.value,
         };
-      }
+      },
     );
 
     // compare
     const expectedLogLevel = {
       label: 'WARNING',
-      value: '3'
+      value: '3',
     };
     assert.deepEqual(logLevel, expectedLogLevel);
   });
@@ -60,17 +64,16 @@ describe('Settings Update Page', () => {
         const selectedOption = selectLogLevel.options[selectLogLevel.selectedIndex];
         return {
           label: selectedOption.innerHTML,
-          value: selectedOption.value
+          value: selectedOption.value,
         };
-      }
+      },
     );
 
     // compare
     const expectedLogLevel = {
       label: 'TRACE',
-      value: '0'
+      value: '0',
     };
     assert.deepEqual(logLevel, expectedLogLevel);
   });
-
 });

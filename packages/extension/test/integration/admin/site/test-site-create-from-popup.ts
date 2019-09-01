@@ -1,6 +1,7 @@
 import { assert } from 'chai';
+import { resolve } from 'path';
 import { Page } from 'puppeteer';
-import BrowserHelper from '../../../helpers/BrowserHelper';
+import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
 
 xdescribe('Site Pages', () => {
   let browserHelper: BrowserHelper;
@@ -8,12 +9,14 @@ xdescribe('Site Pages', () => {
 
   const actualSite = {
     name: 'siteA',
-    url: 'http://www.sitea.com/index.html'
+    url: 'http://www.sitea.com/index.html',
   };
 
   before(async () => {
-    browserHelper = await BrowserHelper.launch();
-    page = browserHelper.page;
+    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    await browserHelper.launch();
+    ({ page } = browserHelper as { page: Page });
   });
 
   afterEach(async () => {
@@ -33,11 +36,11 @@ xdescribe('Site Pages', () => {
 
   it('Test Create New Site', async () => {
     // open stubbed site
-    await page.goto(actualSite.url, BrowserHelper.gotoOpts);
+    await page.goto(actualSite.url, browserHelper.gotoOpts);
 
     // open popup page
     const popupPage = await browserHelper.browser.newPage();
-    await popupPage.goto(`chrome-extension://${BrowserHelper.extension.id}/popup/popup.html`, BrowserHelper.gotoOpts);
+    await popupPage.goto(`chrome-extension://${browserHelper.extension.id}/popup/popup.html`, browserHelper.gotoOpts);
 
     // move focus to stubbed site
     await page.bringToFront();
@@ -49,7 +52,7 @@ xdescribe('Site Pages', () => {
     await popupPage.evaluate(anchorId => document.getElementById(anchorId).click(), 'newsite');
 
     // retrieve the newly created admin page
-    const adminPage = await BrowserHelper.waitForPageCreation(browserHelper.browser);
+    const adminPage = await browserHelper.waitForPageCreation();
 
     // wait for redirection to "new site" page
     await adminPage.waitFor('#save');
@@ -64,11 +67,11 @@ xdescribe('Site Pages', () => {
     // save site
     await Promise.all([
       adminPage.click('#save'),
-      adminPage.waitForNavigation(BrowserHelper.gotoOpts)
+      adminPage.waitForNavigation(browserHelper.gotoOpts),
     ]);
 
     // check redirection to site list
-    const sitesUrl = `chrome-extension://${BrowserHelper.extension.id}/sites`;
+    const sitesUrl = `chrome-extension://${browserHelper.extension.id}/sites`;
     assert.strictEqual(sitesUrl, adminPage.url());
 
     // check the newly created site is now present in extension IndexedDB

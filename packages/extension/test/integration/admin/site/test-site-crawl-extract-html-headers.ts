@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { readFileSync } from 'fs';
 import { join, resolve } from 'path';
-import BrowserHelper from '../../../helpers/BrowserHelper';
+import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
 import TestUtils from 'get-set-fetch/test/utils/TestUtils';
 import { Page } from 'puppeteer';
 
@@ -18,29 +18,31 @@ xdescribe('Site Crawl Extract HTML Headers', () => {
     opts: {},
     pluginDefinitions: [
       {
-        name: 'SelectResourcePlugin'
+        name: 'SelectResourcePlugin',
       },
       {
-        name: 'FetchPlugin'
+        name: 'FetchPlugin',
       },
       {
-        name: 'ExtractUrlsPlugin'
+        name: 'ExtractUrlsPlugin',
       },
       {
-        name: 'ExtractTitlePlugin'
+        name: 'ExtractTitlePlugin',
       },
       {
-        name: 'UpdateResourcePlugin'
+        name: 'UpdateResourcePlugin',
       },
       {
-        name: 'InsertResourcesPlugin'
-      }
-    ]
+        name: 'InsertResourcesPlugin',
+      },
+    ],
   };
 
   before(async () => {
-    browserHelper = await BrowserHelper.launch();
-    page = browserHelper.page;
+    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    await browserHelper.launch();
+    ({ page } = browserHelper as { page: Page });
   });
 
   afterEach(async () => {
@@ -64,7 +66,7 @@ xdescribe('Site Crawl Extract HTML Headers', () => {
   async function waitForCrawlComplete(adminPage, siteId, resolve = null) {
     // if no promise defined return one
     if (!resolve) {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         setTimeout(waitForCrawlComplete, 5000, adminPage, siteId, resolve);
       });
     }
@@ -111,7 +113,7 @@ xdescribe('Site Crawl Extract HTML Headers', () => {
     const titles = {
       'http://www.sitea.com/index.html': 'siteA',
       'http://www.sitea.com/pageA.html': 'pageA',
-      'http://www.sitea.com/pageB.html': 'pageB'
+      'http://www.sitea.com/pageB.html': 'pageB',
     };
     for (let i = 0; i < crawledResources.length; i += 1) {
       const crawledResource = crawledResources[i];
@@ -127,7 +129,7 @@ xdescribe('Site Crawl Extract HTML Headers', () => {
     const client = await page.target().createCDPSession();
     await client.send('Page.setDownloadBehavior', {
       behavior: 'allow',
-      downloadPath: resolve(targetDir)
+      downloadPath: resolve(targetDir),
     });
 
     // download csv

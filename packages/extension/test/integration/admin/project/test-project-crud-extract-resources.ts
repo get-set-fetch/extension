@@ -1,6 +1,7 @@
 import { assert } from 'chai';
+import { resolve } from 'path';
 import { Page } from 'puppeteer';
-import BrowserHelper, { clear } from '../../../helpers/BrowserHelper';
+import { BrowserHelper, clearQuerySelector } from 'get-set-fetch-extension-test-utils';
 import { IProjectStorage } from 'get-set-fetch-extension-commons';
 
 /* eslint-disable no-shadow, max-len */
@@ -17,20 +18,20 @@ describe('Project CRUD Pages', () => {
       maxResources: 101,
       delay: 1001,
       hostnameRe: '/hostname/',
-      pathnameRe: '/pathname/'
+      pathnameRe: '/pathname/',
     },
     scenarioOpts: {
-      scenarioId: null
+      scenarioId: null,
     },
     pluginDefinitions: [
       {
         name: 'SelectResourcePlugin',
         opts: {
-          delay: 1001
-        }
+          delay: 1001,
+        },
       },
       {
-        name: 'FetchPlugin'
+        name: 'FetchPlugin',
       },
       {
         name: 'ExtractUrlsPlugin',
@@ -38,30 +39,32 @@ describe('Project CRUD Pages', () => {
           hostnameRe: '/hostname/',
           pathnameRe: '/pathname/',
           resourcePathnameRe: '/(gif|png|jpg|jpeg)$/i',
-          maxDepth: 11
-        }
+          maxDepth: 11,
+        },
       },
       {
-        name: 'ImageFilterPlugin'
+        name: 'ImageFilterPlugin',
       },
       {
-        name: 'UpdateResourcePlugin'
+        name: 'UpdateResourcePlugin',
       },
       {
         name: 'InsertResourcesPlugin',
         opts: {
-          maxResources: 101
-        }
-      }
-    ]
+          maxResources: 101,
+        },
+      },
+    ],
   };
 
   before(async () => {
-    browserHelper = await BrowserHelper.launch();
-    page = browserHelper.page;
+    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    await browserHelper.launch();
+    ({ page } = browserHelper as { page: Page });
 
     // get expectedProject scenarioId
-    const scenarios = await page.evaluate(() => GsfClient.fetch('GET', `scenarios`));
+    const scenarios = await page.evaluate(() => GsfClient.fetch('GET', 'scenarios'));
     expectedProject.scenarioOpts.scenarioId = scenarios.find(scenario => scenario.name === 'get-set-fetch-scenario-extract-resources').id;
   });
 
@@ -97,37 +100,46 @@ describe('Project CRUD Pages', () => {
     await page.type('input#description', expectedProject.description);
     await page.type('input#url', expectedProject.url);
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.maxDepth') as HTMLInputElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('crawlOpts.maxDepth') as HTMLInputElement).value = '';
+    });
     await page.type('input[id="crawlOpts.maxDepth"]', expectedProject.crawlOpts.maxDepth.toString());
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.maxResources') as HTMLInputElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('crawlOpts.maxResources') as HTMLInputElement).value = '';
+    });
     await page.type('input[id="crawlOpts.maxResources"]', expectedProject.crawlOpts.maxResources.toString());
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.delay') as HTMLInputElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('crawlOpts.delay') as HTMLInputElement).value = '';
+    });
     await page.type('input[id="crawlOpts.delay"]', expectedProject.crawlOpts.delay.toString());
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.hostnameRe') as HTMLInputElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('crawlOpts.hostnameRe') as HTMLInputElement).value = '';
+    });
     await page.type('input[id="crawlOpts.hostnameRe"]', expectedProject.crawlOpts.hostnameRe.toString());
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.pathnameRe') as HTMLInputElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('crawlOpts.pathnameRe') as HTMLInputElement).value = '';
+    });
     await page.type('input[id="crawlOpts.pathnameRe"]', expectedProject.crawlOpts.pathnameRe.toString());
 
     // dropdown scenario is correctly populated#
     const expectedScenarioIdOpts = [
       { label: 'Scrape Scenario' },
       { label: 'get-set-fetch-scenario-extract-html-content' },
-      { label: 'get-set-fetch-scenario-extract-resources' }
+      { label: 'get-set-fetch-scenario-extract-resources' },
     ];
     const scenarioIdOpts = await page.evaluate(
-      () =>
-      Array.from((document.getElementById('scenarioOpts.scenarioId') as HTMLSelectElement).options)
-      .map(
-        ({ label }) => ({ label })
-      )
+      () => Array.from((document.getElementById('scenarioOpts.scenarioId') as HTMLSelectElement).options)
+        .map(
+          ({ label }) => ({ label }),
+        ),
     );
     assert.sameDeepMembers(scenarioIdOpts, expectedScenarioIdOpts);
 
-     // fill in dropdown scenario
+    // fill in dropdown scenario
     await page.select('select[id="scenarioOpts.scenarioId"]', expectedProject.scenarioOpts.scenarioId.toString());
 
     // save the project
@@ -154,7 +166,7 @@ describe('Project CRUD Pages', () => {
     await page.waitFor(`a[href=\\/project\\/${savedProject.id}`);
     const projectNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/project\\/${id}`).innerHTML,
-      savedProject.id
+      savedProject.id,
     );
     assert.strictEqual(savedProject.name, projectNameInList);
   });
@@ -180,24 +192,34 @@ describe('Project CRUD Pages', () => {
     await page.type('input#description', changedSuffix);
     await page.type('input#url', changedSuffix);
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.maxDepth') as HTMLInputElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('crawlOpts.maxDepth') as HTMLInputElement).value = '';
+    });
     await page.type('input[id="crawlOpts.maxDepth"]', (expectedProject.crawlOpts.maxDepth + 1).toString());
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.maxResources') as HTMLInputElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('crawlOpts.maxResources') as HTMLInputElement).value = '';
+    });
     await page.type('input[id="crawlOpts.maxResources"]', (expectedProject.crawlOpts.maxResources + 1).toString());
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.delay') as HTMLInputElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('crawlOpts.delay') as HTMLInputElement).value = '';
+    });
     await page.type('input[id="crawlOpts.delay"]', (expectedProject.crawlOpts.delay + 1).toString());
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.hostnameRe') as HTMLInputElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('crawlOpts.hostnameRe') as HTMLInputElement).value = '';
+    });
     await page.type('input[id="crawlOpts.hostnameRe"]', '/hostname_changed/');
 
-    await page.evaluate( () => (document.getElementById('crawlOpts.pathnameRe') as HTMLInputElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('crawlOpts.pathnameRe') as HTMLInputElement).value = '';
+    });
     await page.type('input[id="crawlOpts.pathnameRe"]', '/pathname_changed/');
 
     // change linked scenario properties
     const expectedScenarioresourcePathnameRe = '/png/';
-    await clear(page, 'input[id="scenarioOpts.resourcePathnameRe"]');
+    await clearQuerySelector(page, 'input[id="scenarioOpts.resourcePathnameRe"]');
     await page.type('input[id="scenarioOpts.resourcePathnameRe"]', expectedScenarioresourcePathnameRe);
 
     // save the project and return to project list page
@@ -236,7 +258,7 @@ describe('Project CRUD Pages', () => {
     await page.waitFor(`a[href=\\/project\\/${updatedProject.id}`);
     const projectNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/project\\/${id}`).innerHTML,
-      updatedProject.id
+      updatedProject.id,
     );
     assert.strictEqual(`${expectedProject.name}${changedSuffix}`, projectNameInList);
   });
@@ -263,25 +285,24 @@ describe('Project CRUD Pages', () => {
   });
 
   it('Test Delete Existing Project', async () => {
-   // create a new project
-   const projectId = await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject as any);
-
-   // reload project list
-   await browserHelper.goto('/projects');
-
-    // wait for delete button to show up
-   await page.waitFor(`input#delete-${projectId}`);
-
-    // delete it
-   await page.click(`input#delete-${projectId}`);
+    // create a new project
+    const projectId = await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject as any);
 
     // reload project list
-   await browserHelper.goto('/projects');
-   await page.waitFor('p#no-entries');
+    await browserHelper.goto('/projects');
+
+    // wait for delete button to show up
+    await page.waitFor(`input#delete-${projectId}`);
+
+    // delete it
+    await page.click(`input#delete-${projectId}`);
+
+    // reload project list
+    await browserHelper.goto('/projects');
+    await page.waitFor('p#no-entries');
 
     // check table is no longer present since there are no sites to display
-   const tableCount = await page.evaluate(() => document.querySelectorAll('table').length);
-   assert.strictEqual(tableCount, 0);
+    const tableCount = await page.evaluate(() => document.querySelectorAll('table').length);
+    assert.strictEqual(tableCount, 0);
   });
-
 });

@@ -1,11 +1,14 @@
 import { assert } from 'chai';
-import BrowserHelper from '../../helpers/BrowserHelper';
+import { resolve } from 'path';
+import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
 
 describe('Test ThankYou Pages', () => {
   let browserHelper: BrowserHelper;
 
   before(async () => {
-    browserHelper = await BrowserHelper.launch(false);
+    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+    browserHelper = new BrowserHelper({ extension: { path: extensionPath }, closeExtraPages: false });
+    await browserHelper.launch();
   });
 
   after(async () => {

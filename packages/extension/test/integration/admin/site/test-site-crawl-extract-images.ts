@@ -1,7 +1,8 @@
 import { assert } from 'chai';
 import { join, resolve } from 'path';
-import BrowserHelper from '../../../helpers/BrowserHelper';
 import { Page } from 'puppeteer';
+import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
+
 
 /* eslint-disable no-shadow */
 xdescribe('Site Crawl Extract Images', () => {
@@ -16,35 +17,37 @@ xdescribe('Site Crawl Extract Images', () => {
     opts: {},
     pluginDefinitions: [
       {
-        name: 'SelectResourcePlugin'
+        name: 'SelectResourcePlugin',
       },
       {
-        name: 'FetchPlugin'
+        name: 'FetchPlugin',
       },
       {
         name: 'ExtractUrlsPlugin',
         opts: {
-          extensionRe: '/^(html|htm|php|png)$/i'
-        }
+          extensionRe: '/^(html|htm|php|png)$/i',
+        },
       },
       {
-        name: 'ExtractTitlePlugin'
+        name: 'ExtractTitlePlugin',
       },
       {
-        name: 'ImageFilterPlugin'
+        name: 'ImageFilterPlugin',
       },
       {
-        name: 'UpdateResourcePlugin'
+        name: 'UpdateResourcePlugin',
       },
       {
-        name: 'InsertResourcesPlugin'
-      }
-    ]
+        name: 'InsertResourcesPlugin',
+      },
+    ],
   };
 
   before(async () => {
-    browserHelper = await BrowserHelper.launch();
-    page = browserHelper.page;
+    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    await browserHelper.launch();
+    ({ page } = browserHelper as { page: Page });
   });
 
   afterEach(async () => {
@@ -70,7 +73,7 @@ xdescribe('Site Crawl Extract Images', () => {
   async function waitForCrawlComplete(adminPage, siteId, resolve = null) {
     // if no promise defined return one
     if (!resolve) {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         setTimeout(waitForCrawlComplete, 5000, adminPage, siteId, resolve);
       });
     }
@@ -115,11 +118,11 @@ xdescribe('Site Crawl Extract Images', () => {
 
     // check each resource
     const expectedResources = {
-      'http://www.sitea.com/index.html': { mediaType: 'text/html', info: { title: 'siteA' } } ,
-      'http://www.sitea.com/pageA.html': { mediaType: 'text/html', info: { title: 'pageA' } } ,
-      'http://www.sitea.com/pageB.html': { mediaType: 'text/html', info: { title: 'pageB' } } ,
+      'http://www.sitea.com/index.html': { mediaType: 'text/html', info: { title: 'siteA' } },
+      'http://www.sitea.com/pageA.html': { mediaType: 'text/html', info: { title: 'pageA' } },
+      'http://www.sitea.com/pageB.html': { mediaType: 'text/html', info: { title: 'pageB' } },
       'http://www.sitea.com/img/imgA-150.png': { mediaType: 'image/png', info: { width: 150, height: 150 } },
-      'http://www.sitea.com/img/imgB-850.png': { mediaType: 'image/png', info: { width: 850, height: 850 } }
+      'http://www.sitea.com/img/imgB-850.png': { mediaType: 'image/png', info: { width: 850, height: 850 } },
     };
 
     for (let i = 0; i < crawledResources.length; i += 1) {
@@ -137,7 +140,7 @@ xdescribe('Site Crawl Extract Images', () => {
     const client = await page.target().createCDPSession();
     await client.send('Page.setDownloadBehavior', {
       behavior: 'allow',
-      downloadPath: resolve(targetDir)
+      downloadPath: resolve(targetDir),
     });
 
     // implement: download zip

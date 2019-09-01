@@ -1,3 +1,3 @@
---require test/utils/ts-node-config.js
---require test/utils/init-proxy.ts
+--require test/init/init-ts-node.js
+--require test/init/init-proxy.ts
 --timeout 45000

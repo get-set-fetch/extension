@@ -1,15 +1,17 @@
 import { assert } from 'chai';
+import { resolve } from 'path';
 import { Page } from 'puppeteer';
-import BrowserHelper from '../../../helpers/BrowserHelper';
-import ScenarioHelper from '../../../helpers/ScenarioHelper';
+import { BrowserHelper, ScenarioHelper } from 'get-set-fetch-extension-test-utils';
 
 describe('Scenario List', () => {
   let browserHelper: BrowserHelper;
   let page: Page;
 
   before(async () => {
-    browserHelper = await BrowserHelper.launch();
-    page = browserHelper.page;
+    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    await browserHelper.launch();
+    ({ page } = browserHelper as { page: Page });
   });
 
   beforeEach(async () => {
@@ -22,16 +24,14 @@ describe('Scenario List', () => {
   });
 
   function getTableScenarios() {
-    return page.evaluate(() => {
-      return Array.from(document.querySelectorAll('table.table-main tbody tr')).map(
-        (row) => ({
-          name: (row.children[0] as HTMLTableCellElement).innerText,
-          description: (row.children[1] as HTMLTableCellElement).innerText,
-          homepage: (row.children[2] as HTMLTableCellElement).innerText,
-          status: (row.children[3] as HTMLTableCellElement).innerText
-        })
-      );
-    });
+    return page.evaluate(() => Array.from(document.querySelectorAll('table.table-main tbody tr')).map(
+      row => ({
+        name: (row.children[0] as HTMLTableCellElement).innerText,
+        description: (row.children[1] as HTMLTableCellElement).innerText,
+        homepage: (row.children[2] as HTMLTableCellElement).innerText,
+        status: (row.children[3] as HTMLTableCellElement).innerText,
+      }),
+    ));
   }
 
   it('Test Scenario Builtin List', async () => {
@@ -44,20 +44,20 @@ describe('Scenario List', () => {
         name: 'get-set-fetch-scenario-extract-resources',
         description: 'Extract Resources scenario is used for extracting various resources from the corresponding sites.',
         homepage: 'https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-resources',
-        status: 'Built-in'
+        status: 'Built-in',
       },
       {
         name: 'get-set-fetch-scenario-extract-html-content',
         description: 'Extract Html Content scenario is used for extracting html nodes text based on dom selectors.',
         homepage: 'https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-html-content',
-        status: 'Built-in'
+        status: 'Built-in',
       },
       {
         name: 'extract-html-headings',
         description: 'Extract Html Headings description',
         homepage: 'https://github.com/authora/extract-html-headings',
-        status: 'Available'
-      }
+        status: 'Available',
+      },
     ];
 
     const actualScenarios = await getTableScenarios();
@@ -73,32 +73,31 @@ describe('Scenario List', () => {
     assert.strictEqual(installBtnCount, 1);
 
     // install extract-html-headings scenario
-    await ScenarioHelper.installScenario(page, 'extract-html-headings');
+    await ScenarioHelper.installScenario(browserHelper, 'extract-html-headings');
 
     // check new scenario status
     let expectedScenario = {
       name: 'extract-html-headings',
       description: 'Extract Html Headings description',
       homepage: 'https://github.com/authora/extract-html-headings',
-      status: 'Installed'
+      status: 'Installed',
     };
 
     let actualScenarios = await getTableScenarios();
     assert.deepInclude(actualScenarios, expectedScenario);
 
     // uninstall extract-html-headings scenario
-    await ScenarioHelper.uninstallScenario(page, 'extract-html-headings');
+    await ScenarioHelper.uninstallScenario(browserHelper, 'extract-html-headings');
 
     // check new scenario status
     expectedScenario = {
       name: 'extract-html-headings',
       description: 'Extract Html Headings description',
       homepage: 'https://github.com/authora/extract-html-headings',
-      status: 'Available'
+      status: 'Available',
     };
 
     actualScenarios = await getTableScenarios();
     assert.deepInclude(actualScenarios, expectedScenario);
   });
-
 });

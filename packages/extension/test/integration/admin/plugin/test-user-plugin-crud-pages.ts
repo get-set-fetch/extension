@@ -1,6 +1,7 @@
 import { assert } from 'chai';
-import BrowserHelper, { clear } from '../../../helpers/BrowserHelper';
+import { resolve } from 'path';
 import { Page } from 'puppeteer';
+import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
 
 /* eslint-disable no-shadow, max-len */
 describe('UserPlugin CRUD Pages', () => {
@@ -9,12 +10,14 @@ describe('UserPlugin CRUD Pages', () => {
 
   const actualPlugin = {
     name: 'pluginA',
-    code: 'codeA'
+    code: 'codeA',
   };
 
   before(async () => {
-    browserHelper = await BrowserHelper.launch();
-    page = browserHelper.page;
+    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    await browserHelper.launch();
+    ({ page } = browserHelper as { page: Page });
   });
 
   beforeEach(async () => {
@@ -32,8 +35,8 @@ describe('UserPlugin CRUD Pages', () => {
     const pluginNames = await page.evaluate(
       () => {
         const pluginLinks = document.querySelectorAll('tbody th a');
-        return  Array.from(pluginLinks).map(pluginLink => pluginLink.innerHTML);
-      }
+        return Array.from(pluginLinks).map(pluginLink => pluginLink.innerHTML);
+      },
     );
 
     // compare
@@ -44,7 +47,7 @@ describe('UserPlugin CRUD Pages', () => {
       'SelectResourcePlugin',
       'UpdateResourcePlugin',
       'ImageFilterPlugin',
-      'ExtractHtmlContentPlugin'
+      'ExtractHtmlContentPlugin',
     ];
     assert.sameMembers(pluginNames, expectedPluginNames);
   });
@@ -75,12 +78,12 @@ describe('UserPlugin CRUD Pages', () => {
     await page.waitFor(`a[href=\\/plugin\\/${savedPlugin.id}`);
     const pluginNameInList = await browserHelper.page.evaluate(
       id => document.querySelector(`a[href=\\/plugin\\/${id}`).innerHTML,
-      savedPlugin.id
+      savedPlugin.id,
     );
     assert.strictEqual(actualPlugin.name, pluginNameInList);
 
     // cleanup
-    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [savedPlugin.id]);
+    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [ savedPlugin.id ]);
   });
 
   it('Test Update Existing Plugin', async () => {
@@ -103,7 +106,9 @@ describe('UserPlugin CRUD Pages', () => {
     await page.type('input#name', changedSuffix);
 
     // change code property, type for textarea positions the cursor at the begining, use below alternative
-    await page.evaluate( () => (document.getElementById('code') as HTMLTextAreaElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('code') as HTMLTextAreaElement).value = '';
+    });
     await page.type('textarea#code', `${actualPlugin.code}${changedSuffix}`);
 
     // save the plugin and return to plugin list page
@@ -120,12 +125,12 @@ describe('UserPlugin CRUD Pages', () => {
     await page.waitFor(`a[href=\\/plugin\\/${updatedPlugin.id}`);
     const pluginNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/plugin\\/${id}`).innerHTML,
-      updatedPlugin.id
+      updatedPlugin.id,
     );
     assert.strictEqual(`${actualPlugin.name}${changedSuffix}`, pluginNameInList);
 
     // cleanup
-    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [updatedPlugin.id]);
+    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [ updatedPlugin.id ]);
   });
 
   it('Test Start Update Existing Plugin And Cancel', async () => {
@@ -146,9 +151,11 @@ describe('UserPlugin CRUD Pages', () => {
 
     // change name property
     await page.type('input#name', changedSuffix);
-    
+
     // change code property, type for textarea positions the cursor at the begining, use below alternative
-    await page.evaluate( () => (document.getElementById('code') as HTMLTextAreaElement).value = '');
+    await page.evaluate(() => {
+      (document.getElementById('code') as HTMLTextAreaElement).value = '';
+    });
     await page.type('textarea#code', `${actualPlugin.code}${changedSuffix}`);
 
     // cancel the update
@@ -165,12 +172,12 @@ describe('UserPlugin CRUD Pages', () => {
     await page.waitFor(`a[href=\\/plugin\\/${updatedPlugin.id}`);
     const pluginNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/plugin\\/${id}`).innerHTML,
-      updatedPlugin.id
+      updatedPlugin.id,
     );
     assert.strictEqual(actualPlugin.name, pluginNameInList);
 
     // cleanup
-    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [updatedPlugin.id]);
+    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [ updatedPlugin.id ]);
   });
 
   it('Test Delete Existing Plugin', async () => {
@@ -193,7 +200,7 @@ describe('UserPlugin CRUD Pages', () => {
     // check plugin is no longer present
     const pluginLinksCount = await page.evaluate(
       pluginId => document.querySelectorAll(`input#delete-${pluginId}`).length,
-      pluginId
+      pluginId,
     );
     assert.strictEqual(pluginLinksCount, 0);
   });

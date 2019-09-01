@@ -1,6 +1,7 @@
 import { assert } from 'chai';
+import { resolve } from 'path';
 import { Page } from 'puppeteer';
-import BrowserHelper from '../../../helpers/BrowserHelper';
+import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
 
 /* eslint-disable no-shadow, max-len */
 xdescribe('Site CRUD Pages', () => {
@@ -9,12 +10,14 @@ xdescribe('Site CRUD Pages', () => {
 
   const actualSite = {
     name: 'siteA',
-    url: 'http://siteA.com'
+    url: 'http://siteA.com',
   };
 
   before(async () => {
-    browserHelper = await BrowserHelper.launch();
-    page = browserHelper.page;
+    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    await browserHelper.launch();
+    ({ page } = browserHelper as { page: Page });
   });
 
   beforeEach(async () => {
@@ -62,7 +65,7 @@ xdescribe('Site CRUD Pages', () => {
     await page.waitFor(`a[href=\\/site\\/${savedSite.id}`);
     const siteNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/site\\/${id}`).innerHTML,
-      savedSite.id
+      savedSite.id,
     );
     assert.strictEqual(actualSite.name, siteNameInList);
   });
@@ -101,7 +104,7 @@ xdescribe('Site CRUD Pages', () => {
     await page.waitFor(`a[href=\\/site\\/${updatedSite.id}`);
     const siteNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/site\\/${id}`).innerHTML,
-      updatedSite.id
+      updatedSite.id,
     );
     assert.strictEqual(`${actualSite.name}${changedSuffix}`, siteNameInList);
   });
@@ -140,7 +143,7 @@ xdescribe('Site CRUD Pages', () => {
     await page.waitFor(`a[href=\\/site\\/${updatedSite.id}`);
     const siteNameInList = await page.evaluate(
       id => document.querySelector(`a[href=\\/site\\/${id}`).innerHTML,
-      updatedSite.id
+      updatedSite.id,
     );
     assert.strictEqual(actualSite.name, siteNameInList);
   });

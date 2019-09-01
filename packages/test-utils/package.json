@@ -1,0 +1,40 @@
+{
+  "name": "get-set-fetch-extension-test-utils",
+  "version": "0.1.1",
+  "description": "",
+  "main": "lib/index.ts",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "clean": "shx rm -rf dist",
+    "lint": "eslint lib/**/*.ts",
+    "build": "npm run lint"
+  },
+  "keywords": [
+    "extension",
+    "test",
+    "utils"
+  ],
+  "author": {
+    "name": "Andrei Sabau"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/get-set-fetch/extension/issues"
+  },
+  "homepage": "https://github.com/get-set-fetch/extension#readme",
+  "dependencies": {
+    "chai": "^4.1.2",
+    "connect": "^3.6.6",
+    "mocha": "^5.2.0",
+    "node-forge": "^0.8.2",
+    "puppeteer": "^1.18.1",
+    "query-string": "^6.1.0",
+    "jszip": "^3.2.0",
+    "serve-static": "^1.13.2",
+    "shelljs": "^0.8.3",
+    "tar-fs": "^2.0.0",
+    "vhost": "^3.0.2"
+  }
+}

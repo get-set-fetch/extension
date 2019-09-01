@@ -1,14 +1,18 @@
 import { assert } from 'chai';
-import BrowserHelper from '../../helpers/BrowserHelper';
+import { resolve } from 'path';
 import { Page } from 'puppeteer';
+import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
+
 
 describe('Test Extension Popup', () => {
   let browserHelper: BrowserHelper;
   let page: Page;
 
   before(async () => {
-    browserHelper = await BrowserHelper.launch();
-    page = browserHelper.page;
+    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    await browserHelper.launch();
+    ({ page } = browserHelper as { page: Page });
   });
 
   after(async () => {
@@ -17,7 +21,7 @@ describe('Test Extension Popup', () => {
 
   it('Test Admin Links', async () => {
     // open extension popup
-    await page.goto(`chrome-extension://${BrowserHelper.extension.id}/popup/popup.html`, BrowserHelper.gotoOpts);
+    await page.goto(`chrome-extension://${browserHelper.extension.id}/popup/popup.html`, browserHelper.gotoOpts);
 
     // detect links
     const ctx = await page.mainFrame().executionContext();
@@ -25,10 +29,10 @@ describe('Test Extension Popup', () => {
       const links = [];
       const aElms = document.querySelectorAll('a');
 
-      aElms.forEach((aElm) => {
+      aElms.forEach(aElm => {
         links.push({
           text: aElm.innerHTML,
-          href: aElm.href
+          href: aElm.href,
         });
       });
 
@@ -37,8 +41,8 @@ describe('Test Extension Popup', () => {
 
     // check if links are rendered correctly
     const expectedLinks = [
-      { text: 'New Site', href: `chrome-extension://${BrowserHelper.extension.id}/popup/popup.html#` },
-      { text: 'Admin Area', href: `chrome-extension://${BrowserHelper.extension.id}/admin/admin.html` }
+      { text: 'New Site', href: `chrome-extension://${browserHelper.extension.id}/popup/popup.html#` },
+      { text: 'Admin Area', href: `chrome-extension://${browserHelper.extension.id}/admin/admin.html` },
     ];
     assert.sameDeepMembers(detectedlinks, expectedLinks);
   });

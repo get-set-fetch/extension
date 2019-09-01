@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "target": "ES2017",
+        "strict": false,
+        "moduleResolution": "node",
+        "allowSyntheticDefaultImports": true
+    },
+    "newLine": "LF",
+}

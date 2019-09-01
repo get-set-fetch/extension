@@ -1,11 +1,12 @@
 import { assert } from 'chai';
+import { before } from 'mocha';
 import { join, resolve } from 'path';
-import TestUtils from 'get-set-fetch/test/utils/TestUtils';
-import BrowserHelper from '../../../helpers/BrowserHelper';
 import { Page } from 'puppeteer';
-import ScenarioHelper from '../../../helpers/ScenarioHelper';
-import ProjectHelper from '../../../helpers/ProjectHelper';
-import CrawlHelper from '../../../helpers/CrawlHelper';
+import BrowserHelper from '../helper/BrowserHelper';
+import ScenarioHelper from '../helper/ScenarioHelper';
+import ProjectHelper from '../helper/ProjectHelper';
+import CrawlHelper from '../helper/CrawlHelper';
+import FileHelper from '../helper/FileHelper';
 
 export interface ICrawlDefinition {
   title: string;
@@ -13,30 +14,33 @@ export interface ICrawlDefinition {
     name: string;
     description: string;
     url: string;
-    crawlOpts?: any;
+    crawlOpts?;
   };
-  scenarioOpts: any;
-  expectedResources: Array<{
+  scenarioOpts;
+  expectedResources: {
     url: string;
     mediaType: string;
-    info: any;
-  }>;
-  expectedCsv: string;
+    info;
+  }[];
+  expectedCsv: string[];
+  csvLineSeparator: string;
 }
 
-const genSuite = (title, crawlDefinitions) => describe(`Project Crawl ${title}`, () => {
+const crawlProjectBaseSuite = (title, crawlDefinitions) => describe(`Project Crawl ${title}`, () => {
   let browserHelper: BrowserHelper;
   let page: Page;
-  const targetDir = join(__dirname, '..', '..', '..', 'tmp');
+  const targetDir = resolve(process.cwd(), 'test', 'tmp');
 
   before(async () => {
-    browserHelper = await BrowserHelper.launch();
-    page = browserHelper.page;
+    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    await browserHelper.launch();
+    ({ page } = browserHelper);
   });
 
   afterEach(async () => {
     // cleanup fs
-    TestUtils.emptyDir(targetDir);
+    FileHelper.emptyDir(targetDir);
 
     // move to admin page
     await browserHelper.goto('/projects');
@@ -57,12 +61,10 @@ const genSuite = (title, crawlDefinitions) => describe(`Project Crawl ${title}`,
     assert.sameDeepMembers(actualResources, expectedResources);
   }
 
-  async function downloadAndCheckCsv(project, expectedCsv) {
-    const generated = await ProjectHelper.downloadProjectCsv(page, project, targetDir);
-    const expected: string[] = expectedCsv.split('\n').map(csvLine => csvLine.trim());
-
-    assert.strictEqual(generated.header, expected[0]);
-    assert.sameDeepMembers(generated.body, expected.slice(1));
+  async function downloadAndCheckCsv(project, expectedCsv, csvLineSeparator) {
+    const generated = await ProjectHelper.downloadProjectCsv(page, project, targetDir, csvLineSeparator);
+    assert.strictEqual(generated.header, expectedCsv[0]);
+    assert.sameDeepMembers(generated.body, expectedCsv.slice(1));
   }
 
   function crawlProjectIt(crawlDefinition) {
@@ -70,10 +72,10 @@ const genSuite = (title, crawlDefinitions) => describe(`Project Crawl ${title}`,
       const { project, scenarioOpts } = crawlDefinition;
 
       // install scenario if not present
-      const scenarios = await page.evaluate(() => GsfClient.fetch('GET', `scenarios`));
+      const scenarios = await page.evaluate(() => GsfClient.fetch('GET', 'scenarios'));
       const scenario = scenarios.find(scenario => scenario.name === scenarioOpts.name);
       if (!scenario) {
-        await ScenarioHelper.installScenario(page, scenarioOpts.name);
+        await ScenarioHelper.installScenario(browserHelper, scenarioOpts.name);
       }
 
       // save new project
@@ -116,16 +118,15 @@ const genSuite = (title, crawlDefinitions) => describe(`Project Crawl ${title}`,
         .createCDPSession();
       await client.send('Page.setDownloadBehavior', {
         behavior: 'allow',
-        downloadPath: resolve(targetDir)
+        downloadPath: resolve(targetDir),
       });
 
       // download and check csv
-      await downloadAndCheckCsv(loadedProject, crawlDefinition.expectedCsv);
+      await downloadAndCheckCsv(loadedProject, crawlDefinition.expectedCsv, crawlDefinition.csvLineSeparator);
     });
   }
 
   crawlDefinitions.map(crawlDefinition => crawlProjectIt(crawlDefinition));
-
 });
 
-export default genSuite;
+export default crawlProjectBaseSuite;

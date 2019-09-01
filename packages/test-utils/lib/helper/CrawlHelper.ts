@@ -2,7 +2,7 @@ export default class CrawlHelper {
   static async waitForCrawlComplete(page, siteId, resolve = null) {
     // if no promise defined return one
     if (!resolve) {
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         setTimeout(CrawlHelper.waitForCrawlComplete, 5000, page, siteId, resolve);
       });
     }
@@ -25,9 +25,8 @@ export default class CrawlHelper {
     let actualResources = await page.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/crawled`), siteId);
 
     // only keep the properties we're interested in
-    actualResources = actualResources.map(({ url, mediaType, info })=> ({ url, mediaType, info }) );
+    actualResources = actualResources.map(({ url, mediaType, info }) => ({ url, mediaType, info }));
 
     return actualResources;
   }
-
 }

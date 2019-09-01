@@ -7,7 +7,8 @@
   ],
   "scripts": {
     "clean": "shx rm -rf dist",
-    "build": "npm run clean && npm run copy:resources",
+    "build": "npm run clean && npm run copy:resources && npm run build:tgz",
+    "build:tgz": "ts-node --files ./scripts/tgz-npm-pkg.ts",
     "copy:resources": "npm run copy:local && npm run update:local && npm run copy:bkg && npm run copy:popup && npm run copy:admin && npm run copy:scenarios",
     "copy:local": "shx mkdir dist && shx cp -R src/resources/* dist/",
     "update:local": "node ./scripts/manifest-update.js",
@@ -22,7 +23,7 @@
     "copy:scenario-extract-html-content": "npm run copy:scenario-extract-html-content-dist && npm run copy:scenario-extract-html-content-pkg",
     "copy:scenarios": "npm run copy:scenario-extract-resource && npm run copy:scenario-extract-html-content",
     "test": "mocha test \"./test/integration/**/*.ts\" --exit",
-    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Project Crawl Extract Html Headings\""
+    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Test ThankYou Pages\""
   },
   "author": {
     "name": "Andrei Sabau"
