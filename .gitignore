@@ -64,3 +64,6 @@ jspm_packages/
 
 # vscode files
 .vscode
+
+# todo files
+todo*
