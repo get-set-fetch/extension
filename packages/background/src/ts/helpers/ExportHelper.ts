@@ -120,7 +120,7 @@ export default class ExportHelper {
               RFC-4180 "If double-quotes are used to enclose fields,
               then a double-quote appearing inside a field must be escaped by preceding it with another double quote."
               */
-              const quotedVal = val.replace(/"/g, '""');
+              const quotedVal = val && val.constructor === String ? val.replace(/"/g, '""') : val;
               elms.push(`"${quotedVal}"`);
             }
 
