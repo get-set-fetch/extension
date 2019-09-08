@@ -57,7 +57,7 @@ const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => descr
 
   after(async () => {
     if (!cleanup) return;
-    
+
     await browserHelper.close();
   });
 
