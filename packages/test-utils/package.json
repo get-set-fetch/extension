@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension-test-utils",
-  "version": "0.1.1",
+  "version": "0.1.2-rc.1",
   "description": "",
   "main": "lib/index.ts",
   "files": [
@@ -27,11 +27,11 @@
   "dependencies": {
     "chai": "^4.1.2",
     "connect": "^3.6.6",
+    "jszip": "^3.2.0",
     "mocha": "^5.2.0",
     "node-forge": "^0.8.2",
     "puppeteer": "^1.18.1",
     "query-string": "^6.1.0",
-    "jszip": "^3.2.0",
     "serve-static": "^1.13.2",
     "shelljs": "^0.8.3",
     "tar-fs": "^2.0.0",

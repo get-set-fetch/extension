@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension-commons",
-  "version": "0.1.2",
+  "version": "0.1.2-rc.1",
   "description": "",
   "main": "dist/index.js",
   "types": "lib/index.d.ts",

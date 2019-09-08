@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension-popup",
-  "version": "0.1.2",
+  "version": "0.1.2-rc.1",
   "description": "",
   "main": "dist/popup.js",
   "files": [

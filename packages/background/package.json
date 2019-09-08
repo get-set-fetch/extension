@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension-background",
-  "version": "0.1.2",
+  "version": "0.1.2-rc.1",
   "description": "",
   "main": "dist/background-bundle.js",
   "module": "dist/background-bundle.js",
