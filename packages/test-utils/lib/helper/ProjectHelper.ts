@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import JSZip from 'jszip/dist/jszip';
 import BrowserHelper from './BrowserHelper';
 
+declare const GsfClient;
 export default class ProjectHelper {
   static async saveProject(browserHelper: BrowserHelper, project, scenarioOpts) {
     const { page } = browserHelper;

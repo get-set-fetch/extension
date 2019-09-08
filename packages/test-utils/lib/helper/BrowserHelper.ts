@@ -1,6 +1,7 @@
 import { stringify } from 'query-string';
 import { launch, Page, NavigationOptions, Browser } from 'puppeteer';
 
+declare const GsfClient;
 interface IExtension {
   id?: string;
   path: string;

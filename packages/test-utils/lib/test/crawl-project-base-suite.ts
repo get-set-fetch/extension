@@ -1,5 +1,4 @@
 import { assert } from 'chai';
-import { before } from 'mocha';
 import { join, resolve } from 'path';
 import { Page } from 'puppeteer';
 import BrowserHelper from '../helper/BrowserHelper';
@@ -25,6 +24,8 @@ export interface ICrawlDefinition {
   expectedCsv: string[];
   csvLineSeparator: string;
 }
+
+declare const GsfClient;
 
 const crawlProjectBaseSuite = (title, crawlDefinitions) => describe(`Project Crawl ${title}`, () => {
   let browserHelper: BrowserHelper;

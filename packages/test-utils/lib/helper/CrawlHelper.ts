@@ -1,3 +1,4 @@
+declare const GsfClient;
 export default class CrawlHelper {
   static async waitForCrawlComplete(page, siteId, resolve = null) {
     // if no promise defined return one
