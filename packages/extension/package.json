@@ -29,7 +29,7 @@
     "name": "Andrei Sabau"
   },
   "license": "MIT",
-  "dependencies": {
+  "devDependencies": {
     "get-set-fetch": "^0.3.8",
     "get-set-fetch-extension-admin": "file:../admin",
     "get-set-fetch-extension-background": "file:../background",
