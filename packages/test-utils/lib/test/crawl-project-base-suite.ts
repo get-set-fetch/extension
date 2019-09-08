@@ -27,7 +27,7 @@ export interface ICrawlDefinition {
 
 declare const GsfClient;
 
-const crawlProjectBaseSuite = (title, crawlDefinitions) => describe(`Project Crawl ${title}`, () => {
+const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => describe(`Project Crawl ${title}`, () => {
   let browserHelper: BrowserHelper;
   let page: Page;
   const targetDir = resolve(process.cwd(), 'test', 'tmp');
@@ -40,6 +40,8 @@ const crawlProjectBaseSuite = (title, crawlDefinitions) => describe(`Project Cra
   });
 
   afterEach(async () => {
+    if (!cleanup) return;
+
     // cleanup fs
     FileHelper.emptyDir(targetDir);
 
@@ -54,6 +56,8 @@ const crawlProjectBaseSuite = (title, crawlDefinitions) => describe(`Project Cra
   });
 
   after(async () => {
+    if (!cleanup) return;
+    
     await browserHelper.close();
   });
 
