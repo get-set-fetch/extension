@@ -20,7 +20,7 @@ The most common use cases are handled by builtin scenarios:
 
 You can also install community based scenarios:
 
-- [Extract Html Headings](https://github.com/a1sabau/gsf-extension-extract-html-headings) - [v0.1.1](https://registry.npmjs.org/gsf-extension-extract-html-headings/0.1.1) 
+- [Extract Html Headings](https://github.com/a1sabau/gsf-extension-extract-html-headings) - [v0.1.2](https://registry.npmjs.org/gsf-extension-extract-html-headings/0.1.2) 
   - "Hello World" example of writing a scrape scenario.
 - [Extract Article Content](https://github.com/a1sabau/gsf-extension-readability/) - [v0.1.1](https://registry.npmjs.org/gsf-extension-readability//0.1.1) 
   - Extract article content using Mozilla Readability library.
