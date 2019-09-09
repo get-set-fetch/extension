@@ -14,14 +14,16 @@ Currently supported browsers: Chrome.
 
 The most common use cases are handled by builtin scenarios:
 - [Extract Html Content](https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-html-content)
-  - Scraps text representation of html nodes
+  - Scraps text representation of html nodes.
 - [Extract Resources](https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-resources)
   - Extracts binary content (images, pdfs, ...)
 
 You can also install community based scenarios:
 
 - [Extract Html Headings](https://github.com/a1sabau/gsf-extension-extract-html-headings) - [v0.1.1](https://registry.npmjs.org/gsf-extension-extract-html-headings/0.1.1) 
-  - "Hello World" example of writing a scrape scenario
+  - "Hello World" example of writing a scrape scenario.
+- [Extract Article Content](https://github.com/a1sabau/gsf-extension-readability/) - [v0.1.1](https://registry.npmjs.org/gsf-extension-readability//0.1.1) 
+  - Extract article content using Mozilla Readability library.
 
 
 If you wrote a scraping scenario and want to share it, please update the above list and make a pull request.
