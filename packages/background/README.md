@@ -35,7 +35,7 @@ Handles the crawling and scraping logic.
   },
 
   scenarioOpts: {
-    scenarioId: 1,
+    name: "extract-html-content",
     description: "Extract Html Content scenario is used for extracting html nodes text based on dom selectors."
     homepage: "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-html-content"
     selectors: "h1↵h2↵h3"

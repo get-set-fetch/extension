@@ -21,7 +21,8 @@ describe('Project CRUD Pages', () => {
       pathnameRe: '/pathname/',
     },
     scenarioOpts: {
-      scenarioId: null,
+      name: 'get-set-fetch-scenario-extract-resources',
+      resourcePathnameRe: '/(gif|png|jpg|jpeg)$/i',
     },
     pluginDefinitions: [
       {
@@ -62,10 +63,6 @@ describe('Project CRUD Pages', () => {
     browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
     await browserHelper.launch();
     ({ page } = browserHelper as { page: Page });
-
-    // get expectedProject scenarioId
-    const scenarios = await page.evaluate(() => GsfClient.fetch('GET', 'scenarios'));
-    expectedProject.scenarioOpts.scenarioId = scenarios.find(scenario => scenario.name === 'get-set-fetch-scenario-extract-resources').id;
   });
 
   beforeEach(async () => {
@@ -126,21 +123,21 @@ describe('Project CRUD Pages', () => {
     await page.type('input[id="crawlOpts.pathnameRe"]', expectedProject.crawlOpts.pathnameRe.toString());
 
     // dropdown scenario is correctly populated#
-    const expectedScenarioIdOpts = [
+    const expectedScenariNamedOpts = [
       { label: 'Scrape Scenario' },
       { label: 'get-set-fetch-scenario-extract-html-content' },
       { label: 'get-set-fetch-scenario-extract-resources' },
     ];
-    const scenarioIdOpts = await page.evaluate(
-      () => Array.from((document.getElementById('scenarioOpts.scenarioId') as HTMLSelectElement).options)
+    const scenarioNameOpts = await page.evaluate(
+      () => Array.from((document.getElementById('scenarioOpts.name') as HTMLSelectElement).options)
         .map(
           ({ label }) => ({ label }),
         ),
     );
-    assert.sameDeepMembers(scenarioIdOpts, expectedScenarioIdOpts);
+    assert.sameDeepMembers(scenarioNameOpts, expectedScenariNamedOpts);
 
     // fill in dropdown scenario
-    await page.select('select[id="scenarioOpts.scenarioId"]', expectedProject.scenarioOpts.scenarioId.toString());
+    await page.select('select[id="scenarioOpts.name"]', expectedProject.scenarioOpts.name);
 
     // save the project
     await page.click('#save');

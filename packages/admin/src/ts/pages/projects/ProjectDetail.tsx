@@ -57,10 +57,10 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
     const scenarioPkgs: IScenarioPackage[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioPackage[];
 
     // compute new baseProjectSchema for scenario dropdown
-    const scenarioIdProp = Object.assign({}, this.state.baseProjectSchema.properties.scenarioOpts.properties.scenarioId);
-    scenarioIdProp.enum = scenarioPkgs.map(pkg => pkg.id);
-    scenarioIdProp.ui = { enumNames: scenarioPkgs.map(pkg => pkg.name) };
-    const baseProjectSchema = setIn(this.state.baseProjectSchema, [ 'properties', 'scenarioOpts', 'properties', 'scenarioId' ], scenarioIdProp);
+    const scenarioNameProp = Object.assign({}, this.state.baseProjectSchema.properties.scenarioOpts.properties.name);
+    scenarioNameProp.enum = scenarioPkgs.map(pkg => pkg.name);
+    scenarioNameProp.ui = { enumNames: scenarioPkgs.map(pkg => pkg.name) };
+    const baseProjectSchema = setIn(this.state.baseProjectSchema, [ 'properties', 'scenarioOpts', 'properties', 'name' ], scenarioNameProp);
 
     this.setState(
       { scenarioPkgs, baseProjectSchema },
@@ -69,13 +69,14 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
   }
 
   async scenarioChangeHandler(project: Project) {
-    const scenario: IScenario = project.scenarioOpts.scenarioId ? await ScenarioHelper.instantiate(project.scenarioOpts.scenarioId) : null;
+    const scenario: IScenario = project.scenarioOpts.name ? await ScenarioHelper.instantiate(project.scenarioOpts.name) : null;
 
     const mergedSchema = this.getMergedSchema(scenario);
 
     let newProject = project;
     if (scenario) {
-      const scenarioPkg = this.state.scenarioPkgs.find(scenarioPkg => scenarioPkg.id === project.scenarioOpts.scenarioId);
+      const scenarioPkg = this.state.scenarioPkgs.find(scenarioPkg => scenarioPkg.name === project.scenarioOpts.name);
+      newProject = setIn(newProject, [ 'scenarioOpts', 'name' ], scenarioPkg.package.name);
       newProject = setIn(newProject, [ 'scenarioOpts', 'description' ], scenarioPkg.package.description);
       newProject = setIn(newProject, [ 'scenarioOpts', 'homepage' ], scenarioPkg.package.homepage);
     }
@@ -102,7 +103,7 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
     let orderedSchema = getIn(this.state.baseProjectSchema, [ 'properties', 'scenarioOpts' ], {});
 
     Object.keys(scenarioSchema.properties)
-      .filter(scenarioKey => ![ 'scenarioId', 'description', 'homepage' ].includes(scenarioKey))
+      .filter(scenarioKey => ![ 'name', 'description', 'homepage' ].includes(scenarioKey))
       .forEach(scenarioKey => {
         orderedSchema = setIn(orderedSchema, [ 'properties', scenarioKey ], scenarioSchema.properties[scenarioKey]);
       });
@@ -122,11 +123,11 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
 
   async changeHandler(key, value) {
     // scenario option changed
-    if (key === 'scenarioOpts.scenarioId') {
-      const newProject = setIn(this.state.project, key.split('.'), parseInt(value, 10));
+    if (key === 'scenarioOpts.name') {
+      const newProject = setIn(this.state.project, key.split('.'), value);
       this.scenarioChangeHandler(newProject);
     }
-    // base property other than scenarioId has changed
+    // base property other than scenarioOpts.name has changed
     else {
       this.setState({
         project: setIn(this.state.project, key.split('.'), value),

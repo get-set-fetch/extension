@@ -11,7 +11,8 @@ interface IProjectCrawlOpts {
 }
 
 interface IProjectScenarioOpts {
-  scenarioId?: number;
+  name?: string;
+  [key: string]: any;
 }
 
 interface IProjectStorage {

@@ -11,7 +11,7 @@ const Log = Logger.getLogger('IdbProject');
 export default class IdbProject extends BaseEntity implements IProjectStorage {
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return [ 'id', 'name', 'description', 'url', 'crawlOpts', 'scenarioId', 'scenarioOpts', 'pluginDefinitions' ];
+    return [ 'id', 'name', 'description', 'url', 'crawlOpts', 'scenarioOpts', 'pluginDefinitions' ];
   }
 
   // get a read transaction
@@ -133,8 +133,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
   description: string;
   url: string;
   crawlOpts: IProjectCrawlOpts;
-  scenarioId: number;
-  scenarioOpts: object;
+  scenarioOpts: IProjectScenarioOpts;
   pluginDefinitions: IPluginDefinition[];
 
   constructor(kwArgs: Partial<IProjectStorage> = {}) {

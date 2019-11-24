@@ -8,10 +8,6 @@ export default class ProjectHelper {
   static async saveProject(browserHelper: BrowserHelper, project, scenarioOpts) {
     const { page } = browserHelper;
 
-    // get scenario id based on name
-    const scenarios = await page.evaluate(() => GsfClient.fetch('GET', 'scenarios'));
-    const scenarioId = scenarios.find(scenario => scenario.name === scenarioOpts.name).id;
-
     // go to project list
     await browserHelper.goto('/projects');
 
@@ -49,7 +45,7 @@ export default class ProjectHelper {
     }
 
     // fill in dropdown scenario
-    await page.select('select[id="scenarioOpts.scenarioId"]', scenarioId.toString());
+    await page.select('select[id="scenarioOpts.name"]', scenarioOpts.name);
 
     // fill in other scenario props
     const validPropKeys: string[] = Object.keys(scenarioOpts).filter(propKey => propKey !== 'name');

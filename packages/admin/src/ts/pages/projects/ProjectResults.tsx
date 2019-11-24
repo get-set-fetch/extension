@@ -38,7 +38,7 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
     if (!project.id) return;
 
     // instantiate scenario
-    const scenario = await ScenarioHelper.instantiate(project.scenarioOpts.scenarioId);
+    const scenario = await ScenarioHelper.instantiate(project.scenarioOpts.name);
 
     // load results
     const results = await this.loadResourcesInfo(project);

@@ -3,9 +3,9 @@ import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
 import GsfClient from '../../../components/GsfClient';
 
 export default class ScenarioHelper {
-  static async instantiate(scenarioId: number): Promise<IScenario> {
+  static async instantiate(scenarioName: string): Promise<IScenario> {
     // load scenario
-    const scenarioPkg: IScenarioPackage = (await GsfClient.fetch(HttpMethod.GET, `scenario/${scenarioId}`)) as IScenarioPackage;
+    const scenarioPkg: IScenarioPackage = (await GsfClient.fetch(HttpMethod.GET, `scenario/${scenarioName}`)) as IScenarioPackage;
 
     // import as module
     const scenarioBlob = new Blob([ scenarioPkg.code ], { type: 'text/javascript' });
