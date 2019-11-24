@@ -362,10 +362,10 @@ export default class GsfProvider {
           case /^scenarios\/available$/.test(request.resource):
             reqPromise = ScenarioManager.getNpmScenarios();
             break;
-          // scenario/:scenarioId
-          case /^scenario\/[0-9]+$/.test(request.resource):
-            const getScenarioId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            reqPromise = GsfProvider.ScenarioPackage.get(getScenarioId);
+          // scenario/:scenarioNameOrId
+          case /^scenario\/.+$/.test(request.resource):
+            const nameOrId = /^scenario\/(.+)$/.exec(request.resource)[1];
+            reqPromise = GsfProvider.ScenarioPackage.get(nameOrId);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
