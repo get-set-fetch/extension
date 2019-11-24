@@ -5,7 +5,19 @@ import resolve from 'rollup-plugin-node-resolve';
 import globals from 'rollup-plugin-node-globals';
 import scss from 'rollup-plugin-scss';
 import url from 'rollup-plugin-url';
-import builtins from 'rollup-plugin-node-builtins';
+import { join } from 'path';
+
+function gsfBuiltin() {
+  return {
+    name: 'gsf-builtin',
+    resolveId(source) {
+      if (source === 'util') {
+        return require.resolve(join('..', '..', 'node_modules', 'util', 'util.js'));
+      }
+      return null;
+    },
+  };
+}
 
 export default {
   input: './src/ts/admin.ts',
@@ -21,7 +33,7 @@ export default {
       preferBuiltins: false,
     }),
     commonjs({
-      include: /node_modules/,
+      include: '../../node_modules/**',
       namedExports: {
         '../../node_modules/react': [
           'Children',
@@ -55,7 +67,7 @@ export default {
         ],
       },
     }),
-    builtins(),
+    gsfBuiltin(),
     typescript(),
     json(),
     scss({
