@@ -203,7 +203,7 @@ export default class ExportHelper {
       (obj, key) => {
         accPath.push(key);
         accProp = accPath.join('.');
-        if (Object.keys(obj).includes(accProp)) {
+        if (obj && Object.keys(obj).includes(accProp)) {
           accPath = [];
           return obj[accProp];
         }
