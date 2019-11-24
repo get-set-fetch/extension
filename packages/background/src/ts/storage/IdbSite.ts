@@ -232,11 +232,20 @@ export default class IdbSite extends BaseEntity implements ISite {
             err,
           );
 
-          // reset the crawlInProgress flag, next crawl operation will attempt to crawl it again
-          if (resource) {
+          /*
+            manually update the resource, this resets the crawlInProgress flag and adds crawledAt date
+            selecting new resources for crawling takes crawledAt in consideration (right now only resources with crawledAt undefined qualify)
+            because of the above behavior, we don't attempt to crawl a resource that throws an error over and over again
+
+            in future a possible approach will be just resetting the crawlInProgress flag
+              - next crawl operation will attempt to crawl it again, but atm this will just retry the same resource over and over again
+              - there is no mechanism to escape the retry loop
             resource.crawlInProgress = false;
-            // eslint-disable-next-line no-await-in-loop
             await resource.update(false);
+          */
+          if (resource) {
+            // eslint-disable-next-line no-await-in-loop
+            await resource.update();
           }
 
           reject(err);
