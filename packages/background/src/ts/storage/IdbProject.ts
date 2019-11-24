@@ -1,9 +1,11 @@
 import { BaseEntity } from 'get-set-fetch';
 import { IProjectStorage, IPluginDefinition, IProjectCrawlOpts } from 'get-set-fetch-extension-commons';
+import { IProjectConfigHash, IProjectScenarioOpts } from 'get-set-fetch-extension-commons/lib/project';
 import Logger from '../logger/Logger';
 import IdbSite from './IdbSite';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 import IdbResource from './IdbResource';
+import JsonUrlHelper from '../helpers/JsonUrlHelper';
 
 const Log = Logger.getLogger('IdbProject');
 
@@ -42,6 +44,22 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
         reject(new Error(`could not read resource: ${nameOrId}`));
       };
     });
+  }
+
+  static async encodeConfigHash(nameOrId): Promise<IProjectConfigHash> {
+    const projectStorage: IProjectStorage = await IdbProject.get(nameOrId);
+
+    // remove id references from the exportable config
+    delete projectStorage.id;
+    delete projectStorage.scenarioOpts.id;
+    const configHash = JsonUrlHelper.encode(projectStorage);
+
+    return { hash: configHash };
+  }
+
+  static async decodeConfigHash(config: IProjectConfigHash): Promise<IProjectStorage> {
+    const projectStorage: IProjectStorage = Object.assign({}, JsonUrlHelper.decode(config.hash)) as IProjectStorage;
+    return projectStorage;
   }
 
   static getAll(): Promise<IdbProject[]> {

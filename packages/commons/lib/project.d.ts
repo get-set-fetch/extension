@@ -24,3 +24,7 @@ interface IProjectStorage {
   scenarioOpts: IProjectScenarioOpts;
   pluginDefinitions: IPluginDefinition[];
 }
+
+interface IProjectConfigHash {
+  hash: string;
+}

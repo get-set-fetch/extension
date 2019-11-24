@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { NavLink, RouteComponentProps } from 'react-router-dom';
 import { HttpMethod, IHeaderCol } from 'get-set-fetch-extension-commons';
+import { IProjectConfigHash } from 'get-set-fetch-extension-commons/lib/project';
 import Table from '../../components/Table';
 import GsfClient from '../../components/GsfClient';
 import Project from './model/Project';
 import Page from '../../layout/Page';
+import Modal from '../../components/Modal';
 
 interface IState {
   header: IHeaderCol[];
@@ -39,6 +41,14 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
           renderLink: false,
           render: (project: Project) => ([
             <input
+              key={`configHash-${project.id}`}
+              id={`configHash-${project.id}`}
+              type='button'
+              className='btn-secondary mr-2'
+              value='Config Hash'
+              onClick={() => this.openConfigHashModal(project)}
+            />,
+            <input
               key={`crawl-${project.id}`}
               id={`crawl-${project.id}`}
               type='button'
@@ -70,6 +80,35 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
     };
 
     this.deleteHandler = this.deleteHandler.bind(this);
+  }
+
+  async openConfigHashModal(project: Project) {
+    const config: IProjectConfigHash = await GsfClient.fetch(HttpMethod.GET, `project/${project.id}/config`) as IProjectConfigHash;
+
+    const textarea = React.createRef<HTMLTextAreaElement>();
+
+    Modal.instance.show(
+      'Configuration Hash',
+      [
+        <textarea key="textarea" id="configHashArea" readOnly rows={4} style={{ width: '100%' }} value={config.hash} ref={textarea} />,
+        <p key="help" style={{ marginBottom: 0 }}>Use this hash to copy project configuration.</p>,
+      ],
+      [
+        {
+          title: 'Copy to clipboard',
+          value: 'copy',
+          clickHandler: evt => {
+            textarea.current.select();
+            document.execCommand('copy');
+          },
+          close: false,
+        },
+        {
+          title: 'Close',
+          value: 'close',
+        },
+      ],
+    );
   }
 
   async crawlProject(project: Project) {

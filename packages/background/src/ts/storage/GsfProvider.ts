@@ -194,6 +194,11 @@ export default class GsfProvider {
             projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
             reqPromise = GsfProvider.Project.getAllResources(projectId);
             break;
+          // project/{project.id}/config
+          case /^project\/[0-9]+\/config$/.test(request.resource):
+            projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            reqPromise = GsfProvider.Project.encodeConfigHash(projectId);
+            break;
           default:
             reqPromise = new Promise(resolve => resolve());
         }
@@ -204,6 +209,10 @@ export default class GsfProvider {
           case /^project$/.test(request.resource):
             const project = new GsfProvider.Project(request.body);
             reqPromise = project.save();
+            break;
+          // project/config
+          case /^project\/config$/.test(request.resource):
+            reqPromise = GsfProvider.Project.decodeConfigHash(request.body);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());

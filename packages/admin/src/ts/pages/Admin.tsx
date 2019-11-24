@@ -1,4 +1,5 @@
 import * as React from 'react';
+
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 import * as queryString from 'query-string';
 import SiteList from './sites/SiteList';
@@ -15,11 +16,12 @@ import ProjectDetail from './projects/ProjectDetail';
 import Navigation from '../layout/Navigation';
 import ProjectResults from './projects/ProjectResults';
 import GettingStarted from './start/GettingStarted';
+import Modal from '../components/Modal';
 
 export default class Admin extends React.Component {
   render() {
-    return (
-      <Router>
+    return [
+      <Router key="router">
         <div className='row h-100'>
 
           {/* left menu */}
@@ -68,7 +70,8 @@ export default class Admin extends React.Component {
           <div className='col-0 col-xl-1'></div>
 
         </div>
-      </Router>
-    );
+      </Router>,
+      <Modal key="modal"/>,
+    ];
   }
 }

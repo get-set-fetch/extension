@@ -23,7 +23,7 @@ const mainConfig = {
     commonjs({
       include: /node_modules/,
       namedExports: {
-        '../../node_modules/pako': [ 'inflate' ],
+        '../../node_modules/pako': [ 'inflate', 'deflate' ],
         '../../node_modules/url-parse': [ 'Url' ],
       },
       ignore: [ 'util' ],

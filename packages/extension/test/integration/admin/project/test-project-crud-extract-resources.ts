@@ -4,6 +4,8 @@ import { Page } from 'puppeteer';
 import { BrowserHelper, clearQuerySelector } from 'get-set-fetch-extension-test-utils';
 import { IProjectStorage } from 'get-set-fetch-extension-commons';
 
+declare const GsfClient;
+
 /* eslint-disable no-shadow, max-len */
 describe('Project CRUD Pages', () => {
   let browserHelper: BrowserHelper;
@@ -58,6 +60,8 @@ describe('Project CRUD Pages', () => {
     ],
   };
 
+  const expectedConfigHash = 'eLvca5CYg7MLivKzgAHjiBFrMAkFZGFYTGaUlBRY6euXl5frFWeWpCbqJefn6mfmpaRW6GWU5OagRzQiDAyxxKWhDlLwG6KlBH0YT18JLfT0YTx9UOTj8Gp6aoluMRCngSJSF6ZINxUSgbpFcHfoKMHYASiWaKRnptUU5KXXZBWAcGq6pop+JvVSmyGFqY0UR+ugxQMZ4YycHnMT01PdMnNKUoswnUzdxGwICqbYWgCsQvEY';
+
   before(async () => {
     const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
     browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
@@ -82,7 +86,7 @@ describe('Project CRUD Pages', () => {
     await browserHelper.close();
   });
 
-  it('Test Create New Project', async () => {
+  it('Test Create New Project - Form Fill', async () => {
     await browserHelper.goto('/projects');
 
     // open project detail page
@@ -148,16 +152,10 @@ describe('Project CRUD Pages', () => {
     // get the newly created project
     const savedProject = await page.evaluate(name => GsfClient.fetch('GET', `project/${name}`), expectedProject.name);
 
-    // get the linked scenario
-    const linkedScenario = await page.evaluate(scenarioId => GsfClient.fetch('GET', `scenario/${scenarioId}`), expectedProject.scenarioOpts.scenarioId);
-
     // check newly created project props
-    assert.strictEqual(savedProject.name, expectedProject.name);
-    assert.strictEqual(savedProject.description, expectedProject.description);
-    assert.strictEqual(savedProject.url, expectedProject.url);
-    assert.strictEqual(savedProject.scenarioOpts.scenarioId, expectedProject.scenarioOpts.scenarioId);
-    assert.deepEqual(savedProject.crawlOpts, expectedProject.crawlOpts);
-    assert.sameDeepMembers(savedProject.pluginDefinitions, expectedProject.pluginDefinitions);
+    const savedProjectWithoutIds = JSON.parse(JSON.stringify(savedProject));
+    delete savedProjectWithoutIds.id;
+    assert.deepEqual(savedProjectWithoutIds, expectedProject);
 
     // check newly created project presence in project list
     await page.waitFor(`a[href=\\/project\\/${savedProject.id}`);
@@ -166,6 +164,60 @@ describe('Project CRUD Pages', () => {
       savedProject.id,
     );
     assert.strictEqual(savedProject.name, projectNameInList);
+
+    // check config hash
+    await page.click(`#configHash-${savedProject.id}`);
+    const actualConfigHash = await page.$eval('#configHashArea', el => (el as HTMLTextAreaElement).value);
+    assert.strictEqual(actualConfigHash, expectedConfigHash);
+  });
+
+  it('Test Create New Project - Config Hash', async () => {
+    await browserHelper.goto('/projects');
+
+    // open project detail page
+    await page.waitFor('#newproject');
+    await page.click('#newproject');
+
+    // wait for the project detail page to load
+    await page.waitFor('input#name');
+
+    // load the hash
+    await page.click('#configHash');
+    await page.waitFor('textarea[id="configHashArea"]');
+    await page.type('textarea[id="configHashArea"]', expectedConfigHash);
+    await page.click('input[data-val="loadConfig"]');
+
+    // wait for form completion
+    await page.waitFor(`input#name[value="${expectedProject.name}"]`);
+
+    // save the project
+    await page.click('#save');
+
+    // wait for project to be saved and project list to be available
+    await page.waitFor('table.table-main');
+
+    // get the newly created project
+    const savedProject = await page.evaluate(name => GsfClient.fetch('GET', `project/${name}`), expectedProject.name);
+
+    // check newly created project props
+    const savedProjectWithoutIds = JSON.parse(JSON.stringify(savedProject));
+    delete savedProjectWithoutIds.id;
+    assert.deepEqual(savedProjectWithoutIds, expectedProject);
+
+    // check newly created project presence in project list
+    await page.waitFor(`a[href=\\/project\\/${savedProject.id}`);
+    const projectNameInList = await page.evaluate(
+      id => document.querySelector(`a[href=\\/project\\/${id}`).innerHTML,
+      savedProject.id,
+    );
+    assert.strictEqual(savedProject.name, projectNameInList);
+
+    // check config hash
+    await page.click(`#configHash-${savedProject.id}`);
+    const actualConfigHash = await page.$eval('#configHashArea', el => (el as HTMLTextAreaElement).value);
+    assert.strictEqual(actualConfigHash, expectedConfigHash);
+
+    await page.click('input[data-val="close"]');
   });
 
   it('Test Update Existing Project', async () => {
