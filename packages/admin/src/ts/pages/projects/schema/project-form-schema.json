@@ -66,6 +66,54 @@
       }
     },
 
+    "lazyOpts": {
+      "title": "Lazy Loading Options",
+      "type": "object",
+      "required": ["maxDepth", "maxResources", "delay"],
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "title": "Lazy Loading",
+          "description": "Autoscroll on pages in order to force additional loading",
+          "enum": [true, false],
+          "default": "false",
+          "ui": {
+            "enumNames": ["Enabled", "Disabled"]
+          }
+        },
+        "delay": {
+          "type": "number",
+          "title": "Delay",
+          "description": "Delay in miliseconds between triggering lazy loading operations",
+          "default": 1000,
+          "ui": {
+            "step": 1,
+            "hidden": true
+          }
+        },
+        "timeout": {
+          "type": "number",
+          "title": "Timeout",
+          "description": "Timeout in miliseconds between triggering lazy loading operations",
+          "default": 1000,
+          "ui": {
+            "step": 1,
+            "hidden": true
+          }
+        },
+        "scrollNo": {
+          "type": "number",
+          "title": "Delay",
+          "description": "Delay in miliseconds between triggering lazy loading operations",
+          "default": 1000,
+          "ui": {
+            "step": 1,
+            "hidden": true
+          }
+        }
+      }
+    },
+
     "scenarioOpts": {
       "type": "object",
       "title": "Scrape Scenario Options",
@@ -73,7 +121,10 @@
       "properties": {
         "name": {
           "type": "string",
-          "title": "Scrape Scenario"
+          "title": "Scrape Scenario",
+          "ui": {
+            "placeholder": "Select"
+          }
         },
         "description": {
           "type": "string",

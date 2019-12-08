@@ -71,7 +71,7 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
     // compute new baseProjectSchema for scenario dropdown
     const scenarioNameProp = Object.assign({}, this.state.baseProjectSchema.properties.scenarioOpts.properties.name);
     scenarioNameProp.enum = scenarioPkgs.map(pkg => pkg.name);
-    scenarioNameProp.ui = { enumNames: scenarioPkgs.map(pkg => pkg.name) };
+    scenarioNameProp.ui = Object.assign(scenarioNameProp.ui, { enumNames: scenarioPkgs.map(pkg => pkg.name) });
     const baseProjectSchema = setIn(this.state.baseProjectSchema, [ 'properties', 'scenarioOpts', 'properties', 'name' ], scenarioNameProp);
 
     this.setState(
@@ -100,6 +100,14 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
       scenario,
       bridge,
     });
+  }
+
+  lazyLoadChangeHandler(project, enabled: boolean) {
+    const { schema } = this.state.bridge as any;
+    schema.properties.lazyOpts.properties.delay.ui.hidden = enabled;
+    const bridge = SchemaBridgeHelper.createBridge(schema);
+
+    this.setState({ bridge, project });
   }
 
   getMergedSchema(scenario: IScenario): IEnhancedJSONSchema {
@@ -134,16 +142,17 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
 
 
   async changeHandler(key, value) {
-    // scenario option changed
-    if (key === 'scenarioOpts.name') {
-      const newProject = setIn(this.state.project, key.split('.'), value);
-      this.scenarioChangeHandler(newProject);
-    }
-    // base property other than scenarioOpts.name has changed
-    else {
-      this.setState({
-        project: setIn(this.state.project, key.split('.'), value),
-      });
+    const project = setIn(this.state.project, key.split('.'), value);
+
+    switch (key) {
+      case 'scenarioOpts.name':
+        this.scenarioChangeHandler(project);
+        break;
+      case 'lazyOpts.enabled':
+        this.lazyLoadChangeHandler(project, value);
+        break;
+      default:
+        this.setState({ project });
     }
   }
 

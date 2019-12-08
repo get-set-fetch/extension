@@ -37,11 +37,9 @@ const renderSelect = props => (
     ref={props.inputRef}
     value={props.value}
   >
-
-    <option value="">
-      {props.placeholder ? props.placeholder : props.label}
-    </option>
-
+    {
+      props.ui && props.ui.placeholder && <option value="">{props.ui.placeholder}</option>
+    }
 
     {props.allowedValues.map((value, idx) => (
       <option key={value} value={value}>

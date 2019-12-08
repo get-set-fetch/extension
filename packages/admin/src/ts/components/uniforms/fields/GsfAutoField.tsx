@@ -63,14 +63,13 @@ export default class GsfAutoField extends AutoField {
       }
     }
 
+    if (props.ui && props.ui.hidden) return null;
     return createElement(props.component, props);
   }
 
   getFieldProps(name, options) {
     const fieldProps = super.getFieldProps(name, options);
     fieldProps.id = fieldProps.name;
-    // fieldProps.error = 'a'
-
     return fieldProps;
   }
 }
