@@ -12,6 +12,8 @@ export default class GsfBridge extends JSONSchemaBridge {
     fieldDef.uniforms = fieldDef.uniforms || {};
     fieldDef.uniforms.help = fieldDef.uniforms.help || fieldDef.description;
     fieldDef.uniforms = Object.assign(fieldDef.uniforms, fieldDef.ui);
+    fieldDef.uniforms.labelClassName = 'col-form-label';
+    fieldDef.uniforms.grid = 2;
     return fieldDef;
   }
 
