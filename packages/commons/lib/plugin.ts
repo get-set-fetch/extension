@@ -10,11 +10,17 @@ export interface IPluginStorage {
 
 export interface IPluginDefinition {
   name: string;
-  opts?: any;
+  opts?: IPluginOpts;
+}
+
+export interface IPluginOpts {
+  runInTab?: boolean;
+  lazyLoad?: boolean;
+  [key: string]: any;
 }
 
 export interface IPlugin {
-  opts?: any;
+  opts?: IPluginOpts;
   test(resource: IResource): boolean;
   apply(site: ISite, resource: IResource): any;
 }
