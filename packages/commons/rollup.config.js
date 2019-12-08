@@ -1,5 +1,5 @@
 import typescript from 'rollup-plugin-typescript';
-import tslint from 'rollup-plugin-tslint';
+// import tslint from 'rollup-plugin-tslint';
 
 export default {
   input: 'lib/index.ts',
@@ -9,6 +9,6 @@ export default {
   },
   plugins: [
     typescript(),
-    tslint(),
+    // tslint(),
   ],
 };

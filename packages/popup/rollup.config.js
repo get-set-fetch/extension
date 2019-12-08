@@ -19,7 +19,7 @@ export default [
         extensions: ['.js', '.json'],
         jsnext: true,
       }),
-      eslint(),
+      // eslint(),
     ],
   },
 ];
