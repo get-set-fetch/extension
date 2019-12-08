@@ -6,7 +6,7 @@ export default class ExtractTitlePlugin implements IPlugin {
     runInTab: boolean;
   };
 
-  constructor(opts) {
+  constructor(opts = {}) {
     this.opts = SchemaHelper.instantiate(ExtractTitlePlugin.OPTS_SCHEMA, opts);
   }
 

@@ -72,7 +72,7 @@ export default class ExtractUrlsPlugin implements IPlugin {
     runInTab: boolean;
   };
 
-  constructor(opts) {
+  constructor(opts = {}) {
     this.opts = SchemaHelper.instantiate(ExtractUrlsPlugin.OPTS_SCHEMA, opts);
   }
 

@@ -26,7 +26,7 @@ export default class InsertResourcesPlugin implements IPlugin {
     };
   }
 
-  constructor(opts) {
+  constructor(opts = {}) {
     this.opts = SchemaHelper.instantiate(InsertResourcesPlugin.OPTS_SCHEMA, opts);
   }
 

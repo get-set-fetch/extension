@@ -30,7 +30,7 @@ export default class SelectResourcePlugin implements IPlugin {
     };
   }
 
-  constructor(opts) {
+  constructor(opts = {}) {
     this.opts = SchemaHelper.instantiate(SelectResourcePlugin.OPTS_SCHEMA, opts);
   }
 
