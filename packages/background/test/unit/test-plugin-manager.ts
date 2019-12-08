@@ -39,6 +39,15 @@ describe('Test PluginManager', () => {
         },
       },
       {
+        name: 'LazyLoadPlugin',
+        opts: {
+          delay: 1000,
+          enabled: false,
+          runInTab: true,
+          scrollNo: -1,
+        },
+      },
+      {
         name: 'UpdateResourcePlugin',
         opts: undefined,
       },

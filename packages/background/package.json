@@ -15,7 +15,7 @@
     "copy:resources": "shx cp -R src/html/*.html dist",
     "test": "nyc --reporter=lcov mocha test ./test/**/*.ts",
     "test:report": "cat ./coverage/lcov.info | ../../node_modules/coveralls/bin/coveralls.js",
-    "test:single": "mocha test ./test/**/*.ts --grep \"Test Site Crawl\""
+    "test:single": "mocha test ./test/**/*.ts --grep \"crawl with lazy loading\""
   },
   "keywords": [
     "scraper",
@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/get-set-fetch/extension#readme",
   "dependencies": {
+    "deepmerge": "^4.2.2",
     "get-set-fetch": "^0.3.8",
     "get-set-fetch-extension-commons": "file:../commons",
     "jszip": "^3.2.0",

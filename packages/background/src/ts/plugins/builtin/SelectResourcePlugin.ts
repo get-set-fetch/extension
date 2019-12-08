@@ -1,4 +1,4 @@
-import { SchemaHelper, IPlugin } from 'get-set-fetch-extension-commons';
+import { SchemaHelper, IPlugin, IResource } from 'get-set-fetch-extension-commons';
 
 /**
  * Plugin responsible for selecting a resource to crawl from the current site.
@@ -34,8 +34,9 @@ export default class SelectResourcePlugin implements IPlugin {
     this.opts = SchemaHelper.instantiate(SelectResourcePlugin.OPTS_SCHEMA, opts);
   }
 
-  test() {
-    return true;
+  // only retrieve a new resource when one hasn't already been selected
+  test(resource: IResource) {
+    return resource === null;
   }
 
   async apply(site) {

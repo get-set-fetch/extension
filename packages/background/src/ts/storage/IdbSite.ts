@@ -1,5 +1,10 @@
-import { IPluginDefinition, ISite } from 'get-set-fetch-extension-commons';
-import { BaseEntity, BloomFilter } from 'get-set-fetch';
+/* eslint-disable no-await-in-loop */
+/* eslint-disable class-methods-use-this */
+
+import { IPluginDefinition, ISite, IPlugin } from 'get-set-fetch-extension-commons';
+import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
+import BloomFilter from 'get-set-fetch/lib/filters/bloom/BloomFilter';
+import deepmerge from '../helpers/DeepMergeHelper';
 import IdbResource from './IdbResource';
 import PluginManager from '../plugins/PluginManager';
 
@@ -7,7 +12,6 @@ import Logger from '../logger/Logger';
 
 const Log = Logger.getLogger('IdbSite');
 
-/* eslint-disable class-methods-use-this */
 export default class IdbSite extends BaseEntity implements ISite {
   // IndexedDB can't do partial update, define all site properties to be stored
   get props() {
@@ -29,7 +33,7 @@ export default class IdbSite extends BaseEntity implements ISite {
       const rTx = IdbSite.rTx();
       const readReq = (Number.isInteger(nameOrId as number) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
-      readReq.onsuccess = async e => {
+      readReq.onsuccess = async (e: any) => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -47,7 +51,7 @@ export default class IdbSite extends BaseEntity implements ISite {
       const rTx = IdbSite.rTx();
       const readReq = projectId ? rTx.index('projectId').getAll(projectId) : rTx.getAll();
 
-      readReq.onsuccess = async e => {
+      readReq.onsuccess = async (e: any) => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -73,7 +77,7 @@ export default class IdbSite extends BaseEntity implements ISite {
       const rTx = IdbSite.rTx();
       const readReq = projectId ? rTx.index('projectId').getAll(projectId) : rTx.getAll();
 
-      readReq.onsuccess = async e => {
+      readReq.onsuccess = async (e: any) => {
         const { result } = e.target;
         if (!result) {
           resolve(null);
@@ -126,7 +130,7 @@ export default class IdbSite extends BaseEntity implements ISite {
   tabId: any;
 
   pluginDefinitions: IPluginDefinition[];
-  plugins: any;
+  plugins: IPlugin[];
 
   storageOpts: {
     resourceFilter: {
@@ -179,7 +183,6 @@ export default class IdbSite extends BaseEntity implements ISite {
     let resource;
     do {
       try {
-        // eslint-disable-next-line no-await-in-loop
         resource = await this.crawlResource();
       }
       catch (err) {
@@ -189,79 +192,93 @@ export default class IdbSite extends BaseEntity implements ISite {
     while (resource);
   }
 
-  /**
-   * loop through ordered (based on phase) plugins and apply each one to the current (site, resource) pair
-   */
-  crawlResource() {
-    return new Promise(async (resolve, reject) => {
-      let resource: IdbResource = null;
-      for (let i = 0; i < this.plugins.length; i += 1) {
-        try {
-          // eslint-disable-next-line no-await-in-loop
-          const result = await this.executePlugin(this.plugins[i], resource);
+  /*
+  will execute the plugins in the order they are defined
+  apply each plugin to the current (site, resource) pair
+  1st plugin will always select the resource to be crawled
+  a LazyLoad type plugin that succesfully scrolls new content, will force all prior plugins to be executed again
 
-          if (resource === null) {
-            resource = result;
-          }
-          else {
-            // plugin apply returns an info object, shallow merge it in order to avoid implementing a deep merge at resource level
-            const info = Object.assign({}, resource.info, result ? result.info : null);
-            resource = Object.assign(resource, result, { info });
-          }
+  examples:
+    SelectPlugin (only retrieves a resource if one is not already present)
+    ExtractPlugin
+    LazyLoad (will trigger SelectPlugin and ExtractPlugin till lazyload condition is no longer met)
+    UpdatePlugin
+  */
+  async crawlResource(inputResource: IdbResource = null, lazyLoad: boolean = false) {
+    let resource: IdbResource;
+    let pluginIdx: number;
 
-          // no resource present
-          if (resource === null) {
-            Log.info(`No crawlable resource found for site ${this.name}`);
-            resolve(null);
-            break;
-          }
+    try {
+      // 1st plugin is always selecting the resource to crawl
+      resource = inputResource || await this.executePlugin(this.plugins[0], inputResource);
 
-          if (i === 0) {
-            Log.info(`${resource.url} selected for crawling`);
-          }
-          /*
-          else {
-            Log.info(`Result after applying ${this.plugins[i].name}: ${JSON.stringify(result)}`);
-          }
-          */
-        }
-        catch (err) {
-          console.log(err);
-          Log.error(
-            `Crawl error for site ${this.name}, Plugin ${this.plugins[i].constructor.name} against resource ${resource ? resource.url : ''}`,
-            err,
-          );
-
-          /*
-            manually update the resource, this resets the crawlInProgress flag and adds crawledAt date
-            selecting new resources for crawling takes crawledAt in consideration (right now only resources with crawledAt undefined qualify)
-            because of the above behavior, we don't attempt to crawl a resource that throws an error over and over again
-
-            in future a possible approach will be just resetting the crawlInProgress flag
-              - next crawl operation will attempt to crawl it again, but atm this will just retry the same resource over and over again
-              - there is no mechanism to escape the retry loop
-            resource.crawlInProgress = false;
-            await resource.update(false);
-          */
-          if (resource) {
-            // eslint-disable-next-line no-await-in-loop
-            await resource.update();
-          }
-
-          reject(err);
-          break;
-        }
+      // no crawlable resource found, exit
+      if (!resource) {
+        Log.info(`No crawlable resource found for site ${this.name}`);
+        return null;
       }
 
+      Log.info(`${resource.url} selected for crawling, lazyLoad: ${lazyLoad}`);
+
+      // execute remaining plugins
+      for (let pluginIdx = 1; pluginIdx < this.plugins.length; pluginIdx += 1) {
+        const result = await this.executePlugin(this.plugins[pluginIdx], resource);
+
+        // lazyload enabled plugin encountered
+        if (this.plugins[pluginIdx].opts && this.plugins[pluginIdx].opts.enabled === true) {
+          // new content was succesfully lazyloaded, re-execute the plugins encountered so far
+          if (result === true) {
+            await this.crawlResource(resource, true);
+          }
+
+          // only execute the plugins after the lazyLoad one on the initial crawlResource invocation
+          if (lazyLoad) return null;
+        }
+        // regular plugin encountered returning a result that can be merged with the current resource
+        else if (result) {
+          /*
+          don't deepmerge at resource level to avoid cloning IdbResource
+          do a deep merge at each result key
+          */
+          Object.keys(result).forEach(key => {
+            resource[key] = deepmerge(resource[key], result[key]);
+          });
+        }
+      }
+    }
+    catch (err) {
+      console.log(err);
+      Log.error(
+        `Crawl error for site ${this.name}, Plugin ${this.plugins[pluginIdx].constructor.name} against resource ${resource ? resource.url : ''}`,
+        err,
+      );
+
+      /*
+        manually update the resource, this resets the crawlInProgress flag and adds crawledAt date
+        selecting new resources for crawling takes crawledAt in consideration (right now only resources with crawledAt undefined qualify)
+        because of the above behavior, we don't attempt to crawl a resource that throws an error over and over again
+
+        in future a possible approach will be just resetting the crawlInProgress flag
+          - next crawl operation will attempt to crawl it again, but atm this will just retry the same resource over and over again
+          - there is no mechanism to escape the retry loop
+        resource.crawlInProgress = false;
+        await resource.update(false);
+      */
       if (resource) {
-        Log.debug(`Resource successfully crawled (json): ${JSON.stringify(resource)}`);
-        Log.info(`Resource successfully crawled (url): ${resource.url}`);
+        // eslint-disable-next-line no-await-in-loop
+        await resource.update();
       }
-      resolve(resource);
-    });
+
+      throw err;
+    }
+
+    Log.debug(`Resource successfully crawled (json): ${JSON.stringify(resource)}`);
+    Log.info(`Resource successfully crawled (url): ${resource.url}`);
+
+    return resource;
   }
 
-  async executePlugin(plugin, resource) {
+  async executePlugin(plugin: IPlugin, resource: IdbResource) {
     Log.info(
       `Executing plugin ${plugin.constructor.name} using options ${JSON.stringify(plugin.opts)} against resource ${JSON.stringify(resource)}`,
     );
@@ -285,7 +302,7 @@ export default class IdbSite extends BaseEntity implements ISite {
       const rwTx = IdbSite.rwTx();
       // save the site and wait for the return result containing the new inserted id
       const reqAddSite = rwTx.add(this.serializeWithoutId());
-      reqAddSite.onsuccess = async e => {
+      reqAddSite.onsuccess = async (e: any) => {
         this.id = e.target.result;
 
         // also save the site url as the first site resource at depth 0
@@ -311,7 +328,7 @@ export default class IdbSite extends BaseEntity implements ISite {
 
       // read the latest resource filter bitset
       const reqReadSite = tx.objectStore('Sites').get(this.id);
-      reqReadSite.onsuccess = e => {
+      reqReadSite.onsuccess = (e: any) => {
         const latestSite = e.target.result;
         const { maxEntries, probability } = this.storageOpts.resourceFilter;
         const bloomFilter = BloomFilter.create(maxEntries, probability, latestSite.resourceFilter);
