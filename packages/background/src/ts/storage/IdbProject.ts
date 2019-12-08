@@ -1,4 +1,4 @@
-import { BaseEntity } from 'get-set-fetch';
+import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
 import { IProjectStorage, IPluginDefinition, IProjectCrawlOpts } from 'get-set-fetch-extension-commons';
 import { IProjectConfigHash, IProjectScenarioOpts } from 'get-set-fetch-extension-commons/lib/project';
 import Logger from '../logger/Logger';

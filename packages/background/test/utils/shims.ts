@@ -1,5 +1,5 @@
 import { JSDOM } from 'jsdom';
-import * as setGlobalVars from 'indexeddbshim';
+import setGlobalVars from 'indexeddbshim';
 import { TextDecoder } from 'util';
 
 /*

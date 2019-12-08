@@ -1,4 +1,4 @@
-import { BaseEntity } from 'get-set-fetch';
+import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
 import { ILog } from 'get-set-fetch-extension-commons';
 
 export default class IdbLog extends BaseEntity implements ILog {

@@ -1,4 +1,4 @@
-import { BaseEntity } from 'get-set-fetch';
+import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
 import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
 import { NpmPackage } from 'get-set-fetch-extension-commons';
 import Logger from '../logger/Logger';

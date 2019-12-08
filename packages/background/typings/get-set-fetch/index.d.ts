@@ -1,5 +1,5 @@
-declare module 'get-set-fetch' {
-  export class BaseEntity {
+declare module 'get-set-fetch/lib/storage/base/BaseEntity' {
+  class BaseEntity {
     id: string|number;
     static db:any;
     
@@ -9,25 +9,31 @@ declare module 'get-set-fetch' {
     static props():string[];
   }
 
-  export class BaseNamedEntity extends BaseEntity {
-    name: string;
-  }
+  export = BaseEntity;
+}
 
-  export class BaseSite extends BaseEntity {
-    constructor(name:string, url:any, opts:any, createDefaultPlugins:boolean);
-    static getAll(projectId:number):Promise<BaseSite[]>;
-    crawl(opts:any):Promise<any>;
-    initCrawl(opts);
-  }
+declare module 'get-set-fetch/lib/storage/base/BaseResource' {
+  class BaseResource {
+    id: string|number;
+    static db:any;
 
-  export class BaseResource extends BaseEntity {
+    static get(nameOrId:string|number):Promise<any>;
+    save():Promise<number>;
+    serialize():any;
+    static props():string[];
+
     constructor(siteId:number|string, url:string, depth:number);
     static getAll(siteId:number, idbKey, instantiate?:boolean):Promise<BaseResource[]>;
   }
 
-  export class BloomFilter {
-    static create(maxEntries:number, probability:number, bitset:Buffer)
-    constructor(m:number, k:number, bitset:Buffer)
+  export = BaseResource;
+}
+
+declare module 'get-set-fetch/lib/filters/bloom/BloomFilter' {
+  class BloomFilter {
+    static create(maxEntries:number, probability:number, bitset:Buffer);
+    constructor(m:number, k:number, bitset:Buffer);
   }
- 
- }
+
+  export = BloomFilter;
+}

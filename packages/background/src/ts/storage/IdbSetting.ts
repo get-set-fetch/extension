@@ -1,4 +1,4 @@
-import { BaseEntity } from 'get-set-fetch';
+import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
 import { ISetting } from 'get-set-fetch-extension-commons';
 
 /* eslint-disable class-methods-use-this */

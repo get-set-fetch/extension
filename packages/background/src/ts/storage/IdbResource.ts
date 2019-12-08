@@ -1,4 +1,4 @@
-import { BaseResource } from 'get-set-fetch';
+import BaseResource from 'get-set-fetch/lib/storage/base/BaseResource';
 import { IResource } from 'get-set-fetch-extension-commons';
 
 /* eslint-disable class-methods-use-this */

@@ -1,4 +1,4 @@
-import { BaseEntity } from 'get-set-fetch';
+import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
 import IdbSite from './IdbSite';
 import IdbResource from './IdbResource';
 import IdbPlugin from './IdbPlugin';
