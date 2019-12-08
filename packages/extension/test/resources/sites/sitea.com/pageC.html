@@ -1,0 +1,47 @@
+<html>
+	<head>
+    <title>pageC</title>
+
+	</head>
+	<body>
+		<h1>PageC Heading Level 1</h1>
+		<h3>PageC Heading Level 3</h3>
+
+		<p>pageC content</p>
+
+		<a href="index.html">main</a>
+		<a href="pageA.html">pageA</a>
+		<a href="pageA.html#ignored_fragment">pageA</a>
+    <a href="http://www.externalA.com/pageA.html">ignored external link</a>
+
+    <p style="height: 2000px">forcing scroll content</p>
+
+    <div id="content"/>
+
+  </body>
+  <script>
+      // lazyload some content to the bottom of the page with a timeout simulating server side call delay
+      const loadMax = 5;
+      const entryPerLoad = 2;
+      let loadNo = 0;
+
+      window.onscroll = function(event) {
+        if (loadNo < loadMax && document.body.scrollHeight === window.pageYOffset + document.body.clientHeight) {
+          setTimeout(appendData, 1000);
+        }
+      };
+
+      function appendData() {
+        const start = loadNo * entryPerLoad;
+        let html = "";
+        for (let i = 0; i < 2; i++) {
+          html += `<p class="entry"><h5>Entry title ${start + i}</h5></p>`;
+        }
+        document.getElementById("content").innerHTML += html;
+        loadNo += 1;
+      }
+
+      window.onload = appendData;
+
+    </script>
+</html>
