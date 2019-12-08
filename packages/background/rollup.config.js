@@ -1,9 +1,23 @@
+import { join } from 'path';
+
 import commonjs from 'rollup-plugin-commonjs';
 import typescript from 'rollup-plugin-typescript';
 import json from 'rollup-plugin-json';
-import ignore from 'rollup-plugin-ignore';
 import resolve from 'rollup-plugin-node-resolve';
 import globals from 'rollup-plugin-node-globals';
+
+// from 'get-set-fetch' we only need: BaseEntity, BaseResource, BloomFilter (replace its nodejs Logger with browser extension Logger)
+function gsfBuiltin() {
+  return {
+    name: 'gsf-builtin',
+    resolveId(source) {
+      if (/Logger/.test(source)) {
+        return require.resolve(join(__dirname, 'src', 'ts', 'logger', 'Logger.ts'));
+      }
+      return null;
+    }
+  };
+}
 
 const mainConfig = {
   input: [
@@ -18,29 +32,28 @@ const mainConfig = {
   chunkFileNames: '[name]-1.js',
   sourceMap: true,
   plugins: [
-    ignore([ 'https', 'http', 'jsdom', 'fs', 'path', 'puppeteer', 'console', 'knex', 'mongodb', '__filename' ]),
-    typescript(),
-    commonjs({
-      include: /node_modules/,
-      namedExports: {
-        '../../node_modules/pako': [ 'inflate', 'deflate' ],
-        '../../node_modules/url-parse': [ 'Url' ],
-      },
-      ignore: [ 'util' ],
-    }),
-    json(),
+    gsfBuiltin(),
+
     resolve({
+      mainFields: ['module', 'main'],
       browser: true,
       preferBuiltins: false,
       extensions: [ '.js', '.json', '.ts' ],
-      only: [
-        'get-set-fetch', 'get-set-fetch-extension-commons',
-        'murmurhash-js',
-        'url-parse', 'requires-port', 'buffer', 'querystringify',
-        'jszip', 'pako', 'untar.js',
-      ],
     }),
+
+    commonjs({
+      include: /node_modules/,
+      namedExports: {
+        'pako': [ 'inflate', 'deflate' ],
+        'url-parse': [ 'Url' ],
+      },
+    }),
+
+    json(),
+
     globals(),
+
+    typescript(),
   ],
 };
 
@@ -50,6 +63,7 @@ const crawlPlugins = [
   { name: 'InsertResourcesPlugin', src: 'src/ts/plugins/builtin/InsertResourcesPlugin.ts' },
   { name: 'FetchPlugin', src: 'src/ts/plugins/builtin/FetchPlugin.ts' },
   { name: 'ExtractUrlsPlugin', src: 'src/ts/plugins/builtin/ExtractUrlsPlugin.ts' },
+  { name: 'LazyLoadPlugin', src: 'src/ts/plugins/builtin/LazyLoadPlugin.ts' },
 ];
 const crawlPluginConfig = crawlPlugins.map(plugin => ({
   input: plugin.src,
