@@ -39,9 +39,10 @@ describe('Test PluginManager', () => {
         },
       },
       {
-        name: 'LazyLoadPlugin',
+        name: 'ScrollPlugin',
         opts: {
           runInTab: true,
+          lazyLoading: true,
           enabled: false,
           delay: 2000,
           timeout: 2000,

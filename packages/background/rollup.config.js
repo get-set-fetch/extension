@@ -63,7 +63,7 @@ const crawlPlugins = [
   { name: 'InsertResourcesPlugin', src: 'src/ts/plugins/builtin/InsertResourcesPlugin.ts' },
   { name: 'FetchPlugin', src: 'src/ts/plugins/builtin/FetchPlugin.ts' },
   { name: 'ExtractUrlsPlugin', src: 'src/ts/plugins/builtin/ExtractUrlsPlugin.ts' },
-  { name: 'LazyLoadPlugin', src: 'src/ts/plugins/builtin/LazyLoadPlugin.ts' },
+  { name: 'ScrollPlugin', src: 'src/ts/plugins/builtin/ScrollPlugin.ts' },
 ];
 const crawlPluginConfig = crawlPlugins.map(plugin => ({
   input: plugin.src,

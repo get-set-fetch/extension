@@ -196,15 +196,16 @@ export default class IdbSite extends BaseEntity implements ISite {
   will execute the plugins in the order they are defined
   apply each plugin to the current (site, resource) pair
   1st plugin will always select the resource to be crawled
-  a LazyLoad type plugin that succesfully scrolls new content, will force all prior plugins to be executed again
+  a LazyLoading type plugin that succesfully scrolls new content, will force all prior plugins to be executed again
 
   examples:
-    SelectPlugin (only retrieves a resource if one is not already present)
-    ExtractPlugin
-    LazyLoad (will trigger SelectPlugin and ExtractPlugin till lazyload condition is no longer met)
+    SelectResourcePlugin (only retrieves a resource if one is not already present)
+    FetchPlugin
+    ExtractUrlsPlugin
+    ScrollPlugin (will trigger SelectResourcePlugin,FetchPlugin,ExtractUrlsPlugin till lazyloading condition is no longer met)
     UpdatePlugin
   */
-  async crawlResource(inputResource: IdbResource = null, lazyLoad: boolean = false) {
+  async crawlResource(inputResource: IdbResource = null, lazyLoading: boolean = false) {
     let resource: IdbResource;
     let pluginIdx: number;
 
@@ -218,30 +219,37 @@ export default class IdbSite extends BaseEntity implements ISite {
         return null;
       }
 
-      Log.info(`${resource.url} selected for crawling, lazyLoad: ${lazyLoad}`);
+      Log.info(`${resource.url} selected for crawling, lazyLoading: ${lazyLoading}`);
 
       // execute remaining plugins
       for (let pluginIdx = 1; pluginIdx < this.plugins.length; pluginIdx += 1) {
         const result = await this.executePlugin(this.plugins[pluginIdx], resource);
 
-        // lazyload enabled plugin encountered
-        if (this.plugins[pluginIdx].opts && this.plugins[pluginIdx].opts.enabled === true) {
+        // lazyloading enabled plugin encountered
+        if (this.plugins[pluginIdx].opts && this.plugins[pluginIdx].opts.lazyLoading === true && this.plugins[pluginIdx].opts.enabled === true) {
           // new content was succesfully lazyloaded, re-execute the plugins encountered so far
           if (result === true) {
             await this.crawlResource(resource, true);
           }
 
           // only execute the plugins after the lazyLoad one on the initial crawlResource invocation
-          if (lazyLoad) return null;
+          if (lazyLoading) return null;
         }
         // regular plugin encountered returning a result that can be merged with the current resource
         else if (result) {
           /*
-          don't deepmerge at resource level to avoid cloning IdbResource
-          do a deep merge at each result key
+          don't deepmerge at resource level, IdbResource class functions like update are lost
+          do an override or deep merge at each result key
           */
           Object.keys(result).forEach(key => {
-            resource[key] = deepmerge(resource[key], result[key]);
+            // non-null, primitive or blob, override coresponding resource key
+            if (result[key] !== Object(result[key] || result[key] instanceof Blob)) {
+              resource[key] = result[key];
+            }
+            // plain object, merge with corresponding resource key
+            else {
+              resource[key] = deepmerge(resource[key], result[key]);
+            }
           });
         }
       }

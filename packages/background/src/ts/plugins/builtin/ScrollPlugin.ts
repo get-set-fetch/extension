@@ -3,9 +3,10 @@ import { SchemaHelper, IPlugin } from 'get-set-fetch-extension-commons';
 /**
  * Plugin responsible for selecting a resource to crawl from the current site.
  */
-export default class LazyLoadPlugin implements IPlugin {
+export default class ScrollPlugin implements IPlugin {
   opts: {
     runInTab: boolean;
+    lazyLoading: boolean;
     enabled: boolean;
     timeout: number;
     delay: number;
@@ -16,10 +17,14 @@ export default class LazyLoadPlugin implements IPlugin {
     return {
       $id: 'https://getsetfetch.org/lazy-load-plugin.schema.json',
       $schema: 'http://json-schema.org/draft-07/schema#',
-      title: 'LazyLoadPlugin',
+      title: 'ScrollPlugin',
       type: 'object',
       properties: {
         runInTab: {
+          type: 'boolean',
+          default: true,
+        },
+        lazyLoading: {
           type: 'boolean',
           default: true,
         },
@@ -37,7 +42,7 @@ export default class LazyLoadPlugin implements IPlugin {
           default: '2000',
           help: 'Maximum waiting time (miliseconds) for DOM changes.',
         },
-        scrollNo: {
+        maxScrollNo: {
           type: 'number',
           default: '-1',
           help: 'Number of maximum scroll operations. -1 scrolls till no new content is added to the page',
@@ -47,7 +52,7 @@ export default class LazyLoadPlugin implements IPlugin {
   }
 
   constructor(opts = {}) {
-    this.opts = SchemaHelper.instantiate(LazyLoadPlugin.OPTS_SCHEMA, opts);
+    this.opts = SchemaHelper.instantiate(ScrollPlugin.OPTS_SCHEMA, opts);
   }
 
   test() {
@@ -57,7 +62,7 @@ export default class LazyLoadPlugin implements IPlugin {
   apply(site) {
     return new Promise(resolve => {
       this.listenToDOMChanges(resolve);
-      setTimeout(() => resolve(false), 1000);
+      setTimeout(() => resolve(false), this.opts.timeout);
     });
   }
 

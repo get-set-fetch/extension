@@ -133,12 +133,12 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
   it('crawl with lazy loading', async () => {
     site.pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
-      pluginDef => [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'LazyLoadPlugin', 'UpdateResourcePlugin' ].indexOf(pluginDef.name) !== -1,
+      pluginDef => [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'ScrollPlugin', 'UpdateResourcePlugin' ].indexOf(pluginDef.name) !== -1,
     );
 
     // enable lazy loading, by default it's false
-    const lazyLoadDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'LazyLoadPlugin');
-    lazyLoadDef.opts.enabled = true;
+    const lazyLoadingDef = site.pluginDefinitions.find(pluginDef => pluginDef.opts.lazyLoading === true);
+    lazyLoadingDef.opts.enabled = true;
 
     let updatePluginSpy;
     const origInstantiate = PluginManager.instantiate;
@@ -177,7 +177,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     }
     ));
 
-    // 3rd call runInTab from LazyLoadPlugin
+    // 3rd call runInTab from lazy loading ScrollPlugin
     runInTabStub.onCall(2).callsFake((tabId, plugin, site, resource) => true);
 
     // 4th call runInTab from ExtractUrlsPlugin
@@ -197,7 +197,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     }
     ));
 
-    // 6th call runInTab from LazyLoadPlugin
+    // 6th call runInTab from lazy loading ScrollPlugin
     runInTabStub.onCall(5).callsFake((tabId, plugin, site, resource) => false);
 
     await site.crawl();

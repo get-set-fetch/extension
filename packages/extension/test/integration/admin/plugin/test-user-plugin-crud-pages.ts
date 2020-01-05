@@ -48,7 +48,7 @@ describe('UserPlugin CRUD Pages', () => {
       'UpdateResourcePlugin',
       'ImageFilterPlugin',
       'ExtractHtmlContentPlugin',
-      'LazyLoadPlugin',
+      'ScrollPlugin',
     ];
     assert.sameMembers(pluginNames, expectedPluginNames);
   });

@@ -15,7 +15,7 @@ export interface IPluginDefinition {
 
 export interface IPluginOpts {
   runInTab?: boolean;
-  lazyLoad?: boolean;
+  lazyLoading?: boolean;
   [key: string]: any;
 }
 
