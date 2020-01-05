@@ -182,7 +182,7 @@ export default class IdbResource extends BaseResource implements IResource {
   crawledAt: any;
   crawlInProgress: boolean;
   depth: number;
-  info: any;
+  info: any = {};
   blob: any;
   mediaType: string;
   urlsToAdd: string[];
