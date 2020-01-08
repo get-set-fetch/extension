@@ -1,14 +1,17 @@
+/* eslint-disable no-param-reassign */
+
 import * as sinon from 'sinon';
 import { assert } from 'chai';
-import { IPlugin } from 'get-set-fetch-extension-commons';
+import { BasePlugin } from 'get-set-fetch-extension-commons';
 import IdbStorage from '../../src/ts/storage/IdbStorage';
-import PluginManager from '../../src/ts/plugins/PluginManager';
 import ModuleHelper from '../utils/ModuleHelper';
 import GsfProvider from '../../src/ts/storage/GsfProvider';
 import IdbSite from '../../src/ts/storage/IdbSite';
 import IdbResource from '../../src/ts/storage/IdbResource';
 import IdbPlugin from '../../src/ts/storage/IdbPlugin';
 import ExtractTitlePlugin from '../../src/ts/plugins/builtin/ExtractTitlePlugin';
+import ModuleStorageManager from '../../src/ts/plugins/ModuleStorageManager';
+import ModuleRuntimeManager from '../../src/ts/plugins/ModuleRuntimeManager';
 
 const conn = { info: 'IndexedDB' };
 
@@ -35,12 +38,12 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // save site
     const testPlugins = [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'UpdateResourcePlugin', 'InsertResourcesPlugin' ];
-    const pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(pluginDef => testPlugins.indexOf(pluginDef.name) !== -1);
+    const pluginDefinitions = ModuleStorageManager.getDefaultPluginDefs().filter(pluginDef => testPlugins.indexOf(pluginDef.name) !== -1);
     site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions });
     await site.save();
 
     // stub ExtractUrlsPlugin, the only one running in tab via "runInTab"
-    sinon.stub(PluginManager, 'runInTab').callsFake((tabId, plugin, site, resource) => {
+    sinon.stub(ModuleRuntimeManager, 'runInTab').callsFake((tabId, plugin, site, resource) => {
       plugin.extractResourceUrls = () => [ `http://siteA/page-${resource.depth + 1}.html` ];
       resource.mediaType = 'html';
       const isApplicable = plugin.test(resource);
@@ -49,7 +52,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
   });
 
   afterEach(async () => {
-    (PluginManager.runInTab as any).restore();
+    (ModuleRuntimeManager.runInTab as any).restore();
   });
 
   after(async () => {
@@ -58,7 +61,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
   it('crawl all available resources', async () => {
     const maxResources = 5;
-    site.pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
+    site.pluginDefinitions = ModuleStorageManager.getDefaultPluginDefs().filter(
       pluginDef => [ 'SelectResourcePlugin', 'UpdateResourcePlugin' ].indexOf(pluginDef.name) !== -1,
     );
 
@@ -109,7 +112,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     const delay = 500;
 
     // keep the plugins to a minimum
-    site.pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
+    site.pluginDefinitions = ModuleStorageManager.getDefaultPluginDefs().filter(
       pluginDef => [ 'SelectResourcePlugin', 'UpdateResourcePlugin' ].indexOf(pluginDef.name) !== -1,
     );
 
@@ -132,7 +135,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
   });
 
   it('crawl with lazy loading', async () => {
-    site.pluginDefinitions = PluginManager.getDefaultPluginDefs().filter(
+    site.pluginDefinitions = ModuleStorageManager.getDefaultPluginDefs().filter(
       pluginDef => [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'ScrollPlugin', 'UpdateResourcePlugin' ].indexOf(pluginDef.name) !== -1,
     );
 
@@ -141,10 +144,10 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     lazyLoadingDef.opts.enabled = true;
 
     let updatePluginSpy;
-    const origInstantiate = PluginManager.instantiate;
-    (PluginManager.runInTab as any).restore();
-    sinon.stub(PluginManager, 'instantiate').callsFake(async pluginDefinitions => {
-      const plugins: IPlugin[] = await origInstantiate(pluginDefinitions);
+    const origInstantiate = ModuleRuntimeManager.instantiatePlugins;
+    (ModuleRuntimeManager.runInTab as any).restore();
+    sinon.stub(ModuleRuntimeManager, 'instantiatePlugins').callsFake(async pluginDefinitions => {
+      const plugins: BasePlugin[] = await origInstantiate(pluginDefinitions);
 
       // spy on UpdateResourcePlugin
       const updatePlugin = plugins.find(plugin => plugin.constructor.name === 'UpdateResourcePlugin');
@@ -158,7 +161,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
 
     // stub ExtractUrlsPlugin, the only one running in tab via "runInTab"
-    const runInTabStub = sinon.stub(PluginManager, 'runInTab');
+    const runInTabStub = sinon.stub(ModuleRuntimeManager, 'runInTab');
 
     // 1st call runInTab from ExtractUrlsPlugin
     runInTabStub.onCall(0).callsFake((tabId, plugin, site, resource) => {

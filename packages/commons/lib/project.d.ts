@@ -1,14 +1,5 @@
 import { IPluginDefinition } from './plugin';
-
-interface IProjectCrawlOpts {
-  maxDepth?: number;
-  maxResources?: number;
-  delay?: number;
-  hostnameRe?: string;
-  pathnameRe?: string;
-  resourceHostnameRe? : string;
-  resourcePathnameRe?: string;
-}
+import { IEnhancedJSONSchema } from './scenario';
 
 interface IProjectScenarioOpts {
   name?: string;
@@ -20,7 +11,6 @@ interface IProjectStorage {
   name: string;
   description: string;
   url: string;
-  crawlOpts:  IProjectCrawlOpts;
   scenarioOpts: IProjectScenarioOpts;
   pluginDefinitions: IPluginDefinition[];
 }

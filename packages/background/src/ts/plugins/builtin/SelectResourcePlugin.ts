@@ -1,38 +1,44 @@
-import { SchemaHelper, IPlugin, IResource } from 'get-set-fetch-extension-commons';
+import { BasePlugin, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
 
 /**
  * Plugin responsible for selecting a resource to crawl from the current site.
  */
-export default class SelectResourcePlugin implements IPlugin {
-  opts: {
-    frequency: number;
-    delay: number;
-  };
-
-  static get OPTS_SCHEMA() {
+export default class SelectResourcePlugin extends BasePlugin {
+  getMetaSchema(): IEnhancedJSONSchema {
     return {
-      $id: 'https://getsetfetch.org/select-resource-plugin.schema.json',
-      $schema: 'http://json-schema.org/draft-07/schema#',
-      title: 'SelectResourcePlugin',
       type: 'object',
       properties: {
-        frequency: {
-          type: 'number',
-          default: '-1',
-          help: 'How often a resource should be re-crawled (hours), enter -1 to never re-crawl.',
-        },
-        delay: {
-          type: 'number',
-          default: '1000',
-          help: 'Delay in miliseconds between fetching two consecutive resources.',
+        name: {
+          type: 'string',
+          const: 'SelectResourcePlugin',
+          description: 'responsible for selecting a resource to scrape from the current site / project.',
         },
       },
     };
   }
 
-  constructor(opts = {}) {
-    this.opts = SchemaHelper.instantiate(SelectResourcePlugin.OPTS_SCHEMA, opts);
+  getOptsSchema(): IEnhancedJSONSchema {
+    return {
+      type: 'object',
+      properties: {
+        frequency: {
+          type: 'number',
+          default: '-1',
+          description: 'How often a resource should be re-crawled (hours), enter -1 to never re-crawl.',
+        },
+        delay: {
+          type: 'number',
+          default: '1000',
+          description: 'Delay in miliseconds between fetching two consecutive resources.',
+        },
+      },
+    };
   }
+
+  opts: {
+    frequency: number;
+    delay: number;
+  };
 
   // only retrieve a new resource when one hasn't already been selected
   test(resource: IResource) {

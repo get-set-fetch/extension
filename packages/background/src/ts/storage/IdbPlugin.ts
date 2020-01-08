@@ -100,6 +100,7 @@ export default class IdbPlugin extends BaseEntity implements IPluginStorage {
   name: string;
   code: string;
   scenarioId: number;
+  builtin: boolean;
 
   constructor(kwArgs: Partial<IPluginStorage> = {}) {
     super();

@@ -13,13 +13,38 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     id: null,
     name: 'projectA',
     url: 'http://siteA',
-    crawlOpts: {
-      maxDepth: 11,
-      maxResources: 101,
-      delay: 1001,
-      pathnameRe: null,
-      resourcePathnameRe: null,
-    },
+    pluginDefinitions: [
+      {
+        name: 'SelectResourcePlugin',
+        opts: {
+          delay: 1001,
+        },
+      },
+      {
+        name: 'FetchPlugin',
+      },
+      {
+        name: 'ExtractUrlsPlugin',
+        opts: {
+          hostnameRe: '/hostname/',
+          pathnameRe: '/pathname/',
+          resourcePathnameRe: '/(gif|png|jpg|jpeg)$/i',
+          maxDepth: 11,
+        },
+      },
+      {
+        name: 'ImageFilterPlugin',
+      },
+      {
+        name: 'UpdateResourcePlugin',
+      },
+      {
+        name: 'InsertResourcesPlugin',
+        opts: {
+          maxResources: 101,
+        },
+      },
+    ],
   };
 
   before(async () => {
@@ -47,14 +72,14 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     assert.instanceOf(projectById, Project);
     assert.strictEqual(expectedProject.name, projectById.name);
     assert.strictEqual(expectedProject.url, projectById.url);
-    assert.deepEqual(expectedProject.crawlOpts, projectById.crawlOpts);
+    assert.deepEqual(expectedProject.pluginDefinitions, projectById.pluginDefinitions);
 
     // get project by name
     const projectByName = await Project.get(expectedProject.name);
     assert.instanceOf(projectByName, Project);
     assert.strictEqual(String(expectedProject.id), String(projectByName.id));
     assert.strictEqual(expectedProject.url, projectByName.url);
-    assert.deepEqual(expectedProject.crawlOpts, projectByName.crawlOpts);
+    assert.deepEqual(expectedProject.pluginDefinitions, projectByName.pluginDefinitions);
 
     // get corresponding site
     const projectSite = await Site.get(`${expectedProject.name}-1`);
@@ -67,14 +92,20 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     const updateProject = await Project.get(expectedProject.id);
     updateProject.name = 'projectA_updated';
     updateProject.url = 'http://siteA/updated';
-    updateProject.crawlOpts.maxDepth = 21;
+
+    const pluginDefinition = updateProject.pluginDefinitions.find(pluginDefinition => pluginDefinition.name === 'ExtractUrlsPlugin');
+    pluginDefinition.opts.maxDepth = 21;
     await updateProject.update();
 
     // get and compare
     const getProject = await Project.get(expectedProject.id);
     assert.strictEqual(updateProject.name, getProject.name);
     assert.strictEqual(updateProject.url, getProject.url);
-    assert.strictEqual(updateProject.crawlOpts.maxDepth, getProject.crawlOpts.maxDepth);
+
+    const getPluginDefinition = getProject.pluginDefinitions.find(pluginDefinition => pluginDefinition.name === 'ExtractUrlsPlugin');
+    const updatePluginDefinition = updateProject.pluginDefinitions.find(pluginDefinition => pluginDefinition.name === 'ExtractUrlsPlugin');
+
+    assert.strictEqual(updatePluginDefinition.opts.maxDepth, getPluginDefinition.opts.maxDepth);
   });
 
   it('delete', async () => {

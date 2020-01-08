@@ -1,17 +1,19 @@
+/* eslint-disable prefer-destructuring */
 import { HttpMethod } from 'get-set-fetch-extension-commons';
 import IdbStorage from './IdbStorage';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
-import PluginManager from '../plugins/PluginManager';
 import IdbPlugin from './IdbPlugin';
 import IdbSite from './IdbSite';
 import IdbResource from './IdbResource';
 import IdbLog from './IdbLog';
 import IdbSetting from './IdbSetting';
 import IdbProject from './IdbProject';
-import IdbScenarioPackage from './IdbScenarioPackage';
+import IdbScenario from './IdbScenario';
 import ExportHelper from '../helpers/ExportHelper';
-import ScenarioManager from '../scenarios/ScenarioManager';
 import Logger from '../logger/Logger';
+import ModuleStorageManager from '../plugins/ModuleStorageManager';
+import ModuleNpmManager from '../plugins/ModuleNpmManager';
+import ModuleRuntimeManager from '../plugins/ModuleRuntimeManager';
 
 const Log = Logger.getLogger('GsfProvider');
 
@@ -19,7 +21,7 @@ const Log = Logger.getLogger('GsfProvider');
 export default class GsfProvider {
   static Site: typeof IdbSite;
   static Project: typeof IdbProject;
-  static ScenarioPackage: typeof IdbScenarioPackage;
+  static Scenario: typeof IdbScenario;
   static Resource: typeof IdbResource;
   static Plugin: typeof IdbPlugin;
   static Log: typeof IdbLog;
@@ -28,11 +30,11 @@ export default class GsfProvider {
   static async init() {
     // init extension storage
     const {
-      Site, Project, ScenarioPackage, Resource, Plugin, Log, Setting,
+      Site, Project, Scenario, Resource, Plugin, Log, Setting,
     } = await IdbStorage.init();
     GsfProvider.Site = Site;
     GsfProvider.Project = Project;
-    GsfProvider.ScenarioPackage = ScenarioPackage;
+    GsfProvider.Scenario = Scenario;
     GsfProvider.Resource = Resource;
     GsfProvider.Plugin = Plugin;
     GsfProvider.Log = Log;
@@ -293,11 +295,11 @@ export default class GsfProvider {
         switch (true) {
           // available plugin definitions {name, opts}
           case /^plugindefs\/available$/.test(request.resource):
-            reqPromise = new Promise(resolve => resolve(PluginManager.getAvailablePluginDefs()));
+            reqPromise = new Promise(resolve => resolve(ModuleStorageManager.getAvailablePluginDefs()));
             break;
           // default plugin definitions {name, opts}
           case /^plugindefs\/default$/.test(request.resource):
-            reqPromise = new Promise(resolve => resolve(PluginManager.getDefaultPluginDefs()));
+            reqPromise = new Promise(resolve => resolve(ModuleStorageManager.getDefaultPluginDefs()));
             break;
           // plugins
           case /^plugins$/.test(request.resource):
@@ -365,16 +367,21 @@ export default class GsfProvider {
         switch (true) {
           // scenarios
           case /^scenarios$/.test(request.resource):
-            reqPromise = GsfProvider.ScenarioPackage.getAll();
+            reqPromise = GsfProvider.Scenario.getAll();
             break;
           // available scenarios
           case /^scenarios\/available$/.test(request.resource):
-            reqPromise = ScenarioManager.getNpmScenarios();
+            reqPromise = ModuleNpmManager.getNpmScenarios();
+            break;
+          // scenario/{:scenarioName}/pluginSchemas
+          case /^scenario\/.+\/pluginSchemas$/.test(request.resource):
+            const name = /^scenario\/(.+)\/pluginSchemas$/.exec(request.resource)[1];
+            reqPromise = ModuleRuntimeManager.getPluginSchemas(name);
             break;
           // scenario/:scenarioNameOrId
           case /^scenario\/.+$/.test(request.resource):
             const nameOrId = /^scenario\/(.+)$/.exec(request.resource)[1];
-            reqPromise = GsfProvider.ScenarioPackage.get(nameOrId);
+            reqPromise = GsfProvider.Scenario.get(nameOrId);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -384,7 +391,7 @@ export default class GsfProvider {
         switch (true) {
           // scenario
           case /^scenario$/.test(request.resource):
-            reqPromise = ScenarioManager.installNpmScenario({ pkgDef: request.body });
+            reqPromise = ModuleNpmManager.installNpmScenario({ pkgDef: request.body });
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -394,7 +401,7 @@ export default class GsfProvider {
         switch (true) {
           // scenarios
           case /^scenarios$/.test(request.resource):
-            reqPromise = GsfProvider.ScenarioPackage.delSome(request.body.ids);
+            reqPromise = GsfProvider.Scenario.delSome(request.body.ids);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());

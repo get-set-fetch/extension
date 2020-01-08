@@ -1,8 +1,25 @@
 import Url from 'url-parse';
-import { IPlugin, IResource, ISite } from 'get-set-fetch-extension-commons';
+import { BasePlugin, IResource, ISite, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
 import ActiveTabHelper from '../../helpers/ActiveTabHelper';
 
-export default class FetchPlugin implements IPlugin {
+export default class FetchPlugin extends BasePlugin {
+  getMetaSchema(): IEnhancedJSONSchema {
+    return {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          const: 'FetchPlugin',
+          description: 'responsible for either downloading or loading in the current tab a new resource url.',
+        },
+      },
+    };
+  }
+
+  getOptsSchema(): IEnhancedJSONSchema {
+    return {};
+  }
+
   test(resource: IResource) {
     const { protocol } = new URL(resource.url);
     return protocol === 'http:' || protocol === 'https:';

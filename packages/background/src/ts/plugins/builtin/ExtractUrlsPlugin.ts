@@ -1,16 +1,26 @@
-import { SchemaHelper, IPlugin, IResource, ISite } from 'get-set-fetch-extension-commons';
+import { IResource, ISite, BasePlugin, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
 
 /**
  * Plugin responsible for extracting new resources from a resource document.
  */
 
 declare const document;
-export default class ExtractUrlsPlugin implements IPlugin {
-  static get OPTS_SCHEMA() {
+export default class ExtractUrlsPlugin extends BasePlugin {
+  getMetaSchema(): IEnhancedJSONSchema {
     return {
-      $id: 'https://getsetfetch.org/extract-urls-plugin.schema.json',
-      $schema: 'http://json-schema.org/draft-07/schema#',
-      title: 'ExtractUrlsPlugin',
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          const: 'ExtractUrlsPlugin',
+          description: 'responsible for extracting new resources(html pages or binary content) urls from the current html page.',
+        },
+      },
+    };
+  }
+
+  getOptsSchema(): IEnhancedJSONSchema {
+    return {
       type: 'object',
       properties: {
         hostnameRe: {
@@ -71,10 +81,6 @@ export default class ExtractUrlsPlugin implements IPlugin {
     maxDepth: number;
     runInTab: boolean;
   };
-
-  constructor(opts = {}) {
-    this.opts = SchemaHelper.instantiate(ExtractUrlsPlugin.OPTS_SCHEMA, opts);
-  }
 
   test(resource: IResource) {
     // don't extract new resources if the max depth has been reached

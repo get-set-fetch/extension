@@ -15,13 +15,12 @@ function gsfBuiltin() {
         return require.resolve(join(__dirname, 'src', 'ts', 'logger', 'Logger.ts'));
       }
       return null;
-    }
+    },
   };
 }
 
 const mainConfig = {
   input: [
-    'src/ts/background-bundle.ts',
     'src/ts/background-main.ts',
   ],
   output: {
@@ -35,7 +34,7 @@ const mainConfig = {
     gsfBuiltin(),
 
     resolve({
-      mainFields: ['module', 'main'],
+      mainFields: [ 'module', 'main' ],
       browser: true,
       preferBuiltins: false,
       extensions: [ '.js', '.json', '.ts' ],
@@ -44,7 +43,7 @@ const mainConfig = {
     commonjs({
       include: /node_modules/,
       namedExports: {
-        'pako': [ 'inflate', 'deflate' ],
+        pako: [ 'inflate', 'deflate' ],
         'url-parse': [ 'Url' ],
       },
     }),

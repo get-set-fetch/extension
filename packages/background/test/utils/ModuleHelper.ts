@@ -1,8 +1,9 @@
-import { IModuleDefinition, IModuleInfo } from 'get-set-fetch-extension-commons';
+import { IModuleRuntime, IModuleStorage } from 'get-set-fetch-extension-commons';
 import GsfProvider from '../../src/ts/storage/GsfProvider';
 
-import PluginManager from '../../src/ts/plugins/PluginManager';
+import ModuleRuntimeManager from '../../src/ts/plugins/ModuleRuntimeManager';
 import IdbPlugin from '../../src/ts/storage/IdbPlugin';
+import ModuleStorageManager from '../../src/ts/plugins/ModuleStorageManager';
 
 const fs = require('fs');
 const path = require('path');
@@ -18,45 +19,44 @@ declare global {
 
 export default class ModuleHelper {
   static async mockPluginManager() {
-    PluginManager.register = async (name: string) => {
+    ModuleRuntimeManager.registerPlugin = async (name: string) => {
       // scenario already registered
-      if (PluginManager.cache.get(name)) return;
+      if (ModuleRuntimeManager.cache.get(name)) return;
 
       const plugin = await GsfProvider.Plugin.get(name);
-      let moduleInfo: IModuleInfo;
 
       // builtin plugins, not linked to a scenario
       const pluginPath = path.join(__dirname, '..', '..', 'dist', 'plugins', `${name}.js`);
       const pluginModule = await import(pluginPath);
 
-      moduleInfo = {
+      const moduleRuntime: IModuleRuntime = {
         code: plugin.code,
         module: pluginModule,
         url: null,
       };
 
-      PluginManager.cache.set(name, moduleInfo);
+      ModuleRuntimeManager.cache.set(name, moduleRuntime);
     };
   }
 
   static async init() {
     // store plugins in db
-    const pluginDefinitions: IModuleDefinition[] = await this.getModulesContent(path.join(__dirname, '..', '..', 'dist', 'plugins'));
+    const pluginDefinitions: IModuleStorage[] = await this.getModulesContent(path.join(__dirname, '..', '..', 'dist', 'plugins'));
     const plugins = pluginDefinitions.map(moduleDef => new IdbPlugin(moduleDef));
-    await PluginManager.persistPlugins(plugins);
+    await ModuleStorageManager.persistModules(plugins);
 
     // mock register as nodejs doesn't suppport blob or URL.createURLfromObject
     ModuleHelper.mockPluginManager();
 
     // register them in PluginManager.cache
     await Promise.all(
-      PluginManager.DEFAULT_PLUGINS.map(defaultPluginName => PluginManager.register(defaultPluginName)),
+      ModuleStorageManager.DEFAULT_PLUGINS.map(defaultPluginName => ModuleRuntimeManager.registerPlugin(defaultPluginName)),
     );
   }
 
-  static getModulesContent(moduleDir): Promise<IModuleDefinition[]> {
+  static getModulesContent(moduleDir): Promise<IModuleStorage[]> {
     return new Promise(resolve => {
-      const modules: IModuleDefinition[] = [];
+      const modules: IModuleStorage[] = [];
       const pluginDirents = fs.readdirSync(moduleDir, { withFileTypes: true }).filter(pluginDirent => pluginDirent.isFile());
 
       for (let i = 0; i < pluginDirents.length; i += 1) {
@@ -66,6 +66,7 @@ export default class ModuleHelper {
         modules.push({
           name: pluginName,
           code: pluginContent,
+          builtin: true,
         });
       }
 

@@ -8,13 +8,6 @@ describe('Test JsonUrlHelper', () => {
     name: 'projectA',
     description: 'projectA description',
     url: 'http://www.sitea.com/index.html',
-    crawlOpts: {
-      maxDepth: 11,
-      maxResources: 101,
-      delay: 1001,
-      hostnameRe: '/hostname/',
-      pathnameRe: '/pathname/',
-    },
     scenarioOpts: {
       name: 'get-set-fetch-scenario-extract-resources',
       resourcePathnameRe: '/(gif|png|jpg|jpeg)$/i',
@@ -54,7 +47,7 @@ describe('Test JsonUrlHelper', () => {
   };
 
   // eslint-disable-next-line max-len
-  const expectedConfigHash = 'eMK7w5xrwpDCmMKDwrMLworDssKzwoABw6PCiBFrMAkFZGFYTGbClMKUFFjDqcOrwpfCl8KXw6sVZ8KWwqQmw6olw6fDp8OqZ8OmwqXCpFbDqGXClMOkw6bCoEc0IgwMwrHDhMKlwqEOUsOwG8KiwqUEfRhPXwktw7TDtGE8fVDDpMOjw7BqemrCiW4xEMKnwoEiUhfCpkg3FRLCgcK6RXB3w6gow4HDmAEowpZowqRnwqbDlRTDpMKlw5dkFcKAcGrCusKmwop+JsO1UsKbITVTG1FhRcKaR3VQw6IOw5nCscKewrnCicOpwqluwpk5JcKpRcKYTsKmbmI2BAVTbC0AwpDCssOxGA==';
+  const expectedConfigHash = 'eMK7w6HDkn05woMrLSjDisOPAsKGwpsjwoYWwpjChALCsjAsMjJKSgrCrMO0w7XDi8OLw4vDtcKKM0tSE8O1wpLDs3PDtTPDs1JSK8O0Mkpyc8KUcMK6LD3CtUTCtxjCiMOTQMOhwq4LU8KkwpsKCW/DnSLCuAd1wpRgw6wAw6QQw5XDl0jDj0zCqynDiEvCr8OJKgDDocOUdE0Vw71MYDBSKXEYUjNxw6jDg3jDukpoCUMfw4bDkyfDkcKjw4jDicONEMOFwrHCnsK5w4DDiHXDi8OMKUktw4J0MnXDk8KeISjCmGJrAcKHw5rDjMKE';
 
   it('encode', async () => {
     const encodedConfigHash = JsonUrlHelper.encode(expectedProject);

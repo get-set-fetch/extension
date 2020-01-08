@@ -1,7 +1,7 @@
 import { LogLevel } from 'get-set-fetch-extension-commons';
-import { GsfProvider, PluginManager } from './background-bundle';
 import Logger from './logger/Logger';
-import ScenarioManager from './scenarios/ScenarioManager';
+import ModuleStorageManager from './plugins/ModuleStorageManager';
+import GsfProvider from './storage/GsfProvider';
 
 const Log = Logger.getLogger('background-main');
 
@@ -31,10 +31,10 @@ const Log = Logger.getLogger('background-main');
     Logger.setLogLevel(logLevel.val);
 
     // read all builtin plugins, persist them as Plugin
-    await PluginManager.discoverLocalPlugins();
+    await ModuleStorageManager.discoverLocalPlugins();
 
     // read all builtin scenarios, persist them as Scenario
-    await ScenarioManager.discoverLocalScenarios();
+    await ModuleStorageManager.discoverLocalScenarios();
   }
   catch (err) {
     Log.error(err);

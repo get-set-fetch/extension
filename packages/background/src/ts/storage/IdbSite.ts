@@ -1,14 +1,14 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable class-methods-use-this */
 
-import { IPluginDefinition, ISite, IPlugin } from 'get-set-fetch-extension-commons';
+import { IPluginDefinition, ISite, BasePlugin } from 'get-set-fetch-extension-commons';
 import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
 import BloomFilter from 'get-set-fetch/lib/filters/bloom/BloomFilter';
 import deepmerge from '../helpers/DeepMergeHelper';
 import IdbResource from './IdbResource';
-import PluginManager from '../plugins/PluginManager';
-
 import Logger from '../logger/Logger';
+import ModuleStorageManager from '../plugins/ModuleStorageManager';
+import ModuleRuntimeManager from '../plugins/ModuleRuntimeManager';
 
 const Log = Logger.getLogger('IdbSite');
 
@@ -130,7 +130,7 @@ export default class IdbSite extends BaseEntity implements ISite {
   tabId: any;
 
   pluginDefinitions: IPluginDefinition[];
-  plugins: IPlugin[];
+  plugins: BasePlugin[];
 
   storageOpts: {
     resourceFilter: {
@@ -158,7 +158,7 @@ export default class IdbSite extends BaseEntity implements ISite {
     }
 
     // if no plugin definitions provided use the default ones
-    this.pluginDefinitions = !kwArgs.pluginDefinitions ? PluginManager.getDefaultPluginDefs() : kwArgs.pluginDefinitions;
+    this.pluginDefinitions = !kwArgs.pluginDefinitions ? ModuleStorageManager.getDefaultPluginDefs() : kwArgs.pluginDefinitions;
 
     // resources from the same site are always crawled in the same tab
     this.tabId = null;
@@ -170,7 +170,7 @@ export default class IdbSite extends BaseEntity implements ISite {
 
   async crawl() {
     try {
-      this.plugins = await PluginManager.instantiate(this.pluginDefinitions);
+      this.plugins = await ModuleRuntimeManager.instantiatePlugins(this.pluginDefinitions);
     }
     catch (err) {
       Log.error(
@@ -286,13 +286,13 @@ export default class IdbSite extends BaseEntity implements ISite {
     return resource;
   }
 
-  async executePlugin(plugin: IPlugin, resource: IdbResource) {
+  async executePlugin(plugin: BasePlugin, resource: IdbResource) {
     Log.info(
       `Executing plugin ${plugin.constructor.name} using options ${JSON.stringify(plugin.opts)} against resource ${JSON.stringify(resource)}`,
     );
 
     if (plugin.opts && plugin.opts.runInTab) {
-      return PluginManager.runInTab(this.tabId, plugin, this, resource);
+      return ModuleRuntimeManager.runInTab(this.tabId, plugin, this, resource);
     }
 
     // test if plugin is aplicable

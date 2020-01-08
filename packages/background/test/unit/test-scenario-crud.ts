@@ -1,13 +1,13 @@
 import { assert } from 'chai';
-import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
+import { IScenarioStorage } from 'get-set-fetch-extension-commons';
 import IdbStorage from '../../src/ts/storage/IdbStorage';
 
 const conn = { info: 'IndexedDB' };
 
 describe(`Test Storage ScenarioPackage - CRUD, using connection ${conn.info}`, () => {
-  let ScenarioPackage = null;
+  let Scenario = null;
 
-  const expectedScenarioPkg: IScenarioPackage = {
+  const expectedScenarioPkg: IScenarioStorage = {
     id: null,
     name: 'scenario A',
     code: 'code A',
@@ -24,15 +24,15 @@ describe(`Test Storage ScenarioPackage - CRUD, using connection ${conn.info}`, (
   };
 
   before(async () => {
-    ({ ScenarioPackage } = await IdbStorage.init());
+    ({ Scenario } = await IdbStorage.init());
   });
 
   beforeEach(async () => {
     // cleanup
-    await ScenarioPackage.delAll();
+    await Scenario.delAll();
 
     // save scenario package
-    const scenarioPkg = new ScenarioPackage(expectedScenarioPkg);
+    const scenarioPkg = new Scenario(expectedScenarioPkg);
     await scenarioPkg.save();
     assert.isNotNull(scenarioPkg.id);
     expectedScenarioPkg.id = scenarioPkg.id;
@@ -44,35 +44,35 @@ describe(`Test Storage ScenarioPackage - CRUD, using connection ${conn.info}`, (
 
   it('get', async () => {
     // get scenario package by id
-    const scenarioPkgById = await ScenarioPackage.get(expectedScenarioPkg.id);
-    assert.instanceOf(scenarioPkgById, ScenarioPackage);
+    const scenarioPkgById = await Scenario.get(expectedScenarioPkg.id);
+    assert.instanceOf(scenarioPkgById, Scenario);
     assert.deepEqual(expectedScenarioPkg, scenarioPkgById);
 
     // get scenario package by name
-    const scenarioPkgByName = await ScenarioPackage.get(expectedScenarioPkg.name);
-    assert.instanceOf(scenarioPkgByName, ScenarioPackage);
+    const scenarioPkgByName = await Scenario.get(expectedScenarioPkg.name);
+    assert.instanceOf(scenarioPkgByName, Scenario);
     assert.deepEqual(String(expectedScenarioPkg.id), String(scenarioPkgByName.id));
   });
 
   it('update', async () => {
     // update scenario package
-    const updateScenarioPkg = await ScenarioPackage.get(expectedScenarioPkg.id);
+    const updateScenarioPkg = await Scenario.get(expectedScenarioPkg.id);
     updateScenarioPkg.name = 'scenario A updated';
     updateScenarioPkg.code = 'code A updated';
     await updateScenarioPkg.update();
 
     // get and compare
-    const getScenarioPkg = await ScenarioPackage.get(expectedScenarioPkg.id);
+    const getScenarioPkg = await Scenario.get(expectedScenarioPkg.id);
     assert.deepEqual(updateScenarioPkg, getScenarioPkg);
   });
 
   it('delete', async () => {
     // delete scenario package
-    const delScenarioPkg = await ScenarioPackage.get(expectedScenarioPkg.id);
+    const delScenarioPkg = await Scenario.get(expectedScenarioPkg.id);
     await delScenarioPkg.del();
 
     // get and compare
-    const getScenarioPkg = await ScenarioPackage.get(expectedScenarioPkg.id);
+    const getScenarioPkg = await Scenario.get(expectedScenarioPkg.id);
     assert.isNull(getScenarioPkg);
   });
 });

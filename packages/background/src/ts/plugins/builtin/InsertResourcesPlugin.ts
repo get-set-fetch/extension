@@ -1,34 +1,40 @@
-import { IPlugin, SchemaHelper, ISite, IResource } from 'get-set-fetch-extension-commons';
+import { BasePlugin, ISite, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
 import IdbSite from '../../storage/IdbSite';
 import IdbResource from '../../storage/IdbResource';
 
 /**
  * Plugin responsible for saving new resources within the current site.
  */
-export default class InsertResourcesPlugin implements IPlugin {
-  opts: {
-    maxResources: number;
-  };
-
-  static get OPTS_SCHEMA() {
+export default class InsertResourcesPlugin extends BasePlugin {
+  getMetaSchema(): IEnhancedJSONSchema {
     return {
-      $id: 'https://getsetfetch.org/insert-resources-plugin.schema.json',
-      $schema: 'http://json-schema.org/draft-07/schema#',
-      title: 'InsertResourcesPlugin',
       type: 'object',
       properties: {
-        maxResources: {
-          type: 'number',
-          default: '100',
-          help: 'Maximum number of resources to be crawled.',
+        name: {
+          type: 'string',
+          const: 'InsertResourcesPlugin',
+          description: 'responsible for saving new resources within the current site / project.',
         },
       },
     };
   }
 
-  constructor(opts = {}) {
-    this.opts = SchemaHelper.instantiate(InsertResourcesPlugin.OPTS_SCHEMA, opts);
+  getOptsSchema(): IEnhancedJSONSchema {
+    return {
+      type: 'object',
+      properties: {
+        maxResources: {
+          type: 'number',
+          default: '100',
+          description: 'Maximum number of resources to be scraped.',
+        },
+      },
+    };
   }
+
+  opts: {
+    maxResources: number;
+  };
 
   test(resource: IResource&IdbResource) {
     // only save new urls if there's something to save

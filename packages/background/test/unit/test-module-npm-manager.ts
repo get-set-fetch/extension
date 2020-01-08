@@ -3,10 +3,10 @@ import * as sinon from 'sinon';
 import * as fs from 'fs';
 import * as path from 'path';
 import { Response } from 'node-fetch';
-import { IScenarioPackage } from 'get-set-fetch-extension-commons/lib/scenario';
-import ScenarioManager from '../../src/ts/scenarios/ScenarioManager';
+import { IScenarioStorage } from 'get-set-fetch-extension-commons';
+import ModuleNpmManager from '../../src/ts/plugins/ModuleNpmManager';
 
-describe('Test ScenarioManager', () => {
+describe('Test ModuleNpmManager', () => {
   let sandbox;
   let fetchStub;
 
@@ -50,7 +50,7 @@ describe('Test ScenarioManager', () => {
   });
 
   it('get available scenarios from readme', async () => {
-    const actualScenarios = await ScenarioManager.getNpmScenarioUrls();
+    const actualScenarios = await ModuleNpmManager.getNpmScenarioUrls();
     const expectedScenarios: string[] = [
       'https://registry.npmjs.org/scenario-a/0.1.5',
       'https://registry.npmjs.org/scenario-b/2.3.0',
@@ -60,8 +60,8 @@ describe('Test ScenarioManager', () => {
   });
 
   it('get npm scenario details', async () => {
-    const actualDetails: IScenarioPackage = await ScenarioManager.getNpmScenarioDetails('https://registry.npmjs.org/scenario-a/0.1.5');
-    const expectedDetails: IScenarioPackage = {
+    const actualDetails: IScenarioStorage = await ModuleNpmManager.getNpmScenarioDetails('https://registry.npmjs.org/scenario-a/0.1.5');
+    const expectedDetails: IScenarioStorage = {
       name: 'scenario-a',
       package: {
         name: 'scenario-a',

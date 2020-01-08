@@ -1,20 +1,22 @@
-import { SchemaHelper, IPlugin, ISite, IResource } from 'get-set-fetch-extension-commons';
+import { ISite, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
+import { BasePlugin } from 'get-set-fetch-extension-commons/lib/plugin';
 
-export default class ExtractHtmlContentPlugin implements IPlugin {
-  opts: {
-    runInTab: boolean;
-    selectors: string;
-  };
-
-  constructor(opts) {
-    this.opts = SchemaHelper.instantiate(ExtractHtmlContentPlugin.OPTS_SCHEMA, opts);
+export default class ExtractHtmlContentPlugin extends BasePlugin {
+  getMetaSchema(): IEnhancedJSONSchema {
+    return {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          const: 'ExtractHtmlContentPlugin',
+          description: 'responsible for scraping html content based on document.querySelectorAll.',
+        },
+      },
+    };
   }
 
-  static get OPTS_SCHEMA() {
+  getOptsSchema(): IEnhancedJSONSchema {
     return {
-      $id: 'https://getsetfetch.org/extract-html-content-plugin.schema.json',
-      $schema: 'http://json-schema.org/draft-07/schema#',
-      title: 'ExtractHtmlContentPlugin',
       type: 'object',
       properties: {
         runInTab: {
@@ -28,6 +30,11 @@ export default class ExtractHtmlContentPlugin implements IPlugin {
       },
     };
   }
+
+  opts: {
+    runInTab: boolean;
+    selectors: string;
+  };
 
   test(resource: IResource) {
     return (/html/i).test(resource.mediaType);

@@ -1,11 +1,16 @@
 import { IResource } from './resource';
 import { ISite } from './site';
+import { IEnhancedJSONSchema } from './scenario';
+import { SchemaHelper } from './schema/SchemaHelper';
+import { IModuleStorage } from './storage';
 
-export interface IPluginStorage {
-  id: number;
+export interface IPluginStorage extends IModuleStorage {
   scenarioId?: number;
-  name: string;
-  code: string;
+}
+
+export interface IPluginSchemas {
+  opts: IEnhancedJSONSchema;
+  meta: IEnhancedJSONSchema;
 }
 
 export interface IPluginDefinition {
@@ -19,8 +24,16 @@ export interface IPluginOpts {
   [key: string]: any;
 }
 
-export interface IPlugin {
-  opts?: IPluginOpts;
-  test(resource: IResource): boolean;
-  apply(site: ISite, resource: IResource): any;
+export abstract class BasePlugin {
+  opts: IPluginOpts;
+
+  constructor(opts = {}) {
+    this.opts = SchemaHelper.instantiate(this.getOptsSchema(), opts);
+  }
+
+  abstract getMetaSchema(): IEnhancedJSONSchema;
+  abstract getOptsSchema(): IEnhancedJSONSchema;
+
+  abstract test(resource: IResource): boolean;
+  abstract apply(site: ISite, resource: IResource): any;
 }

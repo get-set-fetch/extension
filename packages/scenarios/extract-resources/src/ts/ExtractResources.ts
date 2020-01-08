@@ -1,4 +1,4 @@
-import { IScenario, ExportType, IExportOpt, IPluginDefinition, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
+import { IScenario, ExportType, IExportOpt, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
 
 import ConfigFormSchema from '../resources/config-form-schema';
 import ImageFilterPlugin from './plugins/ImageFilterPlugin';
@@ -8,32 +8,15 @@ export default class ExtractResources implements IScenario {
     return ConfigFormSchema as IEnhancedJSONSchema;
   }
 
-  getPluginDefinitions(scenarioProps) {
-    const pluginDefinitions: IPluginDefinition[] = [
-      {
-        name: 'SelectResourcePlugin',
-      },
-      {
-        name: 'FetchPlugin',
-      },
-      {
-        name: 'ExtractUrlsPlugin',
-        opts: {
-          resourcePathnameRe: scenarioProps.resourcePathnameRe,
-        },
-      },
-      {
-        name: 'ImageFilterPlugin',
-      },
-      {
-        name: 'UpdateResourcePlugin',
-      },
-      {
-        name: 'InsertResourcesPlugin',
-      },
+  getPluginNames() {
+    return [
+      'SelectResourcePlugin',
+      'FetchPlugin',
+      'ExtractUrlsPlugin',
+      'ImageFilterPlugin',
+      'UpdateResourcePlugin',
+      'InsertResourcesPlugin',
     ];
-
-    return pluginDefinitions;
   }
 
   getResultTableHeaders() {

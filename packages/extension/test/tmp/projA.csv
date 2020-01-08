@@ -1,0 +1,6 @@
+url,mediaType
+"https://www.sitea.com/index.html","text/html"
+"https://www.sitea.com/pageA.html","text/html"
+"https://www.sitea.com/pdf/pdfA-150.pdf","application/pdf"
+"https://www.sitea.com/pageB.html","text/html"
+"https://www.sitea.com/pdf/pdfB-850.pdf","application/pdf"

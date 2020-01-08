@@ -1,4 +1,4 @@
-import { IScenario, ExportType, IExportOpt, IPluginDefinition, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
+import { IScenario, ExportType, IExportOpt, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
 
 import ConfigFormSchema from '../resources/config-form-schema';
 import ExtractHtmlContentPlugin from './plugins/ExtractHtmlContentPlugin';
@@ -8,32 +8,15 @@ export default class ExtractHtmlContent implements IScenario {
     return ConfigFormSchema as IEnhancedJSONSchema;
   }
 
-  getPluginDefinitions(scenarioProps) {
-    const pluginDefinitions: IPluginDefinition[] = [
-      {
-        name: 'SelectResourcePlugin',
-      },
-      {
-        name: 'FetchPlugin',
-      },
-      {
-        name: 'ExtractUrlsPlugin',
-      },
-      {
-        name: 'ExtractHtmlContentPlugin',
-        opts: {
-          selectors: scenarioProps.selectors,
-        },
-      },
-      {
-        name: 'UpdateResourcePlugin',
-      },
-      {
-        name: 'InsertResourcesPlugin',
-      },
+  getPluginNames() {
+    return [
+      'SelectResourcePlugin',
+      'FetchPlugin',
+      'ExtractUrlsPlugin',
+      'ExtractHtmlContentPlugin',
+      'UpdateResourcePlugin',
+      'InsertResourcesPlugin',
     ];
-
-    return pluginDefinitions;
   }
 
   getResultTableHeaders() {

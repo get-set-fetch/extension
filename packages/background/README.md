@@ -26,14 +26,6 @@ Handles the crawling and scraping logic.
   description: "projectA description",
   url: "https://root-url",
 
-  crawlOpts: {
-    delay: 1000,
-    hostnameRe: " /\.org$/",
-    maxDepth: 1,
-    maxResources: 100,
-    pathnameRe: "/category\/product/"
-  },
-
   scenarioOpts: {
     name: "extract-html-content",
     description: "Extract Html Content scenario is used for extracting html nodes text based on dom selectors."

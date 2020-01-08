@@ -5,13 +5,13 @@ import IdbPlugin from './IdbPlugin';
 import IdbLog from './IdbLog';
 import IdbSetting from './IdbSetting';
 import IdbProject from './IdbProject';
-import IdbScenarioPackage from './IdbScenarioPackage';
+import IdbScenario from './IdbScenario';
 
 export default class IdbStorage {
   static init(): Promise<{
     Site: typeof IdbSite;
     Project: typeof IdbProject;
-    ScenarioPackage: typeof IdbScenarioPackage;
+    Scenario: typeof IdbScenario;
     Resource: typeof IdbResource;
     Plugin: typeof IdbPlugin;
     Log: typeof IdbLog;
@@ -35,8 +35,8 @@ export default class IdbStorage {
           projectStore.createIndex('name', 'name', { unique: true });
         }
 
-        if (!db.objectStoreNames.contains('ScenarioPackages')) {
-          const scenarioStore = db.createObjectStore('ScenarioPackages', { keyPath: 'id', autoIncrement: true });
+        if (!db.objectStoreNames.contains('Scenarios')) {
+          const scenarioStore = db.createObjectStore('Scenarios', { keyPath: 'id', autoIncrement: true });
           scenarioStore.createIndex('name', 'name', { unique: true });
         }
 
@@ -73,7 +73,7 @@ export default class IdbStorage {
         resolve({
           Site: IdbSite,
           Project: IdbProject,
-          ScenarioPackage: IdbScenarioPackage,
+          Scenario: IdbScenario,
           Resource: IdbResource,
           Plugin: IdbPlugin,
           Log: IdbLog,

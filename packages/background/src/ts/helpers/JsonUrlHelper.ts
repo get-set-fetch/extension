@@ -7,14 +7,6 @@ export default class JsonUrlHelper {
       description: '',
       url: '',
 
-      crawlOpts: {
-        delay: 1000,
-        hostnameRe: '',
-        maxDepth: -1,
-        maxResources: 100,
-        pathnameRe: '',
-      },
-
       pluginDefinitions: [
         {
           name: 'SelectResourcePlugin',
@@ -46,6 +38,8 @@ export default class JsonUrlHelper {
 
       scenarioOpts: {
         name: '',
+        description: '',
+        homepage: '',
       },
     };
 

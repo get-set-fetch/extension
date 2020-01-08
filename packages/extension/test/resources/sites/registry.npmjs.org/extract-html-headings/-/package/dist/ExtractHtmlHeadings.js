@@ -83,7 +83,8 @@ class ExtractHeadingsPlugin {
     constructor(opts) {
         this.opts = SchemaHelper.instantiate(ExtractHeadingsPlugin.OPTS_SCHEMA, opts);
     }
-    static get OPTS_SCHEMA() {
+
+    getOptsSchema() {
         return {
             $id: 'https://getsetfetch.org/html-headings-plugin.schema.json',
             $schema: 'http://json-schema.org/draft-07/schema#',
@@ -97,6 +98,7 @@ class ExtractHeadingsPlugin {
             }
         };
     }
+
     test(resource) {
         return resource.mediaType.indexOf('html') !== -1;
     }
@@ -122,29 +124,17 @@ class ExtractHtmlHeadings {
     getConfigFormUISchema() {
         return ConfigFormUISchema;
     }
-    getPluginDefinitions(scenarioProps) {
-        const pluginDefinitions = [
-            {
-                name: 'SelectResourcePlugin'
-            },
-            {
-                name: 'FetchPlugin'
-            },
-            {
-                name: 'ExtractUrlsPlugin',
-            },
-            {
-                name: 'ExtractHeadingsPlugin'
-            },
-            {
-                name: 'UpdateResourcePlugin'
-            },
-            {
-                name: 'InsertResourcesPlugin'
-            }
-        ];
-        return pluginDefinitions;
+    getPluginNames() {
+        return [
+            'SelectResourcePlugin',
+            'FetchPlugin',
+            'ExtractUrlsPlugin',
+            'ExtractHeadingsPlugin',
+            'UpdateResourcePlugin',
+            'InsertResourcesPlugin'
+        ]
     }
+
     getResultTableHeaders() {
         return [
             {

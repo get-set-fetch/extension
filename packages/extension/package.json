@@ -23,7 +23,7 @@
     "copy:scenario-extract-html-content": "npm run copy:scenario-extract-html-content-dist && npm run copy:scenario-extract-html-content-pkg",
     "copy:scenarios": "npm run copy:scenario-extract-resource && npm run copy:scenario-extract-html-content",
     "test": "mocha test \"./test/integration/**/*.ts\" --exit",
-    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Test ThankYou Pages\""
+    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"default maxDepth = -1, extract images\""
   },
   "author": {
     "name": "Andrei Sabau"

@@ -1,23 +1,24 @@
-import { SchemaHelper, IPlugin } from 'get-set-fetch-extension-commons';
+import { BasePlugin, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
 
 /**
- * Plugin responsible for selecting a resource to crawl from the current site.
+ * Plugin responsible for lazy loading scrolling in order to load additional content.
  */
-export default class ScrollPlugin implements IPlugin {
-  opts: {
-    runInTab: boolean;
-    lazyLoading: boolean;
-    enabled: boolean;
-    timeout: number;
-    delay: number;
-    scrollNo: number;
-  };
-
-  static get OPTS_SCHEMA() {
+export default class ScrollPlugin extends BasePlugin {
+  getMetaSchema(): IEnhancedJSONSchema {
     return {
-      $id: 'https://getsetfetch.org/lazy-load-plugin.schema.json',
-      $schema: 'http://json-schema.org/draft-07/schema#',
-      title: 'ScrollPlugin',
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          const: 'ScrollPlugin',
+          description: 'responsible for lazy loading scrolling in order to load additional content.',
+        },
+      },
+    };
+  }
+
+  getOptsSchema(): IEnhancedJSONSchema {
+    return {
       type: 'object',
       properties: {
         runInTab: {
@@ -35,25 +36,30 @@ export default class ScrollPlugin implements IPlugin {
         delay: {
           type: 'number',
           default: '2000',
-          help: 'Maximum waiting time (miliseconds) for DOM changes.',
+          description: 'Maximum waiting time (miliseconds) for DOM changes.',
         },
         timeout: {
           type: 'number',
           default: '2000',
-          help: 'Maximum waiting time (miliseconds) for DOM changes.',
+          description: 'Maximum waiting time (miliseconds) for DOM changes.',
         },
         maxScrollNo: {
           type: 'number',
           default: '-1',
-          help: 'Number of maximum scroll operations. -1 scrolls till no new content is added to the page',
+          description: 'Number of maximum scroll operations. -1 scrolls till no new content is added to the page',
         },
       },
     };
   }
 
-  constructor(opts = {}) {
-    this.opts = SchemaHelper.instantiate(ScrollPlugin.OPTS_SCHEMA, opts);
-  }
+  opts: {
+    runInTab: boolean;
+    lazyLoading: boolean;
+    enabled: boolean;
+    timeout: number;
+    delay: number;
+    maxScrollNo: number;
+  };
 
   test() {
     return this.opts.enabled;

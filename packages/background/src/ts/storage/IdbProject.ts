@@ -1,5 +1,5 @@
 import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
-import { IProjectStorage, IPluginDefinition, IProjectCrawlOpts } from 'get-set-fetch-extension-commons';
+import { IProjectStorage, IPluginDefinition } from 'get-set-fetch-extension-commons';
 import { IProjectConfigHash, IProjectScenarioOpts } from 'get-set-fetch-extension-commons/lib/project';
 import Logger from '../logger/Logger';
 import IdbSite from './IdbSite';
@@ -13,7 +13,7 @@ const Log = Logger.getLogger('IdbProject');
 export default class IdbProject extends BaseEntity implements IProjectStorage {
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return [ 'id', 'name', 'description', 'url', 'crawlOpts', 'scenarioOpts', 'pluginDefinitions' ];
+    return [ 'id', 'name', 'description', 'url', 'scenarioOpts', 'pluginDefinitions' ];
   }
 
   // get a read transaction
@@ -150,7 +150,6 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
   name: string;
   description: string;
   url: string;
-  crawlOpts: IProjectCrawlOpts;
   scenarioOpts: IProjectScenarioOpts;
   pluginDefinitions: IPluginDefinition[];
 

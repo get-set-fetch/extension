@@ -1,16 +1,21 @@
 
-import { SchemaHelper, IPlugin, IResource } from 'get-set-fetch-extension-commons';
+import { BasePlugin, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
 
-export default class ExtractTitlePlugin implements IPlugin {
-  opts: {
-    runInTab: boolean;
-  };
-
-  constructor(opts = {}) {
-    this.opts = SchemaHelper.instantiate(ExtractTitlePlugin.OPTS_SCHEMA, opts);
+export default class ExtractTitlePlugin extends BasePlugin {
+  getMetaSchema(): IEnhancedJSONSchema {
+    return {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          const: 'ExtractTitlePlugin',
+          description: 'responsible for extracting the title of the current html page.',
+        },
+      },
+    };
   }
 
-  static get OPTS_SCHEMA() {
+  getOptsSchema(): IEnhancedJSONSchema {
     return {
       $id: 'https://getsetfetch.org/extract-title-plugin.schema.json',
       $schema: 'http://json-schema.org/draft-07/schema#',
@@ -24,6 +29,10 @@ export default class ExtractTitlePlugin implements IPlugin {
       },
     };
   }
+
+  opts: {
+    runInTab: boolean;
+  };
 
   test(resource: IResource) {
     return resource.mediaType.indexOf('html') !== -1;

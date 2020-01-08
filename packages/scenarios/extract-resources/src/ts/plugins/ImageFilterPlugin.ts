@@ -1,19 +1,22 @@
-import { SchemaHelper, IPlugin, ISite, IResource } from 'get-set-fetch-extension-commons';
+import { ISite, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
+import { BasePlugin } from 'get-set-fetch-extension-commons/lib/plugin';
 
-export default class ImageFilterPlugin implements IPlugin {
-  opts: {
-    runInTab: boolean;
-  };
-
-  constructor(opts) {
-    this.opts = SchemaHelper.instantiate(ImageFilterPlugin.OPTS_SCHEMA, opts);
+export default class ImageFilterPlugin extends BasePlugin {
+  getMetaSchema(): IEnhancedJSONSchema {
+    return {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          const: 'ImageFilterPlugin',
+          description: 'responsible for resolving width and height for image type resources.',
+        },
+      },
+    };
   }
 
-  static get OPTS_SCHEMA() {
+  getOptsSchema() {
     return {
-      $id: 'https://getsetfetch.org/image-filter-plugin.schema.json',
-      $schema: 'http://json-schema.org/draft-07/schema#',
-      title: 'ImageFilterPlugin',
       type: 'object',
       properties: {
         runInTab: {
@@ -21,8 +24,12 @@ export default class ImageFilterPlugin implements IPlugin {
           default: false,
         },
       },
-    };
+    } as IEnhancedJSONSchema;
   }
+
+  opts: {
+    runInTab: boolean;
+  };
 
   test(resource: IResource) {
     return (/image/i).test(resource.mediaType);
