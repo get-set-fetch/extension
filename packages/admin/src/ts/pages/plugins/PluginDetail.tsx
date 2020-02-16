@@ -25,7 +25,7 @@ export default class PluginDetail extends React.Component<RouteComponentProps<{p
     super(props);
 
     this.state = {
-      bridge: SchemaBridgeHelper.createBridge(PluginSchema),
+      bridge: SchemaBridgeHelper.createBridge(PluginSchema, {}),
       plugin: null,
     };
 

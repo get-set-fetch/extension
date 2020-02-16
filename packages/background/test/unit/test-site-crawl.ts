@@ -38,8 +38,8 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
     // save site
     const testPlugins = [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'UpdateResourcePlugin', 'InsertResourcesPlugin' ];
-    const pluginDefinitions = ModuleStorageManager.getDefaultPluginDefs().filter(pluginDef => testPlugins.indexOf(pluginDef.name) !== -1);
-    site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', pluginDefinitions });
+    const plugins = ModuleStorageManager.getDefaultPluginDefs().filter(pluginDef => testPlugins.indexOf(pluginDef.name) !== -1);
+    site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', plugins });
     await site.save();
 
     // stub ExtractUrlsPlugin, the only one running in tab via "runInTab"
@@ -61,8 +61,8 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
   it('crawl all available resources', async () => {
     const maxResources = 5;
-    site.pluginDefinitions = ModuleStorageManager.getDefaultPluginDefs().filter(
-      pluginDef => [ 'SelectResourcePlugin', 'UpdateResourcePlugin' ].indexOf(pluginDef.name) !== -1,
+    site.plugins = ModuleStorageManager.getDefaultPluginDefs().filter(
+      plugin => [ 'SelectResourcePlugin', 'UpdateResourcePlugin' ].indexOf(plugin.name) !== -1,
     );
 
     // save 4 additional resources, an initial resource is created when the site is created
@@ -79,7 +79,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
   it('crawl until maxDepth is reached', async () => {
     const maxDepth = 3;
-    const extractUrlPlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlsPlugin');
+    const extractUrlPlugDef = site.plugins.find(plugin => plugin.name === 'ExtractUrlsPlugin');
     extractUrlPlugDef.opts.maxDepth = maxDepth;
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
@@ -94,10 +94,10 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     const maxResources = 7;
 
     // make sure maxDepth is not reached before reaching maxResources threshold
-    const extractUrlsPlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'ExtractUrlsPlugin');
+    const extractUrlsPlugDef = site.plugins.find(plugin => plugin.name === 'ExtractUrlsPlugin');
     extractUrlsPlugDef.opts.maxDepth = 100;
 
-    const insertResourcePlugDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'InsertResourcesPlugin');
+    const insertResourcePlugDef = site.plugins.find(plugin => plugin.name === 'InsertResourcesPlugin');
     insertResourcePlugDef.opts.maxResources = maxResources;
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
@@ -112,12 +112,12 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     const delay = 500;
 
     // keep the plugins to a minimum
-    site.pluginDefinitions = ModuleStorageManager.getDefaultPluginDefs().filter(
-      pluginDef => [ 'SelectResourcePlugin', 'UpdateResourcePlugin' ].indexOf(pluginDef.name) !== -1,
+    site.plugins = ModuleStorageManager.getDefaultPluginDefs().filter(
+      plugin => [ 'SelectResourcePlugin', 'UpdateResourcePlugin' ].indexOf(plugin.name) !== -1,
     );
 
     // adjust crawl delay
-    const selectResourceDef = site.pluginDefinitions.find(pluginDef => pluginDef.name === 'SelectResourcePlugin');
+    const selectResourceDef = site.plugins.find(plugin => plugin.name === 'SelectResourcePlugin');
     selectResourceDef.opts.delay = delay;
 
 
@@ -135,27 +135,27 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
   });
 
   it('crawl with lazy loading', async () => {
-    site.pluginDefinitions = ModuleStorageManager.getDefaultPluginDefs().filter(
-      pluginDef => [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'ScrollPlugin', 'UpdateResourcePlugin' ].indexOf(pluginDef.name) !== -1,
+    site.plugins = ModuleStorageManager.getDefaultPluginDefs().filter(
+      plugin => [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'ScrollPlugin', 'UpdateResourcePlugin' ].indexOf(plugin.name) !== -1,
     );
 
     // enable lazy loading, by default it's false
-    const lazyLoadingDef = site.pluginDefinitions.find(pluginDef => pluginDef.opts.lazyLoading === true);
+    const lazyLoadingDef = site.plugins.find(plugin => plugin.opts.lazyLoading === true);
     lazyLoadingDef.opts.enabled = true;
 
     let updatePluginSpy;
     const origInstantiate = ModuleRuntimeManager.instantiatePlugins;
     (ModuleRuntimeManager.runInTab as any).restore();
-    sinon.stub(ModuleRuntimeManager, 'instantiatePlugins').callsFake(async pluginDefinitions => {
-      const plugins: BasePlugin[] = await origInstantiate(pluginDefinitions);
+    sinon.stub(ModuleRuntimeManager, 'instantiatePlugins').callsFake(async plugins => {
+      const pluginInstances: BasePlugin[] = await origInstantiate(plugins);
 
       // spy on UpdateResourcePlugin
-      const updatePlugin = plugins.find(plugin => plugin.constructor.name === 'UpdateResourcePlugin');
-      updatePluginSpy = sinon.spy(updatePlugin, 'apply');
+      const updatePluginInst = pluginInstances.find(pluginInst => pluginInst.constructor.name === 'UpdateResourcePlugin');
+      updatePluginSpy = sinon.spy(updatePluginInst, 'apply');
 
       // insert entry for ExtractTitlePlugin, not available on default plugin list
-      plugins.splice(2, 0, new ExtractTitlePlugin());
-      return plugins;
+      pluginInstances.splice(2, 0, new ExtractTitlePlugin());
+      return pluginInstances;
     });
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');

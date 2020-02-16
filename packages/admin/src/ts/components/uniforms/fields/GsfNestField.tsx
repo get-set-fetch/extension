@@ -17,17 +17,28 @@ const GsfNest = ({
   name,
   showInlineError,
   ...props
-}) => (
-  <div className={classnames(className, { 'has-error': error })} {...filterDOMProps(props)}>
-    <hr/>
-    {label && <h4 className="title">{label}</h4>}
-
-    {!!(error && showInlineError) && <span className="text-danger">{errorMessage}</span>}
-
-    {children
+}) => {
+  if (props.childrenOnly) {
+    return children
       ? injectName(name, children)
-      : fields.map(key => <GsfAutoField key={key} name={joinName(name, key)} {...itemProps} />)}
-  </div>
-);
+      : fields.map(key => <GsfAutoField key={key} name={joinName(name, key)} {...itemProps} />);
+  }
+
+  const title = props.field.title ? props.field.title : label;
+
+  return (
+    <div className={classnames(className, { 'has-error': error })} {...filterDOMProps(props)}>
+      <hr/>
+      {title && <h4 className="title">{title}</h4>}
+      {props.field.description && <p>{props.field.description}</p>}
+
+      {!!(error && showInlineError) && <span className="text-danger">{errorMessage}</span>}
+
+      {children
+        ? injectName(name, children)
+        : fields.map(key => <GsfAutoField key={key} name={joinName(name, key)} {...itemProps} />)}
+    </div>
+  );
+};
 
 export default gsfConnectField(GsfNest, { ensureValue: false, includeInChain: false });

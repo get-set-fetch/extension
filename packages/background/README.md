@@ -26,14 +26,9 @@ Handles the crawling and scraping logic.
   description: "projectA description",
   url: "https://root-url",
 
-  scenarioOpts: {
-    name: "extract-html-content",
-    description: "Extract Html Content scenario is used for extracting html nodes text based on dom selectors."
-    homepage: "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-html-content"
-    selectors: "h1↵h2↵h3"
-  },
+  scenario: "extract-html-content",
 
-  pluginDefinitions: [
+  plugins: [
     {
       name: "SelectResourcePlugin",
       opts: {
@@ -71,8 +66,7 @@ Handles the crawling and scraping logic.
 ```
 
 ## Project Entity Notes
-scenarioOpts field contains the user defined settings for the project selected scenario extract-html-content.
-These settings are used by the scenario to generate partial pluginDefinitions.
+
 
 # Site Entity Example
 ```json
@@ -82,7 +76,9 @@ These settings are used by the scenario to generate partial pluginDefinitions.
   url: "https://root-url.com",
   projectId: 1,
 
-  pluginDefinitions: [
+  scenario: "ExtractHtmlResources",
+
+  plugins: [
     {
       name: "SelectResourcePlugin",
       opts: {
@@ -121,7 +117,7 @@ These settings are used by the scenario to generate partial pluginDefinitions.
 ```
 
 ## Site Entity Notes
-Each site inherits the parent project partial pluginDefinitions. This allows to easily create multiple sites with the same configuration under a common project followed by individual changes to each site.
+Each site inherits the parent project plugin definitions. This allows to easily create multiple sites with the same configuration under a common project followed by individual changes to each site.
 Resource filter is a bloom filter used for detecting duplicate urls.
 
 # Plugin Instances

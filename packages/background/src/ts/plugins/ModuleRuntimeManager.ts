@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-len
-import { IModuleRuntime, IModuleStorage, BasePlugin, IPluginDefinition, IScenario, IPluginSchemas, IPluginStorage } from 'get-set-fetch-extension-commons';
+import { IModuleRuntime, IModuleStorage, BasePlugin, IPluginDefinition, IScenario, IPluginStorage, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
 import Logger from '../logger/Logger';
 import GsfProvider from '../storage/GsfProvider';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
@@ -71,9 +71,9 @@ export default class ModuleRuntimeManager {
     );
   }
 
-  static async instantiatePlugins(pluginDefinitions: IPluginDefinition[]): Promise<BasePlugin[]> {
+  static async instantiatePlugins(plugins: IPluginDefinition[]): Promise<BasePlugin[]> {
     return Promise.all(
-      pluginDefinitions.map(async pluginDef => ModuleRuntimeManager.instantiatePlugin(pluginDef.name, pluginDef.opts)),
+      plugins.map(async plugin => ModuleRuntimeManager.instantiatePlugin(plugin.name, plugin.opts)),
     );
   }
 
@@ -86,19 +86,15 @@ export default class ModuleRuntimeManager {
 
     const ClassDef = ModuleRuntimeManager.cache.get(name).module.default;
     const pluginInstance = new (ClassDef)(opts);
-
     return pluginInstance;
   }
 
-  static async getPluginSchemas(scenarioName: string): Promise<IPluginSchemas[]> {
+  static async getPluginSchemas(scenarioName: string): Promise<IEnhancedJSONSchema[]> {
     const scenario: IScenario = await ModuleRuntimeManager.instantiateScenario(scenarioName);
     return Promise.all(
       scenario.getPluginNames().map(async pluginName => {
         const plugin: BasePlugin = await ModuleRuntimeManager.instantiatePlugin(pluginName);
-        return {
-          meta: plugin.getMetaSchema(),
-          opts: plugin.getOptsSchema(),
-        };
+        return Object.assign(plugin.getOptsSchema(), { $id: pluginName });
       }),
     );
   }
@@ -118,16 +114,22 @@ export default class ModuleRuntimeManager {
     const pluginInfo = ModuleRuntimeManager.cache.get(pluginName);
 
     const codeWithoutExport = pluginInfo.code.replace(/^export .+$/gm, '');
-    Log.debug(`injecting in browser tab: ${codeWithoutExport}`);
+    Log.debug(`injecting in browser tab ${pluginName}: ${codeWithoutExport}`);
 
     let result = {};
     try {
-      const pluginDeff = `${pluginName}`;
+      const pluginDef = `${pluginName}`;
       const pluginInstanceName = `inst${pluginName}`;
 
       // listen for incoming message
       const message = new Promise((resolve, reject) => {
         const listener = msg => {
+          /*
+          this is not a message sent via runInTab, ignore it,
+          messages may also come from admin GsfClient, test utils CrawlHelper.waitForCrawlComplete
+          */
+          if (msg.resolved === undefined) return;
+
           chrome.runtime.onMessage.removeListener(listener);
           if (msg.resolved) {
             resolve(msg.result);
@@ -151,7 +153,7 @@ export default class ModuleRuntimeManager {
           (async function() {
             try {
               // instantiate plugin instance
-              const ${pluginInstanceName} = new ${pluginDeff}(${JSON.stringify(pluginInstance.opts)})
+              const ${pluginInstanceName} = new ${pluginDef}(${JSON.stringify(pluginInstance.opts)})
 
               // execute plugin
               let result = null;

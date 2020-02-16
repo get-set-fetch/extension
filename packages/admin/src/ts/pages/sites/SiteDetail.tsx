@@ -1,17 +1,16 @@
 import * as React from 'react';
 import { setIn, removeIn } from 'immutable';
 import * as queryString from 'query-string';
-import { HttpMethod } from 'get-set-fetch-extension-commons';
+import { HttpMethod, IPluginDefinition } from 'get-set-fetch-extension-commons';
 import { NavLink, RouteComponentProps } from 'react-router-dom';
 import GsfClient from '../../components/GsfClient';
 import SiteDetailPlugins from './SiteDetailPlugins';
 import Site from './model/Site';
-import PluginDefinition from './model/PluginDefinition';
 import Page from '../../layout/Page';
 
 interface IState {
   site: Site;
-  availablePluginDefinitions: PluginDefinition[];
+  availablePluginDefinitions: IPluginDefinition[];
 }
 
 export default class SiteDetail extends React.Component<RouteComponentProps<{siteId: string}>, IState> {
@@ -55,7 +54,7 @@ export default class SiteDetail extends React.Component<RouteComponentProps<{sit
     }
     this.setState({ site });
 
-    const availablePluginDefinitions: PluginDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'plugindefs/available')) as PluginDefinition[];
+    const availablePluginDefinitions: IPluginDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'plugindefs/available')) as IPluginDefinition[];
     this.setState({ availablePluginDefinitions });
 
     // default plugins for a new site

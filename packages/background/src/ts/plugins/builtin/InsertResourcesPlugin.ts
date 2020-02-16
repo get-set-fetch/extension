@@ -6,22 +6,11 @@ import IdbResource from '../../storage/IdbResource';
  * Plugin responsible for saving new resources within the current site.
  */
 export default class InsertResourcesPlugin extends BasePlugin {
-  getMetaSchema(): IEnhancedJSONSchema {
-    return {
-      type: 'object',
-      properties: {
-        name: {
-          type: 'string',
-          const: 'InsertResourcesPlugin',
-          description: 'responsible for saving new resources within the current site / project.',
-        },
-      },
-    };
-  }
-
   getOptsSchema(): IEnhancedJSONSchema {
     return {
       type: 'object',
+      title: 'Insert Resources Plugin',
+      description: 'responsible for saving new resources within the current site / project.',
       properties: {
         maxResources: {
           type: 'number',
@@ -29,6 +18,7 @@ export default class InsertResourcesPlugin extends BasePlugin {
           description: 'Maximum number of resources to be scraped.',
         },
       },
+      required: [ 'maxResources' ],
     };
   }
 

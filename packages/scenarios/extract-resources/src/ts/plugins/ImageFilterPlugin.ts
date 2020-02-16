@@ -2,34 +2,13 @@ import { ISite, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-c
 import { BasePlugin } from 'get-set-fetch-extension-commons/lib/plugin';
 
 export default class ImageFilterPlugin extends BasePlugin {
-  getMetaSchema(): IEnhancedJSONSchema {
-    return {
-      type: 'object',
-      properties: {
-        name: {
-          type: 'string',
-          const: 'ImageFilterPlugin',
-          description: 'responsible for resolving width and height for image type resources.',
-        },
-      },
-    };
-  }
-
   getOptsSchema() {
     return {
       type: 'object',
-      properties: {
-        runInTab: {
-          type: 'boolean',
-          default: false,
-        },
-      },
+      title: 'Image Filter Plugin',
+      description: 'responsible for resolving width and height for image type resources.',
     } as IEnhancedJSONSchema;
   }
-
-  opts: {
-    runInTab: boolean;
-  };
 
   test(resource: IResource) {
     return (/image/i).test(resource.mediaType);

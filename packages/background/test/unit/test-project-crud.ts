@@ -13,7 +13,7 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     id: null,
     name: 'projectA',
     url: 'http://siteA',
-    pluginDefinitions: [
+    plugins: [
       {
         name: 'SelectResourcePlugin',
         opts: {
@@ -72,14 +72,14 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     assert.instanceOf(projectById, Project);
     assert.strictEqual(expectedProject.name, projectById.name);
     assert.strictEqual(expectedProject.url, projectById.url);
-    assert.deepEqual(expectedProject.pluginDefinitions, projectById.pluginDefinitions);
+    assert.deepEqual(expectedProject.plugins, projectById.plugins);
 
     // get project by name
     const projectByName = await Project.get(expectedProject.name);
     assert.instanceOf(projectByName, Project);
     assert.strictEqual(String(expectedProject.id), String(projectByName.id));
     assert.strictEqual(expectedProject.url, projectByName.url);
-    assert.deepEqual(expectedProject.pluginDefinitions, projectByName.pluginDefinitions);
+    assert.deepEqual(expectedProject.plugins, projectByName.plugins);
 
     // get corresponding site
     const projectSite = await Site.get(`${expectedProject.name}-1`);
@@ -93,7 +93,7 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     updateProject.name = 'projectA_updated';
     updateProject.url = 'http://siteA/updated';
 
-    const pluginDefinition = updateProject.pluginDefinitions.find(pluginDefinition => pluginDefinition.name === 'ExtractUrlsPlugin');
+    const pluginDefinition = updateProject.plugins.find(pluginDefinition => pluginDefinition.name === 'ExtractUrlsPlugin');
     pluginDefinition.opts.maxDepth = 21;
     await updateProject.update();
 
@@ -102,8 +102,8 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
     assert.strictEqual(updateProject.name, getProject.name);
     assert.strictEqual(updateProject.url, getProject.url);
 
-    const getPluginDefinition = getProject.pluginDefinitions.find(pluginDefinition => pluginDefinition.name === 'ExtractUrlsPlugin');
-    const updatePluginDefinition = updateProject.pluginDefinitions.find(pluginDefinition => pluginDefinition.name === 'ExtractUrlsPlugin');
+    const getPluginDefinition = getProject.plugins.find(pluginDefinition => pluginDefinition.name === 'ExtractUrlsPlugin');
+    const updatePluginDefinition = updateProject.plugins.find(pluginDefinition => pluginDefinition.name === 'ExtractUrlsPlugin');
 
     assert.strictEqual(updatePluginDefinition.opts.maxDepth, getPluginDefinition.opts.maxDepth);
   });

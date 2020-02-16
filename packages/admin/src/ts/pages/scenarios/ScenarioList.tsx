@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { HttpMethod, IHeaderCol, IScenarioPackage } from 'get-set-fetch-extension-commons';
+import { HttpMethod, IHeaderCol, IScenarioStorage } from 'get-set-fetch-extension-commons';
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
 import Table from '../../components/Table';
@@ -10,12 +10,12 @@ enum ScenarioStatus {
   BUILTIN = 'Built-in'
 }
 
-interface IAdvancedScenarioPackage extends IScenarioPackage {
+interface IAdvancedScenarioPackage extends IScenarioStorage {
   status: ScenarioStatus;
 }
 
 interface IState {
-  scenarioPkgs: IScenarioPackage[];
+  scenarioPkgs: IScenarioStorage[];
   header: IHeaderCol[];
 }
 
@@ -83,12 +83,12 @@ export default class ScenarioList extends React.Component<{}, IState> {
   }
 
   componentDidMount() {
-    this.loadScenarioPackages();
+    this.loadScenarios();
   }
 
-  async loadScenarioPackages() {
+  async loadScenarios() {
     // get installed scenario packages
-    const installedPkgs: IAdvancedScenarioPackage[] = ((await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioPackage[])
+    const installedPkgs: IAdvancedScenarioPackage[] = ((await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioStorage[])
       .map(
         installedPkg => Object.assign(
           installedPkg,
@@ -100,25 +100,25 @@ export default class ScenarioList extends React.Component<{}, IState> {
 
     // get available scenario packages, only show the not already installed ones
     const installedPkgNames = installedPkgs.map(pkg => pkg.name);
-    const availablePkgs: IAdvancedScenarioPackage[] = ((await GsfClient.fetch(HttpMethod.GET, 'scenarios/available')) as IScenarioPackage[])
+    const availablePkgs: IAdvancedScenarioPackage[] = ((await GsfClient.fetch(HttpMethod.GET, 'scenarios/available')) as IScenarioStorage[])
       .filter(availablePkg => installedPkgNames.indexOf(availablePkg.name) === -1)
       .map(availablePkg => Object.assign(availablePkg, { status: ScenarioStatus.AVAILABLE }));
 
     this.setState({ scenarioPkgs: installedPkgs.concat(availablePkgs) });
   }
 
-  async installScenarioPkg(scenarioPkg: IScenarioPackage) {
+  async installScenarioPkg(scenarioPkg: IScenarioStorage) {
     // save scenario
     await GsfClient.fetch(HttpMethod.POST, 'scenario', scenarioPkg);
     // re-load scenario list
-    await this.loadScenarioPackages();
+    await this.loadScenarios();
   }
 
   async uninstallScenarioPkg(scenarioPkg) {
     // delete scenario
     await GsfClient.fetch(HttpMethod.DELETE, 'scenarios', { ids: [ scenarioPkg.id ] });
     // re-load scenario list
-    await this.loadScenarioPackages();
+    await this.loadScenarios();
   }
 
   // eslint-disable-next-line class-methods-use-this

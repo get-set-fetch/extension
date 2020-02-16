@@ -1,19 +1,15 @@
-import { IScenario, ExportType, IExportOpt, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
+import { IScenario, ExportType, IExportOpt } from 'get-set-fetch-extension-commons';
 
-import ConfigFormSchema from '../resources/config-form-schema';
 import ImageFilterPlugin from './plugins/ImageFilterPlugin';
 
 export default class ExtractResources implements IScenario {
-  getConfigFormSchema() {
-    return ConfigFormSchema as IEnhancedJSONSchema;
-  }
-
   getPluginNames() {
     return [
       'SelectResourcePlugin',
       'FetchPlugin',
       'ExtractUrlsPlugin',
       'ImageFilterPlugin',
+      'ScrollPlugin',
       'UpdateResourcePlugin',
       'InsertResourcesPlugin',
     ];

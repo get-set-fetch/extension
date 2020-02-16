@@ -8,7 +8,6 @@ import PluginList from './plugins/PluginList';
 import PluginDetail from './plugins/PluginDetail';
 import LogList from './logs/LogList';
 import SettingList from './settings/SettingList';
-import Help from './help/Help';
 import ProjectList from './projects/ProjectList';
 import ScenarioList from './scenarios/ScenarioList';
 import ProjectDetail from './projects/ProjectDetail';
@@ -35,7 +34,7 @@ export default class Admin extends React.Component {
 
               <Switch>
                 <Route path='/projects' component={ProjectList} />
-                <Route path='/project/:projectId?' exact={true} component={ProjectDetail} />
+                <Route path='/project/:projectIdOrHash?' exact={true} component={ProjectDetail} />
                 <Route path='/project/:projectId?/results' exact={true} component={ProjectResults} />
 
                 <Route path='/site/:siteId?' component={SiteDetail} />

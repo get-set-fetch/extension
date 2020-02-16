@@ -8,7 +8,9 @@ export default class ActiveTabHelper {
           if (result) {
             resolve(result[0]);
           }
-          else reject(chrome.runtime.lastError);
+          else {
+            reject(chrome.runtime.lastError);
+          }
         },
       );
     });

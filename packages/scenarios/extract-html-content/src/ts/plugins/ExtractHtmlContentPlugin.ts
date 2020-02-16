@@ -2,32 +2,25 @@ import { ISite, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-c
 import { BasePlugin } from 'get-set-fetch-extension-commons/lib/plugin';
 
 export default class ExtractHtmlContentPlugin extends BasePlugin {
-  getMetaSchema(): IEnhancedJSONSchema {
-    return {
-      type: 'object',
-      properties: {
-        name: {
-          type: 'string',
-          const: 'ExtractHtmlContentPlugin',
-          description: 'responsible for scraping html content based on document.querySelectorAll.',
-        },
-      },
-    };
-  }
-
   getOptsSchema(): IEnhancedJSONSchema {
     return {
       type: 'object',
+      title: 'Extract Html Content Plugin',
+      description: 'responsible for scraping html content based on document.querySelectorAll.',
       properties: {
         runInTab: {
           type: 'boolean',
-          default: true,
+          const: true,
         },
         selectors: {
           type: 'string',
           default: 'h1\nh2',
+          ui: {
+            customField: 'LongTextField',
+          },
         },
       },
+      required: [ 'runInTab', 'selectors' ],
     };
   }
 

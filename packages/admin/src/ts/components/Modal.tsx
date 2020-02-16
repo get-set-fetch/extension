@@ -17,7 +17,7 @@ interface IState {
 }
 
 export default class Modal extends React.Component<{}, IState> {
-  static instance;
+  static instance: Modal;
   modalContainer: HTMLDivElement;
 
   constructor(props) {
@@ -80,26 +80,35 @@ export default class Modal extends React.Component<{}, IState> {
         <div className="modal-bkg" onClick={this.hide}/>
         <div className="modal-dialog" role="document">
           <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">{this.state.title}</h5>
-            </div>
+            {
+              this.state.title
+              && <div className="modal-header">
+                <h5 className="modal-title">{this.state.title}</h5>
+              </div>
+            }
+
             <div className="modal-body">
               {this.state.content}
             </div>
-            <div className="modal-footer">
-              {
-                this.state.actions.map(
-                  action => <input
-                    key={action.value}
-                    type="button"
-                    className="btn-secondary mr-2"
-                    value={action.title}
-                    onClick={this.actionHandler}
-                    data-val={action.value}
-                  />,
-                )
-              }
-            </div>
+
+            {
+              this.state.actions
+              && <div className="modal-footer">
+                {
+                  this.state.actions.map(
+                    action => <input
+                      key={action.value}
+                      type="button"
+                      className="btn-secondary mr-2"
+                      value={action.title}
+                      onClick={this.actionHandler}
+                      data-val={action.value}
+                    />,
+                  )
+                }
+              </div>
+            }
+
           </div>
         </div>
       </React.Fragment>,

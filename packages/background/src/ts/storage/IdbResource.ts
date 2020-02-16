@@ -49,11 +49,6 @@ export default class IdbResource extends BaseResource implements IResource {
     return this.getAll(siteId, idbKey);
   }
 
-  static getAllNotCrawled(siteId: number) {
-    const idbKey = IDBKeyRange.only([ siteId, 0, new Date(0) ]);
-    return this.getAll(siteId, idbKey);
-  }
-
   static getAll(siteId: number, idbKey = null, instantiate: boolean = true): Promise<IdbResource[]> {
     return new Promise((resolve, reject) => {
       const rTx = IdbResource.rTx();
@@ -186,6 +181,7 @@ export default class IdbResource extends BaseResource implements IResource {
   blob: any;
   mediaType: string;
   urlsToAdd: string[];
+  temp: object;
 
   constructor(kwArgs: Partial<IResource> = {}) {
     super(kwArgs.siteId, kwArgs.url, kwArgs.depth);
@@ -195,6 +191,12 @@ export default class IdbResource extends BaseResource implements IResource {
     });
 
     this.crawledAt = kwArgs.crawledAt ? kwArgs.crawledAt : new Date(0);
+
+    /*
+    used for storing plugin temporary data
+    ex: ScrollPlugin keeps at resource.temp.srollNo, the number of scroll operations against current resource
+    */
+    this.temp = {};
   }
 
   save(): Promise<number> {

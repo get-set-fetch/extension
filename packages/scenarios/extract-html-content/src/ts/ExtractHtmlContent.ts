@@ -1,19 +1,15 @@
-import { IScenario, ExportType, IExportOpt, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
+import { IScenario, ExportType, IExportOpt } from 'get-set-fetch-extension-commons';
 
-import ConfigFormSchema from '../resources/config-form-schema';
 import ExtractHtmlContentPlugin from './plugins/ExtractHtmlContentPlugin';
 
 export default class ExtractHtmlContent implements IScenario {
-  getConfigFormSchema() {
-    return ConfigFormSchema as IEnhancedJSONSchema;
-  }
-
   getPluginNames() {
     return [
       'SelectResourcePlugin',
       'FetchPlugin',
       'ExtractUrlsPlugin',
       'ExtractHtmlContentPlugin',
+      'ScrollPlugin',
       'UpdateResourcePlugin',
       'InsertResourcesPlugin',
     ];

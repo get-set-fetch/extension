@@ -1,4 +1,4 @@
-import { AutoField, RadioField, DateField, ListField, NumField, TextField, LongTextField, BoolField } from 'uniforms-bootstrap4';
+import { AutoField, RadioField, DateField, NumField, TextField, LongTextField, BoolField } from 'uniforms-bootstrap4';
 import { BaseField } from 'uniforms';
 import { createElement } from 'react';
 import GsfNestField from './GsfNestField';
@@ -6,6 +6,7 @@ import ScenarioDescriptionField from './custom/ScenarioDescriptionField';
 import CodeEditorField from './custom/CodeEditorField';
 import GsfSelectField from './GsfSelectField';
 import ScenarioLinkField from './custom/ScenarioLinkField';
+import GsfBoolField from './GsfBoolField';
 
 export default class GsfAutoField extends AutoField {
   static displayName = 'AutoField';
@@ -27,9 +28,6 @@ export default class GsfAutoField extends AutoField {
         switch (props.fieldType) {
           case Date:
             props.component = DateField;
-            break;
-          case Array:
-            props.component = ListField;
             break;
           case Number:
             props.component = NumField;
@@ -56,7 +54,7 @@ export default class GsfAutoField extends AutoField {
             }
             break;
           case Boolean:
-            props.component = BoolField;
+            props.component = GsfBoolField;
             break;
           default:
         }

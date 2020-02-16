@@ -1,5 +1,9 @@
 import { crawlProjectBaseSuite, ICrawlDefinition } from 'get-set-fetch-extension-test-utils';
 
+/*
+regarding project.plugins we only need to define the plugin properties different from default values
+only these need to be updated from UI
+*/
 const crawlDefinitions: ICrawlDefinition[] = [
   {
     title: 'no maxDepth limit',
@@ -7,13 +11,21 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-      crawlOpts: {
-        maxDepth: -1,
-      },
-    },
-    scenarioOpts: {
-      name: 'get-set-fetch-scenario-extract-html-content',
-      selectors: 'h1\ni.classA',
+      scenario: 'get-set-fetch-scenario-extract-html-content',
+      plugins: [
+        {
+          name: 'ExtractUrlsPlugin',
+          opts: {
+            maxDepth: -1,
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: 'h1\ni.classA',
+          },
+        },
+      ],
     },
     expectedResources: [
       {
@@ -45,13 +57,21 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-      crawlOpts: {
-        maxDepth: 0,
-      },
-    },
-    scenarioOpts: {
-      name: 'get-set-fetch-scenario-extract-html-content',
-      selectors: 'h1\ni.classA',
+      scenario: 'get-set-fetch-scenario-extract-html-content',
+      plugins: [
+        {
+          name: 'ExtractUrlsPlugin',
+          opts: {
+            maxDepth: 0,
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: 'h1\ni.classA',
+          },
+        },
+      ],
     },
     expectedResources: [
       {
@@ -72,13 +92,21 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-      crawlOpts: {
-        maxDepth: 1,
-      },
-    },
-    scenarioOpts: {
-      name: 'get-set-fetch-scenario-extract-html-content',
-      selectors: 'h1\ni.classA',
+      scenario: 'get-set-fetch-scenario-extract-html-content',
+      plugins: [
+        {
+          name: 'ExtractUrlsPlugin',
+          opts: {
+            maxDepth: 1,
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: 'h1\ni.classA',
+          },
+        },
+      ],
     },
     expectedResources: [
       {
@@ -96,6 +124,101 @@ const crawlDefinitions: ICrawlDefinition[] = [
       'url,info.content.h1.0,info.content.i.classA.0',
       '"https://www.sitea.com/index.html","Main Header 1","italics main"',
       '"https://www.sitea.com/pageA.html","PageA Heading Level 1","italics A"',
+    ],
+    csvLineSeparator: '\n',
+  },
+  {
+    title: 'maxDepth = 0 with scroll lazy loading maxScrollNo = -1',
+    project: {
+      name: 'projA',
+      description: 'descriptionA',
+      url: 'https://www.sitea.com/pageC.html',
+      scenario: 'get-set-fetch-scenario-extract-html-content',
+      plugins: [
+        {
+          name: 'ExtractUrlsPlugin',
+          opts: {
+            maxDepth: 0,
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: 'h5',
+          },
+        },
+        {
+          name: 'ScrollPlugin',
+          opts: {
+            enabled: true,
+          },
+        },
+      ],
+    },
+    expectedResources: [
+      {
+        url: 'https://www.sitea.com/pageC.html',
+        mediaType: 'text/html',
+        info: { content: { h5: [
+          'Entry title 0',
+          'Entry title 1',
+          'Entry title 2',
+          'Entry title 3',
+          'Entry title 4',
+          'Entry title 5',
+        ] } },
+      },
+    ],
+    expectedCsv: [
+      'url,info.content.h5.0,info.content.h5.1,info.content.h5.2,info.content.h5.3,info.content.h5.4,info.content.h5.5',
+      '"https://www.sitea.com/pageC.html","Entry title 0","Entry title 1","Entry title 2","Entry title 3","Entry title 4","Entry title 5"',
+    ],
+    csvLineSeparator: '\n',
+  },
+  {
+    title: 'maxDepth = 0 with scroll lazy loading maxScrollNo = 1',
+    project: {
+      name: 'projA',
+      description: 'descriptionA',
+      url: 'https://www.sitea.com/pageC.html',
+      scenario: 'get-set-fetch-scenario-extract-html-content',
+      plugins: [
+        {
+          name: 'ExtractUrlsPlugin',
+          opts: {
+            maxDepth: 0,
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: 'h5',
+          },
+        },
+        {
+          name: 'ScrollPlugin',
+          opts: {
+            enabled: true,
+            maxScrollNo: 1,
+          },
+        },
+      ],
+    },
+    expectedResources: [
+      {
+        url: 'https://www.sitea.com/pageC.html',
+        mediaType: 'text/html',
+        info: { content: { h5: [
+          'Entry title 0',
+          'Entry title 1',
+          'Entry title 2',
+          'Entry title 3',
+        ] } },
+      },
+    ],
+    expectedCsv: [
+      'url,info.content.h5.0,info.content.h5.1,info.content.h5.2,info.content.h5.3',
+      '"https://www.sitea.com/pageC.html","Entry title 0","Entry title 1","Entry title 2","Entry title 3"',
     ],
     csvLineSeparator: '\n',
   },

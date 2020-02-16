@@ -1,16 +1,14 @@
 import * as React from 'react';
 import { NavLink, RouteComponentProps } from 'react-router-dom';
-import { HttpMethod, IHeaderCol } from 'get-set-fetch-extension-commons';
-import { IProjectConfigHash } from 'get-set-fetch-extension-commons/lib/project';
+import { HttpMethod, IHeaderCol, IProjectConfigHash, IProjectStorage } from 'get-set-fetch-extension-commons';
 import Table from '../../components/Table';
 import GsfClient from '../../components/GsfClient';
-import Project from './model/Project';
 import Page from '../../layout/Page';
 import Modal from '../../components/Modal';
 
 interface IState {
   header: IHeaderCol[];
-  data: Project[];
+  data: IProjectStorage[];
   selectedRows: number[];
 }
 
@@ -22,11 +20,11 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
       header: [
         {
           label: 'Name',
-          render: (project: Project) => (project.name),
+          render: (project: IProjectStorage) => (project.name),
         },
         {
           label: 'Description',
-          render: (project: Project) => (
+          render: (project: IProjectStorage) => (
             <span style={{ textOverflow: 'ellipsis' }}>
               {project.description ? project.description.substr(0, 100) : ''}
             </span>
@@ -39,7 +37,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
         {
           label: 'Actions',
           renderLink: false,
-          render: (project: Project) => ([
+          render: (project: IProjectStorage) => ([
             <input
               key={`configHash-${project.id}`}
               id={`configHash-${project.id}`}
@@ -82,7 +80,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
     this.deleteHandler = this.deleteHandler.bind(this);
   }
 
-  async openConfigHashModal(project: Project) {
+  async openConfigHashModal(project: IProjectStorage) {
     const config: IProjectConfigHash = await GsfClient.fetch(HttpMethod.GET, `project/${project.id}/config`) as IProjectConfigHash;
 
     const textarea = React.createRef<HTMLTextAreaElement>();
@@ -111,7 +109,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
     );
   }
 
-  async crawlProject(project: Project) {
+  async crawlProject(project: IProjectStorage) {
     try {
       await GsfClient.fetch(HttpMethod.GET, `project/${project.id}/crawl`);
     }
@@ -120,7 +118,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
     }
   }
 
-  async deleteProject(project: Project) {
+  async deleteProject(project: IProjectStorage) {
     try {
       await GsfClient.fetch(HttpMethod.DELETE, 'projects', { ids: [ project.id ] });
     }
@@ -131,7 +129,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
     this.loadProjects();
   }
 
-  viewResults(project: Project) {
+  viewResults(project: IProjectStorage) {
     this.props.history.push(`/project/${project.id}/results`);
   }
 
@@ -140,7 +138,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
   }
 
   async loadProjects() {
-    const data: Project[] = (await GsfClient.fetch(HttpMethod.GET, 'projects')) as Project[];
+    const data: IProjectStorage[] = (await GsfClient.fetch(HttpMethod.GET, 'projects')) as IProjectStorage[];
     this.setState({ data });
   }
 
@@ -182,7 +180,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
     );
   }
 
-  rowLink(row: Project) {
+  rowLink(row: IProjectStorage) {
     return `/project/${row.id}`;
   }
 }

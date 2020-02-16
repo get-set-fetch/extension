@@ -1,67 +1,78 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import JSZip from 'jszip/dist/jszip';
+import { IProjectStorage, IPluginDefinition } from 'get-set-fetch-extension-commons';
 import BrowserHelper from './BrowserHelper';
 
 declare const GsfClient;
 export default class ProjectHelper {
-  static async saveProject(browserHelper: BrowserHelper, project, scenarioOpts) {
+  static async saveProject(browserHelper: BrowserHelper, project: IProjectStorage) {
     const { page } = browserHelper;
 
     // go to project list
     await browserHelper.goto('/projects');
 
-    // open project detail page
-    await page.waitFor('#newproject');
-    await page.click('#newproject');
+    // if project already exists edit it, otherwise create a new one
+    const projectLink = project.id ? `a.btn-block[href="/project/${project.id}"]` : '#newproject'; // `a[href=\\/project\\/${projectId}`
+    await page.waitFor(projectLink);
+    await page.click(projectLink);
 
     // wait for the project detail page to load
     await page.waitFor('input#name');
 
     // fill in text input data for the new project
+    await page.evaluate(() => {
+      (document.getElementById('name') as HTMLInputElement).value = '';
+    });
     await page.type('input#name', project.name);
+
+    await page.evaluate(() => {
+      (document.getElementById('description') as HTMLInputElement).value = '';
+    });
     await page.type('input#description', project.description);
+
+    await page.evaluate(() => {
+      (document.getElementById('url') as HTMLInputElement).value = '';
+    });
     await page.type('input#url', project.url);
 
-    if (project.crawlOpts && project.crawlOpts.maxDepth !== undefined) {
-      await page.evaluate(() => {
-        (document.getElementById('crawlOpts.maxDepth') as HTMLInputElement).value = '';
-      });
-      await page.type('input[id="crawlOpts.maxDepth"]', project.crawlOpts.maxDepth.toString());
-    }
-
-    if (project.crawlOpts && project.crawlOpts.maxResources) {
-      await page.evaluate(() => {
-        (document.getElementById('crawlOpts.maxResources') as HTMLInputElement).value = '';
-      });
-      await page.type('input[id="crawlOpts.maxResources"]', project.crawlOpts.maxResources.toString());
-    }
-
-    if (project.crawlOpts && project.crawlOpts.delay) {
-      await page.evaluate(() => {
-        (document.getElementById('crawlOpts.delay') as HTMLInputElement).value = '';
-      });
-      await page.type('input[id="crawlOpts.delay"]', project.crawlOpts.delay.toString());
-    }
-
     // fill in dropdown scenario
-    await page.select('select[id="scenarioOpts.name"]', scenarioOpts.name);
+    await page.select('select[id="scenarioPkg.name"]', project.scenario);
 
-    // fill in other scenario props
-    const validPropKeys: string[] = Object.keys(scenarioOpts).filter(propKey => propKey !== 'name');
-    await Promise.all(
-      validPropKeys.map(async propKey => {
-        const propSelector = `[id="scenarioOpts.${propKey}"]`;
-        await page.evaluate(
-          propSelector => {
-            const input = document.querySelector(propSelector);
-            input.value = '';
+    // wait for scenarioLink to be rendered, this means the plugin schemas are also rendered
+    await page.waitFor('[id="scenarioLink"]');
+
+    // fill in plugin props in sequential manner
+    await project.plugins.reduce(
+      async (pluginPromise: Promise<void>, plugin: IPluginDefinition) => {
+        await pluginPromise;
+
+        if (!plugin.opts) return Promise.resolve();
+
+        return Object.getOwnPropertyNames(plugin.opts).reduce(
+          async (pluginPropPromise: Promise<void>, pluginProp: string) => {
+            await pluginPropPromise;
+            const propId = `plugins.${plugin.name}.${pluginProp}`;
+            await page.waitFor(`[id="${propId}"]`);
+
+            const propTagName = await page.evaluate(propId => document.getElementById(propId).tagName, propId);
+
+            // input field
+            if (propTagName === 'INPUT' || propTagName === 'TEXTAREA') {
+              await page.evaluate(propId => {
+                (document.getElementById(propId) as HTMLInputElement).value = '';
+              }, propId);
+              await page.type(`[id="${propId}"]`, plugin.opts[pluginProp].toString());
+            }
+            // select field
+            else if (propTagName === 'SELECT') {
+              await page.select(`select[id="${propId}"]`, plugin.opts[pluginProp].toString());
+            }
           },
-          propSelector,
+          Promise.resolve(),
         );
-
-        await page.type(propSelector, scenarioOpts[propKey].toString());
-      }),
+      },
+      Promise.resolve(),
     );
 
     // save the project

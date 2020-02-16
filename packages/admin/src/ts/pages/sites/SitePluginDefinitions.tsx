@@ -1,16 +1,15 @@
 import * as React from 'react';
-import { IHeaderCol } from 'get-set-fetch-extension-commons';
+import { IHeaderCol, IPluginDefinition } from 'get-set-fetch-extension-commons';
 import Table from '../../components/Table';
-import PluginDefinition from './model/PluginDefinition';
 
 interface IProps {
   siteId: string;
-  pluginDefinitions: PluginDefinition[];
+  pluginDefinitions: IPluginDefinition[];
 }
 
 interface IState {
   header: IHeaderCol[];
-  availablePlugins: PluginDefinition[];
+  availablePlugins: IPluginDefinition[];
 }
 
 export default class SitePluginDefinitions extends React.Component<IProps, IState> {

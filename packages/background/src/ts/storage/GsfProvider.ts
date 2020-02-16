@@ -260,11 +260,6 @@ export default class GsfProvider {
             const siteId = parseInt(/\d+/.exec(request.resource)[0], 10);
             reqPromise = GsfProvider.Resource.getAll(siteId, null, false);
             break;
-          // resources/:siteId/notcrawled
-          case /^resources\/[0-9]+\/notcrawled$/.test(request.resource):
-            const notCrawledSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);
-            reqPromise = GsfProvider.Resource.getAllNotCrawled(notCrawledSiteId);
-            break;
           // resources/:siteId/crawled
           case /^resources\/[0-9]+\/crawled$/.test(request.resource):
             const crawledSiteId = parseInt(/\d+/.exec(request.resource)[0], 10);

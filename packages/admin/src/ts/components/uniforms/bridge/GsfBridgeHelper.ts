@@ -1,10 +1,19 @@
-import isMyJsonValid from 'is-my-json-valid';
+import createValidation from 'is-my-json-valid';
 import GsfBridge from './GsfBridge';
 
 
 export default class SchemaBridgeHelper {
-  static createBridge(schema): GsfBridge {
-    const validate = isMyJsonValid(schema);
+  static createBridge(schema, data): GsfBridge {
+    const validate = createValidation(
+      schema,
+      {
+        greedy: true,
+        verbose: true,
+        formats: {
+          regex: /^\/.+\/i{0,1}$/,
+        },
+      },
+    );
 
     const schemaValidator = model => {
       validate(model);
@@ -21,6 +30,6 @@ export default class SchemaBridgeHelper {
       }
     };
 
-    return new GsfBridge(schema, schemaValidator);
+    return new GsfBridge(schema, data, schemaValidator);
   }
 }

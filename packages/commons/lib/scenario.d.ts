@@ -1,12 +1,12 @@
-import { JSONSchema6 } from 'json-schema';
+import { JSONSchema7 } from 'json-schema';
 import { ExportType } from ".";
 import { IHeaderCol } from "./table";
 import { IPluginDefinition, BasePlugin } from './plugin';
 import { IModuleStorage } from './storage';
-import { NpmPackage } from './npm';
+import { INpmPackage } from './npm';
 
 export interface IScenarioStorage extends IModuleStorage {
-  package: NpmPackage;
+  package: INpmPackage;
 }
 
 export interface IScenarioLink {
@@ -16,13 +16,7 @@ export interface IScenarioLink {
 
 export interface IScenario {
   id?: string;
-  getConfigFormSchema: () => IEnhancedJSONSchema;
   getPluginNames: () => string[];
-  /*
-  getEmbeddedPlugins: () => {
-    [name: string]: typeof BasePlugin;
-  };
-  */
   getResultTableHeaders(): IHeaderCol[];
   getResultExportOpts(): IExportOpt[];
 }
@@ -39,12 +33,12 @@ export interface IExportResult {
   error?: string;
 }
 
-export interface IEnhancedJSONSchema extends JSONSchema6 {
+export interface IEnhancedJSONSchema extends JSONSchema7 {
   properties?: {
     [k: string]: IEnhancedJSONSchema;
   };
   ui?: {
     enumNames?: string[];
+    customField?: string;
   };
-  subType?: string;
 }

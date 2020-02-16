@@ -3,24 +3,18 @@ import { BasePlugin, IResource, ISite, IEnhancedJSONSchema } from 'get-set-fetch
 import ActiveTabHelper from '../../helpers/ActiveTabHelper';
 
 export default class FetchPlugin extends BasePlugin {
-  getMetaSchema(): IEnhancedJSONSchema {
+  getOptsSchema(): IEnhancedJSONSchema {
     return {
       type: 'object',
-      properties: {
-        name: {
-          type: 'string',
-          const: 'FetchPlugin',
-          description: 'responsible for either downloading or loading in the current tab a new resource url.',
-        },
-      },
+      title: 'Fetch Plugin',
+      description: 'responsible for either downloading or loading in the current tab a new resource url.',
     };
   }
 
-  getOptsSchema(): IEnhancedJSONSchema {
-    return {};
-  }
-
   test(resource: IResource) {
+    // only fetch a resource that hasn't been fetched yet
+    if (resource.mediaType) return false;
+
     const { protocol } = new URL(resource.url);
     return protocol === 'http:' || protocol === 'https:';
   }

@@ -6,37 +6,26 @@ import { IResource, ISite, BasePlugin, IEnhancedJSONSchema } from 'get-set-fetch
 
 declare const document;
 export default class ExtractUrlsPlugin extends BasePlugin {
-  getMetaSchema(): IEnhancedJSONSchema {
-    return {
-      type: 'object',
-      properties: {
-        name: {
-          type: 'string',
-          const: 'ExtractUrlsPlugin',
-          description: 'responsible for extracting new resources(html pages or binary content) urls from the current html page.',
-        },
-      },
-    };
-  }
-
   getOptsSchema(): IEnhancedJSONSchema {
     return {
       type: 'object',
+      title: 'Extract Urls Plugin',
+      description: 'responsible for extracting new resources(html pages or binary content) urls from the current html page.',
       properties: {
         hostnameRe: {
+          title: 'Hostname regexp',
           type: 'string',
-          subType: 'regexp',
-          default: '',
+          format: 'regex',
         },
         pathnameRe: {
+          title: 'Pathname regexp',
           type: 'string',
-          subType: 'regexp',
-          default: '',
+          format: 'regex',
         },
         resourcePathnameRe: {
+          title: 'Resource regexp',
           type: 'string',
-          subType: 'regexp',
-          default: '',
+          format: 'regex',
         },
         maxDepth: {
           type: 'number',
@@ -44,9 +33,10 @@ export default class ExtractUrlsPlugin extends BasePlugin {
         },
         runInTab: {
           type: 'boolean',
-          default: true,
+          const: true,
         },
       },
+      required: [ 'maxDepth', 'runInTab' ],
     };
   }
 

@@ -8,4 +8,5 @@ export interface IResource {
   mediaType: string;
   blob: any;
   info: any;
+  temp: any;
 }

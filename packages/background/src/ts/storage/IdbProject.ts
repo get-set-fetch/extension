@@ -1,6 +1,6 @@
 import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
 import { IProjectStorage, IPluginDefinition } from 'get-set-fetch-extension-commons';
-import { IProjectConfigHash, IProjectScenarioOpts } from 'get-set-fetch-extension-commons/lib/project';
+import { IProjectConfigHash } from 'get-set-fetch-extension-commons/lib/project';
 import Logger from '../logger/Logger';
 import IdbSite from './IdbSite';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
@@ -13,7 +13,7 @@ const Log = Logger.getLogger('IdbProject');
 export default class IdbProject extends BaseEntity implements IProjectStorage {
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return [ 'id', 'name', 'description', 'url', 'scenarioOpts', 'pluginDefinitions' ];
+    return [ 'id', 'name', 'description', 'url', 'scenario', 'plugins' ];
   }
 
   // get a read transaction
@@ -51,7 +51,6 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
 
     // remove id references from the exportable config
     delete projectStorage.id;
-    delete projectStorage.scenarioOpts.id;
     const configHash = JsonUrlHelper.encode(projectStorage);
 
     return { hash: configHash };
@@ -150,8 +149,8 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
   name: string;
   description: string;
   url: string;
-  scenarioOpts: IProjectScenarioOpts;
-  pluginDefinitions: IPluginDefinition[];
+  scenario: string;
+  plugins: IPluginDefinition[];
 
   constructor(kwArgs: Partial<IProjectStorage> = {}) {
     super();
@@ -170,7 +169,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
 
         // also save the project url as a new site
         try {
-          const site = new IdbSite({ name: `${this.name}-1`, url: this.url, projectId: this.id, pluginDefinitions: this.pluginDefinitions });
+          const site = new IdbSite({ name: `${this.name}-1`, url: this.url, projectId: this.id, plugins: this.plugins });
           await site.save();
           resolve(this.id);
         }
@@ -193,7 +192,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
         try {
           const sites = await IdbSite.getAll(this.id);
           await Promise.all(sites.map(async site => {
-            Object.assign(site, { url: this.url, pluginDefinitions: this.pluginDefinitions });
+            Object.assign(site, { url: this.url, plugins: this.plugins });
             await site.update();
           }));
 

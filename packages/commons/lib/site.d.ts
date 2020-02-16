@@ -7,8 +7,8 @@ export interface ISite {
   url: string;
   tabId: any;
 
-  pluginDefinitions: IPluginDefinition[];
-  plugins: any;
+  plugins: IPluginDefinition[];
+  pluginInstances: any;
 
   storageOpts: {
     resourceFilter: {

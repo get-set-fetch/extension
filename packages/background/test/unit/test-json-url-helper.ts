@@ -8,11 +8,9 @@ describe('Test JsonUrlHelper', () => {
     name: 'projectA',
     description: 'projectA description',
     url: 'http://www.sitea.com/index.html',
-    scenarioOpts: {
-      name: 'get-set-fetch-scenario-extract-resources',
-      resourcePathnameRe: '/(gif|png|jpg|jpeg)$/i',
-    },
-    pluginDefinitions: [
+    scenario: 'get-set-fetch-scenario-extract-resources',
+
+    plugins: [
       {
         name: 'SelectResourcePlugin',
         opts: {
@@ -47,7 +45,7 @@ describe('Test JsonUrlHelper', () => {
   };
 
   // eslint-disable-next-line max-len
-  const expectedConfigHash = 'eMK7w6HDkn05woMrLSjDisOPAsKGwpsjwoYWwpjChALCsjAsMjJKSgrCrMO0w7XDi8OLw4vDtcKKM0tSE8O1wpLDs3PDtTPDs1JSK8O0Mkpyc8KUcMK6LD3CtUTCtxjCiMOTQMOhwq4LU8KkwpsKCW/DnSLCuAd1wpRgw6wAw6QQw5XDl0jDj0zCqynDiEvCr8OJKgDDocOUdE0Vw71MYDBSKXEYUjNxw6jDg3jDukpoCUMfw4bDkyfDkcKjw4jDicONEMOFwrHCnsK5w4DDiHXDi8OMKUktw4J0MnXDk8KeISjCmGJrAcKHw5rDjMKE';
+  const expectedConfigHash = 'eMK7CMOpasKtwoPDqy0ow4rDjwLDusOeESMIYRIKw4jDgsKwYMONKCkpwrDDksOXLy8vw5crw44sSU3DlEvDjsOPw5XDj8OMS0nCrcOQw4sow4nDjUENw7XDtMOUEsOdYiBOA8KFwpguTEI3FRJSwrpFcMKnURY7wobDlMKMHX0YT18JLWbDtGE8wpAMw4zDrQEoKjTDkjPDk2oKw7LDkmvCsgpAODVdU0U/EyXCvg1RHMOrwpnCm8KYwp7DqsKWwplTwpJawoTDqWTDqkbCviEowphiawFWw73Cs3E=';
 
   it('encode', async () => {
     const encodedConfigHash = JsonUrlHelper.encode(expectedProject);

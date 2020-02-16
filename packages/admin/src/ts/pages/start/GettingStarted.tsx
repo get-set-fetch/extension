@@ -4,13 +4,17 @@ import Page from '../../layout/Page';
 
 export default class GettingStarted extends React.Component {
   render() {
+    // eslint-disable-next-line max-len
+    const projectHashImdb = 'eLsI6WqtnZJLD4IwEIT/iumZSuDI1YsmxosevRRYHklpsSyJmPjfLTRFKhgfx3ay2843M87ClVU1h2CG0Aqr6bXFWiDWke/ngA1g1pNYS5W7sLVItUoHmVqBggFEC6w4TaRAEPhXLpmCSwsi6Qy+Z0zBu5jG2fuXgbkBqVbsxInFJELVwsKOrba0MY5mq9xhDWowJ1XT0wzOogidyI+JkpzPtmiGMYeURBnjDbx+ySOc3bq9ZGkpcns1qa9HsKxAtkiicDhqf+ahg+wtfuzcIsAf2zfU7wHfOd3u';
+
+
     return (
       <Page title="Getting Started">
         <div className="p-4">
           <h5 className="inner">Create a new scraping project</h5>
           <hr/>
           <p>
-            Start by creating a <NavLink to='/project' className='inner-nav-link'>new scraping project</NavLink>.
+            Start by creating a <NavLink to='/project/' className='inner-nav-link'>new scraping project</NavLink>.
             At a very minimum enter its name, start url and select a scraping scenario.
             There are two builtin scenarios: extract binary resources and extract html content.
             You can install additional 3rd party scenarios from the <NavLink to='/scenarios' className='inner-nav-link'>scenario list page</NavLink>.
@@ -28,12 +32,17 @@ export default class GettingStarted extends React.Component {
           <h5 className="inner">Export scraped data</h5>
           <hr/>
           <p>
-            From the <NavLink to='/projects' className='inner-nav-link'>project list page</NavLink>, actions column, click &quot;results&quot;.
+            From the <NavLink to='/projects/' className='inner-nav-link'>project list page</NavLink>, actions column, click &quot;results&quot;.
             All resources scraped so far will be displayed in a tabular form.
           </p>
           <p>
             Depending on the selected scraping scenario, you can export the data as either csv or zip.
           </p>
+
+          <h5 className="inner">Examples</h5>
+          <hr/>
+          <p>Some examples:
+            <NavLink to={`/project/${encodeURIComponent(projectHashImdb)}`} className='inner-nav-link'>internet archive lazy loading</NavLink></p>
 
           <h5 className="inner">Troubleshooting</h5>
           <hr/>

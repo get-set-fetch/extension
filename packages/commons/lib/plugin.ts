@@ -8,11 +8,6 @@ export interface IPluginStorage extends IModuleStorage {
   scenarioId?: number;
 }
 
-export interface IPluginSchemas {
-  opts: IEnhancedJSONSchema;
-  meta: IEnhancedJSONSchema;
-}
-
 export interface IPluginDefinition {
   name: string;
   opts?: IPluginOpts;
@@ -31,7 +26,6 @@ export abstract class BasePlugin {
     this.opts = SchemaHelper.instantiate(this.getOptsSchema(), opts);
   }
 
-  abstract getMetaSchema(): IEnhancedJSONSchema;
   abstract getOptsSchema(): IEnhancedJSONSchema;
 
   abstract test(resource: IResource): boolean;

@@ -7,9 +7,15 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-    },
-    scenarioOpts: {
-      name: 'extract-html-headings',
+      scenario: 'extract-html-headings',
+      plugins: [
+        {
+          name: 'ExtractUrlsPlugin',
+          opts: {
+            maxDepth: -1,
+          },
+        },
+      ],
     },
     expectedResources: [
       { url: 'https://www.sitea.com/index.html', mediaType: 'text/html', info: { content: [ 'Main Header 1' ] } },
@@ -26,4 +32,4 @@ const crawlDefinitions: ICrawlDefinition[] = [
   },
 ];
 
-crawlProjectBaseSuite('Extract Html Headings', crawlDefinitions);
+crawlProjectBaseSuite('Extract Html Headings', [ crawlDefinitions[0] ], false);

@@ -15,7 +15,7 @@
     "copy:resources": "shx cp -R src/html/*.html dist",
     "test": "nyc --reporter=lcov mocha test ./test/**/*.ts",
     "test:report": "cat ./coverage/lcov.info | ../../node_modules/coveralls/bin/coveralls.js",
-    "test:single": "mocha test ./test/**/*.ts --grep \"get scenario plugins schemas\""
+    "test:single": "mocha test ./test/**/*.ts --grep \"crawl all available resources\""
   },
   "keywords": [
     "scraper",

@@ -8,10 +8,13 @@ export default class CrawlHelper {
       });
     }
 
-    const notCrawledResources = await page.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/notcrawled`), siteId);
+    const allResources = await page.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}`), siteId);
+    const crawledResources = await page.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/crawled`), siteId);
+
+    const notCrawledNo = allResources.length - crawledResources.length;
 
     // crawl complete, there are no more resources to be crawled
-    if (notCrawledResources.length === 0) {
+    if (notCrawledNo === 0) {
       resolve();
     }
     else {

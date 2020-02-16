@@ -1,6 +1,7 @@
 import { assert } from 'chai';
-import { join, resolve } from 'path';
+import { resolve } from 'path';
 import { Page } from 'puppeteer';
+import { IProjectStorage } from 'get-set-fetch-extension-commons';
 import BrowserHelper from '../helper/BrowserHelper';
 import ScenarioHelper from '../helper/ScenarioHelper';
 import ProjectHelper from '../helper/ProjectHelper';
@@ -9,13 +10,7 @@ import FileHelper from '../helper/FileHelper';
 
 export interface ICrawlDefinition {
   title: string;
-  project: {
-    name: string;
-    description: string;
-    url: string;
-    crawlOpts?;
-  };
-  scenarioOpts;
+  project: IProjectStorage;
   expectedResources: {
     url: string;
     mediaType: string;
@@ -74,17 +69,17 @@ const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => descr
 
   function crawlProjectIt(crawlDefinition) {
     return it(crawlDefinition.title, async () => {
-      const { project, scenarioOpts } = crawlDefinition;
+      const { project } = crawlDefinition;
 
       // install scenario if not present
       const scenarios = await page.evaluate(() => GsfClient.fetch('GET', 'scenarios'));
-      const scenario = scenarios.find(scenario => scenario.name === scenarioOpts.name);
+      const scenario = scenarios.find(scenario => scenario.name === project.scenario);
       if (!scenario) {
-        await ScenarioHelper.installScenario(browserHelper, scenarioOpts.name);
+        await ScenarioHelper.installScenario(browserHelper, project.scenario);
       }
 
       // save new project
-      await ProjectHelper.saveProject(browserHelper, project, scenarioOpts);
+      await ProjectHelper.saveProject(browserHelper, project);
 
       // verify project has been saved
       const projects = await page.evaluate(() => GsfClient.fetch('GET', 'projects'));

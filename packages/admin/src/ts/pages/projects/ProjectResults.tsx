@@ -1,15 +1,14 @@
 import * as React from 'react';
-import { IScenario, HttpMethod, IExportOpt, IExportResult, ExportType } from 'get-set-fetch-extension-commons';
+import { IScenario, HttpMethod, IExportOpt, IExportResult, ExportType, IProjectStorage } from 'get-set-fetch-extension-commons';
 import { RouteComponentProps } from 'react-router-dom';
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
 import Table from '../../components/Table';
-import Project from './model/Project';
 import Resource from '../sites/model/Resource';
 import ScenarioHelper from '../scenarios/model/ScenarioHelper';
 
 interface IState {
-  project: Project;
+  project: IProjectStorage;
   scenario: IScenario;
   results: object[];
 }
@@ -31,14 +30,13 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
     const { projectId } = this.props.match.params;
 
     // load project
-    const projectData = projectId ? await GsfClient.fetch(HttpMethod.GET, `project/${projectId}`) : {};
-    const project: Project = new Project(projectData);
+    const project = (projectId ? await GsfClient.fetch(HttpMethod.GET, `project/${projectId}`) : {}) as IProjectStorage;
 
     // project not found, nothing more to do
     if (!project.id) return;
 
     // instantiate scenario
-    const scenario = await ScenarioHelper.instantiate(project.scenarioOpts.name);
+    const scenario = await ScenarioHelper.instantiate(project.scenario);
 
     // load results
     const results = await this.loadResourcesInfo(project);
@@ -46,7 +44,7 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
     this.setState({ project, scenario, results });
   }
 
-  async loadResourcesInfo(project: Project): Promise<object[]> {
+  async loadResourcesInfo(project: IProjectStorage): Promise<object[]> {
     let resources = [];
 
     try {

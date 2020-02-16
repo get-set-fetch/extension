@@ -4,26 +4,15 @@ import { BasePlugin, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extens
  * Plugin responsible for selecting a resource to crawl from the current site.
  */
 export default class SelectResourcePlugin extends BasePlugin {
-  getMetaSchema(): IEnhancedJSONSchema {
-    return {
-      type: 'object',
-      properties: {
-        name: {
-          type: 'string',
-          const: 'SelectResourcePlugin',
-          description: 'responsible for selecting a resource to scrape from the current site / project.',
-        },
-      },
-    };
-  }
-
   getOptsSchema(): IEnhancedJSONSchema {
     return {
       type: 'object',
+      title: 'Select Resource Plugin',
+      description: 'responsible for selecting a resource to scrape from the current site / project.',
       properties: {
         frequency: {
           type: 'number',
-          default: '-1',
+          const: '-1',
           description: 'How often a resource should be re-crawled (hours), enter -1 to never re-crawl.',
         },
         delay: {
@@ -32,6 +21,7 @@ export default class SelectResourcePlugin extends BasePlugin {
           description: 'Delay in miliseconds between fetching two consecutive resources.',
         },
       },
+      required: [ 'frequency', 'delay' ],
     };
   }
 

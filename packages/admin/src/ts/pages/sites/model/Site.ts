@@ -1,5 +1,5 @@
 import { Record } from 'immutable';
-import PluginDefinition from './PluginDefinition';
+import { IPluginDefinition } from 'get-set-fetch-extension-commons';
 
 interface ICrawlOptions {
   delay: number;
@@ -20,7 +20,7 @@ interface ISiteProps {
   id: string;
   name: string;
   url: string;
-  pluginDefinitions: PluginDefinition[];
+  pluginDefinitions: IPluginDefinition[];
   opts: ISiteOptions;
 }
 

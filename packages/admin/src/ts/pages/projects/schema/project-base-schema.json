@@ -1,0 +1,60 @@
+{
+  "title": "Project Details",
+  "type": "object",
+  "required": ["name", "url", "scenarioPkg", "plugins"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Name",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "default": ""
+    },
+    "url": {
+      "type": "string",
+      "title": "Start URL",
+      "format": "uri"
+    },
+    "scenarioPkg": {
+      "type": "object",
+      "title": "Scrape Scenario",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Scrape Scenario",
+          "enum": [],
+          "ui": {
+            "placeholder": "Select",
+            "enumNames": []
+          }
+        },
+        "description": {
+          "type": "string",
+          "ui": {
+            "label": "",
+            "customField": "ScenarioDescription"
+          }
+        },
+        "homepage": {
+          "type": "string",
+          "format": "uri",
+          "ui": {
+            "label": "",
+            "customField": "ScenarioLink"
+          }
+        }
+      }
+    },
+    "plugins": {
+      "type": "object",
+      "ui": {
+        "childrenOnly": true
+      },
+      "properties": {}
+    }
+  }
+}

@@ -27,6 +27,7 @@
   "dependencies": {
     "chai": "^4.1.2",
     "connect": "^3.6.6",
+    "get-set-fetch-extension-commons": "file:../commons",
     "jszip": "^3.2.0",
     "mocha": "^5.2.0",
     "node-forge": "^0.8.2",

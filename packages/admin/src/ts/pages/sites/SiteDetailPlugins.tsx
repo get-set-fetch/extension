@@ -3,7 +3,7 @@
 
 import * as React from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import PluginDefinition from './model/PluginDefinition';
+import { IPluginDefinition } from 'get-set-fetch-extension-commons';
 
 
 const getItemStyle = (isDragging, draggableStyle) => ({
@@ -23,7 +23,7 @@ const getItemStyle = (isDragging, draggableStyle) => ({
 });
 
 interface IProps {
-  pluginDefinitions: PluginDefinition[];
+  pluginDefinitions: IPluginDefinition[];
   reorderPluginDef: (result) => void;
   changePluginDef: (evt) => void;
   removePluginDef: (evt) => void;

@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import * as sinon from 'sinon';
-import { IEnhancedJSONSchema, IPluginSchemas } from 'get-set-fetch-extension-commons';
+import { IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
 import ModuleHelper from '../utils/ModuleHelper';
 import GsfProvider from '../../src/ts/storage/GsfProvider';
 import IdbStorage from '../../src/ts/storage/IdbStorage';
@@ -28,14 +28,14 @@ describe('Test ModuleRuntimeManager', () => {
       },
       {
         name: 'FetchPlugin',
-        opts: null,
+        opts: {},
       },
       {
         name: 'ExtractUrlsPlugin',
         opts: {
-          hostnameRe: null,
-          pathnameRe: null,
-          resourcePathnameRe: null,
+          hostnameRe: undefined,
+          pathnameRe: undefined,
+          resourcePathnameRe: undefined,
           maxDepth: -1,
           runInTab: true,
         },
@@ -46,14 +46,14 @@ describe('Test ModuleRuntimeManager', () => {
           runInTab: true,
           lazyLoading: true,
           enabled: false,
-          delay: 2000,
+          delay: 1000,
           timeout: 2000,
           maxScrollNo: -1,
         },
       },
       {
         name: 'UpdateResourcePlugin',
-        opts: null,
+        opts: {},
       },
       {
         name: 'InsertResourcesPlugin',
@@ -73,33 +73,25 @@ describe('Test ModuleRuntimeManager', () => {
       getPluginNames: () => [ 'SelectResourcePlugin' ],
     }));
 
-    const expectedSchemas: IPluginSchemas[] = [
+    const expectedSchemas: IEnhancedJSONSchema[] = [
       {
-        meta: {
-          type: 'object',
-          properties: {
-            name: {
-              type: 'string',
-              const: 'SelectResourcePlugin',
-              description: 'responsible for selecting a resource to scrape from the current site / project.',
-            },
+        $id: 'SelectResourcePlugin',
+        type: 'object',
+        title: 'Select Resource Plugin',
+        description: 'responsible for selecting a resource to scrape from the current site / project.',
+        properties: {
+          frequency: {
+            type: 'number',
+            const: '-1',
+            description: 'How often a resource should be re-crawled (hours), enter -1 to never re-crawl.',
+          },
+          delay: {
+            type: 'number',
+            default: '1000',
+            description: 'Delay in miliseconds between fetching two consecutive resources.',
           },
         },
-        opts: {
-          type: 'object',
-          properties: {
-            frequency: {
-              type: 'number',
-              default: '-1',
-              description: 'How often a resource should be re-crawled (hours), enter -1 to never re-crawl.',
-            },
-            delay: {
-              type: 'number',
-              default: '1000',
-              description: 'Delay in miliseconds between fetching two consecutive resources.',
-            },
-          },
-        },
+        required: [ 'frequency', 'delay' ],
       },
       // te iubesc.
     ];

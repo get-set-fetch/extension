@@ -13,7 +13,7 @@
       "default": null,
       "ui": {
         "customField": "CodeEditor",
-        "rows": 8
+        "rows": 20
       }
     }
   }

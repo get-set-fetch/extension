@@ -22,6 +22,8 @@ global.window.fetch = () => Promise.resolve();
 global.window.btoa = val => Buffer.from(val).toString('base64');
 global.window.atob = val => Buffer.from(val, 'base64').toString();
 
+global.window.Blob = class Blob {};
+
 // "polyfill" TextDecoder, nodejs prior to 11 (not yet LTS) makes TextDecoder available from utils not global
 if (!global.TextDecoder) {
   global.TextDecoder = TextDecoder;

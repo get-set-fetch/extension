@@ -7,7 +7,9 @@ export default class JsonUrlHelper {
       description: '',
       url: '',
 
-      pluginDefinitions: [
+      scenario: '',
+
+      plugins: [
         {
           name: 'SelectResourcePlugin',
           opts: {
@@ -35,12 +37,6 @@ export default class JsonUrlHelper {
           },
         },
       ],
-
-      scenarioOpts: {
-        name: '',
-        description: '',
-        homepage: '',
-      },
     };
 
     return JSON.stringify(sampleJSON);

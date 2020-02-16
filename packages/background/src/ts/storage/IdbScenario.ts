@@ -1,6 +1,6 @@
 import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
 import { IScenarioStorage } from 'get-set-fetch-extension-commons/lib/scenario';
-import { NpmPackage } from 'get-set-fetch-extension-commons';
+import { INpmPackage } from 'get-set-fetch-extension-commons';
 import Logger from '../logger/Logger';
 
 const Log = Logger.getLogger('IdbScenario');
@@ -98,7 +98,7 @@ export default class IdbScenario extends BaseEntity implements IScenarioStorage 
 
   id: number;
   name: string;
-  package: NpmPackage;
+  package: INpmPackage;
   code: string;
   builtin: boolean = false;
 

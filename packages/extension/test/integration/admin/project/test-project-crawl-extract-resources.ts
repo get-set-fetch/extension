@@ -7,13 +7,16 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-      crawlOpts: {
-        maxDepth: -1,
-      },
-    },
-    scenarioOpts: {
-      name: 'get-set-fetch-scenario-extract-resources',
-      resourcePathnameRe: '/(png)$/i',
+      scenario: 'get-set-fetch-scenario-extract-resources',
+      plugins: [
+        {
+          name: 'ExtractUrlsPlugin',
+          opts: {
+            maxDepth: -1,
+            resourcePathnameRe: '/(png)$/i',
+          },
+        },
+      ],
     },
     expectedResources: [
       { url: 'https://www.sitea.com/index.html', mediaType: 'text/html', info: {} },
@@ -38,13 +41,16 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-      crawlOpts: {
-        maxDepth: -1,
-      },
-    },
-    scenarioOpts: {
-      name: 'get-set-fetch-scenario-extract-resources',
-      resourcePathnameRe: '/(pdf)$/i',
+      scenario: 'get-set-fetch-scenario-extract-resources',
+      plugins: [
+        {
+          name: 'ExtractUrlsPlugin',
+          opts: {
+            maxDepth: -1,
+            resourcePathnameRe: '/(pdf)$/i',
+          },
+        },
+      ],
     },
     expectedResources: [
       { url: 'https://www.sitea.com/index.html', mediaType: 'text/html', info: {} },

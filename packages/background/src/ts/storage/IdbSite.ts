@@ -1,7 +1,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-disable class-methods-use-this */
 
-import { IPluginDefinition, ISite, BasePlugin } from 'get-set-fetch-extension-commons';
+import { IPluginDefinition, ISite, BasePlugin, IResource } from 'get-set-fetch-extension-commons';
 import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
 import BloomFilter from 'get-set-fetch/lib/filters/bloom/BloomFilter';
 import deepmerge from '../helpers/DeepMergeHelper';
@@ -15,7 +15,7 @@ const Log = Logger.getLogger('IdbSite');
 export default class IdbSite extends BaseEntity implements ISite {
   // IndexedDB can't do partial update, define all site properties to be stored
   get props() {
-    return [ 'id', 'projectId', 'name', 'url', 'robotsTxt', 'pluginDefinitions', 'resourceFilter' ];
+    return [ 'id', 'projectId', 'name', 'url', 'robotsTxt', 'plugins', 'resourceFilter' ];
   }
 
   // get a read transaction
@@ -129,8 +129,8 @@ export default class IdbSite extends BaseEntity implements ISite {
   url: string;
   tabId: any;
 
-  pluginDefinitions: IPluginDefinition[];
-  plugins: BasePlugin[];
+  plugins: IPluginDefinition[];
+  pluginInstances: BasePlugin[];
 
   storageOpts: {
     resourceFilter: {
@@ -158,7 +158,7 @@ export default class IdbSite extends BaseEntity implements ISite {
     }
 
     // if no plugin definitions provided use the default ones
-    this.pluginDefinitions = !kwArgs.pluginDefinitions ? ModuleStorageManager.getDefaultPluginDefs() : kwArgs.pluginDefinitions;
+    this.plugins = !kwArgs.plugins ? ModuleStorageManager.getDefaultPluginDefs() : kwArgs.plugins;
 
     // resources from the same site are always crawled in the same tab
     this.tabId = null;
@@ -170,7 +170,7 @@ export default class IdbSite extends BaseEntity implements ISite {
 
   async crawl() {
     try {
-      this.plugins = await ModuleRuntimeManager.instantiatePlugins(this.pluginDefinitions);
+      this.pluginInstances = await ModuleRuntimeManager.instantiatePlugins(this.plugins);
     }
     catch (err) {
       Log.error(
@@ -186,6 +186,7 @@ export default class IdbSite extends BaseEntity implements ISite {
         resource = await this.crawlResource();
       }
       catch (err) {
+        console.log(err);
         // todo: if resource in status "crawling", reset it, or try another crawlResource a fixed number of times
       }
     }
@@ -202,7 +203,7 @@ export default class IdbSite extends BaseEntity implements ISite {
     SelectResourcePlugin (only retrieves a resource if one is not already present)
     FetchPlugin
     ExtractUrlsPlugin
-    ScrollPlugin (will trigger SelectResourcePlugin,FetchPlugin,ExtractUrlsPlugin till lazyloading condition is no longer met)
+    ScrollPlugin (will trigger SelectResourcePlugin, FetchPlugin, ExtractUrlsPlugin till lazyloading condition is no longer met)
     UpdatePlugin
   */
   async crawlResource(inputResource: IdbResource = null, lazyLoading: boolean = false) {
@@ -211,7 +212,7 @@ export default class IdbSite extends BaseEntity implements ISite {
 
     try {
       // 1st plugin is always selecting the resource to crawl
-      resource = inputResource || await this.executePlugin(this.plugins[0], inputResource);
+      resource = inputResource || await this.executePlugin(this.pluginInstances[0], inputResource);
 
       // no crawlable resource found, exit
       if (!resource) {
@@ -222,42 +223,32 @@ export default class IdbSite extends BaseEntity implements ISite {
       Log.info(`${resource.url} selected for crawling, lazyLoading: ${lazyLoading}`);
 
       // execute remaining plugins
-      for (let pluginIdx = 1; pluginIdx < this.plugins.length; pluginIdx += 1) {
-        const result = await this.executePlugin(this.plugins[pluginIdx], resource);
+      for (pluginIdx = 1; pluginIdx < this.pluginInstances.length; pluginIdx += 1) {
+        const result = await this.executePlugin(this.pluginInstances[pluginIdx], resource);
+
+        // each plugin returns a result to be merged with the current resource
+        this.mergeResourceResult(resource, result);
 
         // lazyloading enabled plugin encountered
-        if (this.plugins[pluginIdx].opts && this.plugins[pluginIdx].opts.lazyLoading === true && this.plugins[pluginIdx].opts.enabled === true) {
+        if (
+          this.pluginInstances[pluginIdx].opts
+          && this.pluginInstances[pluginIdx].opts.lazyLoading === true
+          && this.pluginInstances[pluginIdx].opts.enabled === true
+        ) {
           // new content was succesfully lazyloaded, re-execute the plugins encountered so far
-          if (result === true) {
+          if (result) {
             await this.crawlResource(resource, true);
           }
 
           // only execute the plugins after the lazyLoad one on the initial crawlResource invocation
           if (lazyLoading) return null;
         }
-        // regular plugin encountered returning a result that can be merged with the current resource
-        else if (result) {
-          /*
-          don't deepmerge at resource level, IdbResource class functions like update are lost
-          do an override or deep merge at each result key
-          */
-          Object.keys(result).forEach(key => {
-            // non-null, primitive or blob, override coresponding resource key
-            if (result[key] !== Object(result[key] || result[key] instanceof Blob)) {
-              resource[key] = result[key];
-            }
-            // plain object, merge with corresponding resource key
-            else {
-              resource[key] = deepmerge(resource[key], result[key]);
-            }
-          });
-        }
       }
     }
     catch (err) {
-      console.log(err);
       Log.error(
-        `Crawl error for site ${this.name}, Plugin ${this.plugins[pluginIdx].constructor.name} against resource ${resource ? resource.url : ''}`,
+        // eslint-disable-next-line max-len
+        `Crawl error for site ${this.name}, Plugin ${this.pluginInstances[pluginIdx].constructor.name} against resource ${resource ? resource.url : ''}`,
         err,
       );
 
@@ -297,12 +288,30 @@ export default class IdbSite extends BaseEntity implements ISite {
 
     // test if plugin is aplicable
     const isApplicable = await plugin.test(resource);
-
     if (isApplicable) {
       return plugin.apply(this, resource);
     }
 
     return null;
+  }
+
+  mergeResourceResult(resource: IResource, result: any) {
+    /*
+    don't deepmerge at resource level, IdbResource class functions like update are lost
+    do an override or deep merge at each result key
+    */
+    Object.keys(result || {}).forEach(key => {
+      // non-null, primitive or blob, override coresponding resource key
+      if (result[key] !== Object(result[key]) || result[key] instanceof Blob) {
+        // eslint-disable-next-line no-param-reassign
+        resource[key] = result[key];
+      }
+      // plain object, merge with corresponding resource key
+      else {
+        // eslint-disable-next-line no-param-reassign
+        resource[key] = deepmerge(resource[key], result[key]);
+      }
+    });
   }
 
   save(): Promise<number> {
