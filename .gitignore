@@ -1,5 +1,6 @@
 # generated resources
 dist/
+!/extract-html-headings/-/package/dist
 keys/
 
 # Logs
