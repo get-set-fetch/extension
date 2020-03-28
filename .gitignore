@@ -1,3 +1,6 @@
+# scrape results
+_results/
+
 # generated resources
 dist/
 !/extract-html-headings/-/package/dist
