@@ -13,28 +13,53 @@ export default class JsonUrlHelper {
         {
           name: 'SelectResourcePlugin',
           opts: {
-            delay: 1000,
+            delay: 1001,
+            frequency: -1,
           },
         },
         {
           name: 'FetchPlugin',
+          opts: {},
+        },
+        {
+          name: 'ScrollPlugin',
+          opts: {
+            delay: 1000,
+            enabled: false,
+            maxScrollNo: -1,
+            runInTab: true,
+            domManipulation: true,
+            timeout: 2000,
+          },
         },
         {
           name: 'ExtractUrlsPlugin',
           opts: {
-            hostnameRe: '',
-            maxDepth: -1,
-            pathnameRe: '',
+            selectors: 'a',
+            maxDepth: 11,
+            maxResources: 101,
+            runInTab: true,
           },
         },
         {
-          name: 'UpdateResourcePlugin',
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: 'h5',
+          },
+        },
+        {
+          name: 'ImageFilterPlugin',
+          opts: {},
         },
         {
           name: 'InsertResourcesPlugin',
           opts: {
             maxResources: 5,
           },
+        },
+        {
+          name: 'UpsertResourcePlugin',
+          opts: {},
         },
       ],
     };

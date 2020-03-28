@@ -24,7 +24,7 @@ export default class ModuleStorageManager {
   /* PLUGIN UTILITIES */
 
   static get DEFAULT_PLUGINS(): string[] {
-    return [ 'SelectResourcePlugin', 'FetchPlugin', 'ExtractUrlsPlugin', 'ScrollPlugin', 'UpdateResourcePlugin', 'InsertResourcesPlugin' ];
+    return [ 'SelectResourcePlugin', 'FetchPlugin', 'ScrollPlugin', 'ExtractUrlsPlugin', 'UpsertResourcePlugin', 'InsertResourcesPlugin' ];
   }
 
   static async discoverLocalPlugins() {
@@ -107,7 +107,8 @@ export default class ModuleStorageManager {
         Log.info(`Checking ${scenarioPkgDef.name} for embedded plugins`);
         const scenario = await GsfProvider.Scenario.get(scenarioPkgDef.name);
         await ModuleRuntimeManager.registerScenario(scenarioPkgDef.name);
-        const embeddedPluginNames = Object.keys(ModuleRuntimeManager.cache.get(scenarioPkgDef.name).module.embeddedPlugins);
+        const modulePlugins = ModuleRuntimeManager.cache.get(scenarioPkgDef.name).module.embeddedPlugins;
+        const embeddedPluginNames = modulePlugins ? Object.keys(modulePlugins) : [];
         const embeddedPlugins = embeddedPluginNames.map(name => new GsfProvider.Plugin({
           scenarioId: scenario.id,
           name,

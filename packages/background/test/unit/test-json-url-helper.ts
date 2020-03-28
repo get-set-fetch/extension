@@ -23,17 +23,13 @@ describe('Test JsonUrlHelper', () => {
       {
         name: 'ExtractUrlsPlugin',
         opts: {
-          hostnameRe: '/hostname/',
-          pathnameRe: '/pathname/',
-          resourcePathnameRe: '/(gif|png|jpg|jpeg)$/i',
+          selectors: 'img',
           maxDepth: 11,
+          maxResources: -1,
         },
       },
       {
         name: 'ImageFilterPlugin',
-      },
-      {
-        name: 'UpdateResourcePlugin',
       },
       {
         name: 'InsertResourcesPlugin',
@@ -41,11 +37,14 @@ describe('Test JsonUrlHelper', () => {
           maxResources: 101,
         },
       },
+      {
+        name: 'UpsertResourcePlugin',
+      },
     ],
   };
 
   // eslint-disable-next-line max-len
-  const expectedConfigHash = 'eMK7CMOpasKtwoPDqy0ow4rDjwLDusOeESMIYRIKw4jDgsKwYMONKCkpwrDDksOXLy8vw5crw44sSU3DlEvDjsOPw5XDj8OMS0nCrcOQw4sow4nDjUENw7XDtMOUEsOdYiBOA8KFwpguTEI3FRJSwrpFcMKnURY7wobDlMKMHX0YT18JLWbDtGE8wpAMw4zDrQEoKjTDkjPDk2oKw7LDkmvCsgpAODVdU0U/EyXCvg1RHMOrwpnCm8KYwp7DqsKWwplTwpJawoTDqWTDqkbCviEowphiawFWw73Cs3E=';
+  const expectedConfigHash = 'eMK7IMOPw43CpcKDKy0ow4rDjwI6w5QRI8KJw4EkFMKQwoVhw4kuwqPCpMKkw4BKX8K/wrzCvFzCrzjCsyQ1US85P1c/My8lwrVCLwMYKMKowqkyPcK1RMK3GMKIw5NASUgXJsKhwpsKCUTDnSLCuCcoTMK9wrjCkisZw6kjMzfCnUAKQcONHcKYUUp2RBrConoEa1QCIxAAwonDicKdw6w=';
 
   it('encode', async () => {
     const encodedConfigHash = JsonUrlHelper.encode(expectedProject);

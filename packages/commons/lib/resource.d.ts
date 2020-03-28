@@ -2,11 +2,12 @@ export interface IResource {
   crawledAt: any;
   id: number;
   url: string;
+  actions: string[];
   crawlInProgress: boolean;
   depth: number;
   siteId: number;
   mediaType: string;
   blob: any;
-  info: any;
-  temp: any;
+  meta: any; // contains various meta data such as img.name, width, height ...
+  content: any; // contains html scrapped content
 }

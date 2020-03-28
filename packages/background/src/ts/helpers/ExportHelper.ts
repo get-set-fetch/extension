@@ -23,7 +23,7 @@ export default class ExportHelper {
       const zip = new JSZip();
       resources.forEach(resource => {
         if (resource[blobCol]) {
-          const name = resource.info && resource.info.name ? resource.info.name : resource.url.substr(-10);
+          const name = resource.meta && resource.meta.name ? resource.meta.name : resource.url.substr(-10);
           zip.file(name, resource[blobCol]);
         }
       });

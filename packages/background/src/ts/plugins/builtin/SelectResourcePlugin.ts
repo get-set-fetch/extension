@@ -1,4 +1,4 @@
-import { BasePlugin, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
+import { BasePlugin, IResource, IEnhancedJSONSchema, ISite } from 'get-set-fetch-extension-commons';
 
 /**
  * Plugin responsible for selecting a resource to crawl from the current site.
@@ -31,11 +31,11 @@ export default class SelectResourcePlugin extends BasePlugin {
   };
 
   // only retrieve a new resource when one hasn't already been selected
-  test(resource: IResource) {
+  test(site: ISite, resource: IResource) {
     return resource === null;
   }
 
-  async apply(site) {
+  async apply(site: ISite) {
     await new Promise(resolve => setTimeout(resolve, this.opts.delay));
     return site.getResourceToCrawl(this.opts.frequency);
   }

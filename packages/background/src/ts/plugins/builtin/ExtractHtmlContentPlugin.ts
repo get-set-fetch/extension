@@ -1,5 +1,5 @@
-import { ISite, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
-import { BasePlugin } from 'get-set-fetch-extension-commons';
+import { ISite, IResource, IEnhancedJSONSchema, BasePlugin } from 'get-set-fetch-extension-commons';
+
 
 export default class ExtractHtmlContentPlugin extends BasePlugin {
   getOptsSchema(): IEnhancedJSONSchema {
@@ -20,7 +20,7 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
           },
         },
       },
-      required: ['runInTab', 'selectors'],
+      required: [ 'runInTab', 'selectors' ],
     };
   }
 
@@ -38,7 +38,7 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
 
   apply(site: ISite, resource: IResource) {
     const content = this.extractContent();
-    const result = this.diffAndMergeResult({ content })
+    const result = this.diffAndMergeResult({ content });
     return result;
   }
 

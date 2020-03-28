@@ -34,7 +34,7 @@ export default class ExtractUrlsPlugin extends BasePlugin {
           const: true,
         },
       },
-      required: ['selectors', 'maxDepth', 'maxResources', 'runInTab'],
+      required: [ 'selectors', 'maxDepth', 'maxResources', 'runInTab' ],
     };
   }
 
@@ -73,7 +73,7 @@ export default class ExtractUrlsPlugin extends BasePlugin {
       }
     }
 
-    const result = this.diffAndMergeResult({ urlsToAdd })
+    const result = this.diffAndMergeResult({ urlsToAdd });
 
     // eslint-disable-next-line no-param-reassign
     site.resourcesNo += result.urlsToAdd.length;

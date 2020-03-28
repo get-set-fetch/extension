@@ -26,17 +26,17 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
       {
         name: 'ExtractUrlsPlugin',
         opts: {
-          hostnameRe: '/hostname/',
-          pathnameRe: '/pathname/',
-          resourcePathnameRe: '/(gif|png|jpg|jpeg)$/i',
-          maxDepth: 11,
+          selectors: 'a',
+          maxDepth: -1,
+          maxResources: -1,
+          runInTab: true,
         },
       },
       {
         name: 'ImageFilterPlugin',
       },
       {
-        name: 'UpdateResourcePlugin',
+        name: 'UpsertResourcePlugin',
       },
       {
         name: 'InsertResourcesPlugin',

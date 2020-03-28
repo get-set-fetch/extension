@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable class-methods-use-this */
 
@@ -28,7 +29,7 @@ export default class IdbSite extends BaseEntity implements ISite {
     return IdbSite.db.transaction('Sites', 'readwrite').objectStore('Sites');
   }
 
-  static get(nameOrId: number|string): Promise<IdbSite> {
+  static get(nameOrId: number | string): Promise<IdbSite> {
     return new Promise((resolve, reject) => {
       const rTx = IdbSite.rTx();
       const readReq = (Number.isInteger(nameOrId as number) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
@@ -164,7 +165,7 @@ export default class IdbSite extends BaseEntity implements ISite {
     this.tabId = null;
   }
 
-  getResourceToCrawl(frequency) {
+  getResourceToCrawl(frequency: number) {
     return IdbResource.getResourceToCrawl(this.id, frequency);
   }
 
@@ -180,68 +181,82 @@ export default class IdbSite extends BaseEntity implements ISite {
     }
     this.resourcesNo = (await IdbSite.getAllIds()).length;
 
-    let resource;
+    const domPluginsPresent = this.pluginInstances.some(
+      pluginInstance => pluginInstance.opts.domManipulation && (pluginInstance.opts.enabled === undefined || pluginInstance.opts.enabled === true),
+    );
+
+    let staticResource = null;
+    let dynamicResource = null;
     do {
-      try {
-        resource = await this.crawlResource();
-      }
-      catch (err) {
-        console.log(err);
-        // todo: if resource in status "crawling", reset it, or try another crawlResource a fixed number of times
+      /*
+      a null resource will result in selection of a new resource from the db (ex: SelectResourcePlugin)
+      an existing resource can result in a new resource being generated in case of dynamic actions (ex: ScrollPlugin, ClickPlugin)
+
+      after applying all the plugins, if the returned resource is null:
+        - there are no resources to crawl from the db
+        - there are no more dynamic actions to take
+      => if both conditions are met, crawl is stopped
+      */
+
+      // retrieve static resource, opening its url in a new browser tab
+      staticResource = await this.crawlResource();
+
+      if (staticResource && domPluginsPresent) {
+        do {
+          // retrieve dynamic resource, use the current tab dom state to further scroll, click, etc..
+          dynamicResource = await this.crawlResource(staticResource);
+        }
+        while (dynamicResource);
       }
     }
-    while (resource);
+    while (staticResource);
   }
 
-  /*
-  will execute the plugins in the order they are defined
-  apply each plugin to the current (site, resource) pair
-  1st plugin will always select the resource to be crawled
-  a LazyLoading type plugin that succesfully scrolls new content, will force all prior plugins to be executed again
-
-  examples:
-    SelectResourcePlugin (only retrieves a resource if one is not already present)
-    FetchPlugin
-    ExtractUrlsPlugin
-    ScrollPlugin (will trigger SelectResourcePlugin, FetchPlugin, ExtractUrlsPlugin till lazyloading condition is no longer met)
-    UpdatePlugin
-  */
-  async crawlResource(inputResource: IdbResource = null, lazyLoading: boolean = false) {
-    let resource: IdbResource;
+  async crawlResource(resource: IdbResource = null) {
     let pluginIdx: number;
+    let resourceFound = false;
 
     try {
-      // 1st plugin is always selecting the resource to crawl
-      resource = inputResource || await this.executePlugin(this.pluginInstances[0], inputResource);
-
-      // no crawlable resource found, exit
-      if (!resource) {
-        Log.info(`No crawlable resource found for site ${this.name}`);
-        return null;
-      }
-
-      Log.info(`${resource.url} selected for crawling, lazyLoading: ${lazyLoading}`);
-
-      // execute remaining plugins
-      for (pluginIdx = 1; pluginIdx < this.pluginInstances.length; pluginIdx += 1) {
+      /*
+      will execute the plugins in the order they are defined
+      apply each plugin to the current (site, resource) pair
+      */
+      for (pluginIdx = 0; pluginIdx < this.pluginInstances.length; pluginIdx += 1) {
         const result = await this.executePlugin(this.pluginInstances[pluginIdx], resource);
+        /*
+        a plugin result can represent:
+        - a new static resource
+          - IdbResource from the db not yet crawled (ex: SelectResourcePlugin)
+        - a new dynamic resource (ex: ScrollPlugin, ClickPlugin)
+          - obj containing an "actions" key
+        - additional data/content to be merged with the current resource (ex: ExtractUrlsPlugin, ExtractHtmlContentPlugin, ...)
+          - generic object
+        */
 
-        // each plugin returns a result to be merged with the current resource
-        this.mergeResourceResult(resource, result);
-
-        // lazyloading enabled plugin encountered
-        if (
-          this.pluginInstances[pluginIdx].opts
-          && this.pluginInstances[pluginIdx].opts.lazyLoading === true
-          && this.pluginInstances[pluginIdx].opts.enabled === true
-        ) {
-          // new content was succesfully lazyloaded, re-execute the plugins encountered so far
-          if (result) {
-            await this.crawlResource(resource, true);
-          }
-
-          // only execute the plugins after the lazyLoad one on the initial crawlResource invocation
-          if (lazyLoading) return null;
+        // a new static resource has been generated
+        if (result instanceof IdbResource) {
+          resource = result;
+          resourceFound = true;
+        }
+        // a new dynamic resource has been generated, it will be crawled right away by the next plugins
+        else if (result && Object.prototype.hasOwnProperty.call(result, 'actions')) {
+          resource = new IdbResource(
+            Object.assign(
+              result,
+              {
+                siteId: resource.siteId,
+                url: resource.url,
+                mediaType: resource.mediaType,
+                depth: resource.depth,
+                crawlInProgress: true,
+              },
+            ),
+          );
+          resourceFound = true;
+        }
+        // new content has been generated to be merged wih the current resource
+        else {
+          this.mergeResourceResult(resource, result);
         }
       }
     }
@@ -253,15 +268,15 @@ export default class IdbSite extends BaseEntity implements ISite {
       );
 
       /*
-        manually update the resource, this resets the crawlInProgress flag and adds crawledAt date
-        selecting new resources for crawling takes crawledAt in consideration (right now only resources with crawledAt undefined qualify)
-        because of the above behavior, we don't attempt to crawl a resource that throws an error over and over again
+      manually update the resource, this resets the crawlInProgress flag and adds crawledAt date
+      selecting new resources for crawling takes crawledAt in consideration (right now only resources with crawledAt undefined qualify)
+      because of the above behavior, we don't attempt to crawl a resource that throws an error over and over again
 
-        in future a possible approach will be just resetting the crawlInProgress flag
-          - next crawl operation will attempt to crawl it again, but atm this will just retry the same resource over and over again
-          - there is no mechanism to escape the retry loop
-        resource.crawlInProgress = false;
-        await resource.update(false);
+      in future a possible approach will be just resetting the crawlInProgress flag
+        - next crawl operation will attempt to crawl it again, but atm this will just retry the same resource over and over again
+        - there is no mechanism to escape the retry loop
+      resource.crawlInProgress = false;
+      await resource.update(false);
       */
       if (resource) {
         // eslint-disable-next-line no-await-in-loop
@@ -271,10 +286,15 @@ export default class IdbSite extends BaseEntity implements ISite {
       throw err;
     }
 
-    Log.debug(`Resource successfully crawled (json): ${JSON.stringify(resource)}`);
-    Log.info(`Resource successfully crawled (url): ${resource.url}`);
+    if (resource) {
+      Log.debug(`Resource successfully crawled (json): ${JSON.stringify(resource)}`);
+      Log.info(`Resource successfully crawled (url): ${resource.url}`);
+    }
+    else {
+      Log.info(`No crawlable resource found for site ${this.name}`);
+    }
 
-    return resource;
+    return resourceFound ? resource : null;
   }
 
   async executePlugin(plugin: BasePlugin, resource: IdbResource) {
@@ -287,7 +307,7 @@ export default class IdbSite extends BaseEntity implements ISite {
     }
 
     // test if plugin is aplicable
-    const isApplicable = await plugin.test(resource);
+    const isApplicable = await plugin.test(this, resource);
     if (isApplicable) {
       return plugin.apply(this, resource);
     }
@@ -296,6 +316,9 @@ export default class IdbSite extends BaseEntity implements ISite {
   }
 
   mergeResourceResult(resource: IResource, result: any) {
+    // if no result is returned from plugin, nothing to merge
+    if (!result) return;
+
     /*
     don't deepmerge at resource level, IdbResource class functions like update are lost
     do an override or deep merge at each result key

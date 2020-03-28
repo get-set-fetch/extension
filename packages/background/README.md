@@ -42,8 +42,8 @@ Handles the crawling and scraping logic.
       name: "ExtractUrlsPlugin",
       opts: {
         maxDepth: 1,
-        hostnameRe: " /\.org$/",
-        pathnameRe: "/category\/product/"
+        maxResources: 10,
+        selectors: "a"
       }
     },
     {
@@ -92,8 +92,8 @@ Handles the crawling and scraping logic.
       name: "ExtractUrlsPlugin",
       opts: {
         maxDepth: 1,
-        hostnameRe: " /\.org$/",
-        pathnameRe: "/category\/product/"
+        maxResources: 10,
+        selectors: "a"
       }
     },
     {
@@ -135,10 +135,9 @@ Resource filter is a bloom filter used for detecting duplicate urls.
     {
       name: "ExtractUrlsPlugin",
       opts: {
-        hostnameRe: /\.org$/,
-        pathnameRe: /category\/product/
-        resourcePathnameRe: null,
         maxDepth: 1,
+        maxResources: 10,
+        selectors: "a"
         runInTab: true
       }
     },
@@ -170,7 +169,7 @@ Resource filter is a bloom filter used for detecting duplicate urls.
     - opens html resources in a new tab or dowloads binary ones.
   - ExtractUrlsPlugin
     - runInTab = true : whether or not the plugin should be executed in the browser tab context where the current resource is opened.
-    - resourcePathnameRe: what other resources (defined as regexp) besides html ones should be crawled
+    - maxResources: how many resources to crawl
     - maxDepth: how deep the crawl should advance. A value of 0 means crawling just the root url. A value of 1 will crawl the root url and direct internal links present in the root url.
   - ExtractHtmlContentPlugin
     - selectors: One or multiple selectors separated by new line. Scraping is achieved by invoking document.querySelectorAll with each selector.

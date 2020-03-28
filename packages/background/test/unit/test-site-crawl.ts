@@ -9,9 +9,9 @@ import GsfProvider from '../../src/ts/storage/GsfProvider';
 import IdbSite from '../../src/ts/storage/IdbSite';
 import IdbResource from '../../src/ts/storage/IdbResource';
 import IdbPlugin from '../../src/ts/storage/IdbPlugin';
-import ExtractTitlePlugin from '../../src/ts/plugins/builtin/ExtractTitlePlugin';
 import ModuleStorageManager from '../../src/ts/plugins/ModuleStorageManager';
 import ModuleRuntimeManager from '../../src/ts/plugins/ModuleRuntimeManager';
+import ExtractHtmlContentPlugin from '../../src/ts/plugins/builtin/ExtractHtmlContentPlugin';
 
 const conn = { info: 'IndexedDB' };
 
@@ -37,16 +37,20 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     await Site.delAll();
 
     // save site
-    const testPlugins = [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'UpdateResourcePlugin', 'InsertResourcesPlugin' ];
-    const plugins = ModuleStorageManager.getDefaultPluginDefs().filter(pluginDef => testPlugins.indexOf(pluginDef.name) !== -1);
+
+    const plugins = [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'InsertResourcesPlugin', 'UpsertResourcePlugin' ].map(
+      name => ModuleStorageManager.getAvailablePluginDefs().find(pluginDef => pluginDef.name === name),
+    );
     site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', plugins });
     await site.save();
 
     // stub ExtractUrlsPlugin, the only one running in tab via "runInTab"
     sinon.stub(ModuleRuntimeManager, 'runInTab').callsFake((tabId, plugin, site, resource) => {
       plugin.extractResourceUrls = () => [ `http://siteA/page-${resource.depth + 1}.html` ];
-      resource.mediaType = 'html';
-      const isApplicable = plugin.test(resource);
+      if (resource) {
+        resource.mediaType = 'html';
+      }
+      const isApplicable = plugin.test(site, resource);
       return isApplicable ? plugin.apply(site, resource) : null;
     });
   });
@@ -61,20 +65,21 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
 
   it('crawl all available resources', async () => {
     const maxResources = 5;
-    site.plugins = ModuleStorageManager.getDefaultPluginDefs().filter(
-      plugin => [ 'SelectResourcePlugin', 'UpdateResourcePlugin' ].indexOf(plugin.name) !== -1,
+
+    site.plugins = [ 'SelectResourcePlugin', 'UpsertResourcePlugin' ].map(
+      name => ModuleStorageManager.getAvailablePluginDefs().find(pluginDef => pluginDef.name === name),
     );
 
     // save 4 additional resources, an initial resource is created when the site is created
-    for (let i = 1; i < maxResources - 1; i += 1) {
+    for (let i = 1; i < maxResources; i += 1) {
       const resource = new Resource({ siteId: site.id, url: `url-${i}`, depth: 1 });
       // eslint-disable-next-line no-await-in-loop
       await resource.save();
     }
+
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
     await site.crawl();
-
-    sinon.assert.callCount(crawlResourceSpy, maxResources);
+    sinon.assert.callCount(crawlResourceSpy, maxResources + 1);
   });
 
   it('crawl until maxDepth is reached', async () => {
@@ -85,8 +90,8 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
     await site.crawl();
 
-    // crawl resources of depth 0-3 + failed attempt returning a null resources indicating the crawling is complete
-    sinon.assert.callCount(crawlResourceSpy, maxDepth + 2);
+    // crawl resources of depth 0-3 (4) + failed attempt returning a null resources indicating the crawling is complete
+    sinon.assert.callCount(crawlResourceSpy, (maxDepth + 1) + 1);
   });
 
   it('crawl until maxResources is reached', async () => {
@@ -96,9 +101,7 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     // make sure maxDepth is not reached before reaching maxResources threshold
     const extractUrlsPlugDef = site.plugins.find(plugin => plugin.name === 'ExtractUrlsPlugin');
     extractUrlsPlugDef.opts.maxDepth = 100;
-
-    const insertResourcePlugDef = site.plugins.find(plugin => plugin.name === 'InsertResourcesPlugin');
-    insertResourcePlugDef.opts.maxResources = maxResources;
+    extractUrlsPlugDef.opts.maxResources = maxResources;
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
     await site.crawl();
@@ -112,14 +115,13 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     const delay = 500;
 
     // keep the plugins to a minimum
-    site.plugins = ModuleStorageManager.getDefaultPluginDefs().filter(
-      plugin => [ 'SelectResourcePlugin', 'UpdateResourcePlugin' ].indexOf(plugin.name) !== -1,
+    site.plugins = [ 'SelectResourcePlugin', 'UpsertResourcePlugin' ].map(
+      name => ModuleStorageManager.getAvailablePluginDefs().find(pluginDef => pluginDef.name === name),
     );
 
     // adjust crawl delay
     const selectResourceDef = site.plugins.find(plugin => plugin.name === 'SelectResourcePlugin');
     selectResourceDef.opts.delay = delay;
-
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
 
@@ -135,13 +137,13 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
   });
 
   it('crawl with lazy loading', async () => {
-    site.plugins = ModuleStorageManager.getDefaultPluginDefs().filter(
-      plugin => [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'ScrollPlugin', 'UpdateResourcePlugin' ].indexOf(plugin.name) !== -1,
+    site.plugins = [ 'SelectResourcePlugin', 'ScrollPlugin', 'ExtractUrlsPlugin', 'UpsertResourcePlugin' ].map(
+      name => ModuleStorageManager.getAvailablePluginDefs().find(pluginDef => pluginDef.name === name),
     );
 
     // enable lazy loading, by default it's false
-    const lazyLoadingDef = site.plugins.find(plugin => plugin.opts.lazyLoading === true);
-    lazyLoadingDef.opts.enabled = true;
+    const scrollPluginDef = site.plugins.find(plugin => plugin.name === 'ScrollPlugin');
+    scrollPluginDef.opts.enabled = true;
 
     let updatePluginSpy;
     const origInstantiate = ModuleRuntimeManager.instantiatePlugins;
@@ -149,12 +151,12 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     sinon.stub(ModuleRuntimeManager, 'instantiatePlugins').callsFake(async plugins => {
       const pluginInstances: BasePlugin[] = await origInstantiate(plugins);
 
-      // spy on UpdateResourcePlugin
-      const updatePluginInst = pluginInstances.find(pluginInst => pluginInst.constructor.name === 'UpdateResourcePlugin');
+      // spy on UpsertResourcePlugin
+      const updatePluginInst = pluginInstances.find(pluginInst => pluginInst.constructor.name === 'UpsertResourcePlugin');
       updatePluginSpy = sinon.spy(updatePluginInst, 'apply');
 
-      // insert entry for ExtractTitlePlugin, not available on default plugin list
-      pluginInstances.splice(2, 0, new ExtractTitlePlugin());
+      // insert entry for ExtractHtmlContentPlugin, not available on default plugin list
+      pluginInstances.splice(3, 0, new ExtractHtmlContentPlugin());
       return pluginInstances;
     });
 
@@ -163,71 +165,113 @@ describe(`Test Site Crawl, using connection ${conn.info}`, () => {
     // stub ExtractUrlsPlugin, the only one running in tab via "runInTab"
     const runInTabStub = sinon.stub(ModuleRuntimeManager, 'runInTab');
 
-    // 1st call runInTab from ExtractUrlsPlugin
-    runInTabStub.onCall(0).callsFake((tabId, plugin, site, resource) => {
+    /*
+    1st call runInTab from lazy loading ScrollPlugin,
+    plugin does not create a new resource, the static resource from SelectResourcePlugin has crawlInProgress = true
+    */
+    runInTabStub.onCall(0).callsFake((tabId, plugin, site, resource) => null);
+
+    // 2nd call runInTab from ExtractUrlsPlugin
+    runInTabStub.onCall(1).callsFake((tabId, plugin, site, resource) => {
       plugin.extractResourceUrls = () => [ 'link-1.html', 'link-2.html' ];
       resource.mediaType = 'html';
-      const isApplicable = plugin.test(resource);
+      const isApplicable = plugin.test(site, resource);
       return isApplicable ? plugin.apply(site, resource) : null;
     });
 
-    // 2nd call runInTab from ExtractTitlePlugin
-    runInTabStub.onCall(1).callsFake((tabId, plugin, site, resource) => ({
-      info: {
+    // 3rd call runInTab from ExtractTitlePlugin
+    runInTabStub.onCall(2).callsFake((tabId, plugin, site, resource) => {
+      plugin.extractContent = () => ({
         h1: [ 'h1a', 'h1b' ],
         h2: [ 'h2a', 'h2b' ],
-      },
-    }
-    ));
-
-    // 3rd call runInTab from lazy loading ScrollPlugin
-    runInTabStub.onCall(2).callsFake((tabId, plugin, site, resource) => true);
-
-    // 4th call runInTab from ExtractUrlsPlugin
-    runInTabStub.onCall(3).callsFake((tabId, plugin, site, resource) => {
-      plugin.extractResourceUrls = () => [ 'link-2.html', 'link-3.html' ];
-      const isApplicable = plugin.test(resource);
+      });
+      const isApplicable = plugin.test(site, resource);
       return isApplicable ? plugin.apply(site, resource) : null;
     });
 
-    // 5th call runInTab from ExtractTitlePlugin
-    runInTabStub.onCall(4).callsFake((tabId, plugin, site, resource) => ({
-      info: {
+    /*
+    4th call runInTab from lazy loading ScrollPlugin
+    plugin creates a new resource, the static resource from SelectResourcePlugin has crawlInProgress = false
+    */
+    runInTabStub.onCall(3).callsFake((tabId, plugin, site, resource) => ({ url: 'page-0.html', actions: [ 'scroll#1' ] }));
+
+    // 5th call runInTab from ExtractUrlsPlugin
+    runInTabStub.onCall(4).callsFake((tabId, plugin, site, resource) => {
+      plugin.extractResourceUrls = () => [ 'link-2.html', 'link-3.html' ];
+      const isApplicable = plugin.test(site, resource);
+      return isApplicable ? plugin.apply(site, resource) : null;
+    });
+
+    // 6th call runInTab from ExtractTitlePlugin
+    runInTabStub.onCall(5).callsFake((tabId, plugin, site, resource) => {
+      plugin.extractContent = () => ({
         h1: [ 'h1b', 'h1c' ],
         h2: [ 'h2a' ],
         h3: [ 'h3a' ],
-      },
-    }
-    ));
+      });
+      const isApplicable = plugin.test(site, resource);
+      return isApplicable ? plugin.apply(site, resource) : null;
+    });
 
-    // 6th call runInTab from lazy loading ScrollPlugin
-    runInTabStub.onCall(5).callsFake((tabId, plugin, site, resource) => false);
+    // 7th call runInTab from lazy loading ScrollPlugin, dom remains unchanged, a new resource is not created
+    runInTabStub.onCall(6).callsFake((tabId, plugin, site, resource) => null);
+
+    // 8th call runInTab from ExtractUrlsPlugin, no crawlInProgress resource, plugin.apply is not invoked
+    runInTabStub.onCall(7).callsFake((tabId, plugin, site, resource) => null);
+
+    // 9th call runInTab from ExtractTitlePlugin,no crawlInProgress resource, plugin.apply is not invoked
+    runInTabStub.onCall(8).callsFake((tabId, plugin, site, resource) => null);
 
     await site.crawl();
 
     /*
-    a single resource has been crawled succefully (1 initial crawl + 1 extra for a single succesfull lazy loading operation),
-    3rd one returned null causing crawl to stop
+    crawlResource sequence:
+      1 - crawlResource() -> returns a new static resource
+      2 - crawlResource(resource) -> returns a new dynamic resource
+      3 - crawlResource(resource) -> attempts to crawl a dynamic resource but doesn't find one
+      4 - crawlResource() -> attempts to crawl a static resource but doesn't find one
     */
-    sinon.assert.callCount(crawlResourceSpy, 3);
+    sinon.assert.callCount(crawlResourceSpy, 4);
 
-    // updated resource that should have been called for UpdateResourcePlugin
-    sinon.assert.callCount(updatePluginSpy, 1);
-    const expectedResource = {
+    // 2 resources crawled (1 static, 1 dynamic), 2 update operations by the UpsertResourcePlugin
+    sinon.assert.callCount(updatePluginSpy, 2);
+
+    const filterResourceProps = ({ url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions }) => ({
+      url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions,
+    });
+
+    // verify static resource
+    const expectedStaticResource = {
       url: 'http://siteA/page-0.html',
       depth: 0,
-      info: {
-        h1: [ 'h1a', 'h1b', 'h1c' ],
+      content: {
+        h1: [ 'h1a', 'h1b' ],
         h2: [ 'h2a', 'h2b' ],
+      },
+      crawlInProgress: false,
+      urlsToAdd: [ 'link-1.html', 'link-2.html' ],
+      mediaType: 'html',
+      actions: [],
+    };
+    const staticResource = filterResourceProps(updatePluginSpy.getCall(0).args[1]);
+    assert.deepEqual(staticResource, expectedStaticResource);
+
+    // verify dynamic resource
+    const expectedDynamicResource = {
+      url: 'http://siteA/page-0.html',
+      depth: 0,
+      content: {
+        h1: [ 'h1c' ],
+        h2: [],
         h3: [ 'h3a' ],
       },
       crawlInProgress: false,
-      urlsToAdd: [ 'link-1.html', 'link-2.html', 'link-3.html' ],
+      urlsToAdd: [ 'link-3.html' ],
       mediaType: 'html',
+      actions: [ 'scroll#1' ],
     };
-    const actualResource = updatePluginSpy.getCall(0).args[1];
 
-    assert.sameMembers(actualResource.urlsToAdd, expectedResource.urlsToAdd);
-    assert.deepEqual(actualResource.info, expectedResource.info);
+    const dynamicResource = filterResourceProps(updatePluginSpy.getCall(1).args[1]);
+    assert.deepEqual(dynamicResource, expectedDynamicResource);
   });
 });

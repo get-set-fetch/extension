@@ -11,7 +11,9 @@ export default class FetchPlugin extends BasePlugin {
     };
   }
 
-  test(resource: IResource) {
+  test(site: ISite, resource: IResource) {
+    if (!resource) return false;
+
     // only fetch a resource that hasn't been fetched yet
     if (resource.mediaType) return false;
 

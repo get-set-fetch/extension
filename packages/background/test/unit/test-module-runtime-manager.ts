@@ -31,20 +31,10 @@ describe('Test ModuleRuntimeManager', () => {
         opts: {},
       },
       {
-        name: 'ExtractUrlsPlugin',
-        opts: {
-          hostnameRe: undefined,
-          pathnameRe: undefined,
-          resourcePathnameRe: undefined,
-          maxDepth: -1,
-          runInTab: true,
-        },
-      },
-      {
         name: 'ScrollPlugin',
         opts: {
           runInTab: true,
-          lazyLoading: true,
+          domManipulation: true,
           enabled: false,
           delay: 1000,
           timeout: 2000,
@@ -52,14 +42,21 @@ describe('Test ModuleRuntimeManager', () => {
         },
       },
       {
-        name: 'UpdateResourcePlugin',
+        name: 'ExtractUrlsPlugin',
+        opts: {
+          selectors: 'a[href$=".html"] # follow html links',
+          maxDepth: -1,
+          maxResources: 100,
+          runInTab: true,
+        },
+      },
+      {
+        name: 'UpsertResourcePlugin',
         opts: {},
       },
       {
         name: 'InsertResourcesPlugin',
-        opts: {
-          maxResources: 100,
-        },
+        opts: {},
       },
     ];
     const actualPlugins = await ModuleRuntimeManager.instantiatePlugins(ModuleStorageManager.getDefaultPluginDefs());
@@ -70,7 +67,7 @@ describe('Test ModuleRuntimeManager', () => {
 
   it('get scenario plugins schemas', async () => {
     sinon.stub(ModuleRuntimeManager, 'instantiateScenario').callsFake(async name => ({
-      getPluginNames: () => [ 'SelectResourcePlugin' ],
+      getPluginNames: () => ['SelectResourcePlugin'],
     }));
 
     const expectedSchemas: IEnhancedJSONSchema[] = [
@@ -91,7 +88,7 @@ describe('Test ModuleRuntimeManager', () => {
             description: 'Delay in miliseconds between fetching two consecutive resources.',
           },
         },
-        required: [ 'frequency', 'delay' ],
+        required: ['frequency', 'delay'],
       },
       // te iubesc.
     ];

@@ -11,14 +11,6 @@ export default class InsertResourcesPlugin extends BasePlugin {
       type: 'object',
       title: 'Insert Resources Plugin',
       description: 'responsible for saving new resources within the current site / project.',
-      properties: {
-        maxResources: {
-          type: 'number',
-          default: '100',
-          description: 'Maximum number of resources to be scraped.',
-        },
-      },
-      required: [ 'maxResources' ],
     };
   }
 
@@ -26,23 +18,15 @@ export default class InsertResourcesPlugin extends BasePlugin {
     maxResources: number;
   };
 
-  test(resource: IResource&IdbResource) {
+  test(site: ISite, resource: IResource & IdbResource) {
+    // only save new urls of a currently crawled resource
+    if (!resource || !resource.crawlInProgress) return false;
+
     // only save new urls if there's something to save
     return resource.urlsToAdd && resource.urlsToAdd.length > 0;
   }
 
-  apply(site: ISite&IdbSite, resource) {
-    const maxAllowedResourceNo = this.opts.maxResources - site.resourcesNo;
-
-    if (maxAllowedResourceNo > 0) {
-      const resourcesToInsert = resource.urlsToAdd.slice(0, maxAllowedResourceNo);
-
-      // eslint-disable-next-line no-param-reassign
-      site.resourcesNo += resourcesToInsert.length;
-
-      return site.saveResources(resourcesToInsert, resource.depth + 1);
-    }
-
-    return null;
+  apply(site: ISite & IdbSite, resource) {
+    return site.saveResources(resource.urlsToAdd, resource.depth + 1);
   }
 }

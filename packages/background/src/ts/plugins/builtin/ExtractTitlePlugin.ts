@@ -1,5 +1,5 @@
 
-import { BasePlugin, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
+import { BasePlugin, IResource, IEnhancedJSONSchema, ISite } from 'get-set-fetch-extension-commons';
 
 export default class ExtractTitlePlugin extends BasePlugin {
   getOptsSchema(): IEnhancedJSONSchema {
@@ -21,13 +21,16 @@ export default class ExtractTitlePlugin extends BasePlugin {
     runInTab: boolean;
   };
 
-  test(resource: IResource) {
-    return resource.mediaType.indexOf('html') !== -1;
+  test(site: ISite, resource: IResource) {
+    // only extract title of a currently crawled resource
+    if (!resource || !resource.crawlInProgress) return false;
+
+    return (/html/i).test(resource.mediaType);
   }
 
   apply() {
     return {
-      info: {
+      content: {
         title: document.title,
       },
     };

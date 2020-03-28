@@ -1,5 +1,4 @@
 import { BasePlugin, IEnhancedJSONSchema, ISite, IResource } from 'get-set-fetch-extension-commons';
-import { resolve } from 'dns';
 
 /**
  * Plugin responsible for lazy loading scrolling in order to load additional content.
@@ -19,7 +18,7 @@ export default class ScrollPlugin extends BasePlugin {
           type: 'boolean',
           const: true,
         },
-        lazyLoading: {
+        domManipulation: {
           type: 'boolean',
           const: true,
         },
@@ -39,13 +38,14 @@ export default class ScrollPlugin extends BasePlugin {
           description: 'Number of maximum scroll operations. -1 scrolls till no new content is added to the page',
         },
       },
-      required: [ 'runInTab', 'lazyLoading', 'enabled', 'delay', 'timeout', 'maxScrollNo' ],
+      required: [ 'runInTab', 'domManipulation', 'enabled', 'delay', 'timeout', 'maxScrollNo' ],
     };
   }
 
+  static scrollNo: number = 0;
+
   opts: {
     runInTab: boolean;
-    lazyLoading: boolean;
     enabled: boolean;
     timeout: number;
     delay: number;
@@ -54,10 +54,15 @@ export default class ScrollPlugin extends BasePlugin {
 
   timeoutId: number;
   observer: MutationObserver;
-  scrollNo: number;
 
-  test(resource: IResource) {
-    const scrollNotExceeded = this.opts.maxScrollNo >= 0 ? (resource.temp.scrollNo || 0) < this.opts.maxScrollNo : true;
+
+  test(site: ISite, resource: IResource) {
+    if (!this.opts.enabled) return false;
+
+    // only apply the plugin (and generate a new resource) based on an already crawled resource
+    if (!resource || resource.crawlInProgress) return false;
+
+    const scrollNotExceeded = this.opts.maxScrollNo >= 0 ? ScrollPlugin.scrollNo < this.opts.maxScrollNo : true;
     return (/html/i).test(resource.mediaType) && this.opts.enabled && scrollNotExceeded;
   }
 
@@ -90,7 +95,9 @@ export default class ScrollPlugin extends BasePlugin {
         if (mutationsList[i].type === 'childList') {
           observer.disconnect();
           window.clearTimeout(this.timeoutId);
-          resolve({ temp: { scrollNo: (resource.temp.scrollNo || 0) + 1 } });
+          resolve({
+            actions: [ `scroll#${ScrollPlugin.scrollNo += 1}` ],
+          });
           break;
         }
       }

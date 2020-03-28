@@ -98,7 +98,7 @@ export default class IdbResource extends BaseResource implements IResource {
   }
 
   // within a transaction find a resource to crawl and set its crawlInProgress flag
-  static getResourceToCrawlWithKey(idbKey) {
+  static getResourceToCrawlWithKey(idbKey): Promise<IdbResource> {
     return new Promise((resolve, reject) => {
       const rwTx = IdbResource.rwTx();
       const getReq = rwTx.index('getResourceToCrawl').get(idbKey);
@@ -122,7 +122,7 @@ export default class IdbResource extends BaseResource implements IResource {
     });
   }
 
-  static async getResourceToCrawl(siteId, frequency) {
+  static async getResourceToCrawl(siteId, frequency: number): Promise<IdbResource> {
     // try to find a resource matching {siteId, crawlInProgress : false, crawledAt: null}
     let resource = await this.getResourceToCrawlWithKey(IDBKeyRange.only([ siteId, 0, new Date(0) ]));
 
@@ -173,15 +173,16 @@ export default class IdbResource extends BaseResource implements IResource {
 
   id: number;
   url: string;
+  actions: string[];
   siteId: number;
   crawledAt: any;
   crawlInProgress: boolean;
   depth: number;
-  info: any = {};
+  meta: any = {};
+  content: any = {}
   blob: any;
   mediaType: string;
   urlsToAdd: string[];
-  temp: object;
 
   constructor(kwArgs: Partial<IResource> = {}) {
     super(kwArgs.siteId, kwArgs.url, kwArgs.depth);
@@ -191,12 +192,7 @@ export default class IdbResource extends BaseResource implements IResource {
     });
 
     this.crawledAt = kwArgs.crawledAt ? kwArgs.crawledAt : new Date(0);
-
-    /*
-    used for storing plugin temporary data
-    ex: ScrollPlugin keeps at resource.temp.srollNo, the number of scroll operations against current resource
-    */
-    this.temp = {};
+    this.actions = kwArgs.actions ? kwArgs.actions : [];
   }
 
   save(): Promise<number> {
@@ -236,7 +232,7 @@ export default class IdbResource extends BaseResource implements IResource {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return [ 'id', 'siteId', 'url', 'depth', 'info', 'crawledAt', 'crawlInProgress', 'blob', 'mediaType' ];
+    return [ 'id', 'siteId', 'url', 'actions', 'depth', 'content', 'meta', 'crawledAt', 'crawlInProgress', 'blob', 'mediaType' ];
   }
 
   serialize(): any {

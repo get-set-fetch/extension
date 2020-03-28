@@ -13,7 +13,7 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
     id: null,
     siteId: null,
     url: 'http://siteA/resourceA',
-    info: { propA: 'valA' },
+    content: { propA: 'valA' },
     blob: Buffer.from('contentA'),
     mediaType: 'text/plain',
   };
@@ -33,7 +33,7 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
 
     // save resource
     const resource = new Resource({ siteId: expectedResource.siteId, url: expectedResource.url });
-    resource.info = expectedResource.info;
+    resource.content = expectedResource.content;
     resource.blob = expectedResource.blob;
     resource.mediaType = expectedResource.mediaType;
     await resource.save();
@@ -67,7 +67,7 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
     assert.instanceOf(resourceById, Resource);
     assert.strictEqual(String(expectedResource.siteId), String(resourceById.siteId));
     assert.strictEqual(expectedResource.url, resourceById.url);
-    assert.strictEqual(expectedResource.info.propA, resourceById.info.propA);
+    assert.strictEqual(expectedResource.content.propA, resourceById.content.propA);
     assert.strictEqual(true, expectedResource.blob.equals(resourceById.blob));
     assert.strictEqual(expectedResource.mediaType, resourceById.mediaType);
 
@@ -76,7 +76,7 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
     assert.instanceOf(resourceByUrl, Resource);
     assert.strictEqual(String(expectedResource.id), String(resourceByUrl.id));
     assert.strictEqual(String(expectedResource.siteId), String(resourceByUrl.siteId));
-    assert.strictEqual(expectedResource.info.propA, resourceByUrl.info.propA);
+    assert.strictEqual(expectedResource.content.propA, resourceByUrl.content.propA);
     assert.strictEqual(true, expectedResource.blob.equals(resourceById.blob));
     assert.strictEqual(expectedResource.mediaType, resourceById.mediaType);
   });
@@ -85,7 +85,7 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
     // update resource
     const updateResource = await Resource.get(expectedResource.id);
     updateResource.url = 'http://siteA/resourceA_updated';
-    updateResource.info = { propA: 'valA_changed' };
+    updateResource.content = { propA: 'valA_changed' };
     updateResource.blob = 'contentA_changed';
     await updateResource.update();
     updateResource.blob = 'contentA_changed1';
@@ -94,7 +94,7 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
     const getResource = await Resource.get(expectedResource.id);
     assert.strictEqual(String(expectedResource.siteId), String(getResource.siteId));
     assert.strictEqual(updateResource.url, getResource.url);
-    assert.strictEqual(updateResource.info.propA, getResource.info.propA);
+    assert.strictEqual(updateResource.content.propA, getResource.content.propA);
     assert.strictEqual(updateResource.mediaType, getResource.mediaType);
   });
 

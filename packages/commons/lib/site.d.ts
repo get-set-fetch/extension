@@ -1,4 +1,5 @@
 import { IPluginDefinition } from "./plugin";
+import { IResource } from "./resource";
 
 export interface ISite {
   id: number;
@@ -16,4 +17,6 @@ export interface ISite {
       probability: number
     }
   }
+
+  getResourceToCrawl: (frequency: number) => Promise<IResource>
 }
