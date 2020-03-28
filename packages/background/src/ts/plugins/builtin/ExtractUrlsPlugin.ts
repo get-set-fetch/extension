@@ -1,10 +1,9 @@
 import { IResource, ISite, BasePlugin, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
+import IdbSite from '../../storage/IdbSite';
 
 /**
  * Plugin responsible for extracting new resources from a resource document.
  */
-
-declare const document;
 export default class ExtractUrlsPlugin extends BasePlugin {
   getOptsSchema(): IEnhancedJSONSchema {
     return {
@@ -12,100 +11,110 @@ export default class ExtractUrlsPlugin extends BasePlugin {
       title: 'Extract Urls Plugin',
       description: 'responsible for extracting new resources(html pages or binary content) urls from the current html page.',
       properties: {
-        hostnameRe: {
-          title: 'Hostname regexp',
+        selectors: {
           type: 'string',
-          format: 'regex',
-        },
-        pathnameRe: {
-          title: 'Pathname regexp',
-          type: 'string',
-          format: 'regex',
-        },
-        resourcePathnameRe: {
-          title: 'Resource regexp',
-          type: 'string',
-          format: 'regex',
+          default: 'a[href$=".html"] # follow html links',
+          ui: {
+            customField: 'LongTextField',
+          },
+          description: 'Html selectors.',
         },
         maxDepth: {
           type: 'number',
           default: '-1',
+          description: 'Maximum depth of resources to be scraped.',
+        },
+        maxResources: {
+          type: 'number',
+          default: '100',
+          description: 'Maximum number of resources to be scraped.',
         },
         runInTab: {
           type: 'boolean',
           const: true,
         },
       },
-      required: [ 'maxDepth', 'runInTab' ],
+      required: ['selectors', 'maxDepth', 'maxResources', 'runInTab'],
     };
   }
 
-  static absoluteUrl(absolutePath, relativePath) {
-    const absSegments = absolutePath.split('/');
-    const relSegments = relativePath.split('/');
-
-    // get to current directory by removing filename or extra slash if present
-    const lastSegment = absSegments[absSegments.length - 1];
-    if (lastSegment.length === 0 || lastSegment.indexOf('.') !== -1) {
-      absSegments.pop();
-    }
-
-    for (let i = 0; i < relSegments.length; i += 1) {
-      switch (relSegments[i]) {
-        case '.':
-          break;
-        case '..':
-          absSegments.pop();
-          break;
-        default:
-          absSegments.push(relSegments[i]);
-      }
-    }
-    return absSegments.join('/');
-  }
-
   opts: {
-    hostnameRe: RegExp;
-    pathnameRe: RegExp;
-    resourcePathnameRe: RegExp;
+    selectors: string;
+    maxResources: number;
     maxDepth: number;
     runInTab: boolean;
   };
 
-  test(resource: IResource) {
-    // don't extract new resources if the max depth has been reached
-    const maxDepthReached = this.opts.maxDepth === -1 ? false : resource.depth >= this.opts.maxDepth;
+  test(site: ISite & IdbSite, resource: IResource) {
+    // only extract new urls of a currently crawled resource
+    if (!resource || !resource.crawlInProgress) return false;
 
-    // don't extract new resources from non-parsable pages or if the max depth has been reached
-    return (/html/i).test(resource.mediaType) && !maxDepthReached;
+    // don't extract new resources if max depth or max resources threshold has been reached
+    const validMaxDepth = this.opts.maxDepth === -1 ? true : resource.depth < this.opts.maxDepth;
+    const validMaxResources = this.opts.maxResources === -1 ? true : site.resourcesNo < this.opts.maxResources;
+
+    // don't extract new resources from non-parsable pages
+    const validMediaType = (/html/i).test(resource.mediaType);
+
+    return validMaxDepth && validMaxResources && validMediaType;
   }
 
-  apply(site: ISite, resource: IResource) {
-    return ({ urlsToAdd: this.extractResourceUrls(site, resource) });
+  apply(site: ISite & IdbSite, resource: IResource) {
+    let urlsToAdd = this.extractResourceUrls(site, resource);
+
+    // there's a limit of scrapped resources, enforce it
+    if (this.opts.maxResources !== -1) {
+      const maxAllowedResourceNo = this.opts.maxResources - site.resourcesNo;
+      if (maxAllowedResourceNo > 0) {
+        urlsToAdd = urlsToAdd.slice(0, maxAllowedResourceNo);
+      }
+      else {
+        urlsToAdd = [];
+      }
+    }
+
+    const result = this.diffAndMergeResult({ urlsToAdd })
+
+    // eslint-disable-next-line no-param-reassign
+    site.resourcesNo += result.urlsToAdd.length;
+
+    return result;
   }
 
-  /*
-  scan for resources in <a href />, <img src />
-  */
   extractResourceUrls(site, resource): string[] {
-    const doc = window.document;
     const currentUrl = new URL(resource.url);
 
-    const anchors = doc.getElementsByTagName('a');
-    const anchorHrefs = Array.from(new Set(Object.keys(anchors).map(key => anchors[key].href)));
+    const rawSelectors: string[] = this.opts.selectors.split('\n');
+    const urls = rawSelectors.reduce(
+      (urls, rawSelector) => {
+        let selector = rawSelector.trim();
 
-    const imgs = doc.getElementsByTagName('img');
-    const imgSrcs = Array.from(new Set(Object.keys(imgs).map(key => imgs[key].src)));
+        // remove comments with last occurance of ' #', ex: a.class # comment becomes a.class
+        if (/\s#/.test(selector)) {
+          const selectorMatch = /(.+)(?=(\s#))/.exec(selector);
+          // eslint-disable-next-line prefer-destructuring
+          selector = selectorMatch[1];
+        }
 
-    const partialUrls = anchorHrefs.concat(imgSrcs);
+        // nothing to query against
+        if (selector.length === 0) {
+          return urls;
+        }
+
+        const selectorUrls = this.extractSelectorUrls(selector);
+        return urls.concat(selectorUrls);
+      },
+      [],
+    );
+    const uniqueUrls = Array.from(new Set(urls));
+
     const validUrls = new Set<string>();
-
-    partialUrls.forEach(partialUrl => {
+    uniqueUrls.forEach(partialUrl => {
       // construct resource full URL without #hhtml_fragment_identifiers
       const resourceUrl = new URL(partialUrl, currentUrl);
       resourceUrl.hash = '';
 
-      if (this.isValidResourceUrl(currentUrl, resourceUrl)) {
+      if (this.isValidResourceUrl(resourceUrl)) {
         validUrls.add(resourceUrl.toString());
       }
     });
@@ -113,63 +122,27 @@ export default class ExtractUrlsPlugin extends BasePlugin {
     return Array.from(validUrls);
   }
 
-  isValidResourceUrl(currentUrl, resourceUrl) {
+  extractSelectorUrls(selector: string) {
+    const urls = Array.from(window.document.querySelectorAll(selector)).map((elm: any) => {
+      if (elm.href) return elm.href;
+      if (elm.src) return elm.src;
+      return null;
+    });
+
+    return urls.filter(url => url !== null);
+  }
+
+  isValidResourceUrl(resourceUrl) {
     // check valid protocol
     if (resourceUrl.protocol.match(/^(http:|https:)$/) === null) {
       return false;
     }
-
-    // check hostname matches regexp
-    if (this.opts.hostnameRe) {
-      if (!this.opts.hostnameRe.test(resourceUrl.hostname)) return false;
-    }
-    // check hostname matches at domain level
-    else if (!this.sameDomainHostnames(resourceUrl.hostname, currentUrl.hostname)) return false;
 
     // check valid pathname
     if (resourceUrl.pathname === null) {
       return false;
     }
 
-    /*
-    based on pathname decide if the resource is html or not
-    if no extension is found, resource is probably html
-    if an extension is found, test it against /htm|php/
-    */
-    const extensionRegExpArr = /^.*\.(.+)$/.exec(resourceUrl.pathname);
-    const isHtml = extensionRegExpArr ? /htm|php/.test(extensionRegExpArr[1]) : true;
-
-    // html resource found, filter which html pages should be queued for scraping
-    if (isHtml) {
-      // if no html regexp is defined ? add all urls : otherwise add only those matching the regexp
-      return this.opts.pathnameRe ? this.opts.pathnameRe.test(resourceUrl.pathname) : true;
-    }
-
-    /*
-    non html resource found
-    if no non-html regexp is defined ? skip all urls : otherwise add only those matching the regexp
-    */
-    return this.opts.resourcePathnameRe ? this.opts.resourcePathnameRe.test(resourceUrl.pathname) : false;
-  }
-
-  sameDomainHostnames(hostname: string, targetHostname: string): boolean {
-    const hostnameParts = hostname.split('.').reverse();
-    let commonHostname = '';
-
-    hostnameParts.forEach((hostnamePart, idx) => {
-      const cummulatedHostname = hostnameParts.slice(0, idx + 1).reverse().join('.');
-      if (targetHostname.endsWith(cummulatedHostname)) {
-        commonHostname = cummulatedHostname;
-      }
-    });
-
-    /*
-    something ending in:
-    - one extension (2 or more letters): .com, .info, ...
-    - two extensions (2-4 letters, 2 or more letters): co.uk, com.ro
-    the domain without extension has to be 4 letters or more, testing bla.com will fail
-    for now this is an acceptable compromise
-    */
-    return /[\w-]{4,}\.[\w-]{2,}$|[\w-]+\.[\w-]{2,4}\.[\w-]{2,}$/.test(commonHostname);
+    return true;
   }
 }
