@@ -13,8 +13,10 @@ export interface ICrawlDefinition {
   project: IProjectStorage;
   expectedResources: {
     url: string;
+    actions?: string[];
     mediaType: string;
-    info;
+    content;
+    meta;
   }[];
   expectedCsv: string[];
   csvLineSeparator: string;
