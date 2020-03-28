@@ -1,17 +1,15 @@
 import { IScenario, ExportType, IExportOpt } from 'get-set-fetch-extension-commons';
 
-import ExtractHtmlContentPlugin from './plugins/ExtractHtmlContentPlugin';
-
 export default class ExtractHtmlContent implements IScenario {
   getPluginNames() {
     return [
       'SelectResourcePlugin',
       'FetchPlugin',
+      'ScrollPlugin',
       'ExtractUrlsPlugin',
       'ExtractHtmlContentPlugin',
-      'ScrollPlugin',
-      'UpdateResourcePlugin',
       'InsertResourcesPlugin',
+      'UpsertResourcePlugin',
     ];
   }
 
@@ -19,7 +17,7 @@ export default class ExtractHtmlContent implements IScenario {
     return [
       {
         label: 'Html Content',
-        render: row => (row.info ? JSON.stringify(row.info.content) : ''),
+        render: row => JSON.stringify(row.content),
       },
       {
         label: 'URL',
@@ -32,7 +30,7 @@ export default class ExtractHtmlContent implements IScenario {
     return [
       {
         type: ExportType.CSV,
-        cols: [ 'url', 'info.content' ],
+        cols: [ 'url', 'content' ],
         fieldSeparator: ',',
         lineSeparator: '\n',
       },
@@ -43,7 +41,3 @@ export default class ExtractHtmlContent implements IScenario {
     ];
   }
 }
-
-export const embeddedPlugins = {
-  ExtractHtmlContentPlugin,
-};

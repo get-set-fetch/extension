@@ -7,11 +7,11 @@ export default class ExtractResources implements IScenario {
     return [
       'SelectResourcePlugin',
       'FetchPlugin',
+      'ScrollPlugin',
       'ExtractUrlsPlugin',
       'ImageFilterPlugin',
-      'ScrollPlugin',
-      'UpdateResourcePlugin',
       'InsertResourcesPlugin',
+      'UpsertResourcePlugin',
     ];
   }
 
@@ -19,7 +19,7 @@ export default class ExtractResources implements IScenario {
     return [
       {
         label: 'Title',
-        render: row => (row.info ? row.info.title : ''),
+        render: row => (row.content ? row.content.title : ''),
       },
       {
         label: 'Type',

@@ -10,7 +10,10 @@ export default class ImageFilterPlugin extends BasePlugin {
     } as IEnhancedJSONSchema;
   }
 
-  test(resource: IResource) {
+  test(site: ISite, resource: IResource) {
+    // only extract metadata of a currently crawled resource
+    if (!resource || !resource.crawlInProgress) return false;
+
     return (/image/i).test(resource.mediaType);
   }
 
@@ -20,7 +23,7 @@ export default class ImageFilterPlugin extends BasePlugin {
       img.onload = (evt: Event) => {
         window.URL.revokeObjectURL(img.src);
         resolve({
-          info: {
+          meta: {
             width: img.naturalWidth,
             height: img.naturalHeight,
             name: resource.url.split('/').pop().split('#')[0].split('?')[0],
