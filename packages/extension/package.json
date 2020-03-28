@@ -21,9 +21,12 @@
     "copy:scenario-extract-html-content-dist": "shx mkdir -p dist/scenarios/get-set-fetch-scenario-extract-html-content/dist && shx cp -R ../../node_modules/get-set-fetch-scenario-extract-html-content/dist/* dist/scenarios/get-set-fetch-scenario-extract-html-content/dist",
     "copy:scenario-extract-html-content-pkg": "shx cp -R ../../node_modules/get-set-fetch-scenario-extract-html-content/package.json dist/scenarios/get-set-fetch-scenario-extract-html-content",
     "copy:scenario-extract-html-content": "npm run copy:scenario-extract-html-content-dist && npm run copy:scenario-extract-html-content-pkg",
-    "copy:scenarios": "npm run copy:scenario-extract-resource && npm run copy:scenario-extract-html-content",
+    "copy:scenario-extract-dynamic-content-dist": "shx mkdir -p dist/scenarios/get-set-fetch-scenario-extract-dynamic-content/dist && shx cp -R ../../node_modules/get-set-fetch-scenario-extract-dynamic-content/dist/* dist/scenarios/get-set-fetch-scenario-extract-dynamic-content/dist",
+    "copy:scenario-extract-dynamic-content-pkg": "shx cp -R ../../node_modules/get-set-fetch-scenario-extract-dynamic-content/package.json dist/scenarios/get-set-fetch-scenario-extract-dynamic-content",
+    "copy:scenario-extract-dynamic-content": "npm run copy:scenario-extract-dynamic-content-dist && npm run copy:scenario-extract-dynamic-content-pkg",
+    "copy:scenarios": "npm run copy:scenario-extract-resource && npm run copy:scenario-extract-html-content && npm run copy:scenario-extract-dynamic-content",
     "test": "mocha test \"./test/integration/**/*.ts\" --exit",
-    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"maxDepth = 1\""
+    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"UserPlugin CRUD Pages\""
   },
   "author": {
     "name": "Andrei Sabau"
@@ -36,6 +39,7 @@
     "get-set-fetch-extension-commons": "file:../commons",
     "get-set-fetch-extension-popup": "file:../popup",
     "get-set-fetch-scenario-extract-html-content": "file:../scenarios/extract-html-content",
-    "get-set-fetch-scenario-extract-resources": "file:../scenarios/extract-resources"
+    "get-set-fetch-scenario-extract-resources": "file:../scenarios/extract-resources",
+    "get-set-fetch-scenario-extract-dynamic-content": "file:../scenarios/extract-dynamic-content"
   }
 }
