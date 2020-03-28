@@ -148,18 +148,19 @@ export default class ModuleRuntimeManager {
       */
       await ActiveTabHelper.executeScript(tabId, { code: `
         {
-          ${codeWithoutExport}
-
           (async function() {
             try {
-              // instantiate plugin instance
-              const ${pluginInstanceName} = new ${pluginDef}(${JSON.stringify(pluginInstance.opts)})
+              // instantiate plugin instance, one time only, multiple plugin invocations will retain the previous plugin state
+              if (!window.${pluginInstanceName}) {
+                ${codeWithoutExport}
+                window.${pluginInstanceName} = new ${pluginDef}(${JSON.stringify(pluginInstance.opts)})
+              }
 
               // execute plugin
               let result = null;
-              const isApplicable = ${pluginInstanceName}.test(${JSON.stringify(resource)});
+              const isApplicable = window.${pluginInstanceName}.test(${JSON.stringify(site)}, ${JSON.stringify(resource)});
               if (isApplicable) {
-                result = await ${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)});
+                result = await window.${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)});
               }
 
               // send the result back via messaging as the promise content will just be serialized to {}
