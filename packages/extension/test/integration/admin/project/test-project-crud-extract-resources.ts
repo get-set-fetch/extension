@@ -31,10 +31,9 @@ describe('Project CRUD Pages', () => {
       {
         name: 'ExtractUrlsPlugin',
         opts: {
-          hostnameRe: '/hostname/',
-          pathnameRe: '/pathname/',
-          resourcePathnameRe: '/(gif|png|jpg|jpeg)$/i',
+          selectors: 'img',
           maxDepth: 11,
+          maxResources: 101,
         },
       },
       {
@@ -43,19 +42,15 @@ describe('Project CRUD Pages', () => {
       },
       {
         name: 'ScrollPlugin',
-        opts: {
-          enabled: false,
-        },
+        opts: {},
       },
       {
-        name: 'UpdateResourcePlugin',
+        name: 'UpsertResourcePlugin',
         opts: {},
       },
       {
         name: 'InsertResourcesPlugin',
-        opts: {
-          maxResources: 101,
-        },
+        opts: {},
       },
     ],
   };
@@ -78,12 +73,22 @@ describe('Project CRUD Pages', () => {
         opts: {},
       },
       {
+        name: 'ScrollPlugin',
+        opts: {
+          delay: 1000,
+          enabled: false,
+          maxScrollNo: -1,
+          runInTab: true,
+          domManipulation: true,
+          timeout: 2000,
+        },
+      },
+      {
         name: 'ExtractUrlsPlugin',
         opts: {
-          hostnameRe: '/hostname/',
-          pathnameRe: '/pathname/',
-          resourcePathnameRe: '/(gif|png|jpg|jpeg)$/i',
+          selectors: 'img',
           maxDepth: 11,
+          maxResources: 101,
           runInTab: true,
         },
       },
@@ -92,30 +97,17 @@ describe('Project CRUD Pages', () => {
         opts: {},
       },
       {
-        name: 'ScrollPlugin',
-        opts: {
-          delay: 1000,
-          enabled: false,
-          lazyLoading: true,
-          maxScrollNo: -1,
-          runInTab: true,
-          timeout: 2000,
-        },
-      },
-      {
-        name: 'UpdateResourcePlugin',
+        name: 'InsertResourcesPlugin',
         opts: {},
       },
       {
-        name: 'InsertResourcesPlugin',
-        opts: {
-          maxResources: 101,
-        },
+        name: 'UpsertResourcePlugin',
+        opts: {},
       },
     ],
   };
 
-  const expectedConfigHash = 'eLsI6WqtnVJLi8IwEP4rEjy4YBu6x968CIIsgl49xHYaI2nSTafULvrfN7Gktj520cMcJpNhvle3Wxh9sOxndxL6waj/7GXdIxYxpXVdh6VAYGGicypUCsdwj7kcqs4Bg9JW5hQL/CCAVqnAdNDecScz8F2BSppWxKtZ0TOzut3zO7ZR31FyYxn1nZt4UqvBjwkX2alQ/HQoXAH/GFMxCEJkOZhKLdSG7UiMpoI+ykXOOMyFRDB/kVknRkt5x8PqvpOQkjhjsoTbO1Mi2U+z1CwVivunXvanBEUOukISf15aC7o99KWd9v8G9iHU16IbOVe3519xDfMN';
+  const expectedConfigHash = 'eLsgz82lgystKMrPAjrUESOJwSQUkIVhyS6jpKTASl+/vLxcrzizJDVRLzk/Vz8zLyW1Qi8DGCioqTI9tUS3GIjTQElIFyahmwoJRN0iuCfISb0oCVYHOTFTI/WiJ1gi0ydKokdJrBhpnpzUm5mbTln6pU4KJC3FAQAl7tle';
 
   before(async () => {
     const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
@@ -154,6 +146,7 @@ describe('Project CRUD Pages', () => {
     // dropdown scenario is correctly populated#
     const expectedScenariNamedOpts = [
       { label: 'Select' },
+      { label: 'get-set-fetch-scenario-extract-dynamic-content' },
       { label: 'get-set-fetch-scenario-extract-html-content' },
       { label: 'get-set-fetch-scenario-extract-resources' },
     ];
@@ -255,12 +248,8 @@ describe('Project CRUD Pages', () => {
 
     const extractUrlsPlugin: IPluginDefinition = projectToUpdate.plugins.find(plugin => plugin.name === 'ExtractUrlsPlugin');
     extractUrlsPlugin.opts.maxDepth += 1;
-    extractUrlsPlugin.opts.hostnameRe = '/hostname_changed/';
-    extractUrlsPlugin.opts.pathnameRe = '/pathname_changed/';
-    extractUrlsPlugin.opts.resourcePathnameRe = '/png/';
-
-    const insertResourcesPlugin: IPluginDefinition = projectToUpdate.plugins.find(plugin => plugin.name === 'InsertResourcesPlugin');
-    insertResourcesPlugin.opts.maxResources += 1;
+    extractUrlsPlugin.opts.maxResources += 1;
+    extractUrlsPlugin.opts.selectors = 'a.changed';
 
     const selectResourcePlugin: IPluginDefinition = projectToUpdate.plugins.find(plugin => plugin.name === 'SelectResourcePlugin');
     selectResourcePlugin.opts.delay += 1;
@@ -277,9 +266,9 @@ describe('Project CRUD Pages', () => {
     scrollPlugin.opts = {
       delay: 1000,
       enabled: false,
-      lazyLoading: true,
       maxScrollNo: -1,
       runInTab: true,
+      domManipulation: true,
       timeout: 2000,
     };
 

@@ -41,6 +41,12 @@ describe('Scenario List', () => {
     // check builtin scenarios presence in scenario list
     const expectedScenarios = [
       {
+        description: 'Extract Dynamic Content scenario is used for extracting content from javascript based html pages',
+        homepage: 'https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-dynamic-content',
+        name: 'get-set-fetch-scenario-extract-dynamic-content',
+        status: 'Built-in',
+      },
+      {
         name: 'get-set-fetch-scenario-extract-resources',
         description: 'Extract Resources scenario is used for extracting various resources from the corresponding sites.',
         homepage: 'https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-resources',

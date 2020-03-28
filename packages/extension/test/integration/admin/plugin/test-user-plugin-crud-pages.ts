@@ -30,7 +30,7 @@ describe('UserPlugin CRUD Pages', () => {
     await browserHelper.close();
   });
 
-  it('Test Check Default Plugins', async () => {
+  it('Test Check Available Plugins', async () => {
     // retrieve plugin names
     const pluginNames = await page.evaluate(
       () => {
@@ -45,10 +45,11 @@ describe('UserPlugin CRUD Pages', () => {
       'ExtractUrlsPlugin',
       'InsertResourcesPlugin',
       'SelectResourcePlugin',
-      'UpdateResourcePlugin',
+      'UpsertResourcePlugin',
       'ImageFilterPlugin',
       'ExtractHtmlContentPlugin',
       'ScrollPlugin',
+      'DynamicNavigationPlugin',
     ];
     assert.sameMembers(pluginNames, expectedPluginNames);
   });
@@ -84,7 +85,7 @@ describe('UserPlugin CRUD Pages', () => {
     assert.strictEqual(actualPlugin.name, pluginNameInList);
 
     // cleanup
-    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [ savedPlugin.id ]);
+    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [savedPlugin.id]);
   });
 
   it('Test Update Existing Plugin', async () => {
@@ -131,7 +132,7 @@ describe('UserPlugin CRUD Pages', () => {
     assert.strictEqual(`${actualPlugin.name}${changedSuffix}`, pluginNameInList);
 
     // cleanup
-    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [ updatedPlugin.id ]);
+    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [updatedPlugin.id]);
   });
 
   it('Test Start Update Existing Plugin And Cancel', async () => {
@@ -178,7 +179,7 @@ describe('UserPlugin CRUD Pages', () => {
     assert.strictEqual(actualPlugin.name, pluginNameInList);
 
     // cleanup
-    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [ updatedPlugin.id ]);
+    await page.evaluate(pluginIds => GsfClient.fetch('DELETE', 'plugins', { ids: pluginIds }), [updatedPlugin.id]);
   });
 
   it('Test Delete Existing Plugin', async () => {

@@ -30,7 +30,7 @@ xdescribe('Site Crawl Extract HTML Headers', () => {
         name: 'ExtractTitlePlugin',
       },
       {
-        name: 'UpdateResourcePlugin',
+        name: 'UpsertResourcePlugin',
       },
       {
         name: 'InsertResourcesPlugin',
@@ -118,7 +118,7 @@ xdescribe('Site Crawl Extract HTML Headers', () => {
     for (let i = 0; i < crawledResources.length; i += 1) {
       const crawledResource = crawledResources[i];
       assert.strictEqual('text/html', crawledResource.mediaType);
-      assert.strictEqual(titles[crawledResource.url], crawledResource.info.title);
+      assert.strictEqual(titles[crawledResource.url], crawledResource.content.title);
     }
 
     // reload site list

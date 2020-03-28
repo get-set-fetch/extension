@@ -1,22 +1,22 @@
 let HttpMethod;
 (function (HttpMethod) {
-  HttpMethod['GET'] = 'GET';
-  HttpMethod['POST'] = 'POST';
-  HttpMethod['PUT'] = 'PUT';
-  HttpMethod['DELETE'] = 'DELETE';
+  HttpMethod.GET = 'GET';
+  HttpMethod.POST = 'POST';
+  HttpMethod.PUT = 'PUT';
+  HttpMethod.DELETE = 'DELETE';
 }(HttpMethod || (HttpMethod = {})));
 let ExportType;
 (function (ExportType) {
-  ExportType['CSV'] = 'csv';
-  ExportType['ZIP'] = 'zip';
+  ExportType.CSV = 'csv';
+  ExportType.ZIP = 'zip';
 }(ExportType || (ExportType = {})));
 let LogLevel;
 (function (LogLevel) {
-  LogLevel[LogLevel['TRACE'] = 0] = 'TRACE';
-  LogLevel[LogLevel['DEBUG'] = 1] = 'DEBUG';
-  LogLevel[LogLevel['INFO'] = 2] = 'INFO';
-  LogLevel[LogLevel['WARN'] = 3] = 'WARN';
-  LogLevel[LogLevel['ERROR'] = 4] = 'ERROR';
+  LogLevel[LogLevel.TRACE = 0] = 'TRACE';
+  LogLevel[LogLevel.DEBUG = 1] = 'DEBUG';
+  LogLevel[LogLevel.INFO = 2] = 'INFO';
+  LogLevel[LogLevel.WARN = 3] = 'WARN';
+  LogLevel[LogLevel.ERROR = 4] = 'ERROR';
 }(LogLevel || (LogLevel = {})));
 
 class SchemaHelper {
@@ -111,7 +111,10 @@ class ExtractHeadingsPlugin extends BasePlugin {
     };
   }
 
-  test(resource) {
+  test(site, resource) {
+    // only extract new urls of a currently crawled resource
+    if (!resource || !resource.crawlInProgress) return false;
+
     return resource.mediaType.indexOf('html') !== -1;
   }
 
@@ -121,9 +124,7 @@ class ExtractHeadingsPlugin extends BasePlugin {
     ), []);
 
     return {
-      info: {
-        content: headings,
-      },
+      content: headings,
     };
   }
 }
@@ -135,8 +136,8 @@ class ExtractHtmlHeadings {
       'FetchPlugin',
       'ExtractUrlsPlugin',
       'ExtractHeadingsPlugin',
-      'UpdateResourcePlugin',
       'InsertResourcesPlugin',
+      'UpsertResourcePlugin',
     ];
   }
 
@@ -144,7 +145,7 @@ class ExtractHtmlHeadings {
     return [
       {
         label: 'Html Content',
-        render: row => (row.info ? JSON.stringify(row.info.content) : ''),
+        render: row => JSON.stringify(row.content),
       },
       {
         label: 'URL',
@@ -157,7 +158,7 @@ class ExtractHtmlHeadings {
     return [
       {
         type: ExportType.CSV,
-        cols: [ 'url', 'info.content' ],
+        cols: [ 'url', 'content' ],
         fieldSeparator: ',',
         lineSeparator: '\n',
       },
@@ -173,4 +174,5 @@ const embeddedPlugins = {
 };
 
 export default ExtractHtmlHeadings;
+// eslint-disable-next-line object-curly-newline
 export { embeddedPlugins };

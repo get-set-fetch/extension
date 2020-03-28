@@ -12,18 +12,32 @@ const crawlDefinitions: ICrawlDefinition[] = [
         {
           name: 'ExtractUrlsPlugin',
           opts: {
+            selectors: 'a[href$=".html"] # follow html links',
             maxDepth: -1,
+            maxResources: -1,
           },
         },
       ],
     },
     expectedResources: [
-      { url: 'https://www.sitea.com/index.html', mediaType: 'text/html', info: { content: [ 'Main Header 1' ] } },
-      { url: 'https://www.sitea.com/pageA.html', mediaType: 'text/html', info: { content: [ 'PageA Heading Level 1', 'PageA Heading Level 2' ] } },
-      { url: 'https://www.sitea.com/pageB.html', mediaType: 'text/html', info: { content: [ 'PageB Heading Level 1', 'PageB Heading Level 3' ] } },
+      { url: 'https://www.sitea.com/index.html',
+        actions: [],
+        mediaType: 'text/html',
+        content: [ 'Main Header 1' ],
+        meta: {} },
+      { url: 'https://www.sitea.com/pageA.html',
+        actions: [],
+        mediaType: 'text/html',
+        content: [ 'PageA Heading Level 1', 'PageA Heading Level 2' ],
+        meta: {} },
+      { url: 'https://www.sitea.com/pageB.html',
+        actions: [],
+        mediaType: 'text/html',
+        content: [ 'PageB Heading Level 1', 'PageB Heading Level 3' ],
+        meta: {} },
     ],
     expectedCsv: [
-      'url,info.content.0,info.content.1',
+      'url,content.0,content.1',
       '"https://www.sitea.com/index.html","Main Header 1",""',
       '"https://www.sitea.com/pageA.html","PageA Heading Level 1","PageA Heading Level 2"',
       '"https://www.sitea.com/pageB.html","PageB Heading Level 1","PageB Heading Level 3"',
@@ -32,4 +46,4 @@ const crawlDefinitions: ICrawlDefinition[] = [
   },
 ];
 
-crawlProjectBaseSuite('Extract Html Headings', [ crawlDefinitions[0] ], false);
+crawlProjectBaseSuite('Extract Html Headings', crawlDefinitions);
