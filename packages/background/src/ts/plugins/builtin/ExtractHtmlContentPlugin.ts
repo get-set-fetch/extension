@@ -1,5 +1,5 @@
 import { ISite, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
-import { BasePlugin } from 'get-set-fetch-extension-commons/lib/plugin';
+import { BasePlugin } from 'get-set-fetch-extension-commons';
 
 export default class ExtractHtmlContentPlugin extends BasePlugin {
   getOptsSchema(): IEnhancedJSONSchema {
@@ -20,7 +20,7 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
           },
         },
       },
-      required: [ 'runInTab', 'selectors' ],
+      required: ['runInTab', 'selectors'],
     };
   }
 
@@ -29,13 +29,22 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
     selectors: string;
   };
 
-  test(resource: IResource) {
+  test(site: ISite, resource: IResource) {
+    // only extract content of a currently crawled resource
+    if (!resource || !resource.crawlInProgress) return false;
+
     return (/html/i).test(resource.mediaType);
   }
 
   apply(site: ISite, resource: IResource) {
+    const content = this.extractContent();
+    const result = this.diffAndMergeResult({ content })
+    return result;
+  }
+
+  extractContent() {
     const selectors: string[] = this.opts.selectors.split('\n');
-    const textResult = selectors.reduce(
+    const content = selectors.reduce(
       (result, selector) => Object.assign(
         result,
         {
@@ -45,10 +54,6 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
       {},
     );
 
-    return {
-      info: {
-        content: textResult,
-      },
-    };
+    return content;
   }
 }
