@@ -110,7 +110,7 @@ export default class BrowserHelper {
     const queryParams = stringify({ redirectPath: '/scenarios' });
     await this.page.goto(`chrome-extension://${this.extension.id}/admin/admin.html?${queryParams}`, this.gotoOpts);
 
-    const scenarioNo = 2;
+    const scenarioNo = 3;
     let tryNo = 0;
     let scenarios = [];
     while (tryNo < 10 && scenarios.length < scenarioNo) {
