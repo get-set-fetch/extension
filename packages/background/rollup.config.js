@@ -64,7 +64,7 @@ const crawlPlugins = [
   { name: 'ExtractUrlsPlugin', src: 'src/ts/plugins/builtin/ExtractUrlsPlugin.ts' },
   { name: 'ScrollPlugin', src: 'src/ts/plugins/builtin/ScrollPlugin.ts' },
   { name: 'ExtractHtmlContentPlugin', src: 'src/ts/plugins/builtin/ExtractHtmlContentPlugin.ts' },
-  // { name: 'DynamicNavigationPlugin', src: 'src/ts/plugins/builtin/DynamicNavigationPlugin.ts' },
+  { name: 'DynamicNavigationPlugin', src: 'src/ts/plugins/builtin/DynamicNavigationPlugin.ts' },
 ];
 const crawlPluginConfig = crawlPlugins.map(plugin => ({
   input: plugin.src,

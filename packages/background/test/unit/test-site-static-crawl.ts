@@ -15,7 +15,7 @@ import ExtractHtmlContentPlugin from '../../src/ts/plugins/builtin/ExtractHtmlCo
 
 const conn = { info: 'IndexedDB' };
 
-describe(`Test Site Crawl, using connection ${conn.info}`, () => {
+describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
   let Site: typeof IdbSite;
   let Resource: typeof IdbResource;
   let Plugin: typeof IdbPlugin;

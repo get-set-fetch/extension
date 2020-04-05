@@ -71,9 +71,9 @@ export default class ModuleRuntimeManager {
     );
   }
 
-  static async instantiatePlugins(plugins: IPluginDefinition[]): Promise<BasePlugin[]> {
+  static async instantiatePlugins(pluginsDefs: IPluginDefinition[]): Promise<BasePlugin[]> {
     return Promise.all(
-      plugins.map(async plugin => ModuleRuntimeManager.instantiatePlugin(plugin.name, plugin.opts)),
+      pluginsDefs.map(async pluginsDef => ModuleRuntimeManager.instantiatePlugin(pluginsDef.name, pluginsDef.opts)),
     );
   }
 

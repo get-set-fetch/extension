@@ -31,6 +31,15 @@ describe('Test ModuleRuntimeManager', () => {
         opts: {},
       },
       {
+        name: 'DynamicNavigationPlugin',
+        opts: {
+          domManipulation: true,
+          maxResources: 100,
+          runInTab: true,
+          selectors: '.more # content',
+        },
+      },
+      {
         name: 'ScrollPlugin',
         opts: {
           runInTab: true,
@@ -51,6 +60,14 @@ describe('Test ModuleRuntimeManager', () => {
         },
       },
       {
+        name: 'ExtractHtmlContentPlugin',
+        opts: {
+          runInTab: true,
+          selectors: 'h1\nh2',
+        },
+      },
+
+      {
         name: 'UpsertResourcePlugin',
         opts: {},
       },
@@ -67,7 +84,7 @@ describe('Test ModuleRuntimeManager', () => {
 
   it('get scenario plugins schemas', async () => {
     sinon.stub(ModuleRuntimeManager, 'instantiateScenario').callsFake(async name => ({
-      getPluginNames: () => ['SelectResourcePlugin'],
+      getPluginNames: () => [ 'SelectResourcePlugin' ],
     }));
 
     const expectedSchemas: IEnhancedJSONSchema[] = [
@@ -88,7 +105,7 @@ describe('Test ModuleRuntimeManager', () => {
             description: 'Delay in miliseconds between fetching two consecutive resources.',
           },
         },
-        required: ['frequency', 'delay'],
+        required: [ 'frequency', 'delay' ],
       },
       // te iubesc.
     ];

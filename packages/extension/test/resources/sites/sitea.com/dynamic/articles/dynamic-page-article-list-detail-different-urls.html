@@ -1,0 +1,35 @@
+<html>
+
+<head>
+    <title>dynamic page article list</title>
+    <script>
+        articleTitles = ['A', 'B', 'C', 'D']
+        articleNo = 2
+        function loadMore(entry) {
+            if (articleNo >= articleTitles.length) return;
+
+            articleTitle = `Article ${articleTitles[articleNo]}`;
+            articleUrl = `article${articleTitles[articleNo]}.html`;
+            document.querySelector(".articles").insertAdjacentHTML(
+                'beforeend',
+                `<p><a href="${articleUrl}">${articleTitle}</a> brief summaryA</p>`
+            );
+            articleNo += 1;
+        }
+    </script>
+
+</head>
+
+<body>
+    <h1>Article List</h1>
+
+    <div class="articles">
+        <p><a href="articleA.html">Article A</a> brief summaryA</p>
+        <p><a href="articleB.html">Article B</a> brief summaryB</p>
+    </div>
+
+    <a href="javascript: loadMore()" class="more">Load more articles</a>
+
+</body>
+
+</html>

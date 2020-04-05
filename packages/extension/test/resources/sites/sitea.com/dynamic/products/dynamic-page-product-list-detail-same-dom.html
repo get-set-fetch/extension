@@ -1,0 +1,28 @@
+<html>
+
+<head>
+  <title>dynamic page simple list</title>
+  <script>
+    function showEntryDetail(entry) {
+      document.getElementById("detail").innerHTML = `<p class="title">${entry.title}</p><p class="description">${entry.description}</p>`;
+    }
+  </script>
+
+</head>
+
+<body>
+  <h1>Simple List</h1>
+
+  <ul>
+    <li><a href="javascript:showEntryDetail({title: 'productA', description: 'descriptionA'})">productA</a></li>
+    <li><a href="javascript:showEntryDetail({title: 'productB', description: 'descriptionB'})">productB</a></li>
+    <li><a href="javascript:showEntryDetail({title: 'productC', description: 'descriptionC'})">productC</a></li>
+    <li><a href="javascript:showEntryDetail({title: 'productC', description: 'descriptionC'})">productC duplicate</a>
+    </li>
+  </ul>
+
+  <div id="detail" />
+
+</body>
+
+</html>

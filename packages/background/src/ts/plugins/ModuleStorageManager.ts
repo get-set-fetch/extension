@@ -24,7 +24,16 @@ export default class ModuleStorageManager {
   /* PLUGIN UTILITIES */
 
   static get DEFAULT_PLUGINS(): string[] {
-    return [ 'SelectResourcePlugin', 'FetchPlugin', 'ScrollPlugin', 'ExtractUrlsPlugin', 'UpsertResourcePlugin', 'InsertResourcesPlugin' ];
+    return [
+      'SelectResourcePlugin',
+      'FetchPlugin',
+      'DynamicNavigationPlugin',
+      'ScrollPlugin',
+      'ExtractUrlsPlugin',
+      'ExtractHtmlContentPlugin',
+      'UpsertResourcePlugin',
+      'InsertResourcesPlugin',
+    ];
   }
 
   static async discoverLocalPlugins() {

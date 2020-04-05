@@ -1,13 +1,12 @@
 import { IScenario, ExportType, IExportOpt } from 'get-set-fetch-extension-commons';
 
-import DynamicNavigationPlugin from './plugins/DynamicNavigationPlugin';
-
 export default class ExtractDynamicContent implements IScenario {
   getPluginNames() {
     return [
       'SelectResourcePlugin',
       'FetchPlugin',
       'DynamicNavigationPlugin',
+      'ExtractUrlsPlugin',
       'ExtractHtmlContentPlugin',
       'InsertResourcesPlugin',
       'UpsertResourcePlugin',
@@ -31,7 +30,7 @@ export default class ExtractDynamicContent implements IScenario {
     return [
       {
         type: ExportType.CSV,
-        cols: [ 'url', 'content' ],
+        cols: [ 'url', 'actions', 'content' ],
         fieldSeparator: ',',
         lineSeparator: '\n',
       },
@@ -42,7 +41,3 @@ export default class ExtractDynamicContent implements IScenario {
     ];
   }
 }
-
-export const embeddedPlugins = {
-  DynamicNavigationPlugin,
-};
