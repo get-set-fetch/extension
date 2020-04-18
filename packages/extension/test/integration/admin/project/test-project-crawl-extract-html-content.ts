@@ -67,7 +67,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-      scenario: 'get-set-fetch-scenario-extract-html-content',
+      scenario: 'get-set-fetch-scenario-scrape-static-content',
       plugins: [
         {
           name: 'ExtractUrlsPlugin',
@@ -107,7 +107,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-      scenario: 'get-set-fetch-scenario-extract-html-content',
+      scenario: 'get-set-fetch-scenario-scrape-static-content',
       plugins: [
         {
           name: 'ExtractUrlsPlugin',
@@ -154,7 +154,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-      scenario: 'get-set-fetch-scenario-extract-html-content',
+      scenario: 'get-set-fetch-scenario-scrape-static-content',
       plugins: [
         {
           name: 'ExtractUrlsPlugin',
@@ -201,7 +201,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/pageC.html',
-      scenario: 'get-set-fetch-scenario-extract-html-content',
+      scenario: 'get-set-fetch-scenario-scrape-static-content',
       plugins: [
         {
           name: 'ExtractUrlsPlugin',
@@ -275,7 +275,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/pageC.html',
-      scenario: 'get-set-fetch-scenario-extract-html-content',
+      scenario: 'get-set-fetch-scenario-scrape-static-content',
       plugins: [
         {
           name: 'ExtractUrlsPlugin',

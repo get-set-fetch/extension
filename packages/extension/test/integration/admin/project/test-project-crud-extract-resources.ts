@@ -146,9 +146,9 @@ describe('Project CRUD Pages', () => {
     // dropdown scenario is correctly populated#
     const expectedScenariNamedOpts = [
       { label: 'Select' },
-      { label: 'get-set-fetch-scenario-extract-dynamic-content' },
-      { label: 'get-set-fetch-scenario-extract-html-content' },
-      { label: 'get-set-fetch-scenario-extract-resources' },
+      { label: 'get-set-fetch-scenario-extract-resources (builtin)' },
+      { label: 'get-set-fetch-scenario-scrape-dynamic-content (builtin)' },
+      { label: 'get-set-fetch-scenario-scrape-static-content (builtin)' },
     ];
     const scenarioNameOpts = await page.evaluate(
       () => Array.from((document.getElementById('scenarioPkg.name') as HTMLSelectElement).options)

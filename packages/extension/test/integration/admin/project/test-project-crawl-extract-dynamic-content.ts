@@ -101,7 +101,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/dynamic/products/dynamic-page-product-list-detail-same-dom.html',
-      scenario: 'get-set-fetch-scenario-extract-dynamic-content',
+      scenario: 'get-set-fetch-scenario-scrape-dynamic-content',
       plugins: [
         {
           name: 'DynamicNavigationPlugin',
@@ -162,7 +162,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/dynamic/products/dynamic-page-product-list-detail-same-dom.html',
-      scenario: 'get-set-fetch-scenario-extract-dynamic-content',
+      scenario: 'get-set-fetch-scenario-scrape-dynamic-content',
       plugins: [
         {
           name: 'DynamicNavigationPlugin',
