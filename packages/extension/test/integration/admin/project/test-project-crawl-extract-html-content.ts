@@ -95,7 +95,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       },
     ],
     expectedCsv: [
-      'url,content.h1.0,content.i.classA.0',
+      'url,content.h1,content.i.classA',
       '"https://www.sitea.com/index.html","Main Header 1","italics main"',
     ],
     csvLineSeparator: '\n',
