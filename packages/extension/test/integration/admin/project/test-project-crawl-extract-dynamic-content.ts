@@ -13,6 +13,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
           name: 'DynamicNavigationPlugin',
           opts: {
             selectors: 'a.more # content',
+            revisit: true,
             maxResources: -1,
           },
         },
@@ -119,29 +120,29 @@ const crawlDefinitions: ICrawlDefinition[] = [
     },
     expectedResources: [
       {
-        url: 'https://www.sitea.com/dynamic-page-product-list-detail-same-dom.html',
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-product-list-detail-same-dom.html',
         actions: [],
         mediaType: 'text/html',
         meta: {},
         content: { 'p.title': [], 'p.description': [] },
       },
       {
-        url: 'https://www.sitea.com/dynamic-page-product-list-detail-same-dom.html',
-        actions: [ 'productA#1' ],
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-product-list-detail-same-dom.html',
+        actions: [ 'productA' ],
         mediaType: 'text/html',
         meta: {},
         content: { 'p.title': [ 'productA' ], 'p.description': [ 'descriptionA' ] },
       },
       {
-        url: 'https://www.sitea.com/dynamic-page-product-list-detail-same-dom.html',
-        actions: [ 'productB#1' ],
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-product-list-detail-same-dom.html',
+        actions: [ 'productB' ],
         mediaType: 'text/html',
         meta: {},
         content: { 'p.title': [ 'productB' ], 'p.description': [ 'descriptionB' ] },
       },
       {
-        url: 'https://www.sitea.com/dynamic-page-product-list-detail-same-dom.html',
-        actions: [ 'productC#1' ],
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-product-list-detail-same-dom.html',
+        actions: [ 'productC' ],
         mediaType: 'text/html',
         meta: {},
         content: { 'p.title': [ 'productC' ], 'p.description': [ 'descriptionC' ] },
@@ -181,22 +182,22 @@ const crawlDefinitions: ICrawlDefinition[] = [
     },
     expectedResources: [
       {
-        url: 'https://www.sitea.com/dynamic-page-product-list-detail-same-dom.html',
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-product-list-detail-same-dom.html',
         actions: [],
         mediaType: 'text/html',
         meta: {},
         content: { 'p.title': [], 'p.description': [] },
       },
       {
-        url: 'https://www.sitea.com/dynamic-page-product-list-detail-same-dom.html',
-        actions: [ 'productA#1' ],
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-product-list-detail-same-dom.html',
+        actions: [ 'productA' ],
         mediaType: 'text/html',
         meta: {},
         content: { 'p.title': [ 'productA' ], 'p.description': [ 'descriptionA' ] },
       },
       {
-        url: 'https://www.sitea.com/dynamic-page-product-list-detail-same-dom.html',
-        actions: [ 'productB#1' ],
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-product-list-detail-same-dom.html',
+        actions: [ 'productB' ],
         mediaType: 'text/html',
         meta: {},
         content: { 'p.title': [ 'productB' ], 'p.description': [ 'descriptionB' ] },
@@ -210,10 +211,139 @@ const crawlDefinitions: ICrawlDefinition[] = [
     ],
     csvLineSeparator: '\n',
   },
+  {
+    title: 'advanced product list, each product entry updates entire dom with product detail, cancel btn updates dom with product list',
+    project: {
+      name: 'projA',
+      description: 'descriptionA',
+      url: 'https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom.html',
+      scenario: 'get-set-fetch-scenario-scrape-dynamic-content',
+      plugins: [
+        {
+          name: 'DynamicNavigationPlugin',
+          opts: {
+            selectors: '.products a # content\n.cancel',
+            maxResources: -1,
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: 'p.title\np.description',
+          },
+        },
+      ],
+    },
+    expectedResources: [
+      {
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom.html',
+        mediaType: 'text/html',
+        meta: {},
+        content: { 'p.title': [], 'p.description': [] },
+        actions: [],
+      },
+      {
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom.html',
+        mediaType: 'text/html',
+        meta: {},
+        content: { 'p.title': [ 'productA' ], 'p.description': [ 'descriptionA' ] },
+        actions: [ 'productA' ],
+      },
+      {
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom.html',
+        mediaType: 'text/html',
+        meta: {},
+        content: { 'p.title': [ 'productB' ], 'p.description': [ 'descriptionB' ] },
+        actions: [ 'productB' ],
+      },
+      {
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom.html',
+        mediaType: 'text/html',
+        meta: {},
+        content: { 'p.title': [ 'productC' ], 'p.description': [ 'descriptionC' ] },
+        actions: [ 'productC' ],
+      },
+    ],
+    expectedCsv: [
+      'url,actions,content.p.description,content.p.title',
+      '"https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom.html","","",""',
+      '"https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom.html","productA","descriptionA","productA"',
+      '"https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom.html","productB","descriptionB","productB"',
+      '"https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom.html","productC","descriptionC","productC"',
 
-  // advanced product list with cancel simple product list, product detail is loaded below the list, single content selector, maxResources = 2
-  // simple product list with preloader, settimeout
+    ],
+    csvLineSeparator: '\n',
+  },
+  {
+    title: 'advanced product list, each product entry updates entire dom with product detail, cancel btn updates dom with product list, preloader',
+    project: {
+      name: 'projA',
+      description: 'descriptionA',
+      url: 'https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom-preloader.html',
+      scenario: 'get-set-fetch-scenario-scrape-dynamic-content',
+      plugins: [
+        {
+          name: 'FetchPlugin',
+          opts: {
+            stabilityTimeout: 800,
+          },
+        },
+        {
+          name: 'DynamicNavigationPlugin',
+          opts: {
+            selectors: '.products a # content\n.cancel',
+            stabilityTimeout: 800,
+            maxResources: -1,
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: 'p.title\np.description',
+          },
+        },
+      ],
+    },
+    expectedResources: [
+      {
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom-preloader.html',
+        mediaType: 'text/html',
+        meta: {},
+        content: { 'p.title': [], 'p.description': [] },
+        actions: [],
+      },
+      {
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom-preloader.html',
+        mediaType: 'text/html',
+        meta: {},
+        content: { 'p.title': [ 'productA' ], 'p.description': [ 'descriptionA' ] },
+        actions: [ 'productA' ],
+      },
+      {
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom-preloader.html',
+        mediaType: 'text/html',
+        meta: {},
+        content: { 'p.title': [ 'productB' ], 'p.description': [ 'descriptionB' ] },
+        actions: [ 'productB' ],
+      },
+      {
+        url: 'https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom-preloader.html',
+        mediaType: 'text/html',
+        meta: {},
+        content: { 'p.title': [ 'productC' ], 'p.description': [ 'descriptionC' ] },
+        actions: [ 'productC' ],
+      },
+    ],
+    expectedCsv: [
+      'url,actions,content.p.description,content.p.title',
+      '"https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom-preloader.html","","",""',
+      '"https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom-preloader.html","productA","descriptionA","productA"',
+      '"https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom-preloader.html","productB","descriptionB","productB"',
+      '"https://www.sitea.com/dynamic/products/dynamic-page-advanced-product-list-detail-different-dom-preloader.html","productC","descriptionC","productC"',
 
+    ],
+    csvLineSeparator: '\n',
+  },
 ];
 
-crawlProjectBaseSuite('Extract Dynamic Content', [ crawlDefinitions[0] ], false);
+crawlProjectBaseSuite('Extract Dynamic Content', crawlDefinitions);

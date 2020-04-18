@@ -1,0 +1,58 @@
+<html>
+
+<head>
+    <title>dynamic page simple list</title>
+    <script>
+        const products = [
+            { title: 'productA', description: "descriptionA" },
+            { title: 'productB', description: "descriptionB" },
+            { title: 'productC', description: "descriptionC" },
+        ]
+
+        function showPartialPreloader(percent) {
+            document.querySelector(".content").innerHTML = `loading ... ${percent}`;
+            return new Promise(resolve => {
+                setTimeout(resolve, 500);
+            })
+        }
+
+        async function showPreloader() {
+            await showPartialPreloader(0);
+            await showPartialPreloader(25);
+            await showPartialPreloader(50);
+            await showPartialPreloader(75);
+        }
+
+        async function showEntryDetail(idx) {
+            await showPreloader();
+            product = products[idx];
+            document.querySelector(".content").innerHTML = `
+                <p class="title">${product.title}</p><p class="description">${product.description}</p>
+                <a class="cancel" href="javascript: showEntryList()">cancel</a>
+            `;
+        }
+        async function showEntryList() {
+            await showPreloader();
+            document.querySelector(".content").innerHTML = `
+                <h1>Advanced Product List</h1>
+
+                <div class="products">
+                    ${renderEntries()}
+                    <p>product A duplicate <a href="javascript:showEntryDetail(0)">productA duplicate</a></p>
+                </div>
+            `;
+        }
+
+        function renderEntries() {
+            return products.map((product, idx) => `<p><a href="javascript:showEntryDetail(${idx})">${product.title}</a></p>`).join("")
+        }
+
+    </script>
+
+</head>
+
+<body onload="showEntryList()">
+    <div class="content" />
+</body>
+
+</html>

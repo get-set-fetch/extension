@@ -47,16 +47,8 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
     site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', plugins });
     await site.save();
 
-    // stub "runInTab", run plugins directly don't inject them into dom
-    sandbox.stub(ModuleRuntimeManager, 'runInTab').callsFake((tabId, plugin, site, resource) => {
-      /*
-      console.log('runInTab');
-      console.log(plugin);
-      console.log(resource);
-      console.log(site.resourcesNo);
-      console.log('--');
-      console.log('--');
-      */
+    // stub "domRead", run plugins directly don't inject them into dom
+    sandbox.stub(ModuleRuntimeManager, 'runPluginInDom').callsFake((tabId, plugin, site, resource) => {
       if (resource) {
         resource.mediaType = 'html';
       }
@@ -68,9 +60,6 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
 
   afterEach(async () => {
     sandbox.restore();
-
-    // (ModuleRuntimeManager.runInTab as any).restore();
-    // (ModuleRuntimeManager.instantiatePlugins as any).restore();
   });
 
   after(async () => {
@@ -80,7 +69,9 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
   it('load more results, single selector, maxResources = -1', async () => {
     const dynamicNavPlugDef = site.plugins.find(plugin => plugin.name === 'DynamicNavigationPlugin');
     dynamicNavPlugDef.opts.selectors = '.more # content';
+    dynamicNavPlugDef.opts.revisit = true;
     dynamicNavPlugDef.opts.maxResources = -1;
+    dynamicNavPlugDef.opts.stabilityTimeout = 0;
 
 
     let upsertSpy;
@@ -208,7 +199,9 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
   it('load more results, single selector, maxResources = 2', async () => {
     const dynamicNavPlugDef = site.plugins.find(plugin => plugin.name === 'DynamicNavigationPlugin');
     dynamicNavPlugDef.opts.selectors = '.more # content';
+    dynamicNavPlugDef.opts.revisit = true;
     dynamicNavPlugDef.opts.maxResources = 2;
+    dynamicNavPlugDef.opts.stabilityTimeout = 0;
 
     let upsertSpy;
     let snapshotStub;
@@ -315,7 +308,7 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
     const dynamicNavPlugDef = site.plugins.find(plugin => plugin.name === 'DynamicNavigationPlugin');
     dynamicNavPlugDef.opts.selectors = '.detail # content\n.cancel';
     dynamicNavPlugDef.opts.maxResources = -1;
-
+    dynamicNavPlugDef.opts.stabilityTimeout = 0;
 
     let upsertSpy;
     let snapshotStub;
@@ -338,7 +331,7 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
       const updatePluginInst = pluginInstances.find(pluginInst => pluginInst.constructor.name === 'UpsertResourcePlugin');
       upsertSpy = sandbox.spy(updatePluginInst, 'apply');
 
-      // stub querySelectorAll, everytime returns a single "a.more" element
+      // stub querySelectorAll
       const querySelectorAllStub = sandbox.stub(global.window.document, 'querySelectorAll');
       querySelectorAllStub.withArgs('.detail').returns([ { innerText: 'prodA' }, { innerText: 'prodB' } ]);
       querySelectorAllStub.withArgs('.cancel').returns([ { innerText: 'cancel' } ]);
@@ -348,18 +341,16 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
 
       // 2nd resource, actions: ['prod1#1'],
       snapshotStub.onCall(0).returns(0); // list content snapshot
-      snapshotStub.onCall(1).returns(11); // dynamic content snapshot after clicking prod1 1st time
+      snapshotStub.onCall(1).returns(11); // dynamic content snapshot after clicking prod1
       extractContentStub.onCall(1).returns({ '.detail': [ 'productA' ] });
 
       // 3rd resource, actions: ['prod2#2'],
       snapshotStub.onCall(2).returns(0); // dynamic content snapshot after clicking prod1 > cancel
-      snapshotStub.onCall(3).returns(11); // dynamic content snapshot after clicking prod1 2nd time
-      snapshotStub.onCall(4).returns(22); // dynamic content snapshot after clicking prod2 1st time
+      snapshotStub.onCall(3).returns(22); // dynamic content snapshot after clicking prod2
       extractContentStub.onCall(2).returns({ '.detail': [ 'productB' ] });
 
       // 4th resource, duplicate, no new resource
-      snapshotStub.onCall(5).returns(0); // dynamic content snapshot after clicking prod2 > cancel
-      snapshotStub.onCall(6).returns(22); // dynamic content snapshot after clicking prod2 2nd time
+      snapshotStub.onCall(4).returns(0); // dynamic content snapshot after clicking prod2 > cancel
 
       return pluginInstances;
     });
@@ -381,8 +372,8 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
     // 3 resources crawled (1 static, 2 dynamic), 3 update operations by the UpsertResourcePlugin
     sinon.assert.callCount(upsertSpy, 3);
 
-    // exhausing all selector click options, snapshot was invoked 7 times, see snapshotStub behavior above
-    sinon.assert.callCount(snapshotStub, 7);
+    // exhausing all selector click options, snapshot was invoked 5 times, see snapshotStub behavior above
+    sinon.assert.callCount(snapshotStub, 5);
 
     const filterResourceProps = ({ url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions }) => ({
       url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions,
@@ -413,7 +404,7 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
       crawlInProgress: false,
       urlsToAdd: [ ],
       mediaType: 'html',
-      actions: [ 'prodA#1' ],
+      actions: [ 'prodA' ],
     };
 
     const dynamicResource1 = filterResourceProps(upsertSpy.getCall(1).args[1]);
@@ -431,7 +422,7 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
       crawlInProgress: false,
       urlsToAdd: [ ],
       mediaType: 'html',
-      actions: [ 'prodB#1' ],
+      actions: [ 'prodB' ],
     };
 
     const dynamicResource2 = filterResourceProps(upsertSpy.getCall(2).args[1]);

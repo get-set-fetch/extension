@@ -33,10 +33,12 @@ describe('Test ModuleRuntimeManager', () => {
       {
         name: 'DynamicNavigationPlugin',
         opts: {
-          domManipulation: true,
-          maxResources: 100,
-          runInTab: true,
+          domRead: true,
+          domWrite: true,
           selectors: '.more # content',
+          revisit: false,
+          stabilityTimeout: 500,
+          maxResources: 100,
         },
       },
       {

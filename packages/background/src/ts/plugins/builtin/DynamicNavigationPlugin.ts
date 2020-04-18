@@ -75,8 +75,7 @@ interface IHistoryNode {
     [key: string]: IHistoryNode;
   };
 
-  childSelector?: string;
-  linksToContent?: boolean;
+  lvl: number;
 
   snapshots: number[];
   duplicateSnapshot?: boolean;
@@ -110,6 +109,16 @@ export default class DynamicNavigationPlugin extends BasePlugin {
           description: 'Html selectors.',
           default: '.more # content',
         },
+        revisit: {
+          type: 'boolean',
+          default: false,
+          description: 'Revisit the same selector multiple times until the dom no longer changes. Usefull for "load more content" scenarios',
+        },
+        stabilityTimeout: {
+          type: 'number',
+          default: '500',
+          description: 'consider the navigation complete when there are no more dom changes within the specified amount (miliseconds).',
+        },
         maxResources: {
           type: 'number',
           default: '100',
@@ -120,7 +129,7 @@ export default class DynamicNavigationPlugin extends BasePlugin {
         delay, depth ??
         */
       },
-      required: [ 'runInTab', 'selectors', 'maxResources' ],
+      required: [ 'selectors', 'revisit', 'stabilityTimeout', 'maxResources' ],
     };
   }
 
@@ -128,6 +137,8 @@ export default class DynamicNavigationPlugin extends BasePlugin {
     domRead: boolean;
     domWrite: boolean;
     selectors: string;
+    revisit: boolean;
+    stabilityTimeout: number;
     maxResources: number;
   };
 
@@ -137,10 +148,10 @@ export default class DynamicNavigationPlugin extends BasePlugin {
   activeNode: IHistoryNode;
 
   init() {
-    this.selectors = this.getSelectors(this.opts.selectors);
+    this.selectors = [ { selector: null, linksToContent: false } ].concat(this.getSelectors(this.opts.selectors));
 
     this.rootNode = {
-      childSelector: this.selectors[0].selector,
+      lvl: 0,
       children: {},
       snapshots: [ this.getSnapshot() ],
     };
@@ -166,40 +177,61 @@ export default class DynamicNavigationPlugin extends BasePlugin {
       this.init();
     }
 
+    await this.waitForDomStability();
+
     return this.navigate(this.activeNode);
   }
 
   async navigate(parentNode: IHistoryNode) {
-    // console.log('----------');
-    // console.log('NAVIGATE');
-    // console.log(parentNode);
+    const parentSelector = this.selectors[parentNode.lvl];
+    let childSelector;
+
     let childElm: HTMLElement;
 
-    if (parentNode.childSelector) {
-    // find a click candidate
-      const childElmCandidates = Array.from(document.querySelectorAll<HTMLElement>(parentNode.childSelector));
-      // console.log('childElmCandidates');
-      // console.log(childElmCandidates);
+    if (parentNode.lvl < this.selectors.length - 1) {
+      childSelector = this.selectors[parentNode.lvl + 1];
+
+      // find a click candidate
+      const childElmCandidates = Array.from(document.querySelectorAll<HTMLElement>(childSelector.selector));
       childElm = childElmCandidates.find(childElm => {
         const childKey: string = childElm.innerText;
+        let childIsValid: boolean;
+
         // new child, always valid
         if (!Object.prototype.hasOwnProperty.call(parentNode.children, childKey)) {
-          return true;
+          childIsValid = true;
         }
-        // existing child, only valid if the last click action didn't result in an existing dom snapshot
-        if (!parentNode.children[childKey].duplicateSnapshot) {
-          return true;
+        // existing child
+        else {
+          // navigation child
+          if (!childSelector.linksToContent) {
+            // after parent linking to content, assume "cancel" navigation returning back to a prev nav step, always valid
+            // at some point this needs better generalization and a lot more integration test scenarios
+            if (parentSelector.linksToContent) {
+              childIsValid = true;
+            }
+            else {
+              childIsValid = false;
+            }
+          }
+          // existing content child
+          else {
+            // only valid if revisit flag is true and the last click action didn't result in an existing dom snapshot
+            if (this.opts.revisit && !parentNode.children[childKey].duplicateSnapshot) {
+              childIsValid = true;
+            }
+            else {
+              childIsValid = false;
+            }
+          }
         }
 
-        return false;
+        return childIsValid;
       });
     }
 
     // no suitable candidate found, go back one history step and try to find another route or stop the navigation
-    // console.log('childElm');
-    // console.log(childElm);
     if (!childElm) {
-      // console.log('no suitable candidate found');
       return parentNode.parent ? this.navigate(parentNode.parent) : null;
     }
 
@@ -211,38 +243,36 @@ export default class DynamicNavigationPlugin extends BasePlugin {
       childNode = parentNode.children[childKey];
     }
     else {
-      const parentSelectorIdx = this.selectors.findIndex(selector => selector.selector === parentNode.childSelector);
-      const childSelectorIdx = parentSelectorIdx < this.selectors.length - 1 ? parentSelectorIdx + 1 : null;
       childNode = {
         innerText: childElm.innerText,
         clickNo: 0,
 
         parent: parentNode,
+        lvl: parentNode.lvl + 1,
         children: {},
 
         snapshots: [],
-
-        childSelector: childSelectorIdx ? this.selectors[childSelectorIdx].selector : null,
-        linksToContent: this.selectors[parentSelectorIdx].linksToContent,
       };
+
+      if (childNode.lvl >= this.selectors.length) {
+        throw new Error('invalid childNode level reached');
+      }
+
+      // eslint-disable-next-line no-param-reassign
+      parentNode.children[childKey] = childNode;
     }
-
-    // console.log(childKey);
-    // console.log(parentNode);
-    // console.log('aaa');
-
-    // eslint-disable-next-line no-param-reassign
-    parentNode.children[childKey] = childNode;
 
     childNode.clickNo += 1;
     await this.clickAndWaitForDomStability(childElm);
 
     const snapshot = this.getSnapshot();
+
+    if (snapshot === undefined) throw new Error('undefined snapshot');
+
     const originNode: IHistoryNode = this.findNodeWithSnapshot(snapshot);
 
     // dom content matches a previous history state, resume from that state
     if (originNode) {
-      // console.log(`origin node found, snapshot: ${snapshot}`);
       childNode.duplicateSnapshot = true;
       return this.navigate(originNode);
     }
@@ -251,49 +281,55 @@ export default class DynamicNavigationPlugin extends BasePlugin {
     childNode.snapshots.push(snapshot);
 
     // linksToContent node, stop navigation return the current route
-    if (childNode.linksToContent) {
-      // console.log('navigate complete');
-      // console.log(childNode);
+    if (childSelector.linksToContent) {
       this.activeNode = childNode;
       return { actions: this.getHistoryPath(childNode) };
     }
 
     // non linkToContent node, continue navigation
-
-    // console.log('keep navigating');
     return this.navigate(childNode);
   }
 
-  clickAndWaitForDomStability(selectorElm: HTMLElement) {
-    const timeout = 1000; // should be opts.param !
-
+  waitForDomStability() {
     return new Promise(resolve => {
+      if (this.opts.stabilityTimeout === 0) {
+        resolve();
+        return;
+      }
+
       const waitResolve = observer => {
         observer.disconnect();
         resolve();
       };
 
       let timeoutId;
-      const observer = new MutationObserver((mutationsList, observer) => {
-        for (let i = 0; i < mutationsList.length; i += 1) {
+      const observer = new MutationObserver((mutationList, observer) => {
+        for (let i = 0; i < mutationList.length; i += 1) {
           // we only care if new nodes have been added
-          if (mutationsList[i].type === 'childList') {
+          if (mutationList[i].type === 'childList') {
             // restart the countdown timer
             window.clearTimeout(timeoutId);
-            timeoutId = window.setTimeout(waitResolve, timeout, observer);
+            timeoutId = window.setTimeout(waitResolve, this.opts.stabilityTimeout, observer);
             break;
           }
         }
       });
 
-      timeoutId = setTimeout(waitResolve, timeout, observer);
+      timeoutId = setTimeout(waitResolve, this.opts.stabilityTimeout, observer);
 
       // start observing document.body
       observer.observe(document.body, { attributes: true, childList: true, subtree: true });
-
-      // do the actual clicking
-      selectorElm.click();
     });
+  }
+
+  clickAndWaitForDomStability(selectorElm: HTMLElement) {
+    // resolved when dom is stable
+    const stabilityPromise = this.waitForDomStability();
+
+    // do the actual clicking
+    selectorElm.click();
+
+    return stabilityPromise;
   }
 
   getSelectors(rawSelectors: string): ISelector[] {
@@ -317,7 +353,7 @@ export default class DynamicNavigationPlugin extends BasePlugin {
   }
 
   getHistoryPath(node: IHistoryNode, path = []): string[] {
-    const crtPathSegment = `${node.innerText}#${node.clickNo}`;
+    const crtPathSegment = this.opts.revisit ? `${node.innerText}#${node.clickNo}` : node.innerText;
     if (node.parent) {
       return this.getHistoryPath(node.parent, [ crtPathSegment ].concat(path));
     }
