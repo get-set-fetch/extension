@@ -107,7 +107,7 @@ describe('Project CRUD Pages', () => {
     ],
   };
 
-  const expectedConfigHash = 'eLsgz82lgystKMrPAjrUESOJwSQUkIVhyS6jpKTASl+/vLxcrzizJDVRLzk/Vz8zLyW1Qi8DGCioqTI9tUS3GIjTQElIFyahmwoJRN0iuCfISb0oCVYHOTFTI/WiJ1gi0ydKokdJrBhpnpzUm5mbTln6pU4KJC3FAQAl7tle';
+  const expectedConfigHash = 'eLtI4gnagystKMrPAjrUESM7wCQUkIVhWSSjpKTASl+/vLxcD5hYUhP1kvNz9TPzUlIr9DKAgYKag9JTS3SLgTgNlNx1YRK6qZBA1C2Ce4KcnIaSuXSQMx7FOQ1HQkZPuygJGyVhYqRrclJqZm464bRK/eRFWnICAEXNzRM=';
 
   before(async () => {
     const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');

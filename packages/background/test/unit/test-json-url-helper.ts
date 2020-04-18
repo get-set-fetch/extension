@@ -44,7 +44,7 @@ describe('Test JsonUrlHelper', () => {
   };
 
   // eslint-disable-next-line max-len
-  const expectedConfigHash = 'eMK7IMOPw43CpcKDKy0ow4rDjwI6w5QRI8KJw4EkFMKQwoVhw4kuwqPCpMKkw4BKX8K/wrzCvFzCrzjCsyQ1US85P1c/My8lwrVCLwMYKMKowqkyPcK1RMK3GMKIw5NASUgXJsKhwpsKCUTDnSLCuCcoTMK9wrjCkisZw6kjMzfCnUAKQcONHcKYUUp2RBrConoEa1QCIxAAwonDicKdw6w=';
+  const expectedConfigHash = 'eMK7SMOiCcOawoMrLSjDisOPAjrDlBEjO8OAJBTCkMKFYVkkwqPCpMKkw4BKX8K/wrzCvFwPwphYUhPDtcKSw7Nzw7Uzw7NSUivDtDLCgMKBwoLCmsKDw5JTS3TCi8KBOA3ClMOcdWESwrrCqcKQQMOULcKCe8KCw4LCnMKGK2vCkcKRPDJzw5MJJBDDlMKcwowZwqVkR8KkIcKqR8KwRiUwAgHCicOJwp3DrA==';
 
   it('encode', async () => {
     const encodedConfigHash = JsonUrlHelper.encode(expectedProject);

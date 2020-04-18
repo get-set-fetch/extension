@@ -19,7 +19,20 @@ export default class JsonUrlHelper {
         },
         {
           name: 'FetchPlugin',
-          opts: {},
+          opts: {
+            stabilityTimeout: 0,
+          },
+        },
+        {
+          name: 'DynamicNavigationPlugin',
+          opts: {
+            domRead: true,
+            domWrite: true,
+            selectors: '.more # content',
+            revisit: false,
+            stabilityTimeout: 0,
+            maxResources: 100,
+          },
         },
         {
           name: 'ScrollPlugin',
@@ -27,8 +40,8 @@ export default class JsonUrlHelper {
             delay: 1000,
             enabled: false,
             maxScrollNo: -1,
-            runInTab: true,
-            domManipulation: true,
+            domRead: true,
+            domWrite: true,
             timeout: 2000,
           },
         },
@@ -38,7 +51,7 @@ export default class JsonUrlHelper {
             selectors: 'a',
             maxDepth: 11,
             maxResources: 101,
-            runInTab: true,
+            domRead: true,
           },
         },
         {
