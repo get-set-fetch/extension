@@ -50,8 +50,8 @@ export default class ExportHelper {
 
         // val is array, assume each arr element is literal, doesn't contain objects
         if (Array.isArray(val)) {
-          const arrCols = val.map((entry, idx) => `${rootKey}.${idx}`);
-          return detailCols.concat(arrCols);
+          detailCols.push(rootKey);
+          return detailCols;
         }
 
         // val is object, each property may contain sub.objects
@@ -68,75 +68,104 @@ export default class ExportHelper {
   }
 
   static exportCSV(data: object[], opts: IExportOpt): string {
-    const rootCols: string[] = opts.cols;
-    if (!rootCols || rootCols.length === 0) throw new Error('Expecting at least one column for csv content');
+    if (!opts.cols || opts.cols.length === 0) throw new Error('Expecting at least one column for csv content');
 
     const fieldSeparator = opts.fieldSeparator ? opts.fieldSeparator : ',';
     const lineSeparator = opts.lineSeparator ? opts.lineSeparator : '\n';
 
     /*
     get expanded cols
-    if rootCol points to an array, expandedCols will resolve to rootCol.0, rootCol.1, ...
-    if rootCol points to an object, expandedCols will resolve to rootCol.propA, rootCol.propB, ...
-    if rootCol points to a literal, expandedCols will resolve to rootCol
+    if col points to a literal, expandedCols will resolve to col
+    if col points to an array, expandedCols will resolve to col
+    if col points to an object, expandedCols will resolve to col.propA, col.propB, ...
 
     assumptations:
       - array elements can only be literals
       - obj properties can be literals, array, sub.objects
     */
-    const globalCols = new Set<string>();
+    const expandedColSet = new Set<string>();
     data.forEach(row => {
-      const detailCols = ExportHelper.getRowDetailCols(row, rootCols);
-      const diffCols = detailCols.filter(col => !globalCols.has(col));
+      const detailCols = ExportHelper.getRowDetailCols(row, opts.cols);
+      const diffCols = detailCols.filter(col => !expandedColSet.has(col));
       if (diffCols.length > 0) {
-        diffCols.forEach(diffCol => globalCols.add(diffCol));
+        diffCols.forEach(diffCol => expandedColSet.add(diffCol));
       }
     });
 
-    // order expanded globalCols based on rootCols
-    const orderedGlobalCols = Array.from(globalCols).sort((colA, colB) => {
-      const rootAIdx = rootCols.findIndex(rootCol => colA.indexOf(rootCol) === 0);
-      const rootBIdx = rootCols.findIndex(rootCol => colB.indexOf(rootCol) === 0);
+    const expandedCols = Array.from(expandedColSet).sort((colA, colB) => {
+      const colAIdx = opts.cols.findIndex(col => colA.indexOf(col) === 0);
+      const colBIdx = opts.cols.findIndex(col => colB.indexOf(col) === 0);
 
-      return (rootAIdx === rootBIdx) ? colA.localeCompare(colB) : rootAIdx - rootBIdx;
+      return (colAIdx === colBIdx) ? colA.localeCompare(colB) : colAIdx - colBIdx;
     });
-    const csvHeader = orderedGlobalCols.join(fieldSeparator);
 
-    // TO DO: one time propPaths generation, skipping the rather complicated getIn logic
-    // const propPaths = orderedGlobalCols.map(col => col.split('.'));
+    const csvHeader = expandedCols.join(fieldSeparator);
 
-    // map each data row to the expanded globalCols
-    const csvBody = data.map(
-      dataRow => {
-        const dataRowElms = orderedGlobalCols.reduce(
-          (elms, orderedGlobalCol) => {
-            const val = ExportHelper.nestedGetIn(dataRow, orderedGlobalCol);
-
-            if (val === undefined) {
-              elms.push('""');
-            }
-            else {
-              /*
-              RFC-4180 "If double-quotes are used to enclose fields,
-              then a double-quote appearing inside a field must be escaped by preceding it with another double quote."
-              */
-              const quotedVal = val && val.constructor === String ? val.replace(/"/g, '""') : val;
-              elms.push(`"${quotedVal}"`);
-            }
-
-            return elms;
-          },
-          [],
-        );
-
-        return dataRowElms.join(fieldSeparator);
+    // map each data row to one or multiple csv rows (in case of data[prop] array)
+    const csvBody = data
+      .reduce<any[]>(
+      (allCsvRows, dataRow) => {
+        const csvArr = ExportHelper.expandDataRowIntoCsvRows(dataRow, expandedCols, fieldSeparator);
+        return allCsvRows.concat(csvArr);
       },
-    ).join(lineSeparator);
+      [],
+    )
+      .join(lineSeparator);
 
     const content = `${csvHeader}${lineSeparator}${csvBody}`;
     return content;
   }
 
+  /*
+  dataRow: {a: ['a1', 'a2'], b: ['b1', 'b2], c: 'c1}
+  into csvRows:
+  [
+    ['a1', 'b1', c1],
+    ['a2', 'b2', c1]
+  ]
+  */
+  static expandDataRowIntoCsvRows(dataRow: object, cols: string[], fieldSeparator) {
+    let idxIncremented;
+    let arrIdx = -1;
+    const csvRows = [];
+
+    do {
+      idxIncremented = false;
+      // eslint-disable-next-line no-loop-func
+      const csvRow = cols.map(expandedCol => {
+        let val = ExportHelper.nestedGetIn(dataRow, expandedCol);
+
+        // arr handling
+        if (Array.isArray(val)) {
+          if (!idxIncremented && arrIdx < val.length - 1) {
+            arrIdx += 1;
+            idxIncremented = true;
+          }
+
+          val = val.length > arrIdx ? val[arrIdx] : val[val.length - 1];
+        }
+
+        /*
+        quotes handling
+        RFC-4180 "If double-quotes are used to enclose fields,
+        then a double-quote appearing inside a field must be escaped by preceding it with another double quote."
+        */
+        if (val === undefined) {
+          return '""';
+        }
+        const quotedVal = val && val.constructor === String ? val.replace(/"/g, '""') : val;
+        return `"${quotedVal}"`;
+      });
+
+      // only add to csv rows if it's the 1st pass or there have been new arr elements added
+      if (arrIdx === -1 || idxIncremented) {
+        csvRows.push(csvRow.join(fieldSeparator));
+      }
+    }
+    while (idxIncremented);
+
+    return csvRows;
+  }
 
   static async exportResourcesCSV(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
     if (resources.length === 0) throw new Error('Nothing to export. No resources found.');
@@ -169,12 +198,6 @@ export default class ExportHelper {
       .join(lineSeparator);
 
     return content;
-  }
-
-  static getIn2(nestedObj, path: string[]) {
-    return path.reduce(
-      (obj, key) => ((obj && obj[key] !== 'undefined') ? obj[key] : undefined), nestedObj,
-    );
   }
 
   /*

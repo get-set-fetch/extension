@@ -46,9 +46,10 @@ describe('Test ExportHelper', () => {
       },
     ).split(lineSeparator).map(csvLine => csvLine.trim());
 
-    const expectedLines = `url,content.0,content.1
-      "urlA","A1 content","A2 content"
-      "urlB","B content",""`.split(lineSeparator).map(csvLine => csvLine.trim());
+    const expectedLines = `url,content
+      "urlA","A1 content"
+      "urlA","A2 content"
+      "urlB","B content"`.split(lineSeparator).map(csvLine => csvLine.trim());
 
     assert.sameDeepOrderedMembers(expectedLines, generatedLines);
   });
@@ -70,10 +71,13 @@ describe('Test ExportHelper', () => {
       },
     ).split(lineSeparator).map(csvLine => csvLine.trim());
 
-    const expectedLines = `url,content.arr.0,content.arr.1,content.arr.2,content.propB,content.propC
-      "urlA","A-arr1","A-arr2","","A-propB",""
-      "urlB","B-arr1","","","","B-propC"
-      "urlC","C-arr1","C-arr2","C-arr3","","C-propC"`.split(lineSeparator).map(csvLine => csvLine.trim());
+    const expectedLines = `url,content.arr,content.propB,content.propC
+    "urlA","A-arr1","A-propB",""
+    "urlA","A-arr2","A-propB",""
+    "urlB","B-arr1","","B-propC"
+    "urlC","C-arr1","","C-propC"
+    "urlC","C-arr2","","C-propC"
+    "urlC","C-arr3","","C-propC"`.split(lineSeparator).map(csvLine => csvLine.trim());
 
     assert.sameDeepOrderedMembers(expectedLines, generatedLines);
   });
