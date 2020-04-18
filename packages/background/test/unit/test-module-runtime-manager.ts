@@ -28,7 +28,9 @@ describe('Test ModuleRuntimeManager', () => {
       },
       {
         name: 'FetchPlugin',
-        opts: {},
+        opts: {
+          stabilityTimeout: 0,
+        },
       },
       {
         name: 'DynamicNavigationPlugin',
@@ -44,8 +46,8 @@ describe('Test ModuleRuntimeManager', () => {
       {
         name: 'ScrollPlugin',
         opts: {
-          runInTab: true,
-          domManipulation: true,
+          domRead: true,
+          domWrite: true,
           enabled: false,
           delay: 1000,
           timeout: 2000,
@@ -58,13 +60,13 @@ describe('Test ModuleRuntimeManager', () => {
           selectors: 'a[href$=".html"] # follow html links',
           maxDepth: -1,
           maxResources: 100,
-          runInTab: true,
+          domRead: true,
         },
       },
       {
         name: 'ExtractHtmlContentPlugin',
         opts: {
-          runInTab: true,
+          domRead: true,
           selectors: 'h1\nh2',
         },
       },

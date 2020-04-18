@@ -26,7 +26,9 @@ describe('Project CRUD Pages', () => {
       },
       {
         name: 'FetchPlugin',
-        opts: {},
+        opts: {
+          stabilityTimeout: 0,
+        },
       },
       {
         name: 'ExtractUrlsPlugin',
@@ -70,7 +72,9 @@ describe('Project CRUD Pages', () => {
       },
       {
         name: 'FetchPlugin',
-        opts: {},
+        opts: {
+          stabilityTimeout: 0,
+        },
       },
       {
         name: 'ScrollPlugin',
@@ -78,8 +82,6 @@ describe('Project CRUD Pages', () => {
           delay: 1000,
           enabled: false,
           maxScrollNo: -1,
-          runInTab: true,
-          domManipulation: true,
           timeout: 2000,
         },
       },
@@ -89,7 +91,6 @@ describe('Project CRUD Pages', () => {
           selectors: 'img',
           maxDepth: 11,
           maxResources: 101,
-          runInTab: true,
         },
       },
       {
@@ -156,7 +157,7 @@ describe('Project CRUD Pages', () => {
           ({ label }) => ({ label }),
         ),
     );
-    assert.sameDeepMembers(scenarioNameOpts, expectedScenariNamedOpts);
+    assert.sameDeepOrderedMembers(scenarioNameOpts, expectedScenariNamedOpts);
 
     // save project
     await ProjectHelper.saveProject(browserHelper, expectedProject);
@@ -261,14 +262,11 @@ describe('Project CRUD Pages', () => {
 
     // compare projects, projectToUpdate doesn't contain some default options that are not manually edited from UI, add them
     selectResourcePlugin.opts.frequency = -1;
-    extractUrlsPlugin.opts.runInTab = true;
     const scrollPlugin: IPluginDefinition = projectToUpdate.plugins.find(plugin => plugin.name === 'ScrollPlugin');
     scrollPlugin.opts = {
       delay: 1000,
       enabled: false,
       maxScrollNo: -1,
-      runInTab: true,
-      domManipulation: true,
       timeout: 2000,
     };
 
