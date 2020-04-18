@@ -59,16 +59,25 @@ export default class GsfBridge extends JSONSchemaBridge {
   getField(name) {
     const fieldDef = super.getField(name);
     fieldDef.uniforms = fieldDef.uniforms || {};
+
+    if (fieldDef.ui) {
+      fieldDef.uniforms = Object.assign(fieldDef.uniforms, fieldDef.ui);
+      fieldDef.uniforms.customPlaceholder = fieldDef.ui.placeholder; // uniforms overrides "placeholder" prop at some point, use a custom one
+      delete fieldDef.ui;
+    }
+
+
     fieldDef.uniforms.help = fieldDef.uniforms.help || fieldDef.description;
-    fieldDef.uniforms = Object.assign(fieldDef.uniforms, fieldDef.ui);
+    delete fieldDef.description;
+
     fieldDef.uniforms.labelClassName = 'col-form-label';
     fieldDef.uniforms.grid = 2;
 
+    // numeric types can only be incremented with whole values, this is added to all fields, not good!!
+    fieldDef.uniforms.step = 1;
+
     // fields defininig constants are read-only
     fieldDef.disabled = fieldDef.const !== undefined;
-
-    // numeric types can only be incremented with whole values
-    fieldDef.uniforms.step = 1;
 
     return fieldDef;
   }

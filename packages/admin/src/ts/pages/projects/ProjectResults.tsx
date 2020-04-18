@@ -30,7 +30,7 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
     const { projectId } = this.props.match.params;
 
     // load project
-    const project = (projectId ? await GsfClient.fetch(HttpMethod.GET, `project/${projectId}`) : {}) as IProjectStorage;
+    const project: Partial<IProjectStorage> = projectId ? await GsfClient.fetch<IProjectStorage>(HttpMethod.GET, `project/${projectId}`) : {};
 
     // project not found, nothing more to do
     if (!project.id) return;
@@ -39,16 +39,16 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
     const scenario = await ScenarioHelper.instantiate(project.scenario);
 
     // load results
-    const results = await this.loadResourcesInfo(project);
+    const results = await this.loadResourcesInfo(project as IProjectStorage);
 
-    this.setState({ project, scenario, results });
+    this.setState({ project: project as IProjectStorage, scenario, results });
   }
 
   async loadResourcesInfo(project: IProjectStorage): Promise<object[]> {
     let resources = [];
 
     try {
-      resources = (await GsfClient.fetch(HttpMethod.GET, `project/${project.id}/resources`)) as Resource[];
+      resources = await GsfClient.fetch<Resource[]>(HttpMethod.GET, `project/${project.id}/resources`);
     }
     catch (err) {
       console.error(err);

@@ -16,7 +16,7 @@ const renderBool = props => (
     value={props.value.toString()}
   >
     {
-      props.ui && props.ui.placeholder && <option value="">{props.ui.placeholder}</option>
+      props.uniforms && props.uniforms.placeholder && <option value="">{props.uniforms.placeholder}</option>
     }
 
     {allowedValues.map(value => (

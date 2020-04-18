@@ -50,35 +50,40 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
   }
 
   async componentDidMount() {
-    // load available scenarios
-    const scenarios: IScenarioStorage[] = (await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioStorage[];
+    // load available scenarios, sort asc with builtin first
+    const scenarios: IScenarioStorage[] = await GsfClient.fetch<IScenarioStorage[]>(HttpMethod.GET, 'scenarios');
+    scenarios.sort((scenarioA, scenarioB) => {
+      const fullNameA = `${scenarioA.builtin ? 0 : 1} ${scenarioA.name}`;
+      const fullNameB = `${scenarioB.builtin ? 0 : 1} ${scenarioB.name}`;
+      return fullNameA.localeCompare(fullNameB);
+    });
 
     // load project
-    let projectStorage: IProjectStorage;
+    let projectStorage: Partial<IProjectStorage>;
     const { projectIdOrHash } = this.props.match.params;
-    console.log(projectIdOrHash);
 
     // project hash is available
     // eslint-disable-next-line no-restricted-globals
     if (projectIdOrHash && isNaN(projectIdOrHash as any)) {
-      projectStorage = await GsfClient.fetch(HttpMethod.POST, 'project/config', { hash: decodeURIComponent(projectIdOrHash) }) as IProjectStorage;
+      projectStorage = await GsfClient.fetch<IProjectStorage>(HttpMethod.POST, 'project/config', { hash: decodeURIComponent(projectIdOrHash) });
     }
     // project id is available
     else {
       projectStorage = (
         projectIdOrHash
-          ? await GsfClient.fetch(HttpMethod.GET, `project/${projectIdOrHash}`)
+          ? await GsfClient.fetch<IProjectStorage>(HttpMethod.GET, `project/${projectIdOrHash}`)
           : {}
-      ) as IProjectStorage;
+      );
     }
-
 
     const project: IProjectUIStorage = convertToProjectUIStorage(projectStorage);
 
     // update scenarioPkg name schema responsible for scenario select, one time operation, can be done directly on ProjectBaseSchema
     const scenarioNameSchema = ProjectBaseSchema.properties.scenarioPkg.properties.name;
     scenarioNameSchema.enum = scenarios.map(pkg => pkg.name);
-    scenarioNameSchema.ui = Object.assign(scenarioNameSchema.ui, { enumNames: scenarios.map(pkg => pkg.name) });
+
+    const scenarioNames = scenarios.map(scenario => (scenario.builtin ? `${scenario.name} (builtin)` : scenario.name));
+    scenarioNameSchema.ui = Object.assign(scenarioNameSchema.ui, { enumNames: scenarioNames });
 
     this.setState(
       { scenarios },
@@ -97,15 +102,16 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
       newProject = setIn(newProject, [ 'scenarioPkg' ], scenario.package);
 
       // add plugin definitions schema to project schema
-      const pluginSchemas = (await GsfClient.fetch(HttpMethod.GET, `scenario/${scenarioName}/pluginSchemas`)) as IEnhancedJSONSchema[];
+      const pluginSchemas = await GsfClient.fetch<IEnhancedJSONSchema[]>(HttpMethod.GET, `scenario/${scenarioName}/pluginSchemas`);
+      const filteredPluginSchemas = this.getFilteredPluginSchemas(pluginSchemas);
       projectSchema.properties.plugins.required = [];
-      pluginSchemas.forEach((pluginSchema: IEnhancedJSONSchema) => {
+      filteredPluginSchemas.forEach((pluginSchema: IEnhancedJSONSchema) => {
         projectSchema.properties.plugins.properties[pluginSchema.$id] = Object.assign({ properties: {} }, pluginSchema);
         projectSchema.properties.plugins.required.push(pluginSchema.$id);
       });
 
       // add plugin definitions values to project model
-      pluginSchemas.forEach((pluginSchema: IEnhancedJSONSchema) => {
+      filteredPluginSchemas.forEach((pluginSchema: IEnhancedJSONSchema) => {
         const defaultValues = SchemaHelper.instantiate(pluginSchema, {});
         const mergedValues = Object.assign(defaultValues, getIn(newProject, [ 'plugins', pluginSchema.$id ], {}));
         newProject = setIn(newProject, [ 'plugins', pluginSchema.$id ], mergedValues);
@@ -117,6 +123,27 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
     this.setState({
       project: newProject,
       bridge,
+    });
+  }
+
+  getFilteredPluginSchemas(pluginSchemas: IEnhancedJSONSchema[]) {
+    return pluginSchemas.map(pluginSchema => {
+      const filteredPluginSchema = JSON.parse(JSON.stringify(pluginSchema)) as IEnhancedJSONSchema;
+      if (filteredPluginSchema.properties) {
+        let filteredRequiredProps: string[] = filteredPluginSchema.required ? filteredPluginSchema.required : [];
+        filteredPluginSchema.properties = Object.keys(pluginSchema.properties).reduce(
+          (acc, key) => {
+            if (pluginSchema.properties[key].const === true) {
+              filteredRequiredProps = filteredRequiredProps.filter(requiredProp => requiredProp !== key);
+              return acc;
+            }
+            return Object.assign(acc, { [key]: pluginSchema.properties[key] });
+          },
+          {},
+        );
+        filteredPluginSchema.required = filteredRequiredProps;
+      }
+      return filteredPluginSchema;
     });
   }
 
@@ -178,7 +205,7 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
 
   async loadConfigFromHash() {
     const configHash: IProjectConfigHash = { hash: this.state.configHash };
-    const projectStorage: IProjectStorage = await GsfClient.fetch(HttpMethod.POST, 'project/config', configHash) as IProjectStorage;
+    const projectStorage: IProjectStorage = await GsfClient.fetch<IProjectStorage>(HttpMethod.POST, 'project/config', configHash);
     const project: IProjectUIStorage = convertToProjectUIStorage(projectStorage);
 
     if (!project) {

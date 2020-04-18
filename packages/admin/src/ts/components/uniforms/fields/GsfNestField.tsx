@@ -27,10 +27,10 @@ const GsfNest = ({
   const title = props.field.title ? props.field.title : label;
 
   return (
-    <div className={classnames(className, { 'has-error': error })} {...filterDOMProps(props)}>
+    <div className={classnames(className, { 'has-error': error })}>
       <hr/>
       {title && <h4 className="title">{title}</h4>}
-      {props.field.description && <p>{props.field.description}</p>}
+      {props.field.uniforms.help && <p>{props.field.uniforms.help}</p>}
 
       {!!(error && showInlineError) && <span className="text-danger">{errorMessage}</span>}
 

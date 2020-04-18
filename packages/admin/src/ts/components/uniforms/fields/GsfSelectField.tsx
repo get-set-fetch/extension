@@ -38,7 +38,7 @@ const renderSelect = props => (
     value={props.value}
   >
     {
-      props.ui && props.ui.placeholder && <option value="">{props.ui.placeholder}</option>
+      props.customPlaceholder && <option value="">{props.customPlaceholder}</option>
     }
 
     {props.allowedValues.map((value, idx) => (

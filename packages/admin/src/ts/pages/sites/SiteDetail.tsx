@@ -54,7 +54,7 @@ export default class SiteDetail extends React.Component<RouteComponentProps<{sit
     }
     this.setState({ site });
 
-    const availablePluginDefinitions: IPluginDefinition[] = (await GsfClient.fetch(HttpMethod.GET, 'plugindefs/available')) as IPluginDefinition[];
+    const availablePluginDefinitions: IPluginDefinition[] = await GsfClient.fetch<IPluginDefinition[]>(HttpMethod.GET, 'plugindefs/available');
     this.setState({ availablePluginDefinitions });
 
     // default plugins for a new site

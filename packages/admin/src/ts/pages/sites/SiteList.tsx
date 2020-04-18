@@ -84,7 +84,7 @@ export default class SiteList extends React.Component<{}, IState> {
   }
 
   async loadSites() {
-    const data: Site[] = (await GsfClient.fetch(HttpMethod.GET, 'sites')) as Site[];
+    const data: Site[] = await GsfClient.fetch<Site[]>(HttpMethod.GET, 'sites');
     this.setState({ data });
   }
 
@@ -92,7 +92,7 @@ export default class SiteList extends React.Component<{}, IState> {
     // load just the crawled resources for the current site
     let crawledResources: Resource[] = [];
     try {
-      crawledResources = (await GsfClient.fetch(HttpMethod.GET, `resources/${siteId}/crawled`)) as Resource[];
+      crawledResources = await GsfClient.fetch<Resource[]>(HttpMethod.GET, `resources/${siteId}/crawled`);
     }
     catch (err) {
       console.error(err);

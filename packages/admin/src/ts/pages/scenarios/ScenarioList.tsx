@@ -16,7 +16,6 @@ interface IAdvancedScenarioPackage extends IScenarioStorage {
 
 interface IState {
   scenarioPkgs: IScenarioStorage[];
-  header: IHeaderCol[];
 }
 
 export default class ScenarioList extends React.Component<{}, IState> {
@@ -24,58 +23,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
     super(props);
 
     this.state = {
-      header: [
-        {
-          label: 'Name',
-          render: (scenarioPkg: IAdvancedScenarioPackage) => (scenarioPkg.name),
-        },
-        {
-          label: 'Description',
-          render: (scenarioPkg: IAdvancedScenarioPackage) => (
-            <span style={{ textOverflow: 'ellipsis' }}>
-              {scenarioPkg.package.description.substr(0, 100)}
-            </span>
-          ),
-        },
-        {
-          label: 'Homepage',
-          render: (scenarioPkg: IAdvancedScenarioPackage) => (
-            <a href={scenarioPkg.package.homepage} target='_blank' rel="noopener noreferrer" className='scenario-homepage'>
-              {scenarioPkg.package.homepage}
-            </a>
-          ),
-        },
-        {
-          label: 'Status',
-          render: (scenarioPkg: IAdvancedScenarioPackage) => (scenarioPkg.status),
-        },
-        {
-          label: 'Actions',
-          render: (scenarioPkg: IAdvancedScenarioPackage) => {
-            switch (scenarioPkg.status) {
-              case ScenarioStatus.AVAILABLE:
-                return <input
-                  id={`install-${scenarioPkg.name}`}
-                  type='button'
-                  className='btn-secondary mr-2'
-                  value='Install'
-                  onClick={() => this.installScenarioPkg(scenarioPkg)}
-                />;
-              case ScenarioStatus.INSTALLED:
-                return <input
-                  id={`uninstall-${scenarioPkg.name}`}
-                  type='button'
-                  className='btn-secondary mr-2'
-                  value='Uninstall'
-                  onClick={() => this.uninstallScenarioPkg(scenarioPkg)}
-                />;
-              default:
-                return null;
-            }
-          },
-        },
-      ],
-      scenarioPkgs: [],
+      scenarioPkgs: null,
     };
 
     this.installScenarioPkg = this.installScenarioPkg.bind(this);
@@ -88,7 +36,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
 
   async loadScenarios() {
     // get installed scenario packages
-    const installedPkgs: IAdvancedScenarioPackage[] = ((await GsfClient.fetch(HttpMethod.GET, 'scenarios')) as IScenarioStorage[])
+    const installedPkgs: IAdvancedScenarioPackage[] = (await GsfClient.fetch<IScenarioStorage[]>(HttpMethod.GET, 'scenarios'))
       .map(
         installedPkg => Object.assign(
           installedPkg,
@@ -100,7 +48,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
 
     // get available scenario packages, only show the not already installed ones
     const installedPkgNames = installedPkgs.map(pkg => pkg.name);
-    const availablePkgs: IAdvancedScenarioPackage[] = ((await GsfClient.fetch(HttpMethod.GET, 'scenarios/available')) as IScenarioStorage[])
+    const availablePkgs: IAdvancedScenarioPackage[] = (await GsfClient.fetch<IScenarioStorage[]>(HttpMethod.GET, 'scenarios/available'))
       .filter(availablePkg => installedPkgNames.indexOf(availablePkg.name) === -1)
       .map(availablePkg => Object.assign(availablePkg, { status: ScenarioStatus.AVAILABLE }));
 
@@ -130,7 +78,57 @@ export default class ScenarioList extends React.Component<{}, IState> {
         title='Scenarios'
       >
         <Table
-          header={this.state.header}
+          header={[
+            {
+              label: 'Name',
+              render: (scenarioPkg: IAdvancedScenarioPackage) => (scenarioPkg.name),
+            },
+            {
+              label: 'Description',
+              render: (scenarioPkg: IAdvancedScenarioPackage) => (
+                <span style={{ textOverflow: 'ellipsis' }}>
+                  {scenarioPkg.package.description.substr(0, 100)}
+                </span>
+              ),
+            },
+            {
+              label: 'Homepage',
+              render: (scenarioPkg: IAdvancedScenarioPackage) => (
+                <a href={scenarioPkg.package.homepage} target='_blank' rel="noopener noreferrer" className='scenario-homepage'>
+                  {scenarioPkg.package.homepage}
+                </a>
+              ),
+            },
+            {
+              label: 'Status',
+              render: (scenarioPkg: IAdvancedScenarioPackage) => (scenarioPkg.status),
+            },
+            {
+              label: 'Actions',
+              render: (scenarioPkg: IAdvancedScenarioPackage) => {
+                switch (scenarioPkg.status) {
+                  case ScenarioStatus.AVAILABLE:
+                    return <input
+                      id={`install-${scenarioPkg.name}`}
+                      type='button'
+                      className='btn-secondary mr-2'
+                      value='Install'
+                      onClick={() => this.installScenarioPkg(scenarioPkg)}
+                    />;
+                  case ScenarioStatus.INSTALLED:
+                    return <input
+                      id={`uninstall-${scenarioPkg.name}`}
+                      type='button'
+                      className='btn-secondary mr-2'
+                      value='Uninstall'
+                      onClick={() => this.uninstallScenarioPkg(scenarioPkg)}
+                    />;
+                  default:
+                    return null;
+                }
+              },
+            },
+          ]}
           data={this.state.scenarioPkgs}
         />
       </Page>

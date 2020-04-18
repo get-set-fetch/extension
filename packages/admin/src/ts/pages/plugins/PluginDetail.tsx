@@ -1,10 +1,9 @@
 /* eslint-disable no-console */
 import * as React from 'react';
 import { setIn } from 'immutable';
-import { HttpMethod } from 'get-set-fetch-extension-commons';
+import { HttpMethod, IPluginStorage } from 'get-set-fetch-extension-commons';
 import { NavLink, RouteComponentProps } from 'react-router-dom';
 import PluginSchema from './model/plugin-schema.json';
-import Plugin from './model/Plugin';
 import Page from '../../layout/Page';
 import GsfClient from '../../components/GsfClient';
 import GsfForm from '../../components/uniforms/GsfForm';
@@ -13,7 +12,7 @@ import GsfBridge from '../../components/uniforms/bridge/GsfBridge';
 
 interface IState {
   bridge: GsfBridge;
-  plugin: Plugin;
+  plugin: Partial<IPluginStorage>;
 }
 
 export default class PluginDetail extends React.Component<RouteComponentProps<{pluginId: string}>, IState> {
@@ -35,13 +34,12 @@ export default class PluginDetail extends React.Component<RouteComponentProps<{p
 
   async componentDidMount() {
     const { pluginId } = this.props.match.params;
-    let plugin: Plugin;
+    let plugin: Partial<IPluginStorage>;
 
     // existing plugin
     if (this.props.match.params.pluginId) {
       try {
-        const pluginData: object = await GsfClient.fetch(HttpMethod.GET, `plugin/${pluginId}`);
-        plugin = new Plugin(pluginData);
+        plugin = await GsfClient.fetch<IPluginStorage>(HttpMethod.GET, `plugin/${pluginId}`);
       }
       catch (err) {
         console.error('error loading plugin');
@@ -49,7 +47,7 @@ export default class PluginDetail extends React.Component<RouteComponentProps<{p
     }
     // new plugin
     else {
-      plugin = new Plugin();
+      plugin = {};
     }
 
     this.setState({ plugin });
@@ -83,12 +81,13 @@ export default class PluginDetail extends React.Component<RouteComponentProps<{p
       >
         <GsfForm
           schema={this.state.bridge}
-          model={this.state.plugin.toJS()}
+          model={this.state.plugin}
           onChange={this.changeHandler}
           onSubmit={this.submitHandler}
           validate="onChangeAfterSubmit"
           showInlineError={true}
           validator={{ clean: true }}
+          onChangeModel={() => {}}
         >
           <div className="form-group">
             <input id="save" className="btn btn-secondary" type="submit" value="Save"/>

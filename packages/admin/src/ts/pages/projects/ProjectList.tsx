@@ -7,7 +7,6 @@ import Page from '../../layout/Page';
 import Modal from '../../components/Modal';
 
 interface IState {
-  header: IHeaderCol[];
   data: IProjectStorage[];
   selectedRows: number[];
 }
@@ -17,62 +16,6 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
     super(props);
 
     this.state = {
-      header: [
-        {
-          label: 'Name',
-          render: (project: IProjectStorage) => (project.name),
-        },
-        {
-          label: 'Description',
-          render: (project: IProjectStorage) => (
-            <span style={{ textOverflow: 'ellipsis' }}>
-              {project.description ? project.description.substr(0, 100) : ''}
-            </span>
-          ),
-        },
-        {
-          label: 'Status',
-          render: () => '-',
-        },
-        {
-          label: 'Actions',
-          renderLink: false,
-          render: (project: IProjectStorage) => ([
-            <input
-              key={`configHash-${project.id}`}
-              id={`configHash-${project.id}`}
-              type='button'
-              className='btn-secondary mr-2'
-              value='Config Hash'
-              onClick={() => this.openConfigHashModal(project)}
-            />,
-            <input
-              key={`crawl-${project.id}`}
-              id={`crawl-${project.id}`}
-              type='button'
-              className='btn-secondary mr-2'
-              value='Scrape'
-              onClick={() => this.crawlProject(project)}
-            />,
-            <input
-              key={`results-${project.id}`}
-              id={`results-${project.id}`}
-              type='button'
-              className='btn-secondary mr-2'
-              value='Results'
-              onClick={() => this.viewResults(project)}
-            />,
-            <input
-              key={`delete-${project.id}`}
-              id={`delete-${project.id}`}
-              type='button'
-              className='btn-secondary'
-              value='Delete'
-              onClick={() => this.deleteProject(project)}
-            />,
-          ]),
-        },
-      ],
       data: [],
       selectedRows: [],
     };
@@ -81,7 +24,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
   }
 
   async openConfigHashModal(project: IProjectStorage) {
-    const config: IProjectConfigHash = await GsfClient.fetch(HttpMethod.GET, `project/${project.id}/config`) as IProjectConfigHash;
+    const config: IProjectConfigHash = await GsfClient.fetch<IProjectConfigHash>(HttpMethod.GET, `project/${project.id}/config`);
 
     const textarea = React.createRef<HTMLTextAreaElement>();
 
@@ -138,7 +81,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
   }
 
   async loadProjects() {
-    const data: IProjectStorage[] = (await GsfClient.fetch(HttpMethod.GET, 'projects')) as IProjectStorage[];
+    const data: IProjectStorage[] = await GsfClient.fetch<IProjectStorage[]>(HttpMethod.GET, 'projects');
     this.setState({ data });
   }
 
@@ -172,7 +115,62 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
         ]}
       >
         <Table
-          header={this.state.header}
+          header={[
+            {
+              label: 'Name',
+              render: (project: IProjectStorage) => (project.name),
+            },
+            {
+              label: 'Description',
+              render: (project: IProjectStorage) => (
+                <span style={{ textOverflow: 'ellipsis' }}>
+                  {project.description ? project.description.substr(0, 100) : ''}
+                </span>
+              ),
+            },
+            {
+              label: 'Status',
+              render: () => '-',
+            },
+            {
+              label: 'Actions',
+              renderLink: false,
+              render: (project: IProjectStorage) => ([
+                <input
+                  key={`configHash-${project.id}`}
+                  id={`configHash-${project.id}`}
+                  type='button'
+                  className='btn-secondary mr-2'
+                  value='Config Hash'
+                  onClick={() => this.openConfigHashModal(project)}
+                />,
+                <input
+                  key={`crawl-${project.id}`}
+                  id={`crawl-${project.id}`}
+                  type='button'
+                  className='btn-secondary mr-2'
+                  value='Scrape'
+                  onClick={() => this.crawlProject(project)}
+                />,
+                <input
+                  key={`results-${project.id}`}
+                  id={`results-${project.id}`}
+                  type='button'
+                  className='btn-secondary mr-2'
+                  value='Results'
+                  onClick={() => this.viewResults(project)}
+                />,
+                <input
+                  key={`delete-${project.id}`}
+                  id={`delete-${project.id}`}
+                  type='button'
+                  className='btn-secondary'
+                  value='Delete'
+                  onClick={() => this.deleteProject(project)}
+                />,
+              ]),
+            },
+          ]}
           rowLink={this.rowLink}
           data={this.state.data}
         />

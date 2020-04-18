@@ -1,14 +1,12 @@
 import * as React from 'react';
 import { NavLink } from 'react-router-dom';
-import { HttpMethod, IHeaderCol } from 'get-set-fetch-extension-commons';
+import { HttpMethod, IPluginStorage } from 'get-set-fetch-extension-commons';
 import Table from '../../components/Table';
 import GsfClient from '../../components/GsfClient';
-import Plugin from './model/Plugin';
 import Page from '../../layout/Page';
 
 interface IState {
-  header: IHeaderCol[];
-  data: Plugin[];
+  data: IPluginStorage[];
   selectedRows: number[];
 }
 
@@ -17,34 +15,6 @@ export default class PluginList extends React.Component<{}, IState> {
     super(props);
 
     this.state = {
-      header: [
-        {
-          label: 'Name',
-          render: (plugin: Plugin) => plugin.name,
-        },
-        {
-          label: 'Code',
-          render: (plugin: Plugin) => (
-            <span style={{ textOverflow: 'ellipsis' }}>
-              {!plugin.scenarioId ? plugin.code.substr(0, 100) : 'embedded plugin'}
-            </span>
-          ),
-        },
-        {
-          label: 'Actions',
-          renderLink: false,
-          render: (plugin: Plugin) => ([
-            <input
-              key={`delete-${plugin.id}`}
-              id={`delete-${plugin.id}`}
-              type='button'
-              className='btn-secondary'
-              value='Delete'
-              onClick={() => this.deletePlugin(plugin)}
-            />,
-          ]),
-        },
-      ],
       data: [],
       selectedRows: [],
     };
@@ -57,11 +27,11 @@ export default class PluginList extends React.Component<{}, IState> {
   }
 
   async loadPlugins() {
-    const data: Plugin[] = (await GsfClient.fetch(HttpMethod.GET, 'plugins')) as Plugin[];
+    const data: IPluginStorage[] = await GsfClient.fetch<IPluginStorage[]>(HttpMethod.GET, 'plugins');
     this.setState({ data });
   }
 
-  async deletePlugin(plugin: Plugin) {
+  async deletePlugin(plugin: IPluginStorage) {
     try {
       // remove plugins
       await GsfClient.fetch(HttpMethod.DELETE, 'plugins', { ids: [ plugin.id ] });
@@ -86,7 +56,34 @@ export default class PluginList extends React.Component<{}, IState> {
         ]}
       >
         <Table
-          header={this.state.header}
+          header={[
+            {
+              label: 'Name',
+              render: (plugin: IPluginStorage) => plugin.name,
+            },
+            {
+              label: 'Code',
+              render: (plugin: IPluginStorage) => (
+                <span style={{ textOverflow: 'ellipsis' }}>
+                  {!plugin.scenarioId ? plugin.code.substr(0, 100) : 'embedded plugin'}
+                </span>
+              ),
+            },
+            {
+              label: 'Actions',
+              renderLink: false,
+              render: (plugin: IPluginStorage) => ([
+                <input
+                  key={`delete-${plugin.id}`}
+                  id={`delete-${plugin.id}`}
+                  type='button'
+                  className='btn-secondary'
+                  value='Delete'
+                  onClick={() => this.deletePlugin(plugin)}
+                />,
+              ]),
+            },
+          ]}
           rowLink={this.rowLink}
           data={this.state.data}
         />
@@ -94,7 +91,7 @@ export default class PluginList extends React.Component<{}, IState> {
     );
   }
 
-  rowLink(row: Plugin) {
+  rowLink(row: IPluginStorage) {
     return `/plugin/${row.id}`;
   }
 }

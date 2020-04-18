@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { HttpMethod, IHeaderCol, ILog, IExportResult, LogLevel } from 'get-set-fetch-extension-commons';
+import { HttpMethod, ILog, IExportResult, LogLevel } from 'get-set-fetch-extension-commons';
 import Table from '../../components/Table';
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
 
 interface IState {
-  header: IHeaderCol[];
   data: ILog[];
 }
 
@@ -13,46 +12,7 @@ export default class LogList extends React.Component<{}, IState> {
   constructor(props) {
     super(props);
 
-    const localeOpts = {
-      year: '2-digit',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    };
-
     this.state = {
-      header: [
-        {
-          label: 'Level',
-          render: (log: ILog) => LogLevel[log.level],
-        },
-        {
-          label: 'Date',
-          render: (log: ILog) => <span style={{ whiteSpace: 'nowrap' }}>{new Date(log.date).toLocaleDateString('en-US', localeOpts)}</span>,
-        },
-        {
-          label: 'Class',
-          render: (log: ILog) => log.cls,
-        },
-        {
-          label: 'Message',
-          render: (log: ILog) => {
-            const msgs = log.msg ? log.msg.map(msg => {
-              // msg is object, usefull for serializing errors
-              if (msg === Object(msg)) {
-                return Object.getOwnPropertyNames(msg).map(propName => msg[propName]).join(' , ');
-              }
-
-              // arg is literal
-              return msg;
-            }) : null;
-
-            return msgs.map((msg, idx) => <span key={idx} style={{ display: 'block' }}>{msg}</span>);
-          },
-        },
-      ],
       data: [],
     };
 
@@ -64,7 +24,7 @@ export default class LogList extends React.Component<{}, IState> {
   }
 
   async loadLogs() {
-    const data: ILog[] = (await GsfClient.fetch(HttpMethod.GET, 'logs')) as ILog[];
+    const data: ILog[] = (await GsfClient.fetch<ILog[]>(HttpMethod.GET, 'logs'));
     this.setState({ data });
   }
 
@@ -111,6 +71,15 @@ export default class LogList extends React.Component<{}, IState> {
   }
 
   render() {
+    const localeOpts = {
+      year: '2-digit',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    };
+
     return (
       <Page
         title="Logs"
@@ -120,7 +89,36 @@ export default class LogList extends React.Component<{}, IState> {
         ]}
       >
         <Table
-          header={this.state.header}
+          header={[
+            {
+              label: 'Level',
+              render: (log: ILog) => LogLevel[log.level],
+            },
+            {
+              label: 'Date',
+              render: (log: ILog) => <span style={{ whiteSpace: 'nowrap' }}>{new Date(log.date).toLocaleDateString('en-US', localeOpts)}</span>,
+            },
+            {
+              label: 'Class',
+              render: (log: ILog) => log.cls,
+            },
+            {
+              label: 'Message',
+              render: (log: ILog) => {
+                const msgs = log.msg ? log.msg.map(msg => {
+                  // msg is object, usefull for serializing errors
+                  if (msg === Object(msg)) {
+                    return Object.getOwnPropertyNames(msg).map(propName => msg[propName]).join(' , ');
+                  }
+
+                  // arg is literal
+                  return msg;
+                }) : null;
+
+                return msgs.map((msg, idx) => <span key={idx} style={{ display: 'block' }}>{msg}</span>);
+              },
+            },
+          ]}
           data={this.state.data}
         />
       </Page>

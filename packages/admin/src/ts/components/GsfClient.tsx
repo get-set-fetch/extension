@@ -39,7 +39,7 @@ export default class GsfClient {
     }
   }
 
-  static fetch(method: HttpMethod, resource: string, body?: object): Promise<object> {
+  static fetch<T = object>(method: HttpMethod, resource: string, body?: object): Promise<T> {
     return new Promise(resolve => {
       GsfClient.addFetchOp();
       chrome.runtime.sendMessage({ method, resource, body }, response => {

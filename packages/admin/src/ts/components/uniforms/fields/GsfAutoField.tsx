@@ -61,7 +61,7 @@ export default class GsfAutoField extends AutoField {
       }
     }
 
-    if (props.ui && props.ui.hidden) return null;
+    if (props.uniforms && props.uniforms.hidden) return null;
     return createElement(props.component, props);
   }
 

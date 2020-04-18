@@ -2,7 +2,7 @@
 declare module 'uniforms-bootstrap4' {
   import * as React from 'react';
 
-  interface IAutoFormProps {
+  interface IAutoFormProps {    
     schema: any;
     onSubmit: any;
     onChange?: any;
@@ -12,6 +12,7 @@ declare module 'uniforms-bootstrap4' {
     validator: any;
     grid?: any;
     modelTransform?: any;
+    onChangeModel?: any;
   }
 
   interface IAutoFieldProps {

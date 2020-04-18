@@ -1,12 +1,11 @@
 import * as React from 'react';
 import { setIn } from 'immutable';
-import { HttpMethod } from 'get-set-fetch-extension-commons';
+import { HttpMethod, ISetting } from 'get-set-fetch-extension-commons';
 import GsfClient from '../../components/GsfClient';
-import Setting from './model/Setting';
 import Page from '../../layout/Page';
 
 interface IState {
-  settings: Setting[];
+  settings: ISetting[];
 }
 
 export default class SettingList extends React.Component<{}, IState> {
@@ -26,7 +25,7 @@ export default class SettingList extends React.Component<{}, IState> {
   }
 
   async loadSettings() {
-    const settings: Setting[] = (await GsfClient.fetch(HttpMethod.GET, 'settings')) as Setting[];
+    const settings: ISetting[] = await GsfClient.fetch<ISetting[]>(HttpMethod.GET, 'settings');
     this.setState({ settings });
   }
 
@@ -46,7 +45,7 @@ export default class SettingList extends React.Component<{}, IState> {
   async submitHandler(evt) {
     evt.preventDefault();
 
-    this.state.settings.forEach(async (entry: Setting) => {
+    this.state.settings.forEach(async (entry: ISetting) => {
       try {
         await GsfClient.fetch(HttpMethod.PUT, 'setting', { key: entry.key, val: entry.val });
       }
