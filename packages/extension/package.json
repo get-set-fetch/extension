@@ -18,15 +18,15 @@
     "copy:scenario-extract-resource-dist": "shx mkdir -p dist/scenarios/get-set-fetch-scenario-extract-resources/dist && shx cp -R ../../node_modules/get-set-fetch-scenario-extract-resources/dist/* dist/scenarios/get-set-fetch-scenario-extract-resources/dist",
     "copy:scenario-extract-resource-pkg": "shx cp -R ../../node_modules/get-set-fetch-scenario-extract-resources/package.json dist/scenarios/get-set-fetch-scenario-extract-resources",
     "copy:scenario-extract-resource": "npm run copy:scenario-extract-resource-dist && npm run copy:scenario-extract-resource-pkg",
-    "copy:scenario-extract-html-content-dist": "shx mkdir -p dist/scenarios/get-set-fetch-scenario-extract-html-content/dist && shx cp -R ../../node_modules/get-set-fetch-scenario-extract-html-content/dist/* dist/scenarios/get-set-fetch-scenario-extract-html-content/dist",
-    "copy:scenario-extract-html-content-pkg": "shx cp -R ../../node_modules/get-set-fetch-scenario-extract-html-content/package.json dist/scenarios/get-set-fetch-scenario-extract-html-content",
-    "copy:scenario-extract-html-content": "npm run copy:scenario-extract-html-content-dist && npm run copy:scenario-extract-html-content-pkg",
-    "copy:scenario-extract-dynamic-content-dist": "shx mkdir -p dist/scenarios/get-set-fetch-scenario-extract-dynamic-content/dist && shx cp -R ../../node_modules/get-set-fetch-scenario-extract-dynamic-content/dist/* dist/scenarios/get-set-fetch-scenario-extract-dynamic-content/dist",
-    "copy:scenario-extract-dynamic-content-pkg": "shx cp -R ../../node_modules/get-set-fetch-scenario-extract-dynamic-content/package.json dist/scenarios/get-set-fetch-scenario-extract-dynamic-content",
-    "copy:scenario-extract-dynamic-content": "npm run copy:scenario-extract-dynamic-content-dist && npm run copy:scenario-extract-dynamic-content-pkg",
-    "copy:scenarios": "npm run copy:scenario-extract-resource && npm run copy:scenario-extract-html-content && npm run copy:scenario-extract-dynamic-content",
+    "copy:scenario-scrape-static-content-dist": "shx mkdir -p dist/scenarios/get-set-fetch-scenario-scrape-static-content/dist && shx cp -R ../../node_modules/get-set-fetch-scenario-scrape-static-content/dist/* dist/scenarios/get-set-fetch-scenario-scrape-static-content/dist",
+    "copy:scenario-scrape-static-content-pkg": "shx cp -R ../../node_modules/get-set-fetch-scenario-scrape-static-content/package.json dist/scenarios/get-set-fetch-scenario-scrape-static-content",
+    "copy:scenario-scrape-static-content": "npm run copy:scenario-scrape-static-content-dist && npm run copy:scenario-scrape-static-content-pkg",
+    "copy:scenario-scrape-dynamic-content-dist": "shx mkdir -p dist/scenarios/get-set-fetch-scenario-scrape-dynamic-content/dist && shx cp -R ../../node_modules/get-set-fetch-scenario-scrape-dynamic-content/dist/* dist/scenarios/get-set-fetch-scenario-scrape-dynamic-content/dist",
+    "copy:scenario-scrape-dynamic-content-pkg": "shx cp -R ../../node_modules/get-set-fetch-scenario-scrape-dynamic-content/package.json dist/scenarios/get-set-fetch-scenario-scrape-dynamic-content",
+    "copy:scenario-scrape-dynamic-content": "npm run copy:scenario-scrape-dynamic-content-dist && npm run copy:scenario-scrape-dynamic-content-pkg",
+    "copy:scenarios": "npm run copy:scenario-extract-resource && npm run copy:scenario-scrape-static-content && npm run copy:scenario-scrape-dynamic-content",
     "test": "mocha test \"./test/integration/**/*.ts\" --exit",
-    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"UserPlugin CRUD Pages\""
+    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Extract Resources\""
   },
   "author": {
     "name": "Andrei Sabau"
@@ -38,8 +38,8 @@
     "get-set-fetch-extension-background": "file:../background",
     "get-set-fetch-extension-commons": "file:../commons",
     "get-set-fetch-extension-popup": "file:../popup",
-    "get-set-fetch-scenario-extract-html-content": "file:../scenarios/extract-html-content",
+    "get-set-fetch-scenario-scrape-static-content": "file:../scenarios/scrape-static-content",
     "get-set-fetch-scenario-extract-resources": "file:../scenarios/extract-resources",
-    "get-set-fetch-scenario-extract-dynamic-content": "file:../scenarios/extract-dynamic-content"
+    "get-set-fetch-scenario-scrape-dynamic-content": "file:../scenarios/scrape-dynamic-content"
   }
 }
