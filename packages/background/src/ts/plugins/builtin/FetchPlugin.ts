@@ -8,8 +8,20 @@ export default class FetchPlugin extends BasePlugin {
       type: 'object',
       title: 'Fetch Plugin',
       description: 'responsible for either downloading or loading in the current tab a new resource url.',
+      properties: {
+        stabilityTimeout: {
+          type: 'number',
+          default: '0',
+          description: 'consider the page loaded when there are no more dom changes within the specified amount (miliseconds). only applies to html resources.',
+        },
+      },
+      required: [ 'stabilityTimeout' ],
     };
   }
+
+  opts: {
+    stabilityTimeout: number;
+  };
 
   test(site: ISite, resource: IResource) {
     if (!resource) return false;
@@ -124,7 +136,12 @@ export default class FetchPlugin extends BasePlugin {
 
       // url request succesfully completed with (3xx) or without (2xx) redirection
       if (/^(2|3)\d{2}$/.test(statusCode)) {
-        const mediaType = await ActiveTabHelper.executeScript(site.tabId, { code: 'document.contentType' });
+        const mediaType = await ActiveTabHelper.executeScript<string>(site.tabId, { code: 'document.contentType' });
+
+        if (/html/.test(mediaType) && this.opts.stabilityTimeout > 0) {
+          await this.waitForDomStabilityExecution(site.tabId, this.opts.stabilityTimeout);
+        }
+
         resolve({ mediaType });
       }
       // url request error
@@ -146,5 +163,54 @@ export default class FetchPlugin extends BasePlugin {
     // extension found, test it against most probable extensions of html compatible mime types
     const ext = extensionMatch[1];
     return /htm|php/.test(ext);
+  }
+
+  waitForDomStabilityExecution(tabId, timeout: number) {
+    // use a block declaration in order not to polute the global namespace
+    const code = `
+    {
+      (async function() {
+        try {
+          function ${this.waitForDomStability.toString()};
+          await waitForDomStability(${timeout});
+        
+          // send the result back via messaging as the promise content will just be serialized to {}
+          chrome.runtime.sendMessage({resolved: true});
+        }
+        catch(err) {
+          chrome.runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
+        }
+      })();
+    }
+    `;
+
+    return ActiveTabHelper.executeAsyncScript(tabId, code);
+  }
+
+  waitForDomStability(timeout: number) {
+    return new Promise(resolve => {
+      const waitResolve = observer => {
+        observer.disconnect();
+        resolve();
+      };
+
+      let timeoutId;
+      const observer = new MutationObserver((mutationList, observer) => {
+        for (let i = 0; i < mutationList.length; i += 1) {
+          // we only care if new nodes have been added
+          if (mutationList[i].type === 'childList') {
+            // restart the countdown timer
+            window.clearTimeout(timeoutId);
+            timeoutId = window.setTimeout(waitResolve, timeout, observer);
+            break;
+          }
+        }
+      });
+
+      timeoutId = setTimeout(waitResolve, timeout, observer);
+
+      // start observing document.body
+      observer.observe(document.body, { attributes: true, childList: true, subtree: true });
+    });
   }
 }

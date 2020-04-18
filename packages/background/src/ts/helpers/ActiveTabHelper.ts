@@ -1,5 +1,41 @@
 export default class ActiveTabHelper {
-  static executeScript(tabId, details) {
+  static async executeAsyncScript(tabId: number, code, Log = null) {
+    let result = {};
+
+    try {
+      // listen for incoming message
+      const message = new Promise((resolve, reject) => {
+        const listener = msg => {
+          /*
+          this is not a message sent via runInDom, ignore it,
+          messages may also come from admin GsfClient, test utils CrawlHelper.waitForCrawlComplete
+          */
+          if (msg.resolved === undefined) return;
+
+          chrome.runtime.onMessage.removeListener(listener);
+          if (msg.resolved) {
+            resolve(msg.result);
+          }
+          else {
+            reject(msg.err);
+          }
+        };
+        chrome.runtime.onMessage.addListener(listener);
+      });
+
+      await ActiveTabHelper.executeScript(tabId, { code });
+
+      result = await message;
+    }
+    catch (err) {
+      if (Log) Log.error(err);
+      throw err;
+    }
+
+    return result;
+  }
+
+  static executeScript<T = any>(tabId: number, details): Promise<T> {
     return new Promise((resolve, reject) => {
       chrome.tabs.executeScript(
         tabId,
@@ -43,7 +79,7 @@ export default class ActiveTabHelper {
     });
   }
 
-  static update(tabId, updateProperties) {
+  static update(tabId: number, updateProperties) {
     return new Promise(resolve => {
       chrome.tabs.update(
         tabId,
