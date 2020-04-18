@@ -315,8 +315,6 @@ export default class IdbSite extends BaseEntity implements ISite {
         // eslint-disable-next-line no-await-in-loop
         await resource.update();
       }
-
-      throw err;
     }
 
     if (resource) {
