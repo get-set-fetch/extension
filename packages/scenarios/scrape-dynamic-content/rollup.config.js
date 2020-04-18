@@ -3,9 +3,9 @@ import typescript from 'rollup-plugin-typescript';
 import resolve from 'rollup-plugin-node-resolve';
 
 export default {
-  input: 'src/ts/ExtractDynamicContent.ts',
+  input: 'src/ts/ScrapeDynamicContent.ts',
   output: {
-    file: 'dist/ExtractDynamicContent.js',
+    file: 'dist/ScrapeDynamicContent.js',
     format: 'esm',
   },
   plugins: [

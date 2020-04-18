@@ -7,7 +7,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/dynamic/articles/dynamic-page-article-list-detail-different-urls.html',
-      scenario: 'get-set-fetch-scenario-extract-dynamic-content',
+      scenario: 'get-set-fetch-scenario-scrape-dynamic-content',
       plugins: [
         {
           name: 'DynamicNavigationPlugin',

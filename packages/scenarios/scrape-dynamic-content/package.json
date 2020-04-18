@@ -1,9 +1,9 @@
 {
-  "name": "get-set-fetch-scenario-extract-html-content",
+  "name": "get-set-fetch-scenario-scrape-dynamic-content",
   "version": "0.1.2-rc.2",
-  "description": "Extract Html Content scenario is used for extracting html nodes text based on dom selectors.",
-  "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-html-content",
-  "main": "dist/ExtractHtmlContent.js",
+  "description": "Scrape Dynamic Content scenario is used for extracting content from javascript based html pages",
+  "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/scrape-dynamic-content",
+  "main": "dist/ScrapeDynamicContent.js",
   "scripts": {
     "clean": "shx rm -rf dist",
     "lint": "eslint src/**/*.ts",

@@ -1,11 +1,11 @@
 import { IScenario, ExportType, IExportOpt } from 'get-set-fetch-extension-commons';
 
-export default class ExtractHtmlContent implements IScenario {
+export default class ScrapeDynamicContent implements IScenario {
   getPluginNames() {
     return [
       'SelectResourcePlugin',
       'FetchPlugin',
-      'ScrollPlugin',
+      'DynamicNavigationPlugin',
       'ExtractUrlsPlugin',
       'ExtractHtmlContentPlugin',
       'InsertResourcesPlugin',
@@ -30,7 +30,7 @@ export default class ExtractHtmlContent implements IScenario {
     return [
       {
         type: ExportType.CSV,
-        cols: [ 'url', 'content' ],
+        cols: [ 'url', 'actions', 'content' ],
         fieldSeparator: ',',
         lineSeparator: '\n',
       },
