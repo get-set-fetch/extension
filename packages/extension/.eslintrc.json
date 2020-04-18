@@ -1,7 +1,12 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
-  "extends": ["airbnb-base", "plugin:@typescript-eslint/recommended"],
+  "plugins": [
+    "@typescript-eslint"
+  ],
+  "extends": [
+    "airbnb-base",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "parserOptions": {
     "ecmaVersion": 2017,
     "sourceType": "module",
@@ -14,7 +19,11 @@
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [".js", ".ts", ".d.ts"]
+        "extensions": [
+          ".js",
+          ".ts",
+          ".d.ts"
+        ]
       }
     }
   },
@@ -27,34 +36,116 @@
     "GsfClient": true
   },
   "rules": {
-    "max-len": ["error", { "code": 150 }],
-    "linebreak-style": ["error", "unix"],
-    "array-bracket-spacing": ["error", "always"],
-    "class-methods-use-this":"off",
-    "curly": ["error"],
-    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
-    "max-line-length": [true, 180],
+    "max-len": [
+      "error",
+      {
+        "code": 170
+      }
+    ],
+    "linebreak-style": [
+      "error",
+      "unix"
+    ],
+    "array-bracket-spacing": [
+      "error",
+      "always"
+    ],
+    "class-methods-use-this": "off",
+    "curly": [
+      "error"
+    ],
+    "lines-between-class-members": [
+      "error",
+      "always",
+      {
+        "exceptAfterSingleLine": true
+      }
+    ],
+    "max-line-length": [
+      true,
+      180
+    ],
     "object-literal-sort-keys": false,
-    "object-curly-newline": ["error", { "ImportDeclaration": "never", "ExportDeclaration": "always" }],
-    "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
-    "arrow-parens": ["error", "as-needed"],
-    "member-access": [true, "no-public"],
-    "eol-last": ["error", "always"],
-    "whitespace": [false, "check-module"],
+    "object-curly-newline": [
+      "error",
+      {
+        "ImportDeclaration": "never",
+        "ExportDeclaration": "always"
+      }
+    ],
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "never",
+        "singleline": "never"
+      }
+    ],
+    "arrow-parens": [
+      "error",
+      "as-needed"
+    ],
+    "member-access": [
+      true,
+      "no-public"
+    ],
+    "eol-last": [
+      "error",
+      "always"
+    ],
+    "whitespace": [
+      false,
+      "check-module"
+    ],
     "ordered-imports": false,
-    "quotemark": [true, "single", "avoid-escape"],
-    "object-curly-spacing": ["error", "always"],
-    "one-line": [false, "check-catch", "check-finally", "check-else", "check-open-brace", "check-whitespace"],
-    "brace-style": ["error", "stroustrup", { "allowSingleLine": false }],
+    "quotemark": [
+      true,
+      "single",
+      "avoid-escape"
+    ],
+    "object-curly-spacing": [
+      "error",
+      "always"
+    ],
+    "one-line": [
+      false,
+      "check-catch",
+      "check-finally",
+      "check-else",
+      "check-open-brace",
+      "check-whitespace"
+    ],
+    "brace-style": [
+      "error",
+      "stroustrup",
+      {
+        "allowSingleLine": false
+      }
+    ],
     "forin": false,
     "no-shadow": "off",
-    "no-cond-assign": ["error", "except-parens"],
-    "import/no-extraneous-dependencies": ["off"],
-
-    "@typescript-eslint/indent": ["error", 2],
-    "@typescript-eslint/interface-name-prefix": ["error", "always"],
-    "@typescript-eslint/no-angle-bracket-type-assertion": ["error"],
-    "@typescript-eslint/explicit-member-accessibility": ["off"],
-    "@typescript-eslint/explicit-function-return-type": ["off"]
+    "no-cond-assign": [
+      "error",
+      "except-parens"
+    ],
+    "import/no-extraneous-dependencies": [
+      "off"
+    ],
+    "@typescript-eslint/indent": [
+      "error",
+      2
+    ],
+    "@typescript-eslint/interface-name-prefix": [
+      "error",
+      "always"
+    ],
+    "@typescript-eslint/no-angle-bracket-type-assertion": [
+      "error"
+    ],
+    "@typescript-eslint/explicit-member-accessibility": [
+      "off"
+    ],
+    "@typescript-eslint/explicit-function-return-type": [
+      "off"
+    ]
   }
 }
