@@ -1,0 +1,13 @@
+patch-package
+--- a/node_modules/uniforms-bootstrap4/es6/wrapField.js
++++ b/node_modules/uniforms-bootstrap4/es6/wrapField.js
+@@ -27,6 +27,9 @@ export default function wrapField(_a, children) {
+         'inputRef',
+         'rows',
+         'transform',
++
++        'enumNames',
++        'customField',
+     ]))),
+         label && (React.createElement("label", { htmlFor: id, className: classnames({
+                 'col-form-label': grid,
