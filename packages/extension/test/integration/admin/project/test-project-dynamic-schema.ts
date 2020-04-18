@@ -24,7 +24,7 @@ describe('Project Dynamic Schema', () => {
   });
 
   after(async () => {
-    // await browserHelper.close();
+    await browserHelper.close();
   });
 
   it('Show / Hide Fields', async () => {
@@ -36,7 +36,7 @@ describe('Project Dynamic Schema', () => {
     await page.waitFor('input#name');
 
     // fill in dropdown scenario
-    await page.select('select[id="scenarioPkg.name"]', 'get-set-fetch-scenario-extract-html-content');
+    await page.select('select[id="scenarioPkg.name"]', 'get-set-fetch-scenario-scrape-static-content');
 
     // wait for scenarioLink to be rendered, this means the plugin schemas are also rendered
     await page.waitFor('[id="scenarioLink"]');
