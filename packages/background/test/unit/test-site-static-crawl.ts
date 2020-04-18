@@ -44,8 +44,8 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
     site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', plugins });
     await site.save();
 
-    // stub ExtractUrlsPlugin, the only one running in tab via "runInTab"
-    sinon.stub(ModuleRuntimeManager, 'runInTab').callsFake((tabId, plugin, site, resource) => {
+    // stub ExtractUrlsPlugin, the only one running in tab via "domRead"
+    sinon.stub(ModuleRuntimeManager, 'runPluginInDom').callsFake((tabId, plugin, site, resource) => {
       plugin.extractResourceUrls = () => [ `http://siteA/page-${resource.depth + 1}.html` ];
       if (resource) {
         resource.mediaType = 'html';
@@ -56,7 +56,7 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
   });
 
   afterEach(async () => {
-    (ModuleRuntimeManager.runInTab as any).restore();
+    (ModuleRuntimeManager.runPluginInDom as any).restore();
   });
 
   after(async () => {
@@ -147,7 +147,7 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
 
     let updatePluginSpy;
     const origInstantiate = ModuleRuntimeManager.instantiatePlugins;
-    (ModuleRuntimeManager.runInTab as any).restore();
+    (ModuleRuntimeManager.runPluginInDom as any).restore();
     sinon.stub(ModuleRuntimeManager, 'instantiatePlugins').callsFake(async plugins => {
       const pluginInstances: BasePlugin[] = await origInstantiate(plugins);
 
@@ -162,25 +162,25 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
 
     const crawlResourceSpy = sinon.spy(site, 'crawlResource');
 
-    // stub ExtractUrlsPlugin, the only one running in tab via "runInTab"
-    const runInTabStub = sinon.stub(ModuleRuntimeManager, 'runInTab');
+    // stub ExtractUrlsPlugin, the only one running in tab via "domRead"
+    const domReadStub = sinon.stub(ModuleRuntimeManager, 'runPluginInDom');
 
     /*
-    1st call runInTab from lazy loading ScrollPlugin,
+    1st call domRead from lazy loading ScrollPlugin,
     plugin does not create a new resource, the static resource from SelectResourcePlugin has crawlInProgress = true
     */
-    runInTabStub.onCall(0).callsFake((tabId, plugin, site, resource) => null);
+    domReadStub.onCall(0).callsFake((tabId, plugin, site, resource) => null);
 
-    // 2nd call runInTab from ExtractUrlsPlugin
-    runInTabStub.onCall(1).callsFake((tabId, plugin, site, resource) => {
+    // 2nd call domRead from ExtractUrlsPlugin
+    domReadStub.onCall(1).callsFake((tabId, plugin, site, resource) => {
       plugin.extractResourceUrls = () => [ 'link-1.html', 'link-2.html' ];
       resource.mediaType = 'html';
       const isApplicable = plugin.test(site, resource);
       return isApplicable ? plugin.apply(site, resource) : null;
     });
 
-    // 3rd call runInTab from ExtractTitlePlugin
-    runInTabStub.onCall(2).callsFake((tabId, plugin, site, resource) => {
+    // 3rd call domRead from ExtractTitlePlugin
+    domReadStub.onCall(2).callsFake((tabId, plugin, site, resource) => {
       plugin.extractContent = () => ({
         h1: [ 'h1a', 'h1b' ],
         h2: [ 'h2a', 'h2b' ],
@@ -190,20 +190,20 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
     });
 
     /*
-    4th call runInTab from lazy loading ScrollPlugin
+    4th call domRead from lazy loading ScrollPlugin
     plugin creates a new resource, the static resource from SelectResourcePlugin has crawlInProgress = false
     */
-    runInTabStub.onCall(3).callsFake((tabId, plugin, site, resource) => ({ url: 'page-0.html', actions: [ 'scroll#1' ] }));
+    domReadStub.onCall(3).callsFake((tabId, plugin, site, resource) => ({ url: 'page-0.html', actions: [ 'scroll#1' ] }));
 
-    // 5th call runInTab from ExtractUrlsPlugin
-    runInTabStub.onCall(4).callsFake((tabId, plugin, site, resource) => {
+    // 5th call domRead from ExtractUrlsPlugin
+    domReadStub.onCall(4).callsFake((tabId, plugin, site, resource) => {
       plugin.extractResourceUrls = () => [ 'link-2.html', 'link-3.html' ];
       const isApplicable = plugin.test(site, resource);
       return isApplicable ? plugin.apply(site, resource) : null;
     });
 
-    // 6th call runInTab from ExtractTitlePlugin
-    runInTabStub.onCall(5).callsFake((tabId, plugin, site, resource) => {
+    // 6th call domRead from ExtractTitlePlugin
+    domReadStub.onCall(5).callsFake((tabId, plugin, site, resource) => {
       plugin.extractContent = () => ({
         h1: [ 'h1b', 'h1c' ],
         h2: [ 'h2a' ],
@@ -213,14 +213,14 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
       return isApplicable ? plugin.apply(site, resource) : null;
     });
 
-    // 7th call runInTab from lazy loading ScrollPlugin, dom remains unchanged, a new resource is not created
-    runInTabStub.onCall(6).callsFake((tabId, plugin, site, resource) => null);
+    // 7th call domRead from lazy loading ScrollPlugin, dom remains unchanged, a new resource is not created
+    domReadStub.onCall(6).callsFake((tabId, plugin, site, resource) => null);
 
-    // 8th call runInTab from ExtractUrlsPlugin, no crawlInProgress resource, plugin.apply is not invoked
-    runInTabStub.onCall(7).callsFake((tabId, plugin, site, resource) => null);
+    // 8th call domRead from ExtractUrlsPlugin, no crawlInProgress resource, plugin.apply is not invoked
+    domReadStub.onCall(7).callsFake((tabId, plugin, site, resource) => null);
 
-    // 9th call runInTab from ExtractTitlePlugin,no crawlInProgress resource, plugin.apply is not invoked
-    runInTabStub.onCall(8).callsFake((tabId, plugin, site, resource) => null);
+    // 9th call domRead from ExtractTitlePlugin,no crawlInProgress resource, plugin.apply is not invoked
+    domReadStub.onCall(8).callsFake((tabId, plugin, site, resource) => null);
 
     await site.crawl();
 
