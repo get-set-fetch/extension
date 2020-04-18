@@ -25,7 +25,7 @@ export interface IExportOpt {
   type: ExportType;
   cols: string[];
   fieldSeparator?: string;
-  lineSeparator?:string;
+  lineSeparator?: string;
 }
 
 export interface IExportResult {
@@ -37,6 +37,7 @@ export interface IEnhancedJSONSchema extends JSONSchema7 {
   properties?: {
     [k: string]: IEnhancedJSONSchema;
   };
+  required?: string[],
   ui?: {
     enumNames?: string[];
     customField?: string;
