@@ -109,77 +109,48 @@ export default class ModuleRuntimeManager {
     return scenarioInstance;
   }
 
-  static async runInTab(tabId, pluginInstance, site, resource) {
+  static async runPluginInDom(tabId, pluginInstance, site, resource) {
     const pluginName = pluginInstance.constructor.name;
     const pluginInfo = ModuleRuntimeManager.cache.get(pluginName);
 
     const codeWithoutExport = pluginInfo.code.replace(/^export .+$/gm, '');
     Log.debug(`injecting in browser tab ${pluginName}: ${codeWithoutExport}`);
 
-    let result = {};
-    try {
-      const pluginDef = `${pluginName}`;
-      const pluginInstanceName = `inst${pluginName}`;
+    const pluginDef = `${pluginName}`;
+    const pluginInstanceName = `inst${pluginName}`;
 
-      // listen for incoming message
-      const message = new Promise((resolve, reject) => {
-        const listener = msg => {
-          /*
-          this is not a message sent via runInTab, ignore it,
-          messages may also come from admin GsfClient, test utils CrawlHelper.waitForCrawlComplete
-          */
-          if (msg.resolved === undefined) return;
-
-          chrome.runtime.onMessage.removeListener(listener);
-          if (msg.resolved) {
-            resolve(msg.result);
-          }
-          else {
-            reject(msg.err);
-          }
-        };
-        chrome.runtime.onMessage.addListener(listener);
-      });
-
-      /*
+    /*
       async run the plugin and sends the result as message once completed
       use a block declaration in order not to polute the global namespace
       avoiding conflicts, thus redeclaration errors
       */
-      await ActiveTabHelper.executeScript(tabId, { code: `
-        {
-          (async function() {
-            try {
-              // instantiate plugin instance, one time only, multiple plugin invocations will retain the previous plugin state
-              if (!window.${pluginInstanceName}) {
-                ${codeWithoutExport}
-                window.${pluginInstanceName} = new ${pluginDef}(${JSON.stringify(pluginInstance.opts)})
-              }
-
-              // execute plugin
-              let result = null;
-              const isApplicable = window.${pluginInstanceName}.test(${JSON.stringify(site)}, ${JSON.stringify(resource)});
-              if (isApplicable) {
-                result = await window.${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)});
-              }
-
-              // send the result back via messaging as the promise content will just be serialized to {}
-              chrome.runtime.sendMessage({resolved: true, result});
+    const code = `
+      {
+        (async function() {
+          try {
+            // instantiate plugin instance, one time only, multiple plugin invocations will retain the previous plugin state
+            if (!window.${pluginInstanceName}) {
+              ${codeWithoutExport}
+              window.${pluginInstanceName} = new ${pluginDef}(${JSON.stringify(pluginInstance.opts)})
             }
-            catch(err) {
-              chrome.runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
+
+            // execute plugin
+            let result = null;
+            const isApplicable = window.${pluginInstanceName}.test(${JSON.stringify(site)}, ${JSON.stringify(resource)});
+            if (isApplicable) {
+              result = await window.${pluginInstanceName}.apply(${JSON.stringify(site)}, ${JSON.stringify(resource)});
             }
-          })();
-        }
-      ` });
 
-      result = await message;
-    }
-    catch (err) {
-      Log.error(err);
-      throw err;
-    }
+            // send the result back via messaging as the promise content will just be serialized to {}
+            chrome.runtime.sendMessage({resolved: true, result});
+          }
+          catch(err) {
+            chrome.runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
+          }
+        })();
+      }
+    `;
 
-    return result;
+    return ActiveTabHelper.executeAsyncScript(tabId, code, Log);
   }
 }

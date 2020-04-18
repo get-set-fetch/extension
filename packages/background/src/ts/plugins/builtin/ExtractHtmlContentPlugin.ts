@@ -8,7 +8,7 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
       title: 'Extract Html Content Plugin',
       description: 'responsible for scraping html content based on document.querySelectorAll.',
       properties: {
-        runInTab: {
+        domRead: {
           type: 'boolean',
           const: true,
         },
@@ -20,12 +20,12 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
           },
         },
       },
-      required: [ 'runInTab', 'selectors' ],
+      required: [ 'selectors' ],
     };
   }
 
   opts: {
-    runInTab: boolean;
+    domRead: boolean;
     selectors: string;
   };
 

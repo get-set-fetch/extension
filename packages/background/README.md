@@ -138,7 +138,7 @@ Resource filter is a bloom filter used for detecting duplicate urls.
         maxDepth: 1,
         maxResources: 10,
         selectors: "a"
-        runInTab: true
+        domRead: true
       }
     },
     {
@@ -168,7 +168,7 @@ Resource filter is a bloom filter used for detecting duplicate urls.
   - FetchPlugin
     - opens html resources in a new tab or dowloads binary ones.
   - ExtractUrlsPlugin
-    - runInTab = true : whether or not the plugin should be executed in the browser tab context where the current resource is opened.
+    - domRead = true : whether or not the plugin should be executed in the browser tab context where the current resource is opened.
     - maxResources: how many resources to crawl
     - maxDepth: how deep the crawl should advance. A value of 0 means crawling just the root url. A value of 1 will crawl the root url and direct internal links present in the root url.
   - ExtractHtmlContentPlugin

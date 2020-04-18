@@ -29,7 +29,7 @@ describe(`Test Storage Project - CRUD, using connection ${conn.info}`, () => {
           selectors: 'a',
           maxDepth: -1,
           maxResources: -1,
-          runInTab: true,
+          domRead: true,
         },
       },
       {

@@ -14,11 +14,11 @@ export default class ScrollPlugin extends BasePlugin {
           type: 'boolean',
           default: false,
         },
-        runInTab: {
+        domRead: {
           type: 'boolean',
           const: true,
         },
-        domManipulation: {
+        domWrite: {
           type: 'boolean',
           const: true,
         },
@@ -38,14 +38,14 @@ export default class ScrollPlugin extends BasePlugin {
           description: 'Number of maximum scroll operations. -1 scrolls till no new content is added to the page',
         },
       },
-      required: [ 'runInTab', 'domManipulation', 'enabled', 'delay', 'timeout', 'maxScrollNo' ],
+      required: [ 'enabled', 'delay', 'timeout', 'maxScrollNo' ],
     };
   }
 
   static scrollNo: number = 0;
 
   opts: {
-    runInTab: boolean;
+    domRead: boolean;
     enabled: boolean;
     timeout: number;
     delay: number;

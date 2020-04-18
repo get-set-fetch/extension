@@ -29,12 +29,12 @@ export default class ExtractUrlsPlugin extends BasePlugin {
           default: '100',
           description: 'Maximum number of resources to be scraped.',
         },
-        runInTab: {
+        domRead: {
           type: 'boolean',
           const: true,
         },
       },
-      required: [ 'selectors', 'maxDepth', 'maxResources', 'runInTab' ],
+      required: [ 'selectors', 'maxDepth', 'maxResources' ],
     };
   }
 
@@ -42,7 +42,7 @@ export default class ExtractUrlsPlugin extends BasePlugin {
     selectors: string;
     maxResources: number;
     maxDepth: number;
-    runInTab: boolean;
+    domRead: boolean;
   };
 
   test(site: ISite & IdbSite, resource: IResource) {

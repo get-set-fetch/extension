@@ -8,17 +8,16 @@ export default class ExtractTitlePlugin extends BasePlugin {
       description: 'responsible for extracting the title of the current html page.',
       type: 'object',
       properties: {
-        runInTab: {
+        domRead: {
           type: 'boolean',
           const: true,
         },
       },
-      required: [ 'runInTab' ],
     };
   }
 
   opts: {
-    runInTab: boolean;
+    domRead: boolean;
   };
 
   test(site: ISite, resource: IResource) {

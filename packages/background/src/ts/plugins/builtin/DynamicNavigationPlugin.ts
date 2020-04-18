@@ -94,11 +94,11 @@ export default class DynamicNavigationPlugin extends BasePlugin {
       title: 'Click Navigation Plugin',
       description: 'responsible for navigating via javascript click events for single page applications.',
       properties: {
-        runInTab: {
+        domRead: {
           type: 'boolean',
           const: true,
         },
-        domManipulation: {
+        domWrite: {
           type: 'boolean',
           const: true,
         },
@@ -125,7 +125,8 @@ export default class DynamicNavigationPlugin extends BasePlugin {
   }
 
   opts: {
-    runInTab: boolean;
+    domRead: boolean;
+    domWrite: boolean;
     selectors: string;
     maxResources: number;
   };

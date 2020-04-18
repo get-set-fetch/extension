@@ -181,8 +181,8 @@ export default class IdbSite extends BaseEntity implements ISite {
     }
     this.resourcesNo = (await IdbSite.getAllIds()).length;
 
-    const domPluginsPresent = this.pluginInstances.some(
-      pluginInstance => pluginInstance.opts.domManipulation && (pluginInstance.opts.enabled === undefined || pluginInstance.opts.enabled === true),
+    const domWritePluginsPresent = this.pluginInstances.some(
+      pluginInstance => pluginInstance.opts.domWrite && (pluginInstance.opts.enabled === undefined || pluginInstance.opts.enabled === true),
     );
 
     let staticResource = null;
@@ -201,7 +201,7 @@ export default class IdbSite extends BaseEntity implements ISite {
       // retrieve static resource, opening its url in a new browser tab
       staticResource = await this.crawlResource();
 
-      if (staticResource && domPluginsPresent) {
+      if (staticResource && domWritePluginsPresent) {
         do {
           // retrieve dynamic resource, use the current tab dom state to further scroll, click, etc..
           dynamicResource = await this.crawlResource(staticResource);
@@ -308,8 +308,8 @@ export default class IdbSite extends BaseEntity implements ISite {
       `Executing plugin ${plugin.constructor.name} using options ${JSON.stringify(plugin.opts)} against resource ${JSON.stringify(resource)}`,
     );
 
-    if (plugin.opts && plugin.opts.runInTab) {
-      return ModuleRuntimeManager.runInTab(this.tabId, plugin, this, resource);
+    if (plugin.opts && (plugin.opts.domRead || plugin.opts.domWrite)) {
+      return ModuleRuntimeManager.runPluginInDom(this.tabId, plugin, this, resource);
     }
 
     // test if plugin is aplicable

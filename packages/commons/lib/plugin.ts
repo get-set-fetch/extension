@@ -14,8 +14,8 @@ export interface IPluginDefinition {
 }
 
 export interface IPluginOpts {
-  runInTab?: boolean;
-  domManipulation?: boolean;
+  domRead?: boolean;
+  domWrite?: boolean;
   [key: string]: any;
 }
 
