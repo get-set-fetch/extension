@@ -103,7 +103,7 @@ class ExtractHeadingsPlugin extends BasePlugin {
       description: 'responsible for extracting H1-H6 html headings',
       type: 'object',
       properties: {
-        runInTab: {
+        domRead: {
           type: 'boolean',
           const: true,
         },
