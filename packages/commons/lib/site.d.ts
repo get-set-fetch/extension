@@ -6,6 +6,7 @@ export interface ISite {
   projectId: number;
   name: string;
   url: string;
+  crawlInProgress: boolean;
   tabId: any;
 
   plugins: IPluginDefinition[];

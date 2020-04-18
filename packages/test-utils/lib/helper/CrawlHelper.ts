@@ -1,31 +1,22 @@
+import { ISite } from 'get-set-fetch-extension-commons';
+
 declare const GsfClient;
 export default class CrawlHelper {
-  static async waitForCrawlComplete(page, siteId, prevResourceNo = null, resolve = null) {
+  static async waitForCrawlComplete(page, siteId, resolve = null) {
     // if no promise defined return one
     if (!resolve) {
       return new Promise(resolve => {
-        setTimeout(CrawlHelper.waitForCrawlComplete, 5000, page, siteId, null, resolve);
+        setTimeout(CrawlHelper.waitForCrawlComplete, 2000, page, siteId, resolve);
       });
     }
 
-    /*
-    check if crawl complete
-    for static resources (2 db steps: insert not crawled resources, update resource to crawled status)
-      - total resources equals crawled resources -> crawl complete
-    for dynamic resources (1 db step:  resource is directly saved with crawled status and scrapped content)
-      - no new resources have been added -> crawl complete
-    */
-    const allResources = await page.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}`), siteId);
-    const crawledResources = await page.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/crawled`), siteId);
-
-    const staticCrawlComplete = allResources.length === crawledResources.length;
-    const dynamicCrawlComplete = prevResourceNo === allResources.length;
-
-    if (staticCrawlComplete && dynamicCrawlComplete) {
+    // check if crawl complete
+    const site: ISite = await page.evaluate(siteId => GsfClient.fetch('GET', `site/${siteId}`), siteId);
+    if (!site.crawlInProgress) {
       resolve();
     }
     else {
-      setTimeout(CrawlHelper.waitForCrawlComplete, 5000, page, siteId, allResources.length, resolve);
+      setTimeout(CrawlHelper.waitForCrawlComplete, 5000, page, siteId, resolve);
     }
 
     return null;

@@ -169,7 +169,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
 
         // also save the project url as a new site
         try {
-          const site = new IdbSite({ name: `${this.name}-1`, url: this.url, projectId: this.id, plugins: this.plugins });
+          const site = new IdbSite({ name: `${this.name}-1`, url: this.url, projectId: this.id, crawlInProgress: false, plugins: this.plugins });
           await site.save();
           resolve(this.id);
         }

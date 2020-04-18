@@ -14,9 +14,17 @@ import ModuleRuntimeManager from '../plugins/ModuleRuntimeManager';
 const Log = Logger.getLogger('IdbSite');
 
 export default class IdbSite extends BaseEntity implements ISite {
-  // IndexedDB can't do partial update, define all site properties to be stored
+  /*
+  IndexedDB can't do partial update, define all site properties to be stored
+
+  crawlInProgress is also defined at site level in addition to resource level
+  for static resources (1st added to the db, and then crawled) we can check if all site resources are crawlInProgress = false => site.crawlInProgress = false
+  for dynamic resources (directly added as crawled, as DynamicNavigationPlugin finds them) the above logic can't be applied
+  so we define a crawlInProgress flag at site level
+  when extensions starts all crawlInProgress flag are set to false
+  */
   get props() {
-    return [ 'id', 'projectId', 'name', 'url', 'robotsTxt', 'plugins', 'resourceFilter' ];
+    return [ 'id', 'projectId', 'name', 'url', 'crawlInProgress', 'robotsTxt', 'plugins', 'resourceFilter' ];
   }
 
   // get a read transaction
@@ -124,11 +132,20 @@ export default class IdbSite extends BaseEntity implements ISite {
     });
   }
 
+  static async resetAllCrawlInProgress() {
+    const sites: IdbSite[] = await IdbSite.getAll();
+    await Promise.all(sites.map(site => {
+      site.crawlInProgress = false;
+      return site.update();
+    }));
+  }
+
   id: number;
   projectId: number;
   name: string;
   url: string;
-  tabId: any;
+  crawlInProgress: boolean;
+  tabId: number;
 
   plugins: IPluginDefinition[];
   pluginInstances: BasePlugin[];
@@ -170,6 +187,12 @@ export default class IdbSite extends BaseEntity implements ISite {
   }
 
   async crawl() {
+    if (this.crawlInProgress) return;
+
+    // mark the site as crawlInProgress
+    this.crawlInProgress = true;
+    await this.update();
+
     try {
       this.pluginInstances = await ModuleRuntimeManager.instantiatePlugins(this.plugins);
     }
@@ -210,6 +233,10 @@ export default class IdbSite extends BaseEntity implements ISite {
       }
     }
     while (staticResource);
+
+    // crawl is complete, reset the corresponding flag
+    this.crawlInProgress = false;
+    this.update();
   }
 
   async crawlResource(resource: IdbResource = null) {

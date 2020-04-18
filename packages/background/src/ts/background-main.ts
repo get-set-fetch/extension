@@ -2,6 +2,7 @@ import { LogLevel } from 'get-set-fetch-extension-commons';
 import Logger from './logger/Logger';
 import ModuleStorageManager from './plugins/ModuleStorageManager';
 import GsfProvider from './storage/GsfProvider';
+import IdbSite from './storage/IdbSite';
 
 const Log = Logger.getLogger('background-main');
 
@@ -35,6 +36,9 @@ const Log = Logger.getLogger('background-main');
 
     // read all builtin scenarios, persist them as Scenario
     await ModuleStorageManager.discoverLocalScenarios();
+
+    // set all sites as not crawlInProgress
+    await IdbSite.resetAllCrawlInProgress();
   }
   catch (err) {
     Log.error(err);
