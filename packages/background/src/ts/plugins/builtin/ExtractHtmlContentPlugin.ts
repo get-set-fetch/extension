@@ -43,7 +43,22 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
   }
 
   extractContent() {
-    const selectors: string[] = this.opts.selectors.split('\n');
+    const selectors: string[] = this.opts.selectors
+      .split('\n')
+      .map((rawSelector: string) => {
+        let selector = rawSelector.trim();
+
+        // remove comments with last occurance of ' #', ex: a.class # comment becomes a.class
+        if (/\s#/.test(selector)) {
+          const selectorMatch = /(.+)(?=(\s#))/.exec(selector);
+          // eslint-disable-next-line prefer-destructuring
+          selector = selectorMatch[1];
+        }
+
+        return selector;
+      })
+      .filter((selector: string) => selector.length > 0);
+
     const content = selectors.reduce(
       (result, selector) => Object.assign(
         result,

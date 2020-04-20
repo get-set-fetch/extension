@@ -24,7 +24,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         {
           name: 'ExtractHtmlContentPlugin',
           opts: {
-            selectors: 'h1\ni.classA',
+            selectors: 'h1\ni.classA # headlines',
           },
         },
       ],
@@ -80,7 +80,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         {
           name: 'ExtractHtmlContentPlugin',
           opts: {
-            selectors: 'h1\ni.classA',
+            selectors: 'h1\ni.classA # headlines',
           },
         },
       ],
@@ -120,7 +120,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         {
           name: 'ExtractHtmlContentPlugin',
           opts: {
-            selectors: 'h1\ni.classA',
+            selectors: 'h1\ni.classA # headlines',
           },
         },
       ],
@@ -167,7 +167,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         {
           name: 'ExtractHtmlContentPlugin',
           opts: {
-            selectors: 'h1\ni.classA',
+            selectors: 'h1\ni.classA # headlines',
           },
         },
       ],
@@ -214,7 +214,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         {
           name: 'ExtractHtmlContentPlugin',
           opts: {
-            selectors: 'h5',
+            selectors: 'h5 # headlines',
           },
         },
         {
@@ -288,7 +288,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         {
           name: 'ExtractHtmlContentPlugin',
           opts: {
-            selectors: 'h5',
+            selectors: 'h5 #headlines',
           },
         },
         {
