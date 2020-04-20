@@ -79,6 +79,17 @@ export default class ActiveTabHelper {
     });
   }
 
+  static close(tabId: number): Promise<void> {
+    return new Promise(resolve => {
+      chrome.tabs.remove(
+        tabId,
+        () => {
+          resolve();
+        },
+      );
+    });
+  }
+
   static update(tabId: number, updateProperties) {
     return new Promise(resolve => {
       chrome.tabs.update(

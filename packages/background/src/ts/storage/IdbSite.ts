@@ -10,6 +10,7 @@ import IdbResource from './IdbResource';
 import Logger from '../logger/Logger';
 import ModuleStorageManager from '../plugins/ModuleStorageManager';
 import ModuleRuntimeManager from '../plugins/ModuleRuntimeManager';
+import ActiveTabHelper from '../helpers/ActiveTabHelper';
 
 const Log = Logger.getLogger('IdbSite');
 
@@ -24,7 +25,7 @@ export default class IdbSite extends BaseEntity implements ISite {
   when extensions starts all crawlInProgress flag are set to false
   */
   get props() {
-    return [ 'id', 'projectId', 'name', 'url', 'crawlInProgress', 'robotsTxt', 'plugins', 'resourceFilter' ];
+    return ['id', 'projectId', 'name', 'url', 'crawlInProgress', 'robotsTxt', 'plugins', 'resourceFilter'];
   }
 
   // get a read transaction
@@ -237,6 +238,11 @@ export default class IdbSite extends BaseEntity implements ISite {
     // crawl is complete, reset the corresponding flag
     this.crawlInProgress = false;
     this.update();
+
+    // close the tab opened for scraping
+    if (this.tabId) {
+      await ActiveTabHelper.close(this.tabId);
+    }
   }
 
   async crawlResource(resource: IdbResource = null) {
@@ -378,7 +384,7 @@ export default class IdbSite extends BaseEntity implements ISite {
 
         // also save the site url as the first site resource at depth 0
         try {
-          await this.saveResources([ this.url ], 0);
+          await this.saveResources([this.url], 0);
           resolve(this.id);
         }
         catch (err) {
@@ -395,7 +401,7 @@ export default class IdbSite extends BaseEntity implements ISite {
   saveResources(urls, depth) {
     return new Promise((resolve, reject) => {
       // need a transaction across multiple stores
-      const tx = IdbSite.db.transaction([ 'Sites', 'Resources' ], 'readwrite');
+      const tx = IdbSite.db.transaction(['Sites', 'Resources'], 'readwrite');
 
       // read the latest resource filter bitset
       const reqReadSite = tx.objectStore('Sites').get(this.id);

@@ -28,3 +28,10 @@ global.window.Blob = class Blob {};
 if (!global.TextDecoder) {
   global.TextDecoder = TextDecoder;
 }
+
+// chrome tab api
+(<any>global).chrome = {
+  tabs: {
+    remove: () => {},
+  },
+};
