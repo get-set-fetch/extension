@@ -133,7 +133,7 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
         let filteredRequiredProps: string[] = filteredPluginSchema.required ? filteredPluginSchema.required : [];
         filteredPluginSchema.properties = Object.keys(pluginSchema.properties).reduce(
           (acc, key) => {
-            if (pluginSchema.properties[key].const === true) {
+            if (Object.prototype.hasOwnProperty.call(pluginSchema.properties[key], 'const')) {
               filteredRequiredProps = filteredRequiredProps.filter(requiredProp => requiredProp !== key);
               return acc;
             }
