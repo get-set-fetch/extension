@@ -205,13 +205,13 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
 
   async loadConfigFromHash() {
     const configHash: IProjectConfigHash = { hash: this.state.configHash };
-    const projectStorage: IProjectStorage = await GsfClient.fetch<IProjectStorage>(HttpMethod.POST, 'project/config', configHash);
-    const project: IProjectUIStorage = convertToProjectUIStorage(projectStorage);
 
-    if (!project) {
+    const projectStorage: IProjectStorage = await GsfClient.fetch<IProjectStorage>(HttpMethod.POST, 'project/config', configHash);
+    if (Object.keys(projectStorage).length === 0) {
       this.setState({ configHashStatus: 'Could not decode config hash.' }, this.openConfigHashModal);
       return;
     }
+    const project: IProjectUIStorage = convertToProjectUIStorage(projectStorage);
 
     // make sure scenarioOpts.name is installed
     if (project.scenarioPkg.name) {

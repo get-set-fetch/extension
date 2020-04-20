@@ -1,4 +1,7 @@
 import { deflate as pakoDeflate, inflate as pakoInflate } from 'pako';
+import Logger from '../logger/Logger';
+
+const Log = Logger.getLogger('JsonUrlHelper');
 
 export default class JsonUrlHelper {
   static getDictionary() {
@@ -89,10 +92,19 @@ export default class JsonUrlHelper {
   }
 
   static decode(deflatedBase64String: string): object {
-    const deflatedString = atob(deflatedBase64String);
-    const deflatedIntArr = deflatedString.split('').map(val => val.charCodeAt(0));
-    const inflatedString = pakoInflate(deflatedIntArr, { dictionary: JsonUrlHelper.getDictionary(), to: 'string' } as any);
-    const inflatedInstance = JSON.parse(inflatedString);
+    if (!deflatedBase64String || deflatedBase64String.length === 0) return null;
+
+    let inflatedInstance = null;
+
+    try {
+      const deflatedString = atob(deflatedBase64String);
+      const deflatedIntArr = deflatedString.split('').map(val => val.charCodeAt(0));
+      const inflatedString = pakoInflate(deflatedIntArr, { dictionary: JsonUrlHelper.getDictionary(), to: 'string' } as any);
+      inflatedInstance = JSON.parse(inflatedString);
+    }
+    catch (err) {
+      Log.error(err);
+    }
 
     return inflatedInstance;
   }
