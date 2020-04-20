@@ -154,6 +154,6 @@
     ],
     "@typescript-eslint/no-object-literal-type-assertion": [
       "off"
-    ],
+    ]
   }
 }
