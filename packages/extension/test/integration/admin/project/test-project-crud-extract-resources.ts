@@ -67,7 +67,6 @@ describe('Project CRUD Pages', () => {
         name: 'SelectResourcePlugin',
         opts: {
           delay: 1001,
-          frequency: -1,
         },
       },
       {
@@ -108,7 +107,7 @@ describe('Project CRUD Pages', () => {
     ],
   };
 
-  const expectedConfigHash = 'eLtI4gnagystKMrPAjrUESM7wCQUkIVhWSSjpKTASl+/vLxcD5hYUhP1kvNz9TPzUlIr9DKAgYKag9JTS3SLgTgNlNx1YRK6qZBA1C2Ce4KcnIaSuXSQMx7FOQ1HQkZPuygJGyVhYqRrclJqZm464bRK/eRFWnICAEXNzRM=';
+  const expectedConfigHash = 'eLtI4gnagystKMrPAjrUESM7wCQUkIVhWSSjpKTASl+/vLxcD5hYUhP1kvNz9TPzUlIr9DKAgYKag9JTS3SLgTgNlNx1YRK6qZBA1C2Ce4LCnEZx1sKRctETK0pKRkmJGAmZnKSZmZtOOHFSPz2Rln4AzP3IOQ==';
 
   before(async () => {
     const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
@@ -261,7 +260,6 @@ describe('Project CRUD Pages', () => {
     const updatedProject = await page.evaluate(id => GsfClient.fetch('GET', `project/${id}`), projectId);
 
     // compare projects, projectToUpdate doesn't contain some default options that are not manually edited from UI, add them
-    selectResourcePlugin.opts.frequency = -1;
     const scrollPlugin: IPluginDefinition = projectToUpdate.plugins.find(plugin => plugin.name === 'ScrollPlugin');
     scrollPlugin.opts = {
       delay: 1000,
