@@ -41,7 +41,7 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
     await Site.delAll();
 
     // save site
-    const plugins = [ 'SelectResourcePlugin', 'DynamicNavigationPlugin', 'ExtractHtmlContentPlugin', 'UpsertResourcePlugin' ].map(
+    const plugins = ['SelectResourcePlugin', 'DynamicNavigationPlugin', 'ExtractHtmlContentPlugin', 'UpsertResourcePlugin'].map(
       name => ModuleStorageManager.getAvailablePluginDefs().find(pluginDef => pluginDef.name === name),
     );
     site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', plugins });
@@ -97,23 +97,23 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
 
       // stub querySelectorAll, everytime returns a single "a.more" element
       const querySelectorAllStub = sandbox.stub(global.window.document, 'querySelectorAll');
-      querySelectorAllStub.withArgs('.more').returns([ { innerText: 'more' } as HTMLElement ]);
+      querySelectorAllStub.withArgs('.more').returns([{ innerText: 'more' } as HTMLElement]);
 
       // 1st resource, initial static html, DynamicNavigationPlugin not triggered on this pass
-      extractContentStub.onCall(0).returns({ '.content': [ 'contentA1', 'contentA2' ] });
+      extractContentStub.onCall(0).returns({ '.content': ['contentA1', 'contentA2'] });
 
       // 2nd resource, actions: ['more#1'],
       snapshotStub.onCall(0).returns(0); // static content snapshot
       snapshotStub.onCall(1).returns(1); // dynamic content snapshot after clicking ".more" 1st time
-      extractContentStub.onCall(1).returns({ '.content': [ 'contentA1', 'contentA2', 'contentB1' ] });
+      extractContentStub.onCall(1).returns({ '.content': ['contentA1', 'contentA2', 'contentB1'] });
 
       // 3rd resource, actions: ['more#2'],
       snapshotStub.onCall(2).returns(2); // dynamic content snapshot after clicking ".more" 2nd time
-      extractContentStub.onCall(2).returns({ '.content': [ 'contentA1', 'contentA2', 'contentB1', 'contentC1', 'contentC2' ] });
+      extractContentStub.onCall(2).returns({ '.content': ['contentA1', 'contentA2', 'contentB1', 'contentC1', 'contentC2'] });
 
       // 4th resource, duplicate, no new resource
       snapshotStub.onCall(3).returns(2); // dynamic content snapshot after clicking ".more" 3rd time
-      extractContentStub.onCall(3).returns({ '.content': [ 'contentA1', 'contentA2', 'contentB1', 'contentC1', 'contentC2' ] });
+      extractContentStub.onCall(3).returns({ '.content': ['contentA1', 'contentA2', 'contentB1', 'contentC1', 'contentC2'] });
 
       return pluginInstances;
     });
@@ -168,9 +168,9 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [ ],
+      urlsToAdd: [],
       mediaType: 'html',
-      actions: [ 'more#1' ],
+      actions: ['more#1'],
     };
 
     const dynamicResource1 = filterResourceProps(upsertSpy.getCall(1).args[1]);
@@ -187,9 +187,9 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [ ],
+      urlsToAdd: [],
       mediaType: 'html',
-      actions: [ 'more#2' ],
+      actions: ['more#2'],
     };
 
     const dynamicResource2 = filterResourceProps(upsertSpy.getCall(2).args[1]);
@@ -226,23 +226,23 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
 
       // stub querySelectorAll, everytime returns a single "a.more" element
       const querySelectorAllStub = sandbox.stub(global.window.document, 'querySelectorAll');
-      querySelectorAllStub.withArgs('.more').returns([ { innerText: 'more' } as HTMLElement ]);
+      querySelectorAllStub.withArgs('.more').returns([{ innerText: 'more' } as HTMLElement]);
 
       // 1st resource, initial static html, DynamicNavigationPlugin not triggered on this pass
-      extractContentStub.onCall(0).returns({ '.content': [ 'contentA1', 'contentA2' ] });
+      extractContentStub.onCall(0).returns({ '.content': ['contentA1', 'contentA2'] });
 
       // 2nd resource, actions: ['more#1'],
       snapshotStub.onCall(0).returns(0); // static content snapshot
       snapshotStub.onCall(1).returns(1); // dynamic content snapshot after clicking ".more" 1st time
-      extractContentStub.onCall(1).returns({ '.content': [ 'contentA1', 'contentA2', 'contentB1' ] });
+      extractContentStub.onCall(1).returns({ '.content': ['contentA1', 'contentA2', 'contentB1'] });
 
       // 3rd resource, actions: ['more#2'],
       snapshotStub.onCall(2).returns(2); // dynamic content snapshot after clicking ".more" 2nd time
-      extractContentStub.onCall(2).returns({ '.content': [ 'contentA1', 'contentA2', 'contentB1', 'contentC1', 'contentC2' ] });
+      extractContentStub.onCall(2).returns({ '.content': ['contentA1', 'contentA2', 'contentB1', 'contentC1', 'contentC2'] });
 
       // 4th resource, duplicate, no new resource
       snapshotStub.onCall(3).returns(2); // dynamic content snapshot after clicking ".more" 3rd time
-      extractContentStub.onCall(3).returns({ '.content': [ 'contentA1', 'contentA2', 'contentB1', 'contentC1', 'contentC2' ] });
+      extractContentStub.onCall(3).returns({ '.content': ['contentA1', 'contentA2', 'contentB1', 'contentC1', 'contentC2'] });
 
       return pluginInstances;
     });
@@ -295,9 +295,9 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [ ],
+      urlsToAdd: [],
       mediaType: 'html',
-      actions: [ 'more#1' ],
+      actions: ['more#1'],
     };
 
     const dynamicResource1 = filterResourceProps(upsertSpy.getCall(1).args[1]);
@@ -333,8 +333,8 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
 
       // stub querySelectorAll
       const querySelectorAllStub = sandbox.stub(global.window.document, 'querySelectorAll');
-      querySelectorAllStub.withArgs('.detail').returns([ { innerText: 'prodA' }, { innerText: 'prodB' } ]);
-      querySelectorAllStub.withArgs('.cancel').returns([ { innerText: 'cancel' } ]);
+      querySelectorAllStub.withArgs('.detail').returns([{ innerText: 'prodA' }, { innerText: 'prodB' }]);
+      querySelectorAllStub.withArgs('.cancel').returns([{ innerText: 'cancel' }]);
 
       // 1st resource, initial list, DynamicNavigationPlugin not triggered on this pass, no product detail returned
       extractContentStub.onCall(0).returns(null);
@@ -342,12 +342,12 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
       // 2nd resource, actions: ['prod1#1'],
       snapshotStub.onCall(0).returns(0); // list content snapshot
       snapshotStub.onCall(1).returns(11); // dynamic content snapshot after clicking prod1
-      extractContentStub.onCall(1).returns({ '.detail': [ 'productA' ] });
+      extractContentStub.onCall(1).returns({ '.detail': ['productA'] });
 
       // 3rd resource, actions: ['prod2#2'],
       snapshotStub.onCall(2).returns(0); // dynamic content snapshot after clicking prod1 > cancel
       snapshotStub.onCall(3).returns(22); // dynamic content snapshot after clicking prod2
-      extractContentStub.onCall(2).returns({ '.detail': [ 'productB' ] });
+      extractContentStub.onCall(2).returns({ '.detail': ['productB'] });
 
       // 4th resource, duplicate, no new resource
       snapshotStub.onCall(4).returns(0); // dynamic content snapshot after clicking prod2 > cancel
@@ -402,9 +402,9 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [ ],
+      urlsToAdd: [],
       mediaType: 'html',
-      actions: [ 'prodA' ],
+      actions: ['prodA'],
     };
 
     const dynamicResource1 = filterResourceProps(upsertSpy.getCall(1).args[1]);
@@ -420,9 +420,9 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [ ],
+      urlsToAdd: [],
       mediaType: 'html',
-      actions: [ 'prodB' ],
+      actions: ['prodB'],
     };
 
     const dynamicResource2 = filterResourceProps(upsertSpy.getCall(2).args[1]);
