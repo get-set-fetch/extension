@@ -10,7 +10,10 @@ import ScenarioHelper from '../scenarios/model/ScenarioHelper';
 interface IState {
   project: IProjectStorage;
   scenario: IScenario;
-  results: object[];
+  csvResult: {
+    header: string[];
+    body: string[][];
+  };
 }
 
 export default class ProjectResults extends React.Component<RouteComponentProps<{projectId: string}>, IState> {
@@ -20,7 +23,7 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
     this.state = {
       project: null,
       scenario: null,
-      results: null,
+      csvResult: null,
     };
 
     this.export = this.export.bind(this);
@@ -38,32 +41,28 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
     // instantiate scenario
     const scenario = await ScenarioHelper.instantiate(project.scenario);
 
-    // load results
-    const results = await this.loadResourcesInfo(project as IProjectStorage);
+    // load results as csv
+    const csvResult = await this.loadCsvResult(project as IProjectStorage, scenario);
 
-    this.setState({ project: project as IProjectStorage, scenario, results });
+    this.setState({ project: project as IProjectStorage, scenario, csvResult });
   }
 
-  async loadResourcesInfo(project: IProjectStorage): Promise<object[]> {
-    let resources = [];
+  async loadCsvResult(project: IProjectStorage, scenario: IScenario) {
+    let csv = null;
 
     try {
-      resources = await GsfClient.fetch<Resource[]>(HttpMethod.GET, `project/${project.id}/resources`);
+      csv = await GsfClient.fetch<{header: string[]; body: string[]}>(
+        HttpMethod.GET,
+        `project/${project.id}/csv`,
+        scenario.getResultExportOpts().find(resultExportOpt => resultExportOpt.type === ExportType.CSV),
+      );
     }
     catch (err) {
       console.error(err);
-      console.error('error loading project resources');
     }
 
-    /*
-    // some of the crawled resources may not contain the info obj depending on the plugin used, filter those out
-    crawledResources = crawledResources.filter(resource => (
-      typeof resource.info === 'object' && Object.keys(resource.info).length > 0
-    ));
-    return crawledResources.map(resource => resource.info || {});
-    */
 
-    return resources;
+    return csv;
   }
 
   async export(evt: React.MouseEvent<HTMLAnchorElement>, exportType: ExportType) {
@@ -102,14 +101,36 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
           )
         }
         {
-          // project found, render results
-          this.state.project.id
-            && <Table
-              header={this.state.scenario.getResultTableHeaders()}
-              data={this.state.results}
-            />
+          this.renderResults()
         }
       </Page>
+    );
+  }
+
+  renderResults() {
+    if (!this.state.project.id || !this.state.csvResult) return null;
+
+          // project found, render results
+    // we get away using idx as a react key because data is readonly, will not be modified
+    return (
+      <table className="table table-hover table-main">
+        <tr>
+          {
+            this.state.csvResult.header.map((col, colIdx) => (<th key={colIdx}>{col}</th>))
+          }
+        </tr>
+        <tbody>
+          {
+            this.state.csvResult.body.map((row, rowIdx) => (
+              <tr key={rowIdx}>
+                {
+                  row.map((col, colIdx) => (<td key={colIdx}>{col.replace(/"/g, '')}</td>))
+                }
+              </tr>
+            ))
+        }
+        </tbody>
+      </table>
     );
   }
 

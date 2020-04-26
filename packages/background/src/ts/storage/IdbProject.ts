@@ -1,11 +1,12 @@
 import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
-import { IProjectStorage, IPluginDefinition } from 'get-set-fetch-extension-commons';
+import { IProjectStorage, IPluginDefinition, IExportOpt } from 'get-set-fetch-extension-commons';
 import { IProjectConfigHash } from 'get-set-fetch-extension-commons/lib/project';
 import Logger from '../logger/Logger';
 import IdbSite from './IdbSite';
 import ActiveTabHelper from '../helpers/ActiveTabHelper';
 import IdbResource from './IdbResource';
 import JsonUrlHelper from '../helpers/JsonUrlHelper';
+import ExportHelper from '../helpers/ExportHelper';
 
 const Log = Logger.getLogger('IdbProject');
 
@@ -111,6 +112,18 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
     const resources = nestedResources.reduce((acc, val) => acc.concat(val), []);
 
     return resources;
+  }
+
+  static async getAllResourcesAsCsv(projectId: number, opts: Partial<IExportOpt>) {
+    const project = await IdbProject.get(projectId);
+    const sites = await IdbSite.getAll(project.id);
+
+    const nestedResources = await Promise.all(
+      sites.map(site => IdbResource.getAll(site.id)),
+    );
+    const resources = nestedResources.reduce((acc, val) => acc.concat(val), []);
+
+    return ExportHelper.exportCsvArr(resources, opts);
   }
 
   static delAll() {

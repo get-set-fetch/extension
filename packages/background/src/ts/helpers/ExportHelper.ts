@@ -67,11 +67,8 @@ export default class ExportHelper {
     );
   }
 
-  static exportCSV(data: object[], opts: IExportOpt): string {
-    if (!opts.cols || opts.cols.length === 0) throw new Error('Expecting at least one column for csv content');
-
-    const fieldSeparator = opts.fieldSeparator ? opts.fieldSeparator : ',';
-    const lineSeparator = opts.lineSeparator ? opts.lineSeparator : '\n';
+  static exportCsvArr(data: object[], opts: Partial<IExportOpt>) {
+    if (!opts.cols || opts.cols.length === 0) throw new Error('Expecting at least one column for csv content.');
 
     /*
     get expanded cols
@@ -99,21 +96,18 @@ export default class ExportHelper {
       return (colAIdx === colBIdx) ? colA.localeCompare(colB) : colAIdx - colBIdx;
     });
 
-    const csvHeader = expandedCols.join(fieldSeparator);
+    const header = expandedCols;
 
     // map each data row to one or multiple csv rows (in case of data[prop] array)
-    const csvBody = data
-      .reduce<any[]>(
+    const body = data.reduce<any[]>(
       (allCsvRows, dataRow) => {
-        const csvArr = ExportHelper.expandDataRowIntoCsvRows(dataRow, expandedCols, fieldSeparator);
+        const csvArr = ExportHelper.expandDataRowIntoCsvRows(dataRow, expandedCols);
         return allCsvRows.concat(csvArr);
       },
       [],
-    )
-      .join(lineSeparator);
-
-    const content = `${csvHeader}${lineSeparator}${csvBody}`;
-    return content;
+    );
+    // const content = `${csvHeader}${lineSeparator}${csvBody}`;
+    return { header, body };
   }
 
   /*
@@ -124,7 +118,7 @@ export default class ExportHelper {
     ['a2', 'b2', c1]
   ]
   */
-  static expandDataRowIntoCsvRows(dataRow: object, cols: string[], fieldSeparator) {
+  static expandDataRowIntoCsvRows(dataRow: object, cols: string[]) {
     let idxIncremented;
     let arrIdx = -1;
     const csvRows = [];
@@ -159,7 +153,7 @@ export default class ExportHelper {
 
       // only add to csv rows if it's the 1st pass or there have been new arr elements added
       if (arrIdx === -1 || idxIncremented) {
-        csvRows.push(csvRow.join(fieldSeparator));
+        csvRows.push(csvRow);
       }
     }
     while (idxIncremented);
@@ -169,10 +163,27 @@ export default class ExportHelper {
 
   static async exportResourcesCSV(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
     if (resources.length === 0) throw new Error('Nothing to export. No resources found.');
+    if (!opts.cols || opts.cols.length === 0) throw new Error('Expecting at least one column for csv content.');
 
-    const content = ExportHelper.exportCSV(resources, opts);
+    try {
+      const content = ExportHelper.exportCsvContent(resources, opts);
     const contentBlob = new Blob([ content ], { type: 'text/csv' });
     return { url: URL.createObjectURL(contentBlob) };
+  }
+    catch (error) {
+      return { error };
+    }
+  }
+
+  static exportCsvContent(resources: object[], opts: IExportOpt) {
+    const fieldSeparator = opts.fieldSeparator ? opts.fieldSeparator : ',';
+    const lineSeparator = opts.lineSeparator ? opts.lineSeparator : '\n';
+
+    const { header, body } = ExportHelper.exportCsvArr(resources, opts);
+    const csvHeader = header.join(fieldSeparator);
+    const csvBody = body.map(row => row.join(fieldSeparator)).join(lineSeparator);
+
+    return `${csvHeader}${lineSeparator}${csvBody}`;
   }
 
   static async exportLogs(logEntries: ILog[]): Promise<IExportResult> {

@@ -13,7 +13,7 @@ describe('Test ExportHelper', () => {
       { url: 'urlB', mediaType: 'text/html', content: 'B " content' },
     ];
 
-    const generatedLines: string[] = ExportHelper.exportCSV(
+    const generatedLines: string[] = ExportHelper.exportCsvContent(
       resources,
       {
         type: ExportType.CSV,
@@ -36,7 +36,7 @@ describe('Test ExportHelper', () => {
       { url: 'urlB', mediaType: 'text/html', content: [ 'B content' ] },
     ];
 
-    const generatedLines: string[] = ExportHelper.exportCSV(
+    const generatedLines: string[] = ExportHelper.exportCsvContent(
       resources,
       {
         type: ExportType.CSV,
@@ -61,7 +61,7 @@ describe('Test ExportHelper', () => {
       { url: 'urlC', mediaType: 'text/html', content: { arr: [ 'C-arr1', 'C-arr2', 'C-arr3' ], propC: 'C-propC' } },
     ];
 
-    const generatedLines: string[] = ExportHelper.exportCSV(
+    const generatedLines: string[] = ExportHelper.exportCsvContent(
       resources,
       {
         type: ExportType.CSV,

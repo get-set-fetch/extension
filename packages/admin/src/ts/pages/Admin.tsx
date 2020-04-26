@@ -29,7 +29,7 @@ export default class Admin extends React.Component {
           </div>
 
           {/* page content */}
-          <div className='col-10 col-xl-9 pl-0'>
+          <div className='col-10 col-xl-10 pl-0'>
             <div className='card card-main shadow-sm text-primary bg-white'>
 
               <Switch>
@@ -66,7 +66,7 @@ export default class Admin extends React.Component {
           </div>
 
           {/* right menu */}
-          <div className='col-0 col-xl-1'></div>
+          {/* <div className='col-0 col-xl-1'></div> */}
 
         </div>
       </Router>,

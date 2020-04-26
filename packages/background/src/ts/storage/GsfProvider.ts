@@ -196,6 +196,11 @@ export default class GsfProvider {
             projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
             reqPromise = GsfProvider.Project.getAllResources(projectId);
             break;
+          // project/{project.id}/resources
+          case /^project\/[0-9]+\/csv$/.test(request.resource):
+            projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
+            reqPromise = GsfProvider.Project.getAllResourcesAsCsv(projectId, request.body);
+            break;
           // project/{project.id}/config
           case /^project\/[0-9]+\/config$/.test(request.resource):
             projectId = parseInt(/\d+/.exec(request.resource)[0], 10);
