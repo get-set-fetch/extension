@@ -3,7 +3,7 @@ import { IExportOpt, IExportResult, ExportType, IResource, ILog, LogLevel } from
 
 export default class ExportHelper {
   static exportResources(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
-    if (resources.length === 0) throw new Error('Nothing to export. No resources crawled or with valid content');
+    if (resources.length === 0) throw new Error('Nothing to export. No resources crawled or with valid content.');
 
     switch (opts.type) {
       case ExportType.ZIP:
@@ -11,30 +11,31 @@ export default class ExportHelper {
       case ExportType.CSV:
         return ExportHelper.exportResourcesCSV(resources, opts);
       default:
-        throw new Error(`Invalid export type ${opts}.type`);
+        throw new Error(`Invalid export type ${opts.type}.`);
     }
   }
 
-  static exportResourcesZIP(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
-    return new Promise(async resolve => {
-      const blobCol: string = opts.cols && opts.cols.length === 1 ? opts.cols[0] : null;
-      if (!blobCol) throw new Error('Expecting a single column for blob content');
+  static async exportResourcesZIP(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
+    const blobCol: string = opts.cols && opts.cols.length === 1 ? opts.cols[0] : null;
+    if (!blobCol) throw new Error('Expecting a single column for blob content.');
 
-      const zip = new JSZip();
-      resources.forEach(resource => {
-        if (resource[blobCol]) {
-          const name = resource.meta && resource.meta.name ? resource.meta.name : resource.url.substr(-10);
-          zip.file(name, resource[blobCol]);
-        }
-      });
+    const blobResources: IResource[] = resources.filter(resource => resource[blobCol]);
+    if (blobResources.length === 0) throw new Error('No binary content to export.');
 
-      const content = await zip.generateAsync({
-        type: 'blob',
-        compression: 'STORE',
-      });
-
-      resolve({ url: URL.createObjectURL(content) });
+    const zip = new JSZip();
+    resources.forEach(resource => {
+      if (resource[blobCol]) {
+        const name = resource.meta && resource.meta.name ? resource.meta.name : resource.url.substr(-10);
+        zip.file(name, resource[blobCol]);
+      }
     });
+
+    const content = await zip.generateAsync({
+      type: 'blob',
+      compression: 'STORE',
+    });
+
+    return { url: URL.createObjectURL(content) };
   }
 
   static getRowDetailCols(row: object, props: string[]): string[] {
@@ -167,9 +168,9 @@ export default class ExportHelper {
 
     try {
       const content = ExportHelper.exportCsvContent(resources, opts);
-    const contentBlob = new Blob([ content ], { type: 'text/csv' });
-    return { url: URL.createObjectURL(contentBlob) };
-  }
+      const contentBlob = new Blob([ content ], { type: 'text/csv' });
+      return { url: URL.createObjectURL(contentBlob) };
+    }
     catch (error) {
       return { error };
     }

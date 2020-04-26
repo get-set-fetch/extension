@@ -42,37 +42,48 @@ export default class GsfProvider {
 
     // wait for client requests
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      let reqPromise = null;
+
       switch (true) {
         case /^site/.test(request.resource):
-          this.siteHandler(request, sendResponse);
+          reqPromise = this.siteHandler(request);
           break;
         case /^project/.test(request.resource):
-          this.projectHandler(request, sendResponse);
+          reqPromise = this.projectHandler(request);
           break;
         case /^resource/.test(request.resource):
-          this.resourceHandler(request, sendResponse);
+          reqPromise = this.resourceHandler(request);
           break;
         case /^plugin/.test(request.resource):
-          this.pluginHandler(request, sendResponse);
+          reqPromise = this.pluginHandler(request);
           break;
         case /^scenario/.test(request.resource):
-          this.scenarioHandler(request, sendResponse);
+          reqPromise = this.scenarioHandler(request);
           break;
         case /^log/.test(request.resource):
-          this.logHandler(request, sendResponse);
+          reqPromise = this.logHandler(request);
           break;
         case /^setting/.test(request.resource):
-          this.settingHandler(request, sendResponse);
+          reqPromise = this.settingHandler(request);
           break;
         default:
       }
+
+      reqPromise.then(
+        result => {
+          sendResponse(result);
+        },
+        error => {
+          sendResponse({ error: error.message });
+        },
+      );
 
       // enable wait for callback
       return true;
     });
   }
 
-  static async siteHandler(request, sendResponse) {
+  static async siteHandler(request) {
     let reqPromise = null;
 
     switch (request.method) {
@@ -150,12 +161,10 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then(result => {
-      sendResponse(result);
-    });
+    return reqPromise;
   }
 
-  static async projectHandler(request, sendResponse) {
+  static async projectHandler(request) {
     let reqPromise = null;
     let projectId;
 
@@ -250,12 +259,10 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then(result => {
-      sendResponse(result);
-    });
+    return reqPromise;
   }
 
-  static async resourceHandler(request, sendResponse) {
+  static async resourceHandler(request) {
     let reqPromise = null;
     switch (request.method) {
       case 'GET':
@@ -283,12 +290,10 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then(result => {
-      sendResponse(result);
-    });
+    return reqPromise;
   }
 
-  static async pluginHandler(request, sendResponse) {
+  static async pluginHandler(request) {
     let reqPromise = null;
     switch (request.method) {
       case 'GET':
@@ -355,12 +360,10 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then(result => {
-      sendResponse(result);
-    });
+    return reqPromise;
   }
 
-  static async scenarioHandler(request, sendResponse) {
+  static async scenarioHandler(request) {
     let reqPromise = null;
     switch (request.method) {
       case 'GET':
@@ -411,12 +414,10 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then(result => {
-      sendResponse(result);
-    });
+    return reqPromise;
   }
 
-  static async logHandler(request, sendResponse) {
+  static async logHandler(request) {
     let reqPromise = null;
     switch (request.method) {
       case 'GET':
@@ -457,12 +458,10 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then(result => {
-      sendResponse(result);
-    });
+    return reqPromise;
   }
 
-  static async settingHandler(request, sendResponse) {
+  static async settingHandler(request) {
     let reqPromise = null;
     switch (request.method) {
       case 'GET':
@@ -500,8 +499,6 @@ export default class GsfProvider {
         reqPromise = new Promise(resolve => resolve());
     }
 
-    reqPromise.then(result => {
-      sendResponse(result);
-    });
+    return reqPromise;
   }
 }

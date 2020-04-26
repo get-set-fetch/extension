@@ -3,8 +3,7 @@ import { IScenario, HttpMethod, IExportOpt, IExportResult, ExportType, IProjectS
 import { RouteComponentProps } from 'react-router-dom';
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
-import Table from '../../components/Table';
-import Resource from '../sites/model/Resource';
+import Modal from '../../components/Modal';
 import ScenarioHelper from '../scenarios/model/ScenarioHelper';
 
 interface IState {
@@ -75,12 +74,29 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
     }
     evt.preventDefault();
 
-    const exportOpt: IExportOpt = this.state.scenario.getResultExportOpts().find(resultExportOpt => resultExportOpt.type === exportType);
-    const exportInfo: IExportResult = await GsfClient.fetch(HttpMethod.GET, `project/export/${this.state.project.id}`, exportOpt);
+    try {
+      const exportOpt: IExportOpt = this.state.scenario.getResultExportOpts().find(resultExportOpt => resultExportOpt.type === exportType);
+      const exportInfo: IExportResult = await GsfClient.fetch(HttpMethod.GET, `project/export/${this.state.project.id}`, exportOpt);
 
-    currentTarget.href = exportInfo.url;
-    currentTarget.setAttribute('downloadready', 'true');
-    currentTarget.click();
+      currentTarget.href = exportInfo.url;
+      currentTarget.setAttribute('downloadready', 'true');
+      currentTarget.click();
+    }
+    catch (error) {
+      Modal.instance.show(
+        'Export Project',
+        [
+          <p key="info">{error}</p>,
+        ],
+        [
+          {
+            title: 'Close',
+            value: 'close',
+          },
+        ],
+      );
+      console.error(error);
+    }
   }
 
   render() {
@@ -110,7 +126,7 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
   renderResults() {
     if (!this.state.project.id || !this.state.csvResult) return null;
 
-          // project found, render results
+    // project found, render results
     // we get away using idx as a react key because data is readonly, will not be modified
     return (
       <table className="table table-hover table-main">
@@ -128,7 +144,7 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
                 }
               </tr>
             ))
-        }
+          }
         </tbody>
       </table>
     );
