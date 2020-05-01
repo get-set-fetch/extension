@@ -1,0 +1,30 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.14.1
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  SNYK-JS-LODASH-567746:
+    - uniforms > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
+    - uniforms-bootstrap4 > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
+    - uniforms-bridge-json-schema > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
+    - uniforms-bootstrap4 > uniforms > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
+    - uniforms-bridge-json-schema > uniforms > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
+    - get-set-fetch-extension-admin > uniforms > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
+    - get-set-fetch-extension-admin > uniforms-bootstrap4 > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
+    - get-set-fetch-extension-admin > uniforms-bridge-json-schema > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
+    - get-set-fetch-extension-admin > uniforms-bootstrap4 > uniforms > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
+    - get-set-fetch-extension-admin > uniforms-bridge-json-schema > uniforms > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
+    - get-set-fetch > jsdom > request-promise-native > request-promise-core > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
+    - get-set-fetch-extension-background > get-set-fetch > jsdom > request-promise-native > request-promise-core > lodash:
+        patched: '2020-05-01T08:02:42.958Z'
