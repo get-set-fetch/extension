@@ -14,7 +14,9 @@
     "publish:prerelease": "lerna publish from-package --exact && lerna version prerelease --preid rc",
     "publish:patch": "lerna publish from-package --exact && lerna version patch",
     "publish:minor": "lerna publish from-package --exact && lerna version minor",
-    "publish:major": "lerna publish from-package --exact && lerna version major"
+    "publish:major": "lerna publish from-package --exact && lerna version major",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "keywords": [
     "scraper"
@@ -123,6 +125,8 @@
     "uniforms-bridge-json-schema": "^2.0.0-alpha.1",
     "untar.js": "^0.3.0",
     "url-parse": "^1.4.3",
-    "util": "^0.12.1"
-  }
+    "util": "^0.12.1",
+    "snyk": "^1.316.1"
+  },
+  "snyk": true
 }
