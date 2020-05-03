@@ -102,6 +102,47 @@ const crawlDefinitions: ICrawlDefinition[] = [
   },
 
   {
+    title: 'maxDepth = 0, maxResources = -1, single page table',
+    project: {
+      name: 'projA',
+      description: 'descriptionA',
+      url: 'https://www.sitea.com/static/table.html',
+      scenario: 'get-set-fetch-scenario-scrape-static-content',
+      plugins: [
+        {
+          name: 'ExtractUrlsPlugin',
+          opts: {
+            maxDepth: 0,
+            maxResources: -1,
+            selectors: 'a[href$=".html"] # follow html links',
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: 'td:first-child # colA\ntd:nth-child(2) # colB',
+          },
+        },
+      ],
+    },
+    expectedResources: [
+      {
+        url: 'https://www.sitea.com/static/table.html',
+        actions: [],
+        mediaType: 'text/html',
+        content: { 'td:first-child': [ 'a1', 'a2', 'a3' ], 'td:nth-child(2)': [ 'b1', 'b2', 'b3' ] },
+        meta: {},
+      },
+    ],
+    expectedCsv: [
+      'url,content.td:first-child,content.td:nth-child(2)',
+      '"https://www.sitea.com/static/table.html","a1","b1"',
+      '"https://www.sitea.com/static/table.html","a2","b2"',
+      '"https://www.sitea.com/static/table.html","a3","b3"',
+    ],
+    csvLineSeparator: '\n',
+  },
+  {
     title: 'maxDepth = 1, maxResources = -1',
     project: {
       name: 'projA',
