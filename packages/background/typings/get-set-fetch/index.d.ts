@@ -32,7 +32,13 @@ declare module 'get-set-fetch/lib/storage/base/BaseResource' {
 declare module 'get-set-fetch/lib/filters/bloom/BloomFilter' {
   class BloomFilter {
     static create(maxEntries:number, probability:number, bitset:Buffer);
+    
     constructor(m:number, k:number, bitset:Buffer);
+    
+    test(val: any):boolean;
+    add(val: any):void;
+
+    bitset:Buffer;
   }
 
   export = BloomFilter;

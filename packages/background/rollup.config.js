@@ -73,17 +73,28 @@ const crawlPluginConfig = crawlPlugins.map(plugin => ({
     format: 'es',
   },
   plugins: [
-    typescript(),
-    commonjs(),
+    gsfBuiltin(),
+
     resolve({
+      mainFields: [ 'module', 'main' ],
       browser: true,
       preferBuiltins: false,
-      extensions: [ '.js', '.json' ],
-      only: [
-        'get-set-fetch-extension-commons',
-      ],
+      extensions: [ '.js', '.json', '.ts' ],
     }),
-    // tslint(),
+
+    commonjs({
+      include: /node_modules/,
+      namedExports: {
+        pako: [ 'inflate', 'deflate' ],
+        'url-parse': [ 'Url' ],
+      },
+    }),
+
+    json(),
+
+    globals(),
+
+    typescript(),
   ],
 }));
 

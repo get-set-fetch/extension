@@ -4,7 +4,6 @@
 
 import { IPluginDefinition, ISite, BasePlugin, IResource } from 'get-set-fetch-extension-commons';
 import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
-import BloomFilter from 'get-set-fetch/lib/filters/bloom/BloomFilter';
 import deepmerge from '../helpers/DeepMergeHelper';
 import IdbResource from './IdbResource';
 import Logger from '../logger/Logger';
@@ -151,12 +150,7 @@ export default class IdbSite extends BaseEntity implements ISite {
   plugins: IPluginDefinition[];
   pluginInstances: BasePlugin[];
 
-  storageOpts: {
-    resourceFilter: {
-      maxEntries: number;
-      probability: number;
-    };
-  };
+  resourceFilter: Buffer;
 
   resourcesNo: number;
 
@@ -166,15 +160,6 @@ export default class IdbSite extends BaseEntity implements ISite {
     Object.keys(kwArgs).forEach(kwArgKey => {
       this[kwArgKey] = kwArgs[kwArgKey];
     });
-
-    if (!kwArgs.storageOpts) {
-      this.storageOpts = {
-        resourceFilter: {
-          maxEntries: 5000,
-          probability: 0.01,
-        },
-      };
-    }
 
     // if no plugin definitions provided use the default ones
     this.plugins = !kwArgs.plugins ? ModuleStorageManager.getDefaultPluginDefs() : kwArgs.plugins;
@@ -384,7 +369,7 @@ export default class IdbSite extends BaseEntity implements ISite {
 
         // also save the site url as the first site resource at depth 0
         try {
-          await this.saveResources([this.url], 0);
+          await this.saveResources([ { siteId: this.id, url: this.url, depth: 0 } ]);
           resolve(this.id);
         }
         catch (err) {
@@ -398,58 +383,11 @@ export default class IdbSite extends BaseEntity implements ISite {
     });
   }
 
-  saveResources(urls, depth) {
-    return new Promise((resolve, reject) => {
-      // need a transaction across multiple stores
-      const tx = IdbSite.db.transaction(['Sites', 'Resources'], 'readwrite');
-
-      // read the latest resource filter bitset
-      const reqReadSite = tx.objectStore('Sites').get(this.id);
-      reqReadSite.onsuccess = (e: any) => {
-        const latestSite = e.target.result;
-        const { maxEntries, probability } = this.storageOpts.resourceFilter;
-        const bloomFilter = BloomFilter.create(maxEntries, probability, latestSite.resourceFilter);
-
-        // create new resources
-        const resources = [];
-        urls.forEach(url => {
-          if (bloomFilter.test(url) === false) {
-            resources.push(new IdbResource({ siteId: this.id, url, depth }).serializeWithoutId());
-            bloomFilter.add(url);
-          }
-        });
-
-        // if present, save filtered resources
-        if (resources.length > 0) {
-          const successHandler = () => {
-            // keep saving new resources
-            if (resources.length > 0) {
-              const resource = resources.pop();
-              Log.info(`saving resource: ${resource.url}`);
-              const reqAddResource = tx.objectStore('Resources').add(resource);
-              reqAddResource.onsuccess = successHandler;
-              reqAddResource.onerror = () => reject(new Error(`could not add resource: ${resource.url}`));
+  saveResources(resources: Partial<IResource>[]) {
+    return IdbResource.saveMultiple(resources);
             }
-            // update bloomFilter, can only be done updating the entire site
-            else {
-              latestSite.resourceFilter = bloomFilter.bitset;
-              const reqUpdateSite = tx.objectStore('Sites').put(latestSite);
-              reqUpdateSite.onsuccess = () => resolve();
-              reqUpdateSite.onerror = () => reject(new Error(`could not update site: ${this.url}`));
-            }
-          };
 
-          successHandler();
-        }
-        // otherwise nothing to do
-        else {
-          resolve();
-        }
-      };
 
-      reqReadSite.onerror = () => reject(new Error(`could not read site: ${this.url}`));
-    });
-  }
 
   update() {
     return new Promise((resolve, reject) => {

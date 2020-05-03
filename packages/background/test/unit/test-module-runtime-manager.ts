@@ -77,7 +77,10 @@ describe('Test ModuleRuntimeManager', () => {
       },
       {
         name: 'InsertResourcesPlugin',
-        opts: {},
+        opts: {
+          maxEntries: 5000,
+          probability: 0.01,
+        },
       },
     ];
     const actualPlugins = await ModuleRuntimeManager.instantiatePlugins(ModuleStorageManager.getDefaultPluginDefs());

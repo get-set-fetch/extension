@@ -41,7 +41,7 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
     await Site.delAll();
 
     // save site
-    const plugins = ['SelectResourcePlugin', 'DynamicNavigationPlugin', 'ExtractHtmlContentPlugin', 'UpsertResourcePlugin'].map(
+    const plugins = [ 'SelectResourcePlugin', 'DynamicNavigationPlugin', 'ExtractHtmlContentPlugin', 'UpsertResourcePlugin', 'InsertResourcesPlugin' ].map(
       name => ModuleStorageManager.getAvailablePluginDefs().find(pluginDef => pluginDef.name === name),
     );
     site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', plugins });

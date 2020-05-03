@@ -12,12 +12,5 @@ export interface ISite {
   plugins: IPluginDefinition[];
   pluginInstances: any;
 
-  storageOpts: {
-    resourceFilter: {
-      maxEntries: number,
-      probability: number
-    }
-  }
-
   getResourceToCrawl: (frequency: number) => Promise<IResource>
 }
