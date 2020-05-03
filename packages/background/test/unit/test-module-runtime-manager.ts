@@ -102,12 +102,12 @@ describe('Test ModuleRuntimeManager', () => {
         description: 'responsible for selecting a resource to scrape from the current site / project.',
         properties: {
           frequency: {
-            type: 'number',
+            type: 'integer',
             const: '-1',
             description: 'How often a resource should be re-crawled (hours), enter -1 to never re-crawl.',
           },
           delay: {
-            type: 'number',
+            type: 'integer',
             default: '1000',
             description: 'Delay in miliseconds between fetching two consecutive resources.',
           },
