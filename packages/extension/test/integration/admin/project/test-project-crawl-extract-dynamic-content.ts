@@ -38,7 +38,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         url: 'https://www.sitea.com/dynamic/articles/dynamic-page-article-list-detail-different-urls.html',
         mediaType: 'text/html',
         meta: {},
-        content: { h1: [ 'Article List' ], 'p.brief': [ ] },
+        content: { h1: [ 'Article List' ], 'p.brief': [ '' ] },
         actions: [],
       },
       {

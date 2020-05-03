@@ -188,11 +188,12 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
       return isApplicable ? plugin.apply(site, resource) : null;
     });
 
-    // 3rd call domRead from ExtractTitlePlugin
+    // 3rd call domRead from ExtractHtmlContentPlugin
     domReadStub.onCall(2).callsFake((tabId, plugin, site, resource) => {
       plugin.extractContent = () => ({
         h1: [ 'h1a', 'h1b' ],
         h2: [ 'h2a', 'h2b' ],
+        h3: [],
       });
       const isApplicable = plugin.test(site, resource);
       return isApplicable ? plugin.apply(site, resource) : null;
@@ -211,12 +212,12 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
       return isApplicable ? plugin.apply(site, resource) : null;
     });
 
-    // 6th call domRead from ExtractTitlePlugin
+    // 6th call domRead from ExtractHtmlContentPlugin
     domReadStub.onCall(5).callsFake((tabId, plugin, site, resource) => {
       plugin.extractContent = () => ({
         h1: [ 'h1b', 'h1c' ],
-        h2: [ 'h2a' ],
-        h3: [ 'h3a' ],
+        h2: [ 'h2b', 'h2c' ],
+        h3: [ 'h3c' ],
       });
       const isApplicable = plugin.test(site, resource);
       return isApplicable ? plugin.apply(site, resource) : null;
@@ -228,7 +229,7 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
     // 8th call domRead from ExtractUrlsPlugin, no crawlInProgress resource, plugin.apply is not invoked
     domReadStub.onCall(7).callsFake((tabId, plugin, site, resource) => null);
 
-    // 9th call domRead from ExtractTitlePlugin,no crawlInProgress resource, plugin.apply is not invoked
+    // 9th call domRead from ExtractHtmlContentPlugin,no crawlInProgress resource, plugin.apply is not invoked
     domReadStub.onCall(8).callsFake((tabId, plugin, site, resource) => null);
 
     await site.crawl();
@@ -256,6 +257,7 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
       content: {
         h1: [ 'h1a', 'h1b' ],
         h2: [ 'h2a', 'h2b' ],
+        h3: [ '', '' ],
       },
       crawlInProgress: false,
       urlsToAdd: [ 'link-1.html', 'link-2.html' ],
@@ -271,8 +273,8 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
       depth: 0,
       content: {
         h1: [ 'h1c' ],
-        h2: [],
-        h3: [ 'h3a' ],
+        h2: [ 'h2c' ],
+        h3: [ 'h3c' ],
       },
       crawlInProgress: false,
       urlsToAdd: [ 'link-3.html' ],

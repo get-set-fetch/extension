@@ -323,9 +323,9 @@ export default class IdbSite extends BaseEntity implements ISite {
         add crawledAt field to the current resource so it won't be crawled again, possibly ending in an infinite loop retrying again and again
         */
         else {
-        await resource.update();
+          await resource.update();
+        }
       }
-    }
     }
 
     return resourceFound ? resource : null;
@@ -369,8 +369,17 @@ export default class IdbSite extends BaseEntity implements ISite {
       }
       // plain object, merge with corresponding resource key
       else {
-        // eslint-disable-next-line no-param-reassign
-        resource[key] = deepmerge(resource[key], result[key]);
+        /*
+        for now, don't merge the following fields under the following assumptations:
+        - content, a single plugin is responsible for scraping content
+        */
+        if (key === 'content') {
+          resource[key] = result[key];
+        }
+        else {
+          // eslint-disable-next-line no-param-reassign
+          resource[key] = deepmerge(resource[key], result[key]);
+        }
       }
     });
   }
@@ -401,9 +410,9 @@ export default class IdbSite extends BaseEntity implements ISite {
 
   saveResources(resources: Partial<IResource>[]) {
     return IdbResource.saveMultiple(resources);
-            }
+  }
 
-
+  
 
   update() {
     return new Promise((resolve, reject) => {

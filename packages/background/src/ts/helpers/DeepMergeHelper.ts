@@ -24,6 +24,20 @@ function arrayMerge(targetArr, sourceArr, options) {
     return Array.from(uniqueArr);
   }
 
+  // merge matrices, only add new rows
+  if (sourceType && Array.isArray(sourceArr[0]) && targetType && Array.isArray(targetArr[0])) {
+    const flattenSourceArr = sourceArr.map(nestedSourceArr => nestedSourceArr.join(''));
+    const flattenTargetArr = targetArr.map(nestedTargetArr => nestedTargetArr.join(''));
+
+    flattenSourceArr.forEach((flattenSourceElm, idx) => {
+      if (!flattenTargetArr.includes(flattenSourceElm)) {
+        targetArr.push(sourceArr[idx]);
+      }
+    });
+
+    return targetArr;
+  }
+
   // return the default implementation
   return defaultArrayMerge(targetArr, sourceArr, options);
 }

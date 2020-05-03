@@ -1,6 +1,5 @@
 import { ISite, IResource, IEnhancedJSONSchema, BasePlugin } from 'get-set-fetch-extension-commons';
 
-
 export default class ExtractHtmlContentPlugin extends BasePlugin {
   getOptsSchema(): IEnhancedJSONSchema {
     return {
@@ -68,6 +67,37 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
       ),
       {},
     );
+
+    /*
+    selector array values should be grouped by common dom parent, but a versatile way to do it has yet to be implemented
+    (lots of use cases to be covered)
+    simple example:
+        selectors: h1\nh2
+        h1: a1, a2
+        h2: b2
+        dom:
+          <div>
+            <h1>a1</h1>
+          </div>
+          <div>
+            <h1>a2</h1>
+            <h2>b2</h2>
+          </div>
+
+    ideal result:
+        h1: a1, a2
+        h2: '', b2
+    resulting in csv entries (further down the chain):
+        a1, ''
+        a2, b2
+
+    current implementation result
+        h1: a1, a2
+        h2: b2,
+    resulting in csv entries (further down the chain):
+        a1, b2
+        a2, ''
+    */
 
     return content;
   }

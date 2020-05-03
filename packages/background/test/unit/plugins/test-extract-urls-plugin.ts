@@ -99,4 +99,51 @@ describe('Test Extract Urls Plugin', () => {
     const { urlsToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
     assert.sameMembers(urlsToAdd, expectedValidUrls);
   });
+
+  it('extract unique urls, cumulative apply', () => {
+    extractUrlsPlugin = new ExtractUrlsPlugin({ selectors: 'a\nimg' });
+
+    // 1st apply
+    stubDocument.withArgs('a').returns([
+      { href: 'http://sitea.com/page1.html' },
+      { href: 'http://sitea.com/page1.html' },
+    ]);
+
+    stubDocument.withArgs('img').returns([
+      { src: 'http://sitea.com/img1.png' },
+      { src: 'http://sitea.com/img1.png' },
+    ]);
+
+    let expectedValidUrls = [
+      'http://sitea.com/page1.html',
+      'http://sitea.com/img1.png',
+    ];
+
+
+    let { urlsToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
+    assert.sameMembers(urlsToAdd, expectedValidUrls);
+
+    // 2nd apply
+    stubDocument.withArgs('a').returns([
+      { href: 'http://sitea.com/page1.html' },
+      { href: 'http://sitea.com/page1.html' },
+      { href: 'http://sitea.com/page2.html' },
+      { href: 'http://sitea.com/page2.html' },
+    ]);
+
+    stubDocument.withArgs('img').returns([
+      { src: 'http://sitea.com/img1.png' },
+      { src: 'http://sitea.com/img1.png' },
+      { src: 'http://sitea.com/img2.png' },
+      { src: 'http://sitea.com/img2.png' },
+    ]);
+
+    expectedValidUrls = [
+      'http://sitea.com/page2.html',
+      'http://sitea.com/img2.png',
+    ];
+
+    ({ urlsToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any));
+    assert.sameMembers(urlsToAdd, expectedValidUrls);
+  });
 });
