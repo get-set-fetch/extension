@@ -66,6 +66,9 @@ export default class GsfProvider {
         case /^setting/.test(request.resource):
           reqPromise = this.settingHandler(request);
           break;
+          case /^utils/.test(request.resource):
+            reqPromise = this.utilsHandler(request);
+            break;
         default:
       }
 
@@ -197,8 +200,7 @@ export default class GsfProvider {
             const crawlProject = await GsfProvider.Project.get(projectId);
 
             // start crawling
-            crawlProject.crawl();
-            reqPromise = new Promise(resolve => resolve());
+            reqPromise = crawlProject.crawl();
             break;
           // project/{project.id}/resources
           case /^project\/[0-9]+\/resources$/.test(request.resource):
@@ -490,6 +492,23 @@ export default class GsfProvider {
               Logger.setLogLevel(setting.val);
             }
             reqPromise = setting.update();
+            break;
+          default:
+            reqPromise = new Promise(resolve => resolve());
+        }
+        break;
+      default:
+        reqPromise = new Promise(resolve => resolve());
+    }
+
+  static async utilsHandler(request) {
+    let reqPromise = null;
+    switch (request.method) {
+      case 'GET':
+        switch (true) {
+          // close active tab
+          case /^utils\/closeactivetab$/.test(request.resource):
+            reqPromise = ActiveTabHelper.close();
             break;
           default:
             reqPromise = new Promise(resolve => resolve());

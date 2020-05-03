@@ -1,5 +1,5 @@
 import BaseEntity from 'get-set-fetch/lib/storage/base/BaseEntity';
-import { IProjectStorage, IPluginDefinition, IExportOpt } from 'get-set-fetch-extension-commons';
+import { IProjectStorage, IPluginDefinition, IExportOpt, ISite } from 'get-set-fetch-extension-commons';
 import { IProjectConfigHash } from 'get-set-fetch-extension-commons/lib/project';
 import Logger from '../logger/Logger';
 import IdbSite from './IdbSite';
@@ -239,17 +239,22 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
   async crawl() {
     const sites = await IdbSite.getAll(this.id);
 
-    return Promise.all(
-      sites.map(async site => {
-        // open a new tab for the current site to be crawled into
-        const tab = await ActiveTabHelper.create();
-        // eslint-disable-next-line no-param-reassign
-        site.tabId = tab.id;
+    sites.forEach(async site => {
+      // open a new tab for the current site to be crawled into
+      const tab = await ActiveTabHelper.create({}, () => this.onScrapeTabRemoved(site));
 
-        // start crawling
-        site.crawl();
-      }),
-    );
+      // eslint-disable-next-line no-param-reassign
+      site.tabId = tab.id;
+
+      // start crawling
+      site.crawl();
+    });
+  }
+
+  onScrapeTabRemoved(site: ISite) {
+    // eslint-disable-next-line no-param-reassign
+    site.tabId = null;
+    Log.trace(`site ${site.name} tabId is now invalidated`);
   }
 
   serializeWithoutId() {

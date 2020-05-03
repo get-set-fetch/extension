@@ -215,14 +215,14 @@ export default class IdbSite extends BaseEntity implements ISite {
           // retrieve dynamic resource, use the current tab dom state to further scroll, click, etc..
           dynamicResource = await this.crawlResource(staticResource);
         }
-        while (dynamicResource);
+        while (this.tabId && dynamicResource);
       }
     }
-    while (staticResource);
+    while (this.tabId && staticResource);
 
     // crawl is complete, reset the corresponding flag
     this.crawlInProgress = false;
-    this.update();
+    await this.update();
 
     // close the tab opened for scraping
     if (this.tabId) {
@@ -303,17 +303,18 @@ export default class IdbSite extends BaseEntity implements ISite {
       await resource.update(false);
       */
       if (resource) {
-        // eslint-disable-next-line no-await-in-loop
+        // reset the resource so it can be re-scraped
+        if ((/scrape tab removed/i).test(err.message)) {
+          await resource.update(false);
+        }
+        /*
+        unknown error occured,
+        add crawledAt field to the current resource so it won't be crawled again, possibly ending in an infinite loop retrying again and again
+        */
+        else {
         await resource.update();
       }
     }
-
-    if (resource) {
-      Log.debug(`Resource successfully crawled (json): ${JSON.stringify(resource)}`);
-      Log.info(`Resource successfully crawled (url): ${resource.url}`);
-    }
-    else {
-      Log.info(`No crawlable resource found for site ${this.name}`);
     }
 
     return resourceFound ? resource : null;
@@ -321,8 +322,12 @@ export default class IdbSite extends BaseEntity implements ISite {
 
   async executePlugin(plugin: BasePlugin, resource: IdbResource) {
     Log.info(
-      `Executing plugin ${plugin.constructor.name} using options ${JSON.stringify(plugin.opts)} against resource ${JSON.stringify(resource)}`,
+      `Executing plugin ${plugin.constructor.name} using options ${JSON.stringify(plugin.opts)} against resource ${JSON.stringify(resource)}, tabId: ${this.tabId}`,
     );
+
+    if (!this.tabId) {
+      throw new Error(`Scraping stopped. Scrape tab removed for site ${this.name}.`);
+    }
 
     if (plugin.opts && (plugin.opts.domRead || plugin.opts.domWrite)) {
       return ModuleRuntimeManager.runPluginInDom(this.tabId, plugin, this, resource);

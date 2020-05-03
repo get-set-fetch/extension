@@ -12,6 +12,7 @@ import IdbResource from '../../src/ts/storage/IdbResource';
 import IdbPlugin from '../../src/ts/storage/IdbPlugin';
 import ModuleStorageManager from '../../src/ts/plugins/ModuleStorageManager';
 import ModuleRuntimeManager from '../../src/ts/plugins/ModuleRuntimeManager';
+import ActiveTabHelper from '../../src/ts/helpers/ActiveTabHelper';
 
 const conn = { info: 'IndexedDB' };
 
@@ -40,12 +41,17 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
     // cleanup
     await Site.delAll();
 
+    sandbox.stub(ActiveTabHelper, 'close').returns(null);
+
     // save site
     const plugins = [ 'SelectResourcePlugin', 'DynamicNavigationPlugin', 'ExtractHtmlContentPlugin', 'UpsertResourcePlugin', 'InsertResourcesPlugin' ].map(
       name => ModuleStorageManager.getAvailablePluginDefs().find(pluginDef => pluginDef.name === name),
     );
     site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', plugins });
     await site.save();
+
+    // mark a tab has been opened for scraping, normally this is set from IdbProject.crawl
+    site.tabId = 1;
 
     // stub "domRead", run plugins directly don't inject them into dom
     sandbox.stub(ModuleRuntimeManager, 'runPluginInDom').callsFake((tabId, plugin, site, resource) => {

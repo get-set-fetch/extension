@@ -12,6 +12,7 @@ import IdbPlugin from '../../src/ts/storage/IdbPlugin';
 import ModuleStorageManager from '../../src/ts/plugins/ModuleStorageManager';
 import ModuleRuntimeManager from '../../src/ts/plugins/ModuleRuntimeManager';
 import ExtractHtmlContentPlugin from '../../src/ts/plugins/builtin/ExtractHtmlContentPlugin';
+import ActiveTabHelper from '../../src/ts/helpers/ActiveTabHelper';
 
 const conn = { info: 'IndexedDB' };
 
@@ -20,6 +21,7 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
   let Resource: typeof IdbResource;
   let Plugin: typeof IdbPlugin;
   let site: IdbSite;
+  let sandbox;
 
   before(async () => {
     // 1. storage init, populate GsfProvider used by some plugin related classes
@@ -30,22 +32,29 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
 
     // discover, register builtin plugins
     await ModuleHelper.init();
+
+    // prepare stubbing
+    sandbox = sinon.createSandbox();
   });
 
   beforeEach(async () => {
     // cleanup
     await Site.delAll();
 
-    // save site
+    sandbox.stub(ActiveTabHelper, 'close').returns(null);
 
+    // save site
     const plugins = [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'InsertResourcesPlugin', 'UpsertResourcePlugin' ].map(
       name => ModuleStorageManager.getAvailablePluginDefs().find(pluginDef => pluginDef.name === name),
     );
     site = new Site({ name: 'siteA', url: 'http://siteA/page-0.html', plugins });
     await site.save();
 
+    // mark a tab has been opened for scraping, normally this is set from IdbProject.crawl
+    site.tabId = 1;
+
     // stub ExtractUrlsPlugin, the only one running in tab via "domRead"
-    sinon.stub(ModuleRuntimeManager, 'runPluginInDom').callsFake((tabId, plugin, site, resource) => {
+    sandbox.stub(ModuleRuntimeManager, 'runPluginInDom').callsFake((tabId, plugin, site, resource) => {
       plugin.extractResourceUrls = () => [ `http://siteA/page-${resource.depth + 1}.html` ];
       if (resource) {
         resource.mediaType = 'html';
@@ -56,7 +65,7 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
   });
 
   afterEach(async () => {
-    (ModuleRuntimeManager.runPluginInDom as any).restore();
+    sandbox.restore();
   });
 
   after(async () => {
