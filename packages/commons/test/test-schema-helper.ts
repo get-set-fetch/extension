@@ -51,9 +51,9 @@ describe('Test Schema Helper', () => {
     assert.strictEqual(inst.toString(), /valB/.toString());
   });
 
-  it('parse number', async () => {
+  it('parse integer', async () => {
     const schemaWithDefault = {
-      type: 'number',
+      type: 'integer',
       default: '2'
     };
 
@@ -67,7 +67,7 @@ describe('Test Schema Helper', () => {
     assert.strictEqual(inst, 0);
 
     const schemaWithConst = {
-      type: 'number',
+      type: 'integer',
       const: '2'
     };
 
@@ -76,6 +76,36 @@ describe('Test Schema Helper', () => {
 
     inst = SchemaHelper.instantiate(schemaWithConst, '5');
     assert.strictEqual(inst, 5);
+
+    inst = SchemaHelper.instantiate(schemaWithConst, 0);
+    assert.strictEqual(inst, 0);
+  });
+
+  it('parse number', async () => {
+    const schemaWithDefault = {
+      type: 'number',
+      default: '2.01'
+    };
+
+    let inst = SchemaHelper.instantiate(schemaWithDefault, undefined);
+    assert.strictEqual(inst, 2.01);
+
+    inst = SchemaHelper.instantiate(schemaWithDefault, '5.01');
+    assert.strictEqual(inst, 5.01);
+
+    inst = SchemaHelper.instantiate(schemaWithDefault, 0);
+    assert.strictEqual(inst, 0);
+
+    const schemaWithConst = {
+      type: 'number',
+      const: '2.01'
+    };
+
+    inst = SchemaHelper.instantiate(schemaWithConst, undefined);
+    assert.strictEqual(inst, 2.01);
+
+    inst = SchemaHelper.instantiate(schemaWithConst, '5.01');
+    assert.strictEqual(inst, 5.01);
 
     inst = SchemaHelper.instantiate(schemaWithConst, 0);
     assert.strictEqual(inst, 0);

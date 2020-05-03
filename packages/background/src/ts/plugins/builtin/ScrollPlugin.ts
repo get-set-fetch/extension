@@ -23,17 +23,17 @@ export default class ScrollPlugin extends BasePlugin {
           const: true,
         },
         delay: {
-          type: 'number',
+          type: 'integer',
           default: '1000',
           description: 'Maximum waiting time (miliseconds) for DOM changes.',
         },
         timeout: {
-          type: 'number',
+          type: 'integer',
           default: '2000',
           description: 'Maximum waiting time (miliseconds) for DOM changes.',
         },
         maxScrollNo: {
-          type: 'number',
+          type: 'integer',
           default: '-1',
           description: 'Number of maximum scroll operations. -1 scrolls till no new content is added to the page',
         },

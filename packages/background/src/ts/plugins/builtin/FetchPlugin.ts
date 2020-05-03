@@ -10,7 +10,7 @@ export default class FetchPlugin extends BasePlugin {
       description: 'responsible for either downloading or loading in the current tab a new resource url.',
       properties: {
         stabilityTimeout: {
-          type: 'number',
+          type: 'integer',
           default: '0',
           description: 'consider the page loaded when there are no more dom changes within the specified amount (miliseconds). only applies to html resources.',
         },

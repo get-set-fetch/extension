@@ -115,12 +115,12 @@ export default class DynamicNavigationPlugin extends BasePlugin {
           description: 'Revisit the same selector multiple times until the dom no longer changes. Usefull for "load more content" scenarios',
         },
         stabilityTimeout: {
-          type: 'number',
+          type: 'integer',
           default: '500',
           description: 'consider the navigation complete when there are no more dom changes within the specified amount (miliseconds).',
         },
         maxResources: {
-          type: 'number',
+          type: 'integer',
           default: '100',
           description: 'Maximum number of resources to be scraped.',
         },

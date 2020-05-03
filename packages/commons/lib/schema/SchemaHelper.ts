@@ -5,6 +5,8 @@ export class SchemaHelper {
         return this.parseObject(schema, data || {});
       case 'string':
         return this.parseString(schema, data);
+      case 'integer':
+        return this.parseInteger(schema, data);
       case 'number':
         return this.parseNumber(schema, data);
       case 'boolean':
@@ -67,8 +69,12 @@ export class SchemaHelper {
     return data || schema.const || schema.default;
   }
 
-  static parseNumber(schema, data) {
+  static parseInteger(schema, data) {
     return parseInt(typeof data === 'undefined' ? schema.const || schema.default : data, 10);
+  }
+
+  static parseNumber(schema, data) {
+    return parseFloat(typeof data === 'undefined' ? schema.const || schema.default : data);
   }
 
   static parseBoolean(schema, data) {

@@ -20,12 +20,12 @@ export default class ExtractUrlsPlugin extends BasePlugin {
           description: 'Html selectors.',
         },
         maxDepth: {
-          type: 'number',
+          type: 'integer',
           default: '-1',
           description: 'Maximum depth of resources to be scraped.',
         },
         maxResources: {
-          type: 'number',
+          type: 'integer',
           default: '100',
           description: 'Maximum number of resources to be scraped.',
         },
