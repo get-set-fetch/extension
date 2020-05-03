@@ -12,6 +12,10 @@ export default class CrawlHelper {
 
     // check if crawl complete
     const site: ISite = await page.evaluate(siteId => GsfClient.fetch('GET', `site/${siteId}`), siteId);
+    if (!site) {
+      throw new Error(`site ${siteId} not found`);
+    }
+
     if (!site.crawlInProgress) {
       resolve();
     }
