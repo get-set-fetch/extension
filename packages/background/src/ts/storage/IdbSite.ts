@@ -24,7 +24,7 @@ export default class IdbSite extends BaseEntity implements ISite {
   when extensions starts all crawlInProgress flag are set to false
   */
   get props() {
-    return ['id', 'projectId', 'name', 'url', 'crawlInProgress', 'robotsTxt', 'plugins', 'resourceFilter'];
+    return [ 'id', 'projectId', 'name', 'url', 'crawlInProgress', 'robotsTxt', 'plugins', 'resourceFilter' ];
   }
 
   // get a read transaction
@@ -187,6 +187,9 @@ export default class IdbSite extends BaseEntity implements ISite {
         `Error instantiating plugin definitions for site ${this.name}`,
         err,
       );
+
+      // no plugins > no scrape process > abort
+      return;
     }
     this.resourcesNo = (await IdbSite.getAllIds()).length;
 
@@ -282,6 +285,14 @@ export default class IdbSite extends BaseEntity implements ISite {
         else {
           this.mergeResourceResult(resource, result);
         }
+      }
+
+      if (resource) {
+        Log.debug(`Resource successfully crawled (json): ${JSON.stringify(resource)}`);
+        Log.info(`Resource successfully crawled (url): ${resource.url}`);
+      }
+      else {
+        Log.info(`No crawlable resource found for site ${this.name}`);
       }
     }
     catch (err) {

@@ -15,7 +15,7 @@ import ModuleStorageManager from '../plugins/ModuleStorageManager';
 import ModuleNpmManager from '../plugins/ModuleNpmManager';
 import ModuleRuntimeManager from '../plugins/ModuleRuntimeManager';
 
-const Log = Logger.getLogger('GsfProvider');
+const GsfLog = Logger.getLogger('GsfProvider');
 
 /* eslint-disable no-case-declarations */
 export default class GsfProvider {
@@ -44,42 +44,58 @@ export default class GsfProvider {
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       let reqPromise = null;
 
-      switch (true) {
-        case /^site/.test(request.resource):
-          reqPromise = this.siteHandler(request);
-          break;
-        case /^project/.test(request.resource):
-          reqPromise = this.projectHandler(request);
-          break;
-        case /^resource/.test(request.resource):
-          reqPromise = this.resourceHandler(request);
-          break;
-        case /^plugin/.test(request.resource):
-          reqPromise = this.pluginHandler(request);
-          break;
-        case /^scenario/.test(request.resource):
-          reqPromise = this.scenarioHandler(request);
-          break;
-        case /^log/.test(request.resource):
-          reqPromise = this.logHandler(request);
-          break;
-        case /^setting/.test(request.resource):
-          reqPromise = this.settingHandler(request);
-          break;
+      /*
+      this is not a message sent via admin GsfClient
+      messages may be triggered by ActiveTabHelper.executeAsyncScript, ignore these
+      */
+      if (request.resolved) return false;
+
+      try {
+        switch (true) {
+          case /^site/.test(request.resource):
+            reqPromise = this.siteHandler(request);
+            break;
+          case /^project/.test(request.resource):
+            reqPromise = this.projectHandler(request);
+            break;
+          case /^resource/.test(request.resource):
+            reqPromise = this.resourceHandler(request);
+            break;
+          case /^plugin/.test(request.resource):
+            reqPromise = this.pluginHandler(request);
+            break;
+          case /^scenario/.test(request.resource):
+            reqPromise = this.scenarioHandler(request);
+            break;
+          case /^log/.test(request.resource):
+            reqPromise = this.logHandler(request);
+            break;
+          case /^setting/.test(request.resource):
+            reqPromise = this.settingHandler(request);
+            break;
           case /^utils/.test(request.resource):
             reqPromise = this.utilsHandler(request);
             break;
-        default:
-      }
+          default:
+        }
 
-      reqPromise.then(
-        result => {
-          sendResponse(result);
-        },
-        error => {
-          sendResponse({ error: error.message });
-        },
-      );
+        if (!reqPromise) {
+          throw new Error(`invalid request promise against request ${JSON.stringify(request)}`);
+        }
+
+        reqPromise.then(
+          result => {
+            sendResponse(result);
+          },
+          error => {
+            sendResponse({ error: error.message });
+          },
+        );
+      }
+      catch (err) {
+        GsfLog.error('Something went wrong.', err);
+        sendResponse({ error: err.message });
+      }
 
       // enable wait for callback
       return true;
@@ -440,7 +456,7 @@ export default class GsfProvider {
       case 'POST':
         switch (true) {
           case /^logs$/.test(request.resource):
-            reqPromise = Log.generic(request.body);
+            reqPromise = GsfLog.generic(request.body);
             break;
           default:
             reqPromise = new Promise(resolve => resolve());
@@ -500,6 +516,9 @@ export default class GsfProvider {
       default:
         reqPromise = new Promise(resolve => resolve());
     }
+
+    return reqPromise;
+  }
 
   static async utilsHandler(request) {
     let reqPromise = null;
