@@ -1,7 +1,10 @@
 import BaseResource from 'get-set-fetch/lib/storage/base/BaseResource';
 import { IResource } from 'get-set-fetch-extension-commons';
+import Logger from '../logger/Logger';
 
 /* eslint-disable class-methods-use-this */
+
+const Log = Logger.getLogger('IdbResource');
 export default class IdbResource extends BaseResource implements IResource {
   // get a read transaction
   static rTx() {
@@ -135,6 +138,32 @@ export default class IdbResource extends BaseResource implements IResource {
     }
 
     return resource;
+  }
+
+  static saveMultiple(resources: Partial<IResource>[], resolve = null, reject = null) {
+    if (resolve && reject) {
+      const rwTx = IdbResource.rwTx();
+      const resource = new IdbResource(resources.pop()).serializeWithoutId();
+      const req = rwTx.add(resource);
+      req.onsuccess = () => {
+        if (resources.length === 0) {
+          resolve();
+        }
+        else this.saveMultiple(resources, resolve, reject);
+      };
+      req.onerror = () => reject(new Error('could not saveMultiple Resources'));
+      return null;
+    }
+
+    // eslint-disable-next-line no-shadow
+    return new Promise((resolve, reject) => {
+      if (resources && resources.length > 0) {
+        this.saveMultiple(resources, resolve, reject);
+      }
+      else {
+        resolve();
+      }
+    });
   }
 
   static delAll() {
