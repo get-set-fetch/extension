@@ -112,8 +112,8 @@ xdescribe('Site Crawl Extract HTML Headers', () => {
     // check each resource
     const titles = {
       'http://www.sitea.com/index.html': 'siteA',
-      'http://www.sitea.com/pageA.html': 'pageA',
-      'http://www.sitea.com/pageB.html': 'pageB',
+      'http://www.sitea.com/static/pageA.html': 'pageA',
+      'http://www.sitea.com/static/pageB.html': 'pageB',
     };
     for (let i = 0; i < crawledResources.length; i += 1) {
       const crawledResource = crawledResources[i];

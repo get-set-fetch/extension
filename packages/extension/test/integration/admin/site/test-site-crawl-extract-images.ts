@@ -119,8 +119,8 @@ xdescribe('Site Crawl Extract Images', () => {
     // check each resource
     const expectedResources = {
       'http://www.sitea.com/index.html': { mediaType: 'text/html', content: { title: 'siteA' }, meta: {} },
-      'http://www.sitea.com/pageA.html': { mediaType: 'text/html', content: { title: 'pageA' }, meta: {} },
-      'http://www.sitea.com/pageB.html': { mediaType: 'text/html', content: { title: 'pageB' }, meta: {} },
+      'http://www.sitea.com/static/pageA.html': { mediaType: 'text/html', content: { title: 'pageA' }, meta: {} },
+      'http://www.sitea.com/static/pageB.html': { mediaType: 'text/html', content: { title: 'pageB' }, meta: {} },
       'http://www.sitea.com/img/imgA-150.png': { mediaType: 'image/png', content: {}, meta: { width: 150, height: 150 } },
       'http://www.sitea.com/img/imgB-850.png': { mediaType: 'image/png', content: {}, meta: { width: 850, height: 850 } },
     };

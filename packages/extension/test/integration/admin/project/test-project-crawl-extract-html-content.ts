@@ -38,25 +38,25 @@ const crawlDefinitions: ICrawlDefinition[] = [
         meta: {},
       },
       {
-        url: 'https://www.sitea.com/pageA.html',
+        url: 'https://www.sitea.com/static/pageA.html',
         actions: [],
         mediaType: 'text/html',
         content: { h1: [ 'PageA Heading Level 1' ], 'i.classA': [ 'italics A' ] },
         meta: {},
       },
       {
-        url: 'https://www.sitea.com/pageB.html',
+        url: 'https://www.sitea.com/static/pageB.html',
         actions: [],
         mediaType: 'text/html',
-        content: { h1: [ 'PageB Heading Level 1' ], 'i.classA': [ 'italics B1', 'italics B2' ] },
+        content: { h1: [ 'PageB Heading Level 1', 'PageB Heading Level 1' ], 'i.classA': [ 'italics B1', 'italics B2' ] },
         meta: {},
       },
     ],
     expectedCsv: [ 'url,content.h1,content.i.classA',
       '"https://www.sitea.com/index.html","Main Header 1","italics main"',
-      '"https://www.sitea.com/pageA.html","PageA Heading Level 1","italics A"',
-      '"https://www.sitea.com/pageB.html","PageB Heading Level 1","italics B1"',
-      '"https://www.sitea.com/pageB.html","PageB Heading Level 1","italics B2"',
+      '"https://www.sitea.com/static/pageA.html","PageA Heading Level 1","italics A"',
+      '"https://www.sitea.com/static/pageB.html","PageB Heading Level 1","italics B1"',
+      '"https://www.sitea.com/static/pageB.html","PageB Heading Level 1","italics B2"',
     ],
     csvLineSeparator: '\n',
   },
@@ -142,6 +142,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     ],
     csvLineSeparator: '\n',
   },
+
   {
     title: 'maxDepth = 1, maxResources = -1',
     project: {
@@ -175,7 +176,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         meta: {},
       },
       {
-        url: 'https://www.sitea.com/pageA.html',
+        url: 'https://www.sitea.com/static/pageA.html',
         actions: [],
         mediaType: 'text/html',
         content: { h1: [ 'PageA Heading Level 1' ], 'i.classA': [ 'italics A' ] },
@@ -185,7 +186,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     expectedCsv: [
       'url,content.h1,content.i.classA',
       '"https://www.sitea.com/index.html","Main Header 1","italics main"',
-      '"https://www.sitea.com/pageA.html","PageA Heading Level 1","italics A"',
+      '"https://www.sitea.com/static/pageA.html","PageA Heading Level 1","italics A"',
     ],
     csvLineSeparator: '\n',
   },
@@ -222,7 +223,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         meta: {},
       },
       {
-        url: 'https://www.sitea.com/pageA.html',
+        url: 'https://www.sitea.com/static/pageA.html',
         actions: [],
         mediaType: 'text/html',
         content: { h1: [ 'PageA Heading Level 1' ], 'i.classA': [ 'italics A' ] },
@@ -232,7 +233,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     expectedCsv: [
       'url,content.h1,content.i.classA',
       '"https://www.sitea.com/index.html","Main Header 1","italics main"',
-      '"https://www.sitea.com/pageA.html","PageA Heading Level 1","italics A"',
+      '"https://www.sitea.com/static/pageA.html","PageA Heading Level 1","italics A"',
     ],
     csvLineSeparator: '\n',
   },
@@ -241,7 +242,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     project: {
       name: 'projA',
       description: 'descriptionA',
-      url: 'https://www.sitea.com/pageC.html',
+      url: 'https://www.sitea.com/static/pageC.html',
       scenario: 'get-set-fetch-scenario-scrape-static-content',
       plugins: [
         {
@@ -268,7 +269,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     },
     expectedResources: [
       {
-        url: 'https://www.sitea.com/pageC.html',
+        url: 'https://www.sitea.com/static/pageC.html',
         actions: [],
         mediaType: 'text/html',
         content: { h5: [
@@ -278,7 +279,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         meta: {},
       },
       {
-        url: 'https://www.sitea.com/pageC.html',
+        url: 'https://www.sitea.com/static/pageC.html',
         actions: [ 'scroll#1' ],
         mediaType: 'text/html',
         content: { h5: [
@@ -288,7 +289,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         meta: {},
       },
       {
-        url: 'https://www.sitea.com/pageC.html',
+        url: 'https://www.sitea.com/static/pageC.html',
         actions: [ 'scroll#2' ],
         mediaType: 'text/html',
         content: { h5: [
@@ -301,12 +302,12 @@ const crawlDefinitions: ICrawlDefinition[] = [
     ],
     expectedCsv: [
       'url,content.h5',
-      '"https://www.sitea.com/pageC.html","Entry title 0"',
-      '"https://www.sitea.com/pageC.html","Entry title 1"',
-      '"https://www.sitea.com/pageC.html","Entry title 2"',
-      '"https://www.sitea.com/pageC.html","Entry title 3"',
-      '"https://www.sitea.com/pageC.html","Entry title 4"',
-      '"https://www.sitea.com/pageC.html","Entry title 5"',
+      '"https://www.sitea.com/static/pageC.html","Entry title 0"',
+      '"https://www.sitea.com/static/pageC.html","Entry title 1"',
+      '"https://www.sitea.com/static/pageC.html","Entry title 2"',
+      '"https://www.sitea.com/static/pageC.html","Entry title 3"',
+      '"https://www.sitea.com/static/pageC.html","Entry title 4"',
+      '"https://www.sitea.com/static/pageC.html","Entry title 5"',
     ],
     csvLineSeparator: '\n',
   },
@@ -315,7 +316,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     project: {
       name: 'projA',
       description: 'descriptionA',
-      url: 'https://www.sitea.com/pageC.html',
+      url: 'https://www.sitea.com/static/pageC.html',
       scenario: 'get-set-fetch-scenario-scrape-static-content',
       plugins: [
         {
@@ -343,7 +344,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     },
     expectedResources: [
       {
-        url: 'https://www.sitea.com/pageC.html',
+        url: 'https://www.sitea.com/static/pageC.html',
         actions: [],
         mediaType: 'text/html',
         content: { h5: [
@@ -353,7 +354,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         meta: {},
       },
       {
-        url: 'https://www.sitea.com/pageC.html',
+        url: 'https://www.sitea.com/static/pageC.html',
         actions: [ 'scroll#1' ],
         mediaType: 'text/html',
         content: { h5: [
@@ -365,10 +366,10 @@ const crawlDefinitions: ICrawlDefinition[] = [
     ],
     expectedCsv: [
       'url,content.h5',
-      '"https://www.sitea.com/pageC.html","Entry title 0"',
-      '"https://www.sitea.com/pageC.html","Entry title 1"',
-      '"https://www.sitea.com/pageC.html","Entry title 2"',
-      '"https://www.sitea.com/pageC.html","Entry title 3"',
+      '"https://www.sitea.com/static/pageC.html","Entry title 0"',
+      '"https://www.sitea.com/static/pageC.html","Entry title 1"',
+      '"https://www.sitea.com/static/pageC.html","Entry title 2"',
+      '"https://www.sitea.com/static/pageC.html","Entry title 3"',
     ],
     csvLineSeparator: '\n',
   },
