@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
-        "esModuleInterop":true,
-
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
         "target": "ES2017",
         "strict": false,
         "moduleResolution": "node",
@@ -10,9 +10,10 @@
         "typeRoots": [
             "./typings",
             "./node_modules/@types"
-        ], 
+        ],
         "lib": [
-            "es2017", "dom"
+            "es2017",
+            "dom"
         ]
     },
     "newLine": "LF",
