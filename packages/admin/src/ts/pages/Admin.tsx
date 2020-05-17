@@ -15,6 +15,7 @@ import ProjectDetail from './projects/ProjectDetail';
 import Navigation from '../layout/Navigation';
 import ProjectResults from './projects/ProjectResults';
 import GettingStarted from './start/GettingStarted';
+import Examples from './start/Examples';
 import Modal from '../components/Modal';
 
 export default class Admin extends React.Component {
@@ -49,6 +50,7 @@ export default class Admin extends React.Component {
                 <Route path='/settings' component={SettingList} />
 
                 <Route path='/start' component={GettingStarted} />
+                <Route path='/examples' component={Examples} />
 
                 <Route path='/'
                   exact={false}

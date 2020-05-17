@@ -40,6 +40,24 @@ a.inner-nav-link {
 
 h5.inner {
   color: green;
+  margin-top: 0.5rem;
+}
+
+h5.subtitle {
+  color: #8b1010;
+  margin-top: 0.5rem;
+}
+
+div.examples {
+  & li {
+    margin-bottom: 1.5rem;
+  }  
+  & p {
+    margin: 0;
+  }  
+  & hr {
+    margin-top: 0.5rem;
+  }
 }
 
 div.card-main {
