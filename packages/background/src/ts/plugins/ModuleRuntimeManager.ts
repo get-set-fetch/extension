@@ -114,7 +114,7 @@ export default class ModuleRuntimeManager {
     const pluginInfo = ModuleRuntimeManager.cache.get(pluginName);
 
     const codeWithoutExport = pluginInfo.code.replace(/^export .+$/gm, '');
-    Log.debug(`injecting in browser tab ${pluginName}: ${codeWithoutExport}`);
+    Log.debug(`injecting in browser tab ${pluginName}`);
 
     const pluginDef = `${pluginName}`;
     const pluginInstanceName = `inst${pluginName}`;
