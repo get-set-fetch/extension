@@ -1,5 +1,6 @@
 import JSZip from 'jszip/dist/jszip';
 import { IExportOpt, IExportResult, ExportType, IResource, ILog, LogLevel } from 'get-set-fetch-extension-commons';
+import * as MimeTypes from './MimeTypes.json';
 
 export default class ExportHelper {
   static exportResources(resources: IResource[], opts: IExportOpt): Promise<IExportResult> {
@@ -36,6 +37,23 @@ export default class ExportHelper {
     });
 
     return { url: URL.createObjectURL(content) };
+  }
+
+  static getExtension(resource: Partial<IResource>): string {
+    // extension can be identified based on mime type
+    if (MimeTypes[resource.mediaType]) {
+      return MimeTypes[resource.mediaType];
+    }
+
+    // extension can be identified based on regex agains url
+    // have at least 2 ".", one from domain, one from extension
+    const extensionMatch = /\..+.\.([^.?]+)($|\?)/.exec(resource.url);
+    if (extensionMatch) {
+      return extensionMatch[1];
+    }
+
+    // failed to find extension
+    return 'unknown';
   }
 
   static getRowDetailCols(row: object, props: string[]): string[] {
