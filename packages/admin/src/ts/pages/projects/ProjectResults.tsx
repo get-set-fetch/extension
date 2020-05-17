@@ -140,7 +140,13 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
             this.state.csvResult.body.map((row, rowIdx) => (
               <tr key={rowIdx}>
                 {
-                  row.map((col, colIdx) => (<td key={colIdx}>{col.replace(/"/g, '')}</td>))
+                  row.map((colVal, colIdx) => (<td key={colIdx}>
+                    {
+                      colIdx === 0
+                        ? this.renderResultLink(colVal.replace(/"/g, ''))
+                        : colVal.replace(/"/g, '')
+                    }
+                  </td>))
                 }
               </tr>
             ))
@@ -181,5 +187,12 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
         </div>
       </div>,
     ]);
+  }
+
+  renderResultLink(url: string) {
+    const maxLen = 30;
+
+    const shortenUrl = url.length < maxLen ? url : `...${url.substr(-maxLen)}`;
+    return <a href={url} className="result-link" target='_blank' rel="noopener noreferrer">{shortenUrl}</a>;
   }
 }
