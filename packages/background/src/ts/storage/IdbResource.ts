@@ -1,5 +1,6 @@
 import BaseResource from 'get-set-fetch/lib/storage/base/BaseResource';
 import { IResource } from 'get-set-fetch-extension-commons';
+import { IResourceParent } from 'get-set-fetch-extension-commons/lib/resource';
 import Logger from '../logger/Logger';
 
 /* eslint-disable class-methods-use-this */
@@ -211,7 +212,8 @@ export default class IdbResource extends BaseResource implements IResource {
   content: any = {}
   blob: any;
   mediaType: string;
-  urlsToAdd: string[];
+  parent: IResourceParent;
+  resourcesToAdd: Partial<IResource>[];
 
   constructor(kwArgs: Partial<IResource> = {}) {
     super(kwArgs.siteId, kwArgs.url, kwArgs.depth);
@@ -261,7 +263,7 @@ export default class IdbResource extends BaseResource implements IResource {
 
   // IndexedDB can't do partial update, define all resource properties to be stored
   get props() {
-    return [ 'id', 'siteId', 'url', 'actions', 'depth', 'content', 'meta', 'crawledAt', 'crawlInProgress', 'blob', 'mediaType' ];
+    return [ 'id', 'siteId', 'url', 'actions', 'depth', 'content', 'meta', 'crawledAt', 'crawlInProgress', 'blob', 'mediaType', 'parent' ];
   }
 
   serialize(): any {

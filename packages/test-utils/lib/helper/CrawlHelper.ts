@@ -26,13 +26,19 @@ export default class CrawlHelper {
     return null;
   }
 
-  static async getCrawledResources(page, siteId) {
+  static async getCrawledResources(page, siteId: number, fields: string[] = [ 'url', 'actions', 'mediaType', 'meta', 'content' ]) {
     // retrieve crawled resources
-    let actualResources = await page.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/crawled`), siteId);
+    const actualResources = await page.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}/crawled`), siteId);
 
     // only keep the properties we're interested in
-    actualResources = actualResources.map(({ url, actions, mediaType, meta, content }) => ({ url, mediaType, meta, content, actions }));
+    const mappedResources = actualResources.map(actualResource => {
+      const mappedResource = {};
+      fields.forEach(field => {
+        mappedResource[field] = actualResource[field];
+      });
+      return mappedResource;
+    });
 
-    return actualResources;
+    return mappedResources;
   }
 }

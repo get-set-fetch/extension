@@ -1,4 +1,5 @@
 import { IResource, ISite, BasePlugin, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
+import { IResourceParent } from 'get-set-fetch-extension-commons/lib/resource';
 import IdbSite from '../../storage/IdbSite';
 
 /**
@@ -60,76 +61,115 @@ export default class ExtractUrlsPlugin extends BasePlugin {
   }
 
   apply(site: ISite & IdbSite, resource: IResource) {
-    let urlsToAdd = this.extractResourceUrls(site, resource);
+    let resourcesToAdd: Partial<IResource>[] = this.extractResources(site, resource);
 
     // there's a limit of scrapped resources, enforce it
     if (this.opts.maxResources !== -1) {
       const maxAllowedResourceNo = this.opts.maxResources - site.resourcesNo;
       if (maxAllowedResourceNo > 0) {
-        urlsToAdd = urlsToAdd.slice(0, maxAllowedResourceNo);
+        resourcesToAdd = resourcesToAdd.slice(0, maxAllowedResourceNo);
       }
       else {
-        urlsToAdd = [];
+        resourcesToAdd = [];
       }
     }
 
-    const result = this.diffAndMergeResult({ urlsToAdd });
+    const result = this.diffAndMergeResult({ resourcesToAdd });
 
     // eslint-disable-next-line no-param-reassign
-    site.resourcesNo += result.urlsToAdd.length;
+    site.resourcesNo += result.resourcesToAdd.length;
 
     return result;
   }
 
-  extractResourceUrls(site, resource): string[] {
+  extractResources(site, resource): Partial<IResource>[] {
     const currentUrl = new URL(resource.url);
 
     const rawSelectors: string[] = this.opts.selectors.split('\n');
-    const urls = rawSelectors.reduce(
-      (urls, rawSelector) => {
-        let selector = rawSelector.trim();
+    const resources = rawSelectors.reduce(
+      (resources, rawSelector) => {
+        let selectorPair = rawSelector.trim();
 
         // remove comments with last occurance of ' #', ex: a.class # comment becomes a.class
-        if (/\s#/.test(selector)) {
-          const selectorMatch = /(.+)(?=(\s#))/.exec(selector);
+        if (/\s#/.test(selectorPair)) {
+          const selectorMatch = /(.+)(?=(\s#))/.exec(selectorPair);
           // eslint-disable-next-line prefer-destructuring
-          selector = selectorMatch[1];
+          selectorPair = selectorMatch[1];
         }
 
         // nothing to query against
-        if (selector.length === 0) {
-          return urls;
+        if (selectorPair.length === 0) {
+          return resources;
         }
 
-        const selectorUrls = this.extractSelectorUrls(selector);
-        return urls.concat(selectorUrls);
+        /*
+        sometimes the link innerText or img alt text is not enough to uniquely differentiate between child urls..
+        ex: extracting pdf files from a site where on each page is a link with "Export" text
+        if we are to rename the pdf files based on link innerText, all pdf files will result in the name 'export.pdf'
+        to avoid this, an extra, optional title selector is added
+        is responsible for linking link(s) with some other elm innerText from the page, like, for ex, h2.page-title
+        */
+        const [ urlSelector, titleSelector ] = selectorPair.split(',').map(elm => elm.trim());
+        const selectorResources = this.extractSelectorResources(urlSelector, titleSelector);
+        return resources.concat(selectorResources);
       },
       [],
     );
-    const uniqueUrls = Array.from(new Set(urls));
 
-    const validUrls = new Set<string>();
-    uniqueUrls.forEach(partialUrl => {
+    resources.forEach(resource => {
       // construct resource full URL without #hhtml_fragment_identifiers
-      const resourceUrl = new URL(partialUrl, currentUrl);
-      resourceUrl.hash = '';
+      const fullUrl = new URL(resource.url, currentUrl);
+      fullUrl.hash = '';
 
-      if (this.isValidResourceUrl(resourceUrl)) {
-        validUrls.add(resourceUrl.toString());
+      if (this.isValidResourceUrl(fullUrl)) {
+        // eslint-disable-next-line no-param-reassign
+        resource.url = fullUrl.toString();
       }
     });
 
-    return Array.from(validUrls);
-  }
 
-  extractSelectorUrls(selector: string) {
-    const urls = Array.from(window.document.querySelectorAll(selector)).map((elm: any) => {
-      if (elm.href) return elm.href;
-      if (elm.src) return elm.src;
-      return null;
+    const uniqueResources = [];
+    const uniqueUrls = [];
+    resources.forEach(resource => {
+      if (!uniqueUrls.includes(resource.url)) {
+        uniqueResources.push(resource);
+        uniqueUrls.push(resource.url);
+      }
     });
 
-    return urls.filter(url => url !== null);
+    return uniqueResources;
+  }
+
+  extractSelectorResources(urlSelector: string, titleSelector: string): Partial<IResource>[] {
+    const titles: string[] = titleSelector ? Array.from(window.document.querySelectorAll(titleSelector)).map((title: any) => title.innerText.trim()) : [];
+    const resources: Partial<IResource>[] = Array.from(window.document.querySelectorAll(urlSelector)).map((elm: any, idx) => {
+      let resource: Partial<IResource> = null;
+      if (elm.href) {
+        resource = {
+          url: elm.href,
+          parent: {
+            linkText: elm.innerText,
+          },
+        };
+      }
+
+      if (elm.src) {
+        resource = {
+          url: elm.src,
+          parent: {
+            imgAlt: elm.alt,
+          },
+        };
+      }
+
+      if (resource && titles.length > 0) {
+        resource.parent.title = titles.length > idx ? titles[idx] : titles[titles.length - 1];
+  }
+
+      return resource;
+    });
+
+    return resources.filter(resource => resource !== null);
   }
 
   isValidResourceUrl(resourceUrl) {

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { resolve } from 'path';
 import { Page } from 'puppeteer';
-import { IProjectStorage } from 'get-set-fetch-extension-commons';
+import { IProjectStorage, IResource } from 'get-set-fetch-extension-commons';
 import BrowserHelper from '../helper/BrowserHelper';
 import ScenarioHelper from '../helper/ScenarioHelper';
 import ProjectHelper from '../helper/ProjectHelper';
@@ -11,15 +11,11 @@ import FileHelper from '../helper/FileHelper';
 export interface ICrawlDefinition {
   title: string;
   project: IProjectStorage;
-  expectedResources: {
-    url: string;
-    actions?: string[];
-    mediaType: string;
-    content;
-    meta;
-  }[];
+  expectedResourceFields?: string[];
+  expectedResources: Partial<IResource>[];
   expectedCsv: string[];
   csvLineSeparator: string;
+  expectedZipEntries?: string[];
 }
 
 declare const GsfClient;
@@ -58,8 +54,8 @@ const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => descr
     await browserHelper.close();
   });
 
-  async function checkCrawledResources(siteId, expectedResources) {
-    const actualResources = await CrawlHelper.getCrawledResources(page, siteId);
+  async function checkCrawledResources(siteId, expectedResources, fields) {
+    const actualResources = await CrawlHelper.getCrawledResources(page, siteId, fields);
     assert.sameDeepMembers(actualResources, expectedResources);
   }
 
@@ -67,6 +63,11 @@ const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => descr
     const generated = await ProjectHelper.downloadProjectCsv(page, project, targetDir, csvLineSeparator);
     assert.strictEqual(generated.header, expectedCsv[0]);
     assert.sameDeepMembers(generated.body, expectedCsv.slice(1));
+  }
+
+  async function downloadAndCheckZip(project, expectedZipEntries) {
+    const generatedZipEntries = await ProjectHelper.downloadProjectZip(page, project, targetDir);
+    assert.sameMembers(generatedZipEntries, expectedZipEntries);
   }
 
   function crawlProjectIt(crawlDefinition) {
@@ -103,7 +104,7 @@ const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => descr
       await CrawlHelper.waitForCrawlComplete(page, loadedSite.id);
 
       // check crawled resources
-      await checkCrawledResources(loadedSite.id, crawlDefinition.expectedResources);
+      await checkCrawledResources(loadedSite.id, crawlDefinition.expectedResources, crawlDefinition.expectedResourceFields);
 
       // reload project list
       await browserHelper.goto('/projects');
@@ -125,6 +126,11 @@ const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => descr
 
       // download and check csv
       await downloadAndCheckCsv(loadedProject, crawlDefinition.expectedCsv, crawlDefinition.csvLineSeparator);
+
+      // download and check zip
+      if (crawlDefinition.expectedZipEntries) {
+        await downloadAndCheckZip(loadedProject, crawlDefinition.expectedZipEntries);
+      }
     });
   }
 

@@ -254,6 +254,8 @@ export default class IdbSite extends BaseEntity implements ISite {
           - generic object
         */
 
+        Log.debug(`Plugin result (json): ${JSON.stringify(result)}`);
+
         // a new static resource has been generated
         if (result instanceof IdbResource) {
           resource = result;
@@ -412,7 +414,6 @@ export default class IdbSite extends BaseEntity implements ISite {
     return IdbResource.saveMultiple(resources);
   }
 
-  
 
   update() {
     return new Promise((resolve, reject) => {

@@ -42,8 +42,40 @@ describe('Test Insert Resources Plugin', () => {
 
   it('multiple apply calls', async () => {
     insertResourcesPlugin = new InsertResourcesPlugin();
-    await insertResourcesPlugin.apply(site, { urlsToAdd: [ 'pageA.html', 'pageB.html' ] });
-    await insertResourcesPlugin.apply(site, { urlsToAdd: [ 'pageA.html', 'pageB.html', 'pageC.html' ] });
+    await insertResourcesPlugin.apply(site, { resourcesToAdd: [
+      {
+        url: 'pageA.html',
+        parent: {
+          linkText: 'pageA',
+        },
+      },
+      {
+        url: 'pageB.html',
+        parent: {
+          linkText: 'pageB',
+        },
+      },
+    ] });
+    await insertResourcesPlugin.apply(site, { resourcesToAdd: [
+      {
+        url: 'pageA.html',
+        parent: {
+          linkText: 'pageA',
+        },
+      },
+      {
+        url: 'pageB.html',
+        parent: {
+          linkText: 'pageB',
+        },
+      },
+      {
+        url: 'pageC.html',
+        parent: {
+          linkText: 'pageC',
+        },
+      },
+    ] });
 
     // re-create the bloom filter based on its bitset
     assert.isDefined(site.resourceFilter);

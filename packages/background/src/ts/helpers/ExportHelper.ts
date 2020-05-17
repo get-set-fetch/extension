@@ -26,7 +26,7 @@ export default class ExportHelper {
     const zip = new JSZip();
     resources.forEach(resource => {
       if (resource[blobCol]) {
-        const name = resource.meta && resource.meta.name ? resource.meta.name : resource.url.substr(-10);
+        const name = `${ExportHelper.getName(resource)}.${ExportHelper.getExtension(resource)}`;
         zip.file(name, resource[blobCol]);
       }
     });
@@ -38,6 +38,29 @@ export default class ExportHelper {
 
     return { url: URL.createObjectURL(content) };
   }
+
+  static getName(resource: Partial<IResource>): string {
+    const nameParts: string[] = [];
+
+    // get resource name from parent metadata
+    if (resource.parent) {
+      const { title, linkText, imgAlt } = resource.parent;
+      nameParts.push(title);
+      nameParts.push(linkText);
+      nameParts.push(imgAlt);
+      return nameParts.filter(namePart => namePart).map(namePart => namePart.substr(0, 100)).join('-');
+    }
+
+    // get resource name just from its url
+    const nameMatch = /.+\/([^.?]+).*($|\?)/.exec(resource.url);
+    if (nameMatch) {
+      return nameMatch[1];
+    }
+
+    // failsafe, just return the last part of url
+    return resource.url.substr(-30);
+  }
+
 
   static getExtension(resource: Partial<IResource>): string {
     // extension can be identified based on mime type

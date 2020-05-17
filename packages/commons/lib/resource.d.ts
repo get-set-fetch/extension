@@ -1,3 +1,9 @@
+export interface IResourceParent {
+  linkText?: string;
+  imgAlt?: string;
+  title?: string;
+}
+
 export interface IResource {
   crawledAt: any;
   id: number;
@@ -10,4 +16,6 @@ export interface IResource {
   blob: any;
   meta: any; // contains various meta data such as img.name, width, height ...
   content: any; // contains html scrapped content
+  parent?: IResourceParent;
+  resourcesToAdd?: Partial<IResource>[];
 }

@@ -34,59 +34,118 @@ describe('Test Extract Urls Plugin', () => {
     extractUrlsPlugin = new ExtractUrlsPlugin();
 
     stubDocument.withArgs('a[href$=".html"]').returns([
-      { href: 'http://sitea.com/page1.html' },
-      { href: 'http://sitea.com/page1.html#fragment1' },
-      { href: 'http://sitea.com/page1.html#fragment2' },
-      { href: 'http://sitea.com/page1.html' },
+      { href: 'http://sitea.com/page1.html', innerText: 'page1' },
+      { href: 'http://sitea.com/page1.html#fragment1', innerText: 'page1' },
+      { href: 'http://sitea.com/page1.html#fragment2', innerText: 'page1' },
+      { href: 'http://sitea.com/page1.html', innerText: 'page1' },
     ]);
 
     const expectedValidUrls = [
-      'http://sitea.com/page1.html',
+      {
+        url: 'http://sitea.com/page1.html',
+        parent: {
+          linkText: 'page1',
+        },
+      },
     ];
     // eslint-disable-next-line prefer-spread
-    const { urlsToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
-    assert.sameMembers(urlsToAdd, expectedValidUrls);
+    const { resourcesToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
+    assert.sameDeepMembers(resourcesToAdd, expectedValidUrls);
   });
 
   it('extract unique urls - include images', () => {
     extractUrlsPlugin = new ExtractUrlsPlugin({ selectors: 'a\nimg' });
 
     stubDocument.withArgs('a').returns([
-      { href: 'http://sitea.com/page1.html' },
-      { href: 'http://sitea.com/page1.html' },
+      { href: 'http://sitea.com/page1.html', innerText: 'page1' },
+      { href: 'http://sitea.com/page1.html', innerText: 'page1' },
     ]);
 
     stubDocument.withArgs('img').returns([
-      { src: 'http://sitea.com/img1.png' },
-      { src: 'http://sitea.com/img1.png' },
+      { src: 'http://sitea.com/img1.png', alt: 'img1' },
+      { src: 'http://sitea.com/img1.png', alt: 'img1' },
     ]);
 
     const expectedValidUrls = [
-      'http://sitea.com/page1.html',
-      'http://sitea.com/img1.png',
+      {
+        url: 'http://sitea.com/page1.html',
+        parent: {
+          linkText: 'page1',
+        },
+      },
+      {
+        url: 'http://sitea.com/img1.png',
+        parent: {
+          imgAlt: 'img1',
+        },
+      },
     ];
     // eslint-disable-next-line prefer-spread
-    const { urlsToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
-    assert.sameMembers(urlsToAdd, expectedValidUrls);
+    const { resourcesToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
+    assert.sameDeepMembers(resourcesToAdd, expectedValidUrls);
+  });
+
+  it('extract unique urls - include title selector', () => {
+    extractUrlsPlugin = new ExtractUrlsPlugin({ selectors: 'a,h1.title' });
+
+    stubDocument.withArgs('a').returns([
+      { href: 'http://sitea.com/page1.html', innerText: 'export' },
+      { href: 'http://sitea.com/page2.html', innerText: 'export' },
+    ]);
+
+    stubDocument.withArgs('h1.title').returns([
+      { innerText: 'page1 title' },
+      { innerText: 'page2 title' },
+    ]);
+
+    const expectedValidUrls = [
+      {
+        url: 'http://sitea.com/page1.html',
+        parent: {
+          linkText: 'export',
+          title: 'page1 title',
+        },
+      },
+      {
+        url: 'http://sitea.com/page2.html',
+        parent: {
+          linkText: 'export',
+          title: 'page2 title',
+        },
+      },
+    ];
+    // eslint-disable-next-line prefer-spread
+    const { resourcesToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
+    assert.sameDeepMembers(resourcesToAdd, expectedValidUrls);
   });
 
   it('extract based on selectors with comments, spaces or empty', () => {
     extractUrlsPlugin = new ExtractUrlsPlugin({ selectors: 'a#id1\na # some comment \n  \n' });
 
     stubDocument.withArgs('a').returns([
-      { href: 'http://sitea.com/page1.html' },
+      { href: 'http://sitea.com/page1.html', innerText: 'page1' },
     ]);
     stubDocument.withArgs('a#id1').returns([
-      { href: 'http://sitea.com/page2.html' },
+      { href: 'http://sitea.com/page2.html', innerText: 'page2' },
     ]);
 
     const expectedValidUrls = [
-      'http://sitea.com/page1.html',
-      'http://sitea.com/page2.html',
+      {
+        url: 'http://sitea.com/page1.html',
+        parent: {
+          linkText: 'page1',
+        },
+      },
+      {
+        url: 'http://sitea.com/page2.html',
+        parent: {
+          linkText: 'page2',
+        },
+      },
     ];
     // eslint-disable-next-line prefer-spread
-    const { urlsToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
-    assert.sameMembers(urlsToAdd, expectedValidUrls);
+    const { resourcesToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
+    assert.sameDeepMembers(resourcesToAdd, expectedValidUrls);
   });
 
   it('extract based on selectors returning empty result', () => {
@@ -96,8 +155,8 @@ describe('Test Extract Urls Plugin', () => {
 
     const expectedValidUrls = [];
     // eslint-disable-next-line prefer-spread
-    const { urlsToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
-    assert.sameMembers(urlsToAdd, expectedValidUrls);
+    const { resourcesToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
+    assert.sameDeepMembers(resourcesToAdd, expectedValidUrls);
   });
 
   it('extract unique urls, cumulative apply', () => {
@@ -105,45 +164,65 @@ describe('Test Extract Urls Plugin', () => {
 
     // 1st apply
     stubDocument.withArgs('a').returns([
-      { href: 'http://sitea.com/page1.html' },
-      { href: 'http://sitea.com/page1.html' },
+      { href: 'http://sitea.com/page1.html', innerText: 'page1' },
+      { href: 'http://sitea.com/page1.html', innerText: 'page1' },
     ]);
 
     stubDocument.withArgs('img').returns([
-      { src: 'http://sitea.com/img1.png' },
-      { src: 'http://sitea.com/img1.png' },
+      { src: 'http://sitea.com/img1.png', alt: 'img1' },
+      { src: 'http://sitea.com/img1.png', alt: 'img1' },
     ]);
 
     let expectedValidUrls = [
-      'http://sitea.com/page1.html',
-      'http://sitea.com/img1.png',
+      {
+        url: 'http://sitea.com/page1.html',
+        parent: {
+          linkText: 'page1',
+        },
+      },
+      {
+        url: 'http://sitea.com/img1.png',
+        parent: {
+          imgAlt: 'img1',
+        },
+      },
     ];
 
 
-    let { urlsToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
-    assert.sameMembers(urlsToAdd, expectedValidUrls);
+    let { resourcesToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
+    assert.sameDeepMembers(resourcesToAdd, expectedValidUrls);
 
     // 2nd apply
     stubDocument.withArgs('a').returns([
-      { href: 'http://sitea.com/page1.html' },
-      { href: 'http://sitea.com/page1.html' },
-      { href: 'http://sitea.com/page2.html' },
-      { href: 'http://sitea.com/page2.html' },
+      { href: 'http://sitea.com/page1.html', innerText: 'page1' },
+      { href: 'http://sitea.com/page1.html', innerText: 'page1' },
+      { href: 'http://sitea.com/page2.html', innerText: 'page2' },
+      { href: 'http://sitea.com/page2.html', innerText: 'page2' },
     ]);
 
     stubDocument.withArgs('img').returns([
-      { src: 'http://sitea.com/img1.png' },
-      { src: 'http://sitea.com/img1.png' },
-      { src: 'http://sitea.com/img2.png' },
-      { src: 'http://sitea.com/img2.png' },
+      { src: 'http://sitea.com/img1.png', alt: 'img1' },
+      { src: 'http://sitea.com/img1.png', alt: 'img1' },
+      { src: 'http://sitea.com/img2.png', alt: 'img2' },
+      { src: 'http://sitea.com/img2.png', alt: 'img2' },
     ]);
 
     expectedValidUrls = [
-      'http://sitea.com/page2.html',
-      'http://sitea.com/img2.png',
+      {
+        url: 'http://sitea.com/page2.html',
+        parent: {
+          linkText: 'page2',
+        },
+      },
+      {
+        url: 'http://sitea.com/img2.png',
+        parent: {
+          imgAlt: 'img2',
+        },
+      },
     ];
 
-    ({ urlsToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any));
-    assert.sameMembers(urlsToAdd, expectedValidUrls);
+    ({ resourcesToAdd } = extractUrlsPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any));
+    assert.sameDeepMembers(resourcesToAdd, expectedValidUrls);
   });
 });

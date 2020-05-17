@@ -97,4 +97,39 @@ describe('Test ExportHelper', () => {
 
     assert.sameDeepOrderedMembers(expectedLines, generatedLines);
   });
+
+  it('get resource extension based on mime type', () => {
+    const extension = ExportHelper.getExtension({ url: 'sitea.com/imgA.png', mediaType: 'image/png' });
+    assert.strictEqual(extension, 'png');
+  });
+
+  it('get resource extension based on regex', () => {
+    const extensionA = ExportHelper.getExtension({ url: 'sitea.com/imgA.pnga', mediaType: 'unknown' });
+    assert.strictEqual(extensionA, 'pnga');
+
+    const extensionB = ExportHelper.getExtension({ url: 'sitea.com/imgA.pnga?someVal=1', mediaType: 'unknown' });
+    assert.strictEqual(extensionB, 'pnga');
+
+    const extensionC = ExportHelper.getExtension({ url: 'sitea.com/imgA', mediaType: 'unknown' });
+    assert.strictEqual(extensionC, 'unknown');
+  });
+
+  it('get resource name based on url regex', () => {
+    const nameA = ExportHelper.getName({ url: 'sitea.com/imgA.png' });
+    assert.strictEqual(nameA, 'imgA');
+
+    const nameB = ExportHelper.getName({ url: 'sitea.com/imgA.png?someVal=1' });
+    assert.strictEqual(nameB, 'imgA');
+
+    const nameC = ExportHelper.getName({ url: 'sitea.com/imgA' });
+    assert.strictEqual(nameC, 'imgA');
+  });
+
+  it('get resource name based on parent metadata', () => {
+    const nameA = ExportHelper.getName({ url: 'sitea.com/imgA.png', parent: { title: 'titleA', imgAlt: 'img A' } });
+    assert.strictEqual(nameA, 'titleA-img A');
+
+    const nameB = ExportHelper.getName({ url: 'sitea.com/fileB.pdf', parent: { title: 'titleB', linkText: 'file B' } });
+    assert.strictEqual(nameB, 'titleB-file B');
+  });
 });

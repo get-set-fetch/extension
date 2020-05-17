@@ -142,8 +142,8 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
     // 3 resources crawled (1 static, 2 dynamic), 3 update operations by the UpsertResourcePlugin
     sinon.assert.callCount(upsertSpy, 3);
 
-    const filterResourceProps = ({ url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions }) => ({
-      url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions,
+    const filterResourceProps = ({ url, depth, content, crawlInProgress, mediaType, actions }) => ({
+      url, depth, content, crawlInProgress, mediaType, actions,
     });
 
     // verify static resource
@@ -157,7 +157,6 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [],
       mediaType: 'html',
       actions: [],
     };
@@ -174,7 +173,6 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [],
       mediaType: 'html',
       actions: [ 'more#1' ],
     };
@@ -193,7 +191,6 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [],
       mediaType: 'html',
       actions: [ 'more#2' ],
     };
@@ -269,8 +266,8 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
     // 3 resources crawled (1 static, 1 dynamic), 3 update operations by the UpsertResourcePlugin
     sinon.assert.callCount(upsertSpy, 2);
 
-    const filterResourceProps = ({ url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions }) => ({
-      url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions,
+    const filterResourceProps = ({ url, depth, content, crawlInProgress, mediaType, actions }) => ({
+      url, depth, content, crawlInProgress, mediaType, actions,
     });
 
     // verify static resource
@@ -284,7 +281,6 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [],
       mediaType: 'html',
       actions: [],
     };
@@ -301,7 +297,6 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [],
       mediaType: 'html',
       actions: [ 'more#1' ],
     };
@@ -381,8 +376,8 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
     // exhausing all selector click options, snapshot was invoked 5 times, see snapshotStub behavior above
     sinon.assert.callCount(snapshotStub, 5);
 
-    const filterResourceProps = ({ url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions }) => ({
-      url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions,
+    const filterResourceProps = ({ url, depth, content, crawlInProgress, mediaType, actions }) => ({
+      url, depth, content, crawlInProgress, mediaType, actions,
     });
 
     // verify static resource
@@ -391,7 +386,6 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
       depth: 0,
       content: null,
       crawlInProgress: false,
-      urlsToAdd: [],
       mediaType: 'html',
       actions: [],
     };
@@ -408,7 +402,6 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [],
       mediaType: 'html',
       actions: [ 'prodA' ],
     };
@@ -426,7 +419,6 @@ describe(`Test Site Dynamic Crawl, using connection ${conn.info}`, () => {
         ],
       },
       crawlInProgress: false,
-      urlsToAdd: [],
       mediaType: 'html',
       actions: [ 'prodB' ],
     };

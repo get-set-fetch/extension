@@ -1,4 +1,5 @@
 import { assert } from 'chai';
+import { IResource } from 'get-set-fetch-extension-commons/lib/resource';
 import IdbStorage from '../../src/ts/storage/IdbStorage';
 import IdbResource from '../../src/ts/storage/IdbResource';
 import IdbSite from '../../src/ts/storage/IdbSite';
@@ -9,13 +10,16 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
   let Site: typeof IdbSite;
   let Resource: typeof IdbResource;
 
-  const expectedResource = {
+  const expectedResource: Partial<IResource> = {
     id: null,
     siteId: null,
     url: 'http://siteA/resourceA',
     content: { propA: 'valA' },
     blob: Buffer.from('contentA'),
     mediaType: 'text/plain',
+    parent: {
+      linkText: 'parentA',
+    },
   };
 
   before(async () => {
@@ -36,6 +40,7 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
     resource.content = expectedResource.content;
     resource.blob = expectedResource.blob;
     resource.mediaType = expectedResource.mediaType;
+    resource.parent = expectedResource.parent;
     await resource.save();
     assert.isNotNull(resource.id);
     expectedResource.id = resource.id;
@@ -70,6 +75,7 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
     assert.strictEqual(expectedResource.content.propA, resourceById.content.propA);
     assert.strictEqual(true, expectedResource.blob.equals(resourceById.blob));
     assert.strictEqual(expectedResource.mediaType, resourceById.mediaType);
+    assert.deepEqual(expectedResource.parent, resourceById.parent);
 
     // get resource by url
     const resourceByUrl = await Resource.get(expectedResource.url);
@@ -77,8 +83,9 @@ describe(`Test Storage Resource - CRUD, using connection ${conn.info}`, () => {
     assert.strictEqual(String(expectedResource.id), String(resourceByUrl.id));
     assert.strictEqual(String(expectedResource.siteId), String(resourceByUrl.siteId));
     assert.strictEqual(expectedResource.content.propA, resourceByUrl.content.propA);
-    assert.strictEqual(true, expectedResource.blob.equals(resourceById.blob));
-    assert.strictEqual(expectedResource.mediaType, resourceById.mediaType);
+    assert.strictEqual(true, expectedResource.blob.equals(resourceByUrl.blob));
+    assert.strictEqual(expectedResource.mediaType, resourceByUrl.mediaType);
+    assert.deepEqual(expectedResource.parent, resourceByUrl.parent);
   });
 
   it('update', async () => {

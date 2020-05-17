@@ -40,10 +40,10 @@ export default class InsertResourcesPlugin extends BasePlugin {
     if (!resource || !resource.crawlInProgress) return false;
 
     // only save new urls if there's something to save
-    return resource.urlsToAdd && resource.urlsToAdd.length > 0;
+    return resource.resourcesToAdd && resource.resourcesToAdd.length > 0;
   }
 
-  async apply(site: ISite & IdbSite, resource) {
+  async apply(site: ISite & IdbSite, resource: Partial<IResource>) {
     let resourcesAdded = false;
 
     if (!this.bloomFilter) {
@@ -56,15 +56,15 @@ export default class InsertResourcesPlugin extends BasePlugin {
       }
     }
 
-    const { urlsToAdd } = resource;
+    const { resourcesToAdd } = resource;
 
-    if (urlsToAdd && urlsToAdd.length > 0) {
+    if (resourcesToAdd && resourcesToAdd.length > 0) {
       // filter resources
       const resources: Partial<IResource>[] = [];
-      urlsToAdd.forEach(url => {
-        if (this.bloomFilter.test(url) === false) {
-          resources.push({ siteId: site.id, url, depth: resource.depth + 1 });
-          this.bloomFilter.add(url);
+      resourcesToAdd.forEach(resourceToAdd => {
+        if (this.bloomFilter.test(resourceToAdd.url) === false) {
+          resources.push({ siteId: site.id, url: resourceToAdd.url, depth: resource.depth + 1, parent: resourceToAdd.parent });
+          this.bloomFilter.add(resourceToAdd.url);
         }
       });
 

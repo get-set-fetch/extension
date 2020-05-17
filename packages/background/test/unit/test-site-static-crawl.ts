@@ -55,7 +55,15 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
 
     // stub ExtractUrlsPlugin, the only one running in tab via "domRead"
     sandbox.stub(ModuleRuntimeManager, 'runPluginInDom').callsFake((tabId, plugin, site, resource) => {
-      plugin.extractResourceUrls = () => [ `http://siteA/page-${resource.depth + 1}.html` ];
+      plugin.extractResources = () => [
+        {
+          url: `http://siteA/page-${resource.depth + 1}.html`,
+          parent: {
+            linkText: `page-${resource.depth + 1}`,
+          },
+        },
+
+      ];
       if (resource) {
         resource.mediaType = 'html';
       }
@@ -182,7 +190,20 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
 
     // 2nd call domRead from ExtractUrlsPlugin
     domReadStub.onCall(1).callsFake((tabId, plugin, site, resource) => {
-      plugin.extractResourceUrls = () => [ 'link-1.html', 'link-2.html' ];
+      plugin.extractResources = () => [
+        {
+          url: 'link-1.html',
+          parent: {
+            linkText: 'link-1',
+          },
+        },
+        {
+          url: 'link-2.html',
+          parent: {
+            linkText: 'link-2',
+          },
+        },
+      ];
       resource.mediaType = 'html';
       const isApplicable = plugin.test(site, resource);
       return isApplicable ? plugin.apply(site, resource) : null;
@@ -207,7 +228,20 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
 
     // 5th call domRead from ExtractUrlsPlugin
     domReadStub.onCall(4).callsFake((tabId, plugin, site, resource) => {
-      plugin.extractResourceUrls = () => [ 'link-2.html', 'link-3.html' ];
+      plugin.extractResources = () => [
+        {
+          url: 'link-2.html',
+          parent: {
+            linkText: 'link-2',
+          },
+        },
+        {
+          url: 'link-3.html',
+          parent: {
+            linkText: 'link-3',
+          },
+        },
+      ];
       const isApplicable = plugin.test(site, resource);
       return isApplicable ? plugin.apply(site, resource) : null;
     });
@@ -246,8 +280,8 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
     // 2 resources crawled (1 static, 1 dynamic), 2 update operations by the UpsertResourcePlugin
     sinon.assert.callCount(updatePluginSpy, 2);
 
-    const filterResourceProps = ({ url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions }) => ({
-      url, depth, content, crawlInProgress, urlsToAdd, mediaType, actions,
+    const filterResourceProps = ({ url, depth, content, crawlInProgress, resourcesToAdd, mediaType, actions }) => ({
+      url, depth, content, crawlInProgress, resourcesToAdd, mediaType, actions,
     });
 
     // verify static resource
@@ -260,7 +294,20 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
         h3: [ '', '' ],
       },
       crawlInProgress: false,
-      urlsToAdd: [ 'link-1.html', 'link-2.html' ],
+      resourcesToAdd: [
+        {
+          url: 'link-1.html',
+          parent: {
+            linkText: 'link-1',
+          },
+        },
+        {
+          url: 'link-2.html',
+          parent: {
+            linkText: 'link-2',
+          },
+        },
+      ],
       mediaType: 'html',
       actions: [],
     };
@@ -277,7 +324,14 @@ describe(`Test Site Static Crawl, using connection ${conn.info}`, () => {
         h3: [ 'h3c' ],
       },
       crawlInProgress: false,
-      urlsToAdd: [ 'link-3.html' ],
+      resourcesToAdd: [
+        {
+          url: 'link-3.html',
+          parent: {
+            linkText: 'link-3',
+          },
+        },
+      ],
       mediaType: 'html',
       actions: [ 'scroll#1' ],
     };
