@@ -7,12 +7,13 @@ export default class FetchPlugin extends BasePlugin {
     return {
       type: 'object',
       title: 'Fetch Plugin',
-      description: 'responsible for either downloading or loading in the current tab a new resource url.',
+      description: 'depending on resource type (binary, html), either downloads or opens in the scraping tab the resource url.',
       properties: {
         stabilityTimeout: {
           type: 'integer',
           default: '0',
-          description: 'consider the page loaded when there are no more dom changes within the specified amount (miliseconds). only applies to html resources.',
+          title: 'Stability Timeout',
+          description: 'Considers the page loaded and ready to be scraped when there are no more DOM changes within the specified amount of time (miliseconds). Only applies to html resources. Useful for bypassing preloader content.',
         },
       },
       required: [ 'stabilityTimeout' ],

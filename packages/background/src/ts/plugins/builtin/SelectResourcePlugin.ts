@@ -8,7 +8,7 @@ export default class SelectResourcePlugin extends BasePlugin {
     return {
       type: 'object',
       title: 'Select Resource Plugin',
-      description: 'responsible for selecting a resource to scrape from the current site / project.',
+      description: 'selects a resource to scrape from the current project.',
       properties: {
         frequency: {
           type: 'integer',

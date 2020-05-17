@@ -10,7 +10,7 @@ export default class ExtractUrlsPlugin extends BasePlugin {
     return {
       type: 'object',
       title: 'Extract Urls Plugin',
-      description: 'responsible for extracting new resources(html pages or binary content) urls from the current html page.',
+      description: 'extracts new (html or binary) resource urls from the current html page.',
       properties: {
         selectors: {
           type: 'string',
@@ -18,17 +18,19 @@ export default class ExtractUrlsPlugin extends BasePlugin {
           ui: {
             customField: 'LongTextField',
           },
-          description: 'Html selectors.',
+          description: 'One or multiple CSS selectors separated by new line. Comments can be added via #. Urls are extracted from link or image html elements.',
         },
         maxDepth: {
           type: 'integer',
           default: '-1',
-          description: 'Maximum depth of resources to be scraped.',
+          title: 'Max Depth',
+          description: 'Maximum depth of resources to be scraped. The starting resource has depth 0. Resources discovered from it have depth 1 and so on. A value of -1 disables this check.',
         },
         maxResources: {
           type: 'integer',
           default: '100',
-          description: 'Maximum number of resources to be scraped.',
+          title: 'Max Resources',
+          description: 'Maximum number of resources to be scraped. A value of -1 disables this check.',
         },
         domRead: {
           type: 'boolean',
@@ -164,7 +166,7 @@ export default class ExtractUrlsPlugin extends BasePlugin {
 
       if (resource && titles.length > 0) {
         resource.parent.title = titles.length > idx ? titles[idx] : titles[titles.length - 1];
-  }
+      }
 
       return resource;
     });

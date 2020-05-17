@@ -8,7 +8,7 @@ export default class ScrollPlugin extends BasePlugin {
     return {
       type: 'object',
       title: 'Scroll Plugin',
-      description: 'responsible for lazy loading scrolling in order to load additional content.',
+      description: 'performs infinite scrolling in order to load additional content.',
       properties: {
         enabled: {
           type: 'boolean',
@@ -25,17 +25,18 @@ export default class ScrollPlugin extends BasePlugin {
         delay: {
           type: 'integer',
           default: '1000',
-          description: 'Maximum waiting time (miliseconds) for DOM changes.',
+          description: 'Delay (miliseconds) between performing two consecutive scroll operations.',
         },
         timeout: {
           type: 'integer',
           default: '2000',
-          description: 'Maximum waiting time (miliseconds) for DOM changes.',
+          description: 'Waits for DOM changes within the specified amount of time (miliseconds). If no changes are detected it means scrolling didn\'t reveal any new content.',
         },
         maxScrollNo: {
           type: 'integer',
           default: '-1',
-          description: 'Number of maximum scroll operations. -1 scrolls till no new content is added to the page',
+          title: 'Max Operations',
+          description: 'Number of maximum scroll operations. A value of -1 scrolls till no new content is added to the page.',
         },
       },
       required: [ 'enabled', 'delay', 'timeout', 'maxScrollNo' ],
