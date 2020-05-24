@@ -11,7 +11,7 @@ export default class InsertResourcesPlugin extends BasePlugin {
     return {
       type: 'object',
       title: 'Insert Resources Plugin',
-      description: 'responsible for saving new resources within the current site / project.',
+      description: 'saves new resources within the current project based on newly identified urls.',
       properties: {
         maxEntries: {
           type: 'integer',

@@ -13,7 +13,7 @@ export default class FetchPlugin extends BasePlugin {
           type: 'integer',
           default: '0',
           title: 'Stability Timeout',
-          description: 'Considers the page loaded and ready to be scraped when there are no more DOM changes within the specified amount of time (miliseconds). Only applies to html resources. Useful for bypassing preloader content.',
+          description: 'Considers the page loaded and ready to be scraped when there are no more DOM changes within the specified amount of time (milliseconds). Only applies to html resources. Useful for bypassing preloader content.',
         },
       },
       required: [ 'stabilityTimeout' ],

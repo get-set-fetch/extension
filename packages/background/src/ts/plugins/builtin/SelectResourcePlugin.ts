@@ -18,7 +18,7 @@ export default class SelectResourcePlugin extends BasePlugin {
         delay: {
           type: 'integer',
           default: '1000',
-          description: 'Delay in miliseconds between fetching two consecutive resources.',
+          description: 'Delay in milliseconds between fetching two consecutive resources.',
         },
       },
       required: [ 'frequency', 'delay' ],

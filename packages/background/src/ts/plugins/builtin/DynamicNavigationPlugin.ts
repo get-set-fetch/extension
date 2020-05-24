@@ -91,7 +91,7 @@ export default class DynamicNavigationPlugin extends BasePlugin {
     return {
       type: 'object',
       title: 'Click Navigation Plugin',
-      description: 'responsible for navigating via javascript click events for single page applications.',
+      description: 'navigates via javascript click events within single page applications.',
       properties: {
         domRead: {
           type: 'boolean',
@@ -106,23 +106,25 @@ export default class DynamicNavigationPlugin extends BasePlugin {
           ui: {
             customField: 'LongTextField',
           },
-          description: 'Html selectors.',
           default: '.more # content',
+          description: 'One or multiple CSS selectors separated by new line. In a continuous loop, a single unvisited node from each selector is clicked. Waits for DOM to become stable between clicks. Comments can be added via #. A selector containing a "# content" comment will pause the plugin and execution will be deferred to the next plugin, usually responsible for the actual scraping. As an example, the following selectors "a.product # content", "a.cancel" will open product detail pages by clicking "a.product" links and then return to product list page by clicking "a.cancel" link.',
         },
         revisit: {
           type: 'boolean',
           default: false,
-          description: 'Revisit the same selector multiple times until the dom no longer changes. Usefull for "load more content" scenarios',
+          description: 'Revisit the same DOM nodes multiple times until the DOM no longer changes. Useful for "load more content" links.',
         },
         stabilityTimeout: {
           type: 'integer',
           default: '500',
-          description: 'consider the navigation complete when there are no more dom changes within the specified amount (miliseconds).',
+          title: 'Stability Timeout',
+          description: 'Considers the DOM stable when there are no more DOM changes within the specified amount of time (milliseconds). Useful for allowing content to fully load between navigational clicks.',
         },
         maxResources: {
           type: 'integer',
           default: '100',
-          description: 'Maximum number of resources to be scraped.',
+          title: "Max Resources",
+          description: 'Maximum number of resources to be scraped. A value of -1 disables this check.',
         },
         /*
 

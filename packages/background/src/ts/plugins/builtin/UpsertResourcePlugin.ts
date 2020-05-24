@@ -10,7 +10,7 @@ export default class UpsertResourcePlugin extends BasePlugin {
     return {
       type: 'object',
       title: 'Upsert Resource Plugin',
-      description: 'responsible for updating a resource at storage level after scraping it.',
+      description: 'updates a static resource or inserts a dynamic one after scraping it.',
     };
   }
 

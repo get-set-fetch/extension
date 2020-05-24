@@ -5,7 +5,7 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
     return {
       type: 'object',
       title: 'Extract Html Content Plugin',
-      description: 'responsible for scraping html content based on document.querySelectorAll.',
+      description: 'extracts text content from the current html page.',
       properties: {
         domRead: {
           type: 'boolean',
@@ -17,6 +17,7 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
           ui: {
             customField: 'LongTextField',
           },
+          description: 'One or multiple CSS selectors separated by new line. Each one will be a column when exporting resources under the csv format. Comments can be added via #.',
         },
       },
       required: [ 'selectors' ],

@@ -18,7 +18,7 @@ export default class ExtractUrlsPlugin extends BasePlugin {
           ui: {
             customField: 'LongTextField',
           },
-          description: 'One or multiple CSS selectors separated by new line. Comments can be added via #. Urls are extracted from link or image html elements.',
+          description: 'One or multiple CSS selectors separated by new line. Urls are extracted from link or image html elements. Comments can be added via #. You can also define a selector pair, ex: a[href$=".html"], h1.title. In this case, when exporting binary resources, the generated filename will be prefixed by h1.title value.',
         },
         maxDepth: {
           type: 'integer',
