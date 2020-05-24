@@ -87,7 +87,7 @@ export default class ScenarioList extends React.Component<{}, IState> {
               label: 'Description',
               render: (scenarioPkg: IAdvancedScenarioPackage) => (
                 <span style={{ textOverflow: 'ellipsis' }}>
-                  {scenarioPkg.package.description.substr(0, 100)}
+                  {scenarioPkg.package.description}
                 </span>
               ),
             },
