@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension",
-  "version": "0.1.2-rc.2",
+  "version": "0.2.0",
   "description": "",
   "files": [
     "dist/"
@@ -38,8 +38,8 @@
     "get-set-fetch-extension-background": "file:../background",
     "get-set-fetch-extension-commons": "file:../commons",
     "get-set-fetch-extension-popup": "file:../popup",
-    "get-set-fetch-scenario-scrape-static-content": "file:../scenarios/scrape-static-content",
     "get-set-fetch-scenario-extract-resources": "file:../scenarios/extract-resources",
-    "get-set-fetch-scenario-scrape-dynamic-content": "file:../scenarios/scrape-dynamic-content"
+    "get-set-fetch-scenario-scrape-dynamic-content": "file:../scenarios/scrape-dynamic-content",
+    "get-set-fetch-scenario-scrape-static-content": "file:../scenarios/scrape-static-content"
   }
 }

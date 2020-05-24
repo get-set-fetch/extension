@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-scenario-scrape-static-content",
-  "version": "0.1.2-rc.2",
+  "version": "0.2.0",
   "description": "extracts text and binary content from static html pages based on CSS selectors",
   "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/scrape-static-content",
   "main": "dist/ScrapeStaticContent.js",
