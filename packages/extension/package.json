@@ -24,9 +24,9 @@
     "copy:scenario-scrape-dynamic-content-dist": "shx mkdir -p dist/scenarios/get-set-fetch-scenario-scrape-dynamic-content/dist && shx cp -R ../../node_modules/get-set-fetch-scenario-scrape-dynamic-content/dist/* dist/scenarios/get-set-fetch-scenario-scrape-dynamic-content/dist",
     "copy:scenario-scrape-dynamic-content-pkg": "shx cp -R ../../node_modules/get-set-fetch-scenario-scrape-dynamic-content/package.json dist/scenarios/get-set-fetch-scenario-scrape-dynamic-content",
     "copy:scenario-scrape-dynamic-content": "npm run copy:scenario-scrape-dynamic-content-dist && npm run copy:scenario-scrape-dynamic-content-pkg",
-    "copy:scenarios": "npm run copy:scenario-extract-resource && npm run copy:scenario-scrape-static-content && npm run copy:scenario-scrape-dynamic-content",
+    "copy:scenarios": "npm run copy:scenario-scrape-static-content && npm run copy:scenario-scrape-dynamic-content",
     "test": "mocha test \"./test/integration/**/*.ts\" --exit",
-    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Extract Resources\""
+    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Project CRUD Pages\""
   },
   "author": {
     "name": "Andrei Sabau"

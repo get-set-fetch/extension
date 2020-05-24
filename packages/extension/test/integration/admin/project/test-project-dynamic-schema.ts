@@ -2,7 +2,6 @@ import { assert } from 'chai';
 import { resolve } from 'path';
 import { Page } from 'puppeteer';
 import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
-import ProjectHelper from 'get-set-fetch-extension-test-utils/lib/helper/ProjectHelper';
 
 declare const GsfClient;
 
@@ -48,10 +47,10 @@ describe('Project Dynamic Schema', () => {
     let scrollDelay = await page.$('[id="plugins.ScrollPlugin.delay"]');
     assert.isNull(scrollDelay);
 
-    let scrollTimeout = await page.$('[id="plugins.ScrollPlugin.timeout"]');
+    let scrollTimeout = await page.$('[id="plugins.ScrollPlugin.changeTimeout"]');
     assert.isNull(scrollTimeout);
 
-    let scrollMaxScrollNo = await page.$('[id="plugins.ScrollPlugin.maxScrollNo"]');
+    let scrollMaxScrollNo = await page.$('[id="plugins.ScrollPlugin.maxOperations"]');
     assert.isNull(scrollMaxScrollNo);
 
     // scroll plugin is enabled, remaining flag are visible
@@ -63,10 +62,10 @@ describe('Project Dynamic Schema', () => {
     scrollDelay = await page.$('[id="plugins.ScrollPlugin.delay"]');
     assert.isNotNull(scrollDelay);
 
-    scrollTimeout = await page.$('[id="plugins.ScrollPlugin.timeout"]');
+    scrollTimeout = await page.$('[id="plugins.ScrollPlugin.changeTimeout"]');
     assert.isNotNull(scrollTimeout);
 
-    scrollMaxScrollNo = await page.$('[id="plugins.ScrollPlugin.maxScrollNo"]');
+    scrollMaxScrollNo = await page.$('[id="plugins.ScrollPlugin.maxOperations"]');
     assert.isNotNull(scrollMaxScrollNo);
 
     // scroll plugin is not enabled, only the enable flag is visible
@@ -78,10 +77,10 @@ describe('Project Dynamic Schema', () => {
     scrollDelay = await page.$('[id="plugins.ScrollPlugin.delay"]');
     assert.isNull(scrollDelay);
 
-    scrollTimeout = await page.$('[id="plugins.ScrollPlugin.timeout"]');
+    scrollTimeout = await page.$('[id="plugins.ScrollPlugin.changeTimeout"]');
     assert.isNull(scrollTimeout);
 
-    scrollMaxScrollNo = await page.$('[id="plugins.ScrollPlugin.maxScrollNo"]');
+    scrollMaxScrollNo = await page.$('[id="plugins.ScrollPlugin.maxOperations"]');
     assert.isNull(scrollMaxScrollNo);
   });
 });

@@ -238,7 +238,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     csvLineSeparator: '\n',
   },
   {
-    title: 'maxDepth = 0, maxResources = -1,  scroll lazy loading maxScrollNo = -1',
+    title: 'maxDepth = 0, maxResources = -1,  scroll lazy loading maxOperations = -1',
     project: {
       name: 'projA',
       description: 'descriptionA',
@@ -312,7 +312,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     csvLineSeparator: '\n',
   },
   {
-    title: 'maxDepth = 0,  maxResources = -1, scroll lazy loading maxScrollNo = 1',
+    title: 'maxDepth = 0,  maxResources = -1, scroll lazy loading maxOperations = 1',
     project: {
       name: 'projA',
       description: 'descriptionA',
@@ -337,7 +337,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
           name: 'ScrollPlugin',
           opts: {
             enabled: true,
-            maxScrollNo: 1,
+            maxOperations: 1,
           },
         },
       ],
@@ -375,4 +375,4 @@ const crawlDefinitions: ICrawlDefinition[] = [
   },
 ];
 
-crawlProjectBaseSuite('Extract Html Content', crawlDefinitions);
+crawlProjectBaseSuite('Extract Static Content', crawlDefinitions);

@@ -13,8 +13,8 @@ export interface ICrawlDefinition {
   project: IProjectStorage;
   expectedResourceFields?: string[];
   expectedResources: Partial<IResource>[];
-  expectedCsv: string[];
-  csvLineSeparator: string;
+  expectedCsv?: string[];
+  csvLineSeparator?: string;
   expectedZipEntries?: string[];
 }
 
@@ -125,7 +125,9 @@ const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => descr
       });
 
       // download and check csv
-      await downloadAndCheckCsv(loadedProject, crawlDefinition.expectedCsv, crawlDefinition.csvLineSeparator);
+      if (crawlDefinition.expectedCsv && crawlDefinition.csvLineSeparator) {
+        await downloadAndCheckCsv(loadedProject, crawlDefinition.expectedCsv, crawlDefinition.csvLineSeparator);
+      }
 
       // download and check zip
       if (crawlDefinition.expectedZipEntries) {

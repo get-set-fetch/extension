@@ -1,7 +1,7 @@
 {
   "name": "get-set-fetch-scenario-scrape-static-content",
   "version": "0.1.2-rc.2",
-  "description": "Extract Html Content scenario is used for extracting html nodes text based on dom selectors.",
+  "description": "extracts text and binary content from static html pages based on CSS selectors",
   "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/scrape-static-content",
   "main": "dist/ScrapeStaticContent.js",
   "scripts": {

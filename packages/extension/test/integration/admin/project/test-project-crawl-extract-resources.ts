@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { crawlProjectBaseSuite, ICrawlDefinition } from 'get-set-fetch-extension-test-utils';
 
 const crawlDefinitions: ICrawlDefinition[] = [
@@ -7,7 +8,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-      scenario: 'get-set-fetch-scenario-extract-resources',
+      scenario: 'get-set-fetch-scenario-scrape-static-content',
       plugins: [
         {
           name: 'ExtractUrlsPlugin',
@@ -15,6 +16,12 @@ const crawlDefinitions: ICrawlDefinition[] = [
             maxDepth: -1,
             maxResources: -1,
             selectors: 'a[href$=".html"] # follow html links\nimg # follow images',
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: ' ',
           },
         },
       ],
@@ -49,7 +56,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         actions: [],
         mediaType: 'image/png',
         content: {},
-        meta: { width: 150, height: 150, name: 'imgA-150.png' },
+        meta: { },
         parent: {
           imgAlt: 'alt-imgA-150',
         } },
@@ -57,20 +64,11 @@ const crawlDefinitions: ICrawlDefinition[] = [
         actions: [],
         mediaType: 'image/png',
         content: {},
-        meta: { width: 850, height: 850, name: 'imgB-850.png' },
+        meta: {},
         parent: {
           imgAlt: 'alt-imgB-850',
         } },
     ],
-    expectedCsv: [
-      'url,mediaType',
-      '"https://www.sitea.com/index.html","text/html"',
-      '"https://www.sitea.com/static/pageA.html","text/html"',
-      '"https://www.sitea.com/static/pageB.html","text/html"',
-      '"https://www.sitea.com/img/imgA-150.png","image/png"',
-      '"https://www.sitea.com/img/imgB-850.png","image/png"',
-    ],
-    csvLineSeparator: '\n',
   },
   {
     title: 'default maxDepth = -1, extract pdfs, named after parent linkText',
@@ -78,7 +76,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-      scenario: 'get-set-fetch-scenario-extract-resources',
+      scenario: 'get-set-fetch-scenario-scrape-static-content',
       plugins: [
         {
           name: 'ExtractUrlsPlugin',
@@ -86,6 +84,12 @@ const crawlDefinitions: ICrawlDefinition[] = [
             maxDepth: -1,
             maxResources: -1,
             selectors: 'a[href$=".html"] # follow html links\na[href$=".pdf"] # follow pdf links',
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: ' ',
           },
         },
       ],
@@ -98,15 +102,6 @@ const crawlDefinitions: ICrawlDefinition[] = [
       { url: 'https://www.sitea.com/pdf/pdfA-150.pdf', actions: [], mediaType: 'application/pdf', content: {}, meta: {}, parent: { linkText: 'pdf A' } },
       { url: 'https://www.sitea.com/pdf/pdfB-850.pdf', actions: [], mediaType: 'application/pdf', content: {}, meta: {}, parent: { linkText: 'pdf B' } },
     ],
-    expectedCsv: [
-      'url,mediaType',
-      '"https://www.sitea.com/index.html","text/html"',
-      '"https://www.sitea.com/static/pageA.html","text/html"',
-      '"https://www.sitea.com/static/pageB.html","text/html"',
-      '"https://www.sitea.com/pdf/pdfA-150.pdf","application/pdf"',
-      '"https://www.sitea.com/pdf/pdfB-850.pdf","application/pdf"',
-    ],
-    csvLineSeparator: '\n',
     expectedZipEntries: [
       'pdf A.pdf',
       'pdf B.pdf',
@@ -118,7 +113,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
       name: 'projA',
       description: 'descriptionA',
       url: 'https://www.sitea.com/index.html',
-      scenario: 'get-set-fetch-scenario-extract-resources',
+      scenario: 'get-set-fetch-scenario-scrape-static-content',
       plugins: [
         {
           name: 'ExtractUrlsPlugin',
@@ -126,6 +121,12 @@ const crawlDefinitions: ICrawlDefinition[] = [
             maxDepth: -1,
             maxResources: -1,
             selectors: 'a[href$=".html"] # follow html links\na[href$=".pdf"],h1 # follow pdf links',
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: ' ',
           },
         },
       ],
@@ -138,15 +139,6 @@ const crawlDefinitions: ICrawlDefinition[] = [
       { url: 'https://www.sitea.com/pdf/pdfA-150.pdf', actions: [], mediaType: 'application/pdf', content: {}, meta: {}, parent: { linkText: 'pdf A', title: 'PageA Heading Level 1' } },
       { url: 'https://www.sitea.com/pdf/pdfB-850.pdf', actions: [], mediaType: 'application/pdf', content: {}, meta: {}, parent: { linkText: 'pdf B', title: 'PageB Heading Level 1' } },
     ],
-    expectedCsv: [
-      'url,mediaType',
-      '"https://www.sitea.com/index.html","text/html"',
-      '"https://www.sitea.com/static/pageA.html","text/html"',
-      '"https://www.sitea.com/static/pageB.html","text/html"',
-      '"https://www.sitea.com/pdf/pdfA-150.pdf","application/pdf"',
-      '"https://www.sitea.com/pdf/pdfB-850.pdf","application/pdf"',
-    ],
-    csvLineSeparator: '\n',
     expectedZipEntries: [
       'PageA Heading Level 1-pdf A.pdf',
       'PageB Heading Level 1-pdf B.pdf',
@@ -155,4 +147,4 @@ const crawlDefinitions: ICrawlDefinition[] = [
 
 ];
 
-crawlProjectBaseSuite('Extract Resources', [ crawlDefinitions[2] ], false);
+crawlProjectBaseSuite('Extract Resources', crawlDefinitions);

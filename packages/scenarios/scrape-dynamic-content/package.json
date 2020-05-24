@@ -1,7 +1,7 @@
 {
   "name": "get-set-fetch-scenario-scrape-dynamic-content",
   "version": "0.1.2-rc.2",
-  "description": "Scrape Dynamic Content scenario is used for extracting content from javascript based html pages",
+  "description": "extracts text and binary content from dynamic (javascript) pages based on CSS selectors",
   "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/scrape-dynamic-content",
   "main": "dist/ScrapeDynamicContent.js",
   "scripts": {

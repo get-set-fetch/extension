@@ -16,7 +16,7 @@ describe('Project CRUD Pages', () => {
     name: 'projectA',
     description: 'projectA description',
     url: 'http://www.sitea.com/index.html',
-    scenario: 'get-set-fetch-scenario-extract-resources',
+    scenario: 'get-set-fetch-scenario-scrape-static-content',
     plugins: [
       {
         name: 'SelectResourcePlugin',
@@ -39,12 +39,14 @@ describe('Project CRUD Pages', () => {
         },
       },
       {
-        name: 'ImageFilterPlugin',
+        name: 'ScrollPlugin',
         opts: {},
       },
       {
-        name: 'ScrollPlugin',
-        opts: {},
+        name: 'ExtractHtmlContentPlugin',
+        opts: {
+          selectors: 'h1.title',
+        },
       },
       {
         name: 'UpsertResourcePlugin',
@@ -61,7 +63,7 @@ describe('Project CRUD Pages', () => {
     name: 'projectA',
     description: 'projectA description',
     url: 'http://www.sitea.com/index.html',
-    scenario: 'get-set-fetch-scenario-extract-resources',
+    scenario: 'get-set-fetch-scenario-scrape-static-content',
     plugins: [
       {
         name: 'SelectResourcePlugin',
@@ -80,8 +82,8 @@ describe('Project CRUD Pages', () => {
         opts: {
           delay: 1000,
           enabled: false,
-          maxScrollNo: -1,
-          timeout: 2000,
+          maxOperations: -1,
+          changeTimeout: 2000,
         },
       },
       {
@@ -93,8 +95,10 @@ describe('Project CRUD Pages', () => {
         },
       },
       {
-        name: 'ImageFilterPlugin',
-        opts: {},
+        name: 'ExtractHtmlContentPlugin',
+        opts: {
+          selectors: 'h1.title',
+        },
       },
       {
         name: 'InsertResourcesPlugin',
@@ -107,7 +111,7 @@ describe('Project CRUD Pages', () => {
     ],
   };
 
-  const expectedConfigHash = 'eLtI4gnagystKMrPAjrUESM7wCQUkIVhWSSjpKTASl+/vLxcD5hYUhP1kvNz9TPzUlIr9DKAgYKag9JTS3SLgTgNlNx1YRK6qZBA1C2Ce4LCnEZx1sKRctETK0pKRkmJGAmZnKSZmZtOOHFSPz2Rln4AzP3IOQ==';
+  const expectedConfigHash = 'eLtI4gnagystKMrPAjrUESM7wCQUkIVhWSSjpKTASl+/vLxcD5hYUhP1kvNz9TPzUlIr9DKAgYKag9JTS3SLgTgNlNx1YRJARlFiQaouMIGVZCbrIlIgRbmN4uyFI/WiJ1iU1JyckZiXnhqCnCbB6cm/ILUInEWL0XM+sck0MzedcEKlJGUa6pVkluSkKpGQ8EhLaACEAddQ';
 
   before(async () => {
     const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
@@ -146,7 +150,6 @@ describe('Project CRUD Pages', () => {
     // dropdown scenario is correctly populated#
     const expectedScenariNamedOpts = [
       { label: 'Select' },
-      { label: 'get-set-fetch-scenario-extract-resources (builtin)' },
       { label: 'get-set-fetch-scenario-scrape-dynamic-content (builtin)' },
       { label: 'get-set-fetch-scenario-scrape-static-content (builtin)' },
     ];
@@ -264,8 +267,8 @@ describe('Project CRUD Pages', () => {
     scrollPlugin.opts = {
       delay: 1000,
       enabled: false,
-      maxScrollNo: -1,
-      timeout: 2000,
+      maxOperations: -1,
+      changeTimeout: 2000,
     };
 
     assert.deepEqual(updatedProject, projectToUpdate);
