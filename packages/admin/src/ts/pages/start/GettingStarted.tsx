@@ -12,7 +12,7 @@ export default class GettingStarted extends React.Component {
           <p>
             Start by creating a <NavLink to='/project/' className='inner-nav-link'>new scraping project</NavLink>.
             At a very minimum enter its name, start url and select a scraping scenario.
-            There are two builtin scenarios: extract binary resources and extract html content.
+            There are two builtin scenarios: scrape-static-content and scrape-dynamic-content.
             You can install additional 3rd party scenarios from the <NavLink to='/scenarios' className='inner-nav-link'>scenario list page</NavLink>.
             See <NavLink to='/examples' className='inner-nav-link'>examples</NavLink> to get an idea on what types of content can be scraped.
           </p>

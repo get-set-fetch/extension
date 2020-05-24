@@ -42,7 +42,7 @@ export default class GettingStarted extends React.Component {
               <a href="https://www.uefa.com/uefachampionsleague/history/rankings/players/goals_scored/" target="_blank" rel="noopener noreferrer" className="inner-nav-link">
                 https://www.uefa.com/uefachampionsleague/history/rankings/players/goals_scored/
               </a>
-              <p>Uefa Champions League top scorers.</p>
+              <p>UEFA Champions League top scorers.</p>
               <p>Extract table data from a single static html page with infinite scrolling.</p>
               <p>Columns: player name, goals.</p>
               <NavLink to={`/project/${encodeURIComponent(projectHashes.uefaTopScorers)}`}>
