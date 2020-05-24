@@ -16,9 +16,9 @@ const Log = Logger.getLogger('background-main');
 
     // handle install / uninstall events
     chrome.runtime.onInstalled.addListener(() => {
-      chrome.tabs.create({ url: 'https://getsetfetch.org/extension/thank-you-install.html' });
+      chrome.tabs.create({ url: 'https://getsetfetch.org/thank-you-install.html' });
     });
-    chrome.runtime.setUninstallURL('https://getsetfetch.org/extension/thank-you-uninstall.html');
+    chrome.runtime.setUninstallURL('https://getsetfetch.org/thank-you-uninstall.html');
 
     await GsfProvider.init();
 

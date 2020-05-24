@@ -53,8 +53,8 @@ export default class GettingStarted extends React.Component {
           <hr/>
           <p>
             The official documentation is available
-            at: <a href="https://getsetfetch.org/extension" target="_blank" rel="noopener noreferrer" className='inner-nav-link'>
-            https://getsetfetch.org/extension</a>.
+            at: <a href="https://getsetfetch.org" target="_blank" rel="noopener noreferrer" className='inner-nav-link'>
+            https://getsetfetch.org</a>.
             <br/>
             In time, a more detailed documentation with lots of examples will be available :)
           </p>

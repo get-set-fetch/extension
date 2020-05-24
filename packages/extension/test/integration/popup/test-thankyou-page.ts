@@ -18,6 +18,6 @@ describe('Test ThankYou Pages', () => {
   it('install page', async () => {
     const tyPage = (await browserHelper.browser.pages()).find(page => /thank/.test(page.url()));
     assert.isDefined(tyPage);
-    assert.equal(tyPage.url(), 'https://getsetfetch.org/extension/thank-you-install.html');
+    assert.equal(tyPage.url(), 'https://getsetfetch.org/thank-you-install.html');
   });
 });
