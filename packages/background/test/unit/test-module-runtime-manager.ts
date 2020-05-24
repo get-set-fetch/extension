@@ -50,8 +50,8 @@ describe('Test ModuleRuntimeManager', () => {
           domWrite: true,
           enabled: false,
           delay: 1000,
-          timeout: 2000,
-          maxScrollNo: -1,
+          changeTimeout: 2000,
+          maxOperations: -1,
         },
       },
       {
@@ -99,7 +99,7 @@ describe('Test ModuleRuntimeManager', () => {
         $id: 'SelectResourcePlugin',
         type: 'object',
         title: 'Select Resource Plugin',
-        description: 'responsible for selecting a resource to scrape from the current site / project.',
+        description: 'selects a resource to scrape from the current project.',
         properties: {
           frequency: {
             type: 'integer',
@@ -109,7 +109,7 @@ describe('Test ModuleRuntimeManager', () => {
           delay: {
             type: 'integer',
             default: '1000',
-            description: 'Delay in miliseconds between fetching two consecutive resources.',
+            description: 'Delay in milliseconds between fetching two consecutive resources.',
           },
         },
         required: [ 'frequency', 'delay' ],
