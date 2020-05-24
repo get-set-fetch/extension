@@ -71,3 +71,6 @@ jspm_packages/
 
 # todo files
 todo*
+
+# comment files
+*.txt
