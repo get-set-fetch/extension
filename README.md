@@ -13,10 +13,10 @@ get-set, Fetch! is a browser extension for scraping sites through out a series o
 Currently supported browsers: Chrome.
 
 The most common use cases are handled by builtin scenarios:
-- [Extract Html Content](https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-html-content)
-  - Scraps text representation of html nodes.
-- [Extract Resources](https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-resources)
-  - Extracts binary content (images, pdfs, ...)
+- [Scrape Static Content](https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/scrape-static-content)
+  - Extracts text and binary content from static html pages based on CSS selectors.
+- [Scrape Dynamic Content](https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/scrape-dynamic-content)
+  - Extracts text and binary content from dynamic (javascript) pages based on CSS selectors.
 
 You can also install community based scenarios:
 
@@ -33,8 +33,8 @@ The extension is structured as a monorepo with the following sub-packages:
 - background: parses pages and stores relevant data in the builtin browser database (IndexedDB)
 - popup: toolbar appearance
 - admin: front-end for the background capabilities
-- extract-html-content-scenario: builtin scenario
-- extract-resources-scenario: builtin scenario
+- scrape-static-content: builtin scenario
+- scrape-dynamic-content: builtin scenario
 - extension: builds the extension files and runs a comprehensive suite of integration tests
 
 In time, a more detailed documentation with lots of examples will be available at https://getsetfetch.org
