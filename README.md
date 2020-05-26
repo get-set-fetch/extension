@@ -43,14 +43,7 @@ You can find technical tidbits in each sub-package readme file.
 
 # Short-Term Roadmap
 
-## v.0.1.2
-  - add resourceFilter options as an InsertResourcesPlugin option  
-  - create a scraping template format starting from { crawlOpts, scenarioName, scenarioOpts, ... }
-  - load templates from arbitrary URIs
-  - use templates to simplify the creation of scrape projects by automatically populating most of the scraping parameters
-  - add template based, getting-started examples
-
-## v.0.1.3
+## v.0.2.1
   - add column filter capability when exporting resources as csv
   - add import / export database capabilities
 
