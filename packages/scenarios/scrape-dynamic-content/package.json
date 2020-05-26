@@ -4,6 +4,9 @@
   "description": "extracts text and binary content from dynamic (javascript) pages based on CSS selectors",
   "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/scrape-dynamic-content",
   "main": "dist/ScrapeDynamicContent.js",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "clean": "shx rm -rf dist",
     "lint": "eslint src/**/*.ts",

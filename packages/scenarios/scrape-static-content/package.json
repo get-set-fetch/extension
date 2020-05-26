@@ -4,6 +4,9 @@
   "description": "extracts text and binary content from static html pages based on CSS selectors",
   "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/scrape-static-content",
   "main": "dist/ScrapeStaticContent.js",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "clean": "shx rm -rf dist",
     "lint": "eslint src/**/*.ts",

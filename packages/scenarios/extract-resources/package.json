@@ -4,6 +4,9 @@
   "description": "Extract Resources scenario is used for extracting various resources from the corresponding sites.",
   "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-resources",
   "main": "dist/ExtractResources.js",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "clean": "shx rm -rf dist",
     "lint": "eslint src/**/*.ts",
