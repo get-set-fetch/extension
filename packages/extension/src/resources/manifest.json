@@ -1,31 +1,27 @@
 {
-
   "manifest_version": 2,
   "name": "get-set, Fetch! web scraper",
   "version": "{GSF_VERSION}",
-
   "description": "Open source data scraper with csv, zip export capabilities. Provides scraping scenarios for fast, minimal configuration scraping.",
-
   "icons": {
     "16": "icons/gsf_32x32.png",
     "32": "icons/gsf_32x32.png",
     "48": "icons/gsf_32x32.png",
     "128": "icons/gsf_32x32.png"
   },
-
   "background": {
     "page": "background/background.html"
   },
-
   "browser_action": {
-      "default_icon": "icons/gsf_32x32.png",
-      "default_title": "Get Set Fetch"
-    },
-
+    "default_icon": "icons/gsf_32x32.png",
+    "default_title": "Get Set Fetch"
+  },
   "web_accessible_resources": [
     "admin/*"
   ],
-
-  "permissions": ["tabs", "activeTab", "webRequest", "<all_urls>"],
+  "permissions": [
+    "webRequest",
+    "<all_urls>"
+  ],
   "content_security_policy": "script-src 'self' 'unsafe-eval' blob: ; object-src 'self' blob: "
 }
