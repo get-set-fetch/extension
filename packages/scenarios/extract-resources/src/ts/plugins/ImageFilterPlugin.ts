@@ -1,5 +1,4 @@
-import { ISite, IResource, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
-import { BasePlugin } from 'get-set-fetch-extension-commons/lib/plugin';
+import { ISite, IResource, IEnhancedJSONSchema, BasePlugin } from 'get-set-fetch-extension-commons';
 
 export default class ImageFilterPlugin extends BasePlugin {
   getOptsSchema() {
