@@ -2,50 +2,6 @@
 import { BasePlugin, IEnhancedJSONSchema, ISite, IResource } from 'get-set-fetch-extension-commons';
 import IdbSite from '../../storage/IdbSite';
 
-/**
-  There are 2 main scrapping scenarios: DynamicContentScenario, StaticContentScenario
-
-  DynamicContentScenario
-    plugins:
-      SelectResourcePlugin
-      FetchPlugin
-      DynamicNavigationPlugin
-      ExtractHtmlContentPlugin
-      InsertResourcesPlugin
-      UpsertResourcePlugin
-
-    crawResource(1)
-      SelectResourcePlugin - gets the ony html resource from db
-      FetchPlugin - opens the resources in browser tab
-      DynamicNavigationPlugin - based on selectors, finds the next valid clickPath, waits for dom to stabilize, returns the path
-      ExtractHtmlContentPlugin - extracts content
-      UpsertResourcePlugin - save the current resource to db (url, clickPath)
-
-    crawlResource(2... n-1)
-      SelectResourcePlugin - returns no new resource
-      FetchPlugin - nothing to fetch
-      DynamicNavigationPlugin - based on selectors, finds the next valid clickPath, waits for dom to stabilize, returns the clickPath and window.url
-      ExtractHtmlContentPlugin - extracts content
-      UpsertResourcePlugin - save the current resource to db (url, clickPath)
-
-    crawlResource(n)
-      SelectResourcePlugin - returns no new resource
-      FetchPlugin - nothing to fetch
-      DynamicNavigationPlugin - based on selectors, returns no valid clickPath
-      ExtractHtmlContentPlugin - don't invoke it
-      UpsertResourcePlugin - don't invoke it
-
-    StaticContentScenario
-      plugins
-        SelectResourcePlugin
-        FetchPlugin
-        ScrollPlugin
-        ExtractUrlsPlugin
-        ExtractHtmlContentPlugin
-        InsertResourcesPlugin
-        UpsertResourcePlugin
-*/
-
 /*
 Plugin responsible for content navigation via javascript clicks.
 
@@ -53,7 +9,7 @@ selectors are grouped on navigation levels separated by "\n"
 clicking selectors of 1st group will update the dom with the content to be scrapped by other plugins
 
 on plugin apply, navigation by clicking dom elms begins, starting with an empy action path
-  - check for available selectors in groupIdx ascening order
+  - check for available selectors in groupIdx ascending order
   - click on first available selector that doesn't duplicate an existing path
      # history stores a tree with the already visited valid action chains
   - wait for dom content changes after selector click
@@ -126,10 +82,6 @@ export default class DynamicNavigationPlugin extends BasePlugin {
           title: "Max Resources",
           description: 'Maximum number of resources to be scraped. A value of -1 disables this check.',
         },
-        /*
-
-        delay, depth ??
-        */
       },
       required: [ 'selectors', 'revisit', 'stabilityTimeout', 'maxResources' ],
     };
