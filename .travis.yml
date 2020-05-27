@@ -10,6 +10,7 @@ install:
   - npm ci
 script:
   - npm run patch
+  - npm run symlink:delete
   - npm run symlink:create
   - npm run build
   - npm run test  
