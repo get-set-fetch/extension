@@ -8,9 +8,8 @@ Handles the crawling and scraping logic.
     - name
     - description
     - root url(s) from where the crawling starts
-    - crawl options
     - scrape scenario
-  - dynamic scrape parameters based on scenario's provided json-schema
+  - dynamic scrape parameters based on scenario's plugin json-schema
 
 - When a project is saved it also creates a site entity for each entered root url (see limitations).
 - A site contains a series of plugin definitions populated based on the selected scenario. A scenario can reference existing, builtin plugins or define new ones.
@@ -186,5 +185,4 @@ Resource filter is a bloom filter used for detecting duplicate urls.
 - site updates are currently disabled
 
 # Roadmap
-- add scenario templates capable of automatically populating scenario parameters for easier scrape settings sharing
-- manage project scrape status: in-progress, stopped, complete, ...
+- manage project scrape status: in-progress, stopped, completed, ...

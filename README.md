@@ -37,7 +37,7 @@ The extension is structured as a monorepo with the following sub-packages:
 - scrape-dynamic-content: builtin scenario
 - extension: builds the extension files and runs a comprehensive suite of integration tests
 
-In time, a more detailed documentation with lots of examples will be available at https://getsetfetch.org
+In time, a more detailed documentation with lots of examples will be available at https://getsetfetch.org .
 
 You can find technical tidbits in each sub-package readme file.
 

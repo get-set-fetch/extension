@@ -14,5 +14,4 @@ The following sections are available, either static or based on json-schemas:
 
 
 ## Roadmap
-- update the "Getting Started" section with out-of-the-box, template based examples
 - internationalization
