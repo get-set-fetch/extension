@@ -20,7 +20,7 @@ export default class IdbStorage {
     return new Promise((resolve, reject) => {
       const openRequest = indexedDB.open('gsf_db', 1);
 
-      openRequest.onupgradeneeded = (e: IDBVersionChangeEvent) => {
+      openRequest.onupgradeneeded = () => {
         const db = openRequest.result;
         if (!db.objectStoreNames.contains('Sites')) {
           const siteStore = db.createObjectStore('Sites', { keyPath: 'id', autoIncrement: true });
@@ -68,7 +68,7 @@ export default class IdbStorage {
         }
       };
 
-      openRequest.onsuccess = (e: any) => {
+      openRequest.onsuccess = () => {
         BaseEntity.db = openRequest.result;
         resolve({
           Site: IdbSite,

@@ -18,8 +18,8 @@ export default class IdbSetting extends BaseEntity implements ISetting {
       const rTx = IdbSetting.rTx();
       const readReq = rTx.get(key);
 
-      readReq.onsuccess = e => {
-        const { result } = e.target;
+      readReq.onsuccess = () => {
+        const { result } = readReq;
         if (!result) {
           resolve(null);
         }
@@ -38,8 +38,8 @@ export default class IdbSetting extends BaseEntity implements ISetting {
       const rTx = IdbSetting.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = e => {
-        const { result } = e.target;
+      readReq.onsuccess = () => {
+        const { result } = readReq;
         if (!result) {
           resolve(null);
         }
@@ -70,8 +70,8 @@ export default class IdbSetting extends BaseEntity implements ISetting {
     return new Promise((resolve, reject) => {
       const rwTx = IdbSetting.rwTx();
       const reqAddResource = rwTx.add(this.serialize());
-      reqAddResource.onsuccess = e => {
-        this.id = e.target.result;
+      reqAddResource.onsuccess = () => {
+        this.id = reqAddResource.result as number;
         resolve(this.id);
       };
       reqAddResource.onerror = () => reject(new Error(`could not add setting entry: ${this.key}`));

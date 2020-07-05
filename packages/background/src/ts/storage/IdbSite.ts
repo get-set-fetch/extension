@@ -42,8 +42,8 @@ export default class IdbSite extends BaseEntity implements ISite {
       const rTx = IdbSite.rTx();
       const readReq = (Number.isInteger(nameOrId as number) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
-      readReq.onsuccess = async (e: any) => {
-        const { result } = e.target;
+      readReq.onsuccess = async () => {
+        const { result } = readReq;
         if (!result) {
           resolve(null);
         }
@@ -60,8 +60,8 @@ export default class IdbSite extends BaseEntity implements ISite {
       const rTx = IdbSite.rTx();
       const readReq = projectId ? rTx.index('projectId').getAll(projectId) : rTx.getAll();
 
-      readReq.onsuccess = async (e: any) => {
-        const { result } = e.target;
+      readReq.onsuccess = async () => {
+        const { result } = readReq;
         if (!result) {
           resolve(null);
         }
@@ -86,8 +86,8 @@ export default class IdbSite extends BaseEntity implements ISite {
       const rTx = IdbSite.rTx();
       const readReq = projectId ? rTx.index('projectId').getAll(projectId) : rTx.getAll();
 
-      readReq.onsuccess = async (e: any) => {
-        const { result } = e.target;
+      readReq.onsuccess = async () => {
+        const { result } = readReq;
         if (!result) {
           resolve(null);
         }
@@ -391,8 +391,8 @@ export default class IdbSite extends BaseEntity implements ISite {
       const rwTx = IdbSite.rwTx();
       // save the site and wait for the return result containing the new inserted id
       const reqAddSite = rwTx.add(this.serializeWithoutId());
-      reqAddSite.onsuccess = async (e: any) => {
-        this.id = e.target.result;
+      reqAddSite.onsuccess = async () => {
+        this.id = reqAddSite.result as number;
 
         // also save the site url as the first site resource at depth 0
         try {

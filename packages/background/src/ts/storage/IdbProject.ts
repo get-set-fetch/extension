@@ -32,8 +32,8 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
       const rTx = IdbProject.rTx();
       const readReq = (Number.isInteger(nameOrId) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
-      readReq.onsuccess = e => {
-        const { result } = e.target;
+      readReq.onsuccess = () => {
+        const { result } = readReq;
         if (!result) {
           resolve(null);
         }
@@ -67,8 +67,8 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
       const rTx = IdbProject.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = e => {
-        const { result } = e.target;
+      readReq.onsuccess = () => {
+        const { result } = readReq;
         if (!result) {
           resolve(null);
         }
@@ -88,8 +88,8 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
       const rTx = IdbProject.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = async e => {
-        const { result } = e.target;
+      readReq.onsuccess = async () => {
+        const { result } = readReq;
         if (!result) {
           resolve(null);
         }
@@ -177,8 +177,8 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
     return new Promise((resolve, reject) => {
       const rwTx = IdbProject.rwTx();
       const reqAddResource = rwTx.add(this.serializeWithoutId());
-      reqAddResource.onsuccess = async e => {
-        this.id = e.target.result;
+      reqAddResource.onsuccess = async () => {
+        this.id = reqAddResource.result as number;
 
         // also save the project url as a new site
         try {
@@ -198,8 +198,8 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
     return new Promise((resolve, reject) => {
       const rwTx = IdbProject.rwTx();
       const reqUpdateResource = rwTx.put(this.serialize());
-      reqUpdateResource.onsuccess = async e => {
-        this.id = e.target.result;
+      reqUpdateResource.onsuccess = async () => {
+        this.id = reqUpdateResource.result as number;
 
         // also update the corresponding site(s)
         try {

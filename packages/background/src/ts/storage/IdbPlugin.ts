@@ -26,8 +26,8 @@ export default class IdbPlugin extends BaseEntity implements IPluginStorage {
       const rTx = IdbPlugin.rTx();
       const readReq = (Number.isInteger(nameOrId as number) ? rTx.get(nameOrId) : rTx.index('name').get(nameOrId));
 
-      readReq.onsuccess = e => {
-        const { result } = e.target;
+      readReq.onsuccess = () => {
+        const { result } = readReq;
         if (!result) {
           resolve(null);
         }
@@ -46,8 +46,8 @@ export default class IdbPlugin extends BaseEntity implements IPluginStorage {
       const rTx = IdbPlugin.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = e => {
-        const { result } = e.target;
+      readReq.onsuccess = () => {
+        const { result } = readReq;
         if (!result) {
           resolve(null);
         }
@@ -113,9 +113,9 @@ export default class IdbPlugin extends BaseEntity implements IPluginStorage {
   save(): Promise<number> {
     return new Promise((resolve, reject) => {
       const rwTx = IdbPlugin.rwTx();
-      const reqAddResource = rwTx.add(this.serializeWithoutId());
-      reqAddResource.onsuccess = e => {
-        this.id = e.target.result;
+      const reqAddResource: IDBRequest<IDBValidKey> = rwTx.add(this.serializeWithoutId());
+      reqAddResource.onsuccess = () => {
+        this.id = reqAddResource.result as number;
         resolve(this.id);
       };
       reqAddResource.onerror = () => reject(new Error(`could not add plugin: ${this.name}`));

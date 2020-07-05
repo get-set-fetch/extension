@@ -1,7 +1,7 @@
 declare module 'get-set-fetch/lib/storage/base/BaseEntity' {
   class BaseEntity {
     id: string|number;
-    static db:any;
+    static db:IDBDatabase;
     
     static get(nameOrId:string|number):Promise<BaseEntity>;
     save():Promise<number>;

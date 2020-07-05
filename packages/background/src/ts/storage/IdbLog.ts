@@ -22,8 +22,8 @@ export default class IdbLog extends BaseEntity implements ILog {
       const rTx = IdbLog.rTx();
       const readReq = rTx.getAll();
 
-      readReq.onsuccess = e => {
-        const { result } = e.target;
+      readReq.onsuccess = () => {
+        const { result } = readReq;
         if (!result) {
           resolve(null);
         }
@@ -64,12 +64,11 @@ export default class IdbLog extends BaseEntity implements ILog {
   }
 
   save(): Promise<number> {
-    // console.log(`log: ${this.cls} ${this.msg}`);
     return new Promise((resolve, reject) => {
       const rwTx = IdbLog.rwTx();
-      const reqAddResource = rwTx.add(this.serializeWithoutId());
-      reqAddResource.onsuccess = e => {
-        this.id = e.target.result;
+      const reqAddResource: IDBRequest<IDBValidKey> = rwTx.add(this.serializeWithoutId());
+      reqAddResource.onsuccess = () => {
+        this.id = reqAddResource.result as number;
         resolve(this.id);
       };
       reqAddResource.onerror = () => reject(new Error(`could not add log entry: ${this.msg}`));
