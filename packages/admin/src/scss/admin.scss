@@ -131,6 +131,16 @@ form.form-main {
   }
 }
 
+div.form-check label.form-check-label {
+  font-weight: normal;
+}
+
+div.form-group label.btn-secondary {
+  font-weight: normal;
+  margin: 0;
+  color: $white;
+}
+
 a.scenario-homepage {
   overflow: hidden;
   text-overflow: ellipsis;

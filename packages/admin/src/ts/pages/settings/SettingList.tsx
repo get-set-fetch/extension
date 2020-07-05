@@ -3,6 +3,7 @@ import { setIn } from 'immutable';
 import { HttpMethod, ISetting } from 'get-set-fetch-extension-commons';
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
+import DatabaseOperations from './DatabaseOperations';
 
 interface IState {
   settings: ISetting[];
@@ -64,7 +65,7 @@ export default class SettingList extends React.Component<{}, IState> {
 
         <form className="form-main">
           <div className="form-group row">
-            <label htmlFor="name" className="col-sm-2 col-form-label text-right">Log Level</label>
+            <label htmlFor="name" className="col-form-label col-2">Log Level</label>
             <div className="col-sm-5">
               <select
                 id="logLevel"
@@ -88,6 +89,8 @@ export default class SettingList extends React.Component<{}, IState> {
               <a id="save" className="btn btn-secondary" href="#" role="button" onClick={this.submitHandler}>Save</a>
             </div>
           </div>
+
+          <DatabaseOperations />
 
         </form>
 
