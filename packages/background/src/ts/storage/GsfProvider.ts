@@ -77,6 +77,7 @@ export default class GsfProvider {
             reqPromise = this.utilsHandler(request);
             break;
           default:
+            throw new Error(`invalid resource ${request.resource}`);
         }
 
         if (!reqPromise) {
