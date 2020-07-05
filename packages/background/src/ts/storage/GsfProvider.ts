@@ -494,6 +494,15 @@ export default class GsfProvider {
             const key = /^setting\/(.+)$/.exec(request.resource)[1];
             reqPromise = GsfProvider.Setting.get(key);
             break;
+          case /^settings\/stores$/.test(request.resource):
+            reqPromise = IdbStorage.getStores();
+            break;
+          case /^settings\/stores\/export$/.test(request.resource):
+            reqPromise = IdbStorage.exportStores(request.body.stores);
+            break;
+          case /^settings\/stores\/import$/.test(request.resource):
+            reqPromise = IdbStorage.importStores(request.body.stores, request.body.content);
+            break;
           default:
             reqPromise = new Promise(resolve => resolve());
         }
