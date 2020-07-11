@@ -97,7 +97,7 @@ export default class IdbStorage {
     return Array.from(BaseEntity.db.objectStoreNames);
   }
 
-  static exportStore(store: string): Promise<any[]> {
+  static getStoreContent(store: string): Promise<any[]> {
     return new Promise((resolve, reject) => {
       const records = [];
 
@@ -118,21 +118,27 @@ export default class IdbStorage {
     });
   }
 
+  static async getStoresContent(stores: string[]): Promise<string> {
+    if (!stores || stores.length === 0) throw new Error('No stores selected.');
+
+    const jsonStores: { [key: string]: any[]} = {};
+
+    for (let i = 0; i < stores.length; i += 1) {
+      const store = stores[i];
+      // eslint-disable-next-line no-await-in-loop
+      const records = await IdbStorage.getStoreContent(store);
+      jsonStores[store] = records;
+    }
+
+    return JSON.stringify(jsonStores);
+  }
+
   static async exportStores(stores: string[]): Promise<IExportResult> {
-    if (!stores || stores.length === 0) return { error: 'No stores selected.' };
-
     try {
-      const jsonStores: { [key: string]: any[]} = {};
-
-      for (let i = 0; i < stores.length; i += 1) {
-        const store = stores[i];
-        // eslint-disable-next-line no-await-in-loop
-        const records = await IdbStorage.exportStore(store);
-        jsonStores[store] = records;
-      }
+      const storesContent: string = await IdbStorage.getStoresContent(stores);
 
       return {
-        url: URL.createObjectURL(new Blob([ JSON.stringify(jsonStores) ], { type: 'application/json' })),
+        url: URL.createObjectURL(new Blob([ storesContent ], { type: 'application/json' })),
       };
     }
     catch (error) {
@@ -148,14 +154,16 @@ export default class IdbStorage {
     });
   }
 
-  static importStoreRecords(store: string, records: any[], resolve = null, reject = null) {
+  static importStoreRecords(store: string, StoreCls: typeof BaseEntity, records: any[], resolve = null, reject = null) {
     if (resolve && reject) {
-      const addRequest: IDBRequest = IdbSite.db.transaction(store, 'readwrite').objectStore(store).add(records.pop());
+      const addRequest: IDBRequest = IdbSite.db.transaction(store, 'readwrite').objectStore(store).add(
+        StoreCls ? new StoreCls(records.pop()) : records.pop(),
+      );
       addRequest.onsuccess = () => {
         if (records.length === 0) {
           resolve();
         }
-        else this.importStoreRecords(store, records, resolve, reject);
+        else this.importStoreRecords(store, StoreCls, records, resolve, reject);
       };
       addRequest.onerror = () => reject(new Error(`could not import records on store ${store}`));
       return null;
@@ -164,7 +172,7 @@ export default class IdbStorage {
     // eslint-disable-next-line no-shadow
     return new Promise((resolve, reject) => {
       if (records && records.length > 0) {
-        this.importStoreRecords(store, records, resolve, reject);
+        this.importStoreRecords(store, StoreCls, records, resolve, reject);
       }
       else {
         resolve();
@@ -189,8 +197,22 @@ export default class IdbStorage {
           return { error: `Expecting records array for store ${store}` };
         }
 
+        // some records need to be parsed through corresponding constructors before saving
+        // ex: string date => Date
+        let StoreCls: typeof BaseEntity;
+        switch (store) {
+          case 'Logs':
+            StoreCls = IdbLog;
+            break;
+          case 'Resources':
+            StoreCls = IdbResource;
+            break;
+          default:
+            // records won't be passed through constructors
+            StoreCls = null;
+        }
         await IdbStorage.clearStore(store);
-        await IdbStorage.importStoreRecords(store, jsonContent[store]);
+        await IdbStorage.importStoreRecords(store, StoreCls, jsonContent[store]);
       }
 
       return null;
