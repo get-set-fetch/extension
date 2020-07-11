@@ -106,7 +106,7 @@ export default class DatabaseOperations extends React.Component<{}, IState> {
         Modal.instance.show(
           'Import Object Stores',
           [
-            <p key="info">Import successful.</p>,
+            <p id="success" key="info">Import successful.</p>,
           ],
           [
             {
@@ -135,7 +135,7 @@ export default class DatabaseOperations extends React.Component<{}, IState> {
       Modal.instance.show(
         'Import Object Stores',
         [
-          <p key="info">Error reading file</p>,
+          <p key="info">Error reading file. {JSON.stringify(reader.error)}</p>,
         ],
         [
           {
