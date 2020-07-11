@@ -166,6 +166,10 @@ export default class IdbSite extends BaseEntity implements ISite {
 
     // resources from the same site are always crawled in the same tab
     this.tabId = null;
+
+    // props comming from parent not used anymore, don't store them in db
+    delete (this as any).robotsTxt;
+    delete (this as any).resourceFilter;
   }
 
   getResourceToCrawl(frequency: number) {

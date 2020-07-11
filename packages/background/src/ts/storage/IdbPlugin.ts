@@ -108,6 +108,10 @@ export default class IdbPlugin extends BaseEntity implements IPluginStorage {
     Object.keys(kwArgs).forEach(kwArgKey => {
       this[kwArgKey] = kwArgs[kwArgKey];
     });
+
+    if (!kwArgs.scenarioId) {
+      this.scenarioId = null;
+    }
   }
 
   save(): Promise<number> {

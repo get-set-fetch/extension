@@ -222,8 +222,31 @@ export default class IdbResource extends BaseResource implements IResource {
       this[kwArgKey] = kwArgs[kwArgKey];
     });
 
-    this.crawledAt = kwArgs.crawledAt ? kwArgs.crawledAt : new Date(0);
     this.actions = kwArgs.actions ? kwArgs.actions : [];
+
+    if (kwArgs.crawledAt) {
+      this.crawledAt = kwArgs.crawledAt instanceof Date ? kwArgs.crawledAt : new Date(kwArgs.crawledAt);
+    }
+    else {
+      this.crawledAt = new Date(0);
+    }
+
+    if (!kwArgs.blob) {
+      this.blob = null;
+    }
+
+    if (!kwArgs.mediaType) {
+      this.mediaType = null;
+    }
+
+    if (!kwArgs.parent) {
+      this.parent = null;
+    }
+
+    // props comming from parent not used anymore, don't store them in db
+    delete (this as any).urlsToAdd;
+    delete (this as any).contentType;
+    delete (this as any).info;
   }
 
   save(): Promise<number> {

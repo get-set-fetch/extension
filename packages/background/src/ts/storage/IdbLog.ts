@@ -60,7 +60,12 @@ export default class IdbLog extends BaseEntity implements ILog {
       this[kwArgKey] = kwArgs[kwArgKey];
     });
 
-    this.date = kwArgs.date ? kwArgs.date : new Date();
+    if (kwArgs.date) {
+      this.date = kwArgs.date instanceof Date ? kwArgs.date : new Date(kwArgs.date);
+    }
+    else {
+      this.date = new Date();
+    }
   }
 
   save(): Promise<number> {

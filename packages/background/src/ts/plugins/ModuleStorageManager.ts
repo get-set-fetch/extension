@@ -59,7 +59,6 @@ export default class ModuleStorageManager {
       return {
         name: pluginInstance.constructor.name,
         opts: pluginInstance.opts || {},
-        schema: pluginInstance.OPTS_SCHEMA,
       };
     });
   }
