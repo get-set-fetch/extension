@@ -7,6 +7,8 @@ declare module 'get-set-fetch/lib/storage/base/BaseEntity' {
     save():Promise<number>;
     serialize():any;
     static props():string[];
+
+    constructor(kwArgs?:any);
   }
 
   export = BaseEntity;
