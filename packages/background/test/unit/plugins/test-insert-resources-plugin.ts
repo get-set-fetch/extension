@@ -18,7 +18,7 @@ describe('Test Insert Resources Plugin', () => {
   beforeEach(() => {
     site = new IdbSite({ url: 'index.html' });
     site.resourcesNo = 0;
-    assert.isUndefined(site.resourceFilter);
+    assert.isNull(site.resourceFilter);
 
     sandbox = createSandbox();
     sandbox.stub(site, 'saveResources').returns(null);
