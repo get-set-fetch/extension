@@ -79,7 +79,7 @@ export default class DynamicNavigationPlugin extends BasePlugin {
         maxResources: {
           type: 'integer',
           default: '100',
-          title: "Max Resources",
+          title: 'Max Resources',
           description: 'Maximum number of resources to be scraped. A value of -1 disables this check.',
         },
       },

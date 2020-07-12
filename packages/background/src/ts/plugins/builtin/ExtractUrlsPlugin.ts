@@ -1,5 +1,4 @@
 import { IResource, ISite, BasePlugin, IEnhancedJSONSchema } from 'get-set-fetch-extension-commons';
-import { IResourceParent } from 'get-set-fetch-extension-commons/lib/resource';
 import IdbSite from '../../storage/IdbSite';
 
 /**

@@ -9,6 +9,8 @@ export interface ISite {
   crawlInProgress: boolean;
   tabId: any;
 
+  resourceFilter: Buffer;
+
   plugins: IPluginDefinition[];
   pluginInstances: any;
 
