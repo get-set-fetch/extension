@@ -46,7 +46,7 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
     const selectors: string[] = this.opts.selectors
       .split('\n')
       .map((rawSelector: string) => {
-        let selector = rawSelector.trim();
+        let selector = this.trimSelector(rawSelector);
 
         // remove comments with last occurance of ' #', ex: a.class # comment becomes a.class
         if (/\s#/.test(selector)) {
@@ -59,15 +59,46 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
       })
       .filter((selector: string) => selector.length > 0);
 
-    const content = selectors.reduce(
-      (result, selector) => Object.assign(
-        result,
-        {
-          [selector.toString()]: Array.from(document.querySelectorAll(selector)).map(elm => (elm as HTMLElement).innerText),
+    let content;
+
+    // only makes sense for more than one selector
+    const selectorBase = selectors.length > 1 ? this.getSelectorBase(selectors) : null;
+
+    /*
+    common base detected for all selectors, query selectors within base elements
+    see https://github.com/get-set-fetch/extension/issues/44
+    */
+    if (selectorBase) {
+      const suffixSelectors = selectors.map(selector => selector.replace(selectorBase, '').trim());
+      content = Array.from(document.querySelectorAll(selectorBase)).reduce(
+        (result, baseElm) => {
+          for (let i = 0; i < suffixSelectors.length; i += 1) {
+            const selector = selectors[i];
+            const suffixSelector = suffixSelectors[i];
+            // eslint-disable-next-line no-param-reassign
+            if (!result[selector]) result[selector] = [];
+            result[selector].push(
+              Array.from(baseElm.querySelectorAll(suffixSelector)).map(elm => (elm as HTMLElement).innerText).join(','),
+            );
+          }
+
+          return result;
         },
-      ),
-      {},
-    );
+        {},
+      );
+    }
+    // no common base detected
+    else {
+      content = selectors.reduce(
+        (result, selector) => Object.assign(
+          result,
+          {
+            [selector]: Array.from(document.querySelectorAll(selector)).map(elm => (elm as HTMLElement).innerText),
+          },
+        ),
+        {},
+      );
+    }
 
     /*
     selector array values should be grouped by common dom parent, but a versatile way to do it has yet to be implemented
@@ -101,5 +132,49 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
     */
 
     return content;
+  }
+
+  getSelectorBase(selectors: string[]) {
+    const cssFragments = selectors[0].split(' ');
+    let selectorBase = null;
+    for (let i = 0; i < cssFragments.length; i += 1) {
+      const checkBase = cssFragments.slice(0, i + 1).join(' ');
+      for (let j = 0; j < selectors.length; j += 1) {
+        if (!selectors[j].startsWith(checkBase)) return selectorBase;
+      }
+      selectorBase = checkBase;
+    }
+    return selectorBase;
+  }
+
+  removeUnquotedBracketSpaces(selector: string) {
+    let insideQuote = 0;
+    let insideBrackets = 0;
+    return selector.replace(
+      /\s+|"|'|\[|\]/g,
+      m => {
+        // check / uncheck insideQuote flag
+        if (m === '"' || m === "'") {
+          // eslint-disable-next-line no-bitwise
+          insideQuote ^= 1;
+          return m;
+        }
+
+        // check / uncheck insideBrackets flag
+        if (m === '[' || m === ']') {
+          // eslint-disable-next-line no-bitwise
+          insideBrackets ^= 1;
+          return m;
+        }
+
+        // replace spaces inside brackets but not in quotes
+        return insideBrackets && !insideQuote ? '' : m;
+      },
+    );
+  }
+
+  trimSelector(rawSelector: string) {
+    const selectorWithSingleSpaces = rawSelector.trim().replace(/ +/, ' ');
+    return this.removeUnquotedBracketSpaces(selectorWithSingleSpaces);
   }
 }

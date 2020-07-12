@@ -109,6 +109,27 @@ describe('Test Extract Html Content Plugin', () => {
     assert.deepEqual(content, expectedContent);
   });
 
+  it('extract html content - multiple selectors, different result length, common base', () => {
+    extractHtmlContentPlugin = new ExtractHtmlContentPlugin(
+      { selectors: '[class|= "top"] h1 \n [class |= "top"] h2\n [class  |= "top"] h3' },
+    );
+
+    stubQuerySelectorAll.withArgs('[class|="top"]').returns([
+      { querySelectorAll: selector => (selector === 'h3' ? [] : [ { innerText: `${selector} valA` } ]) },
+      { querySelectorAll: selector => (selector === 'h2' ? [] : [ { innerText: `${selector} valB` } ]) },
+      { querySelectorAll: selector => (selector === 'h1' ? [] : [ { innerText: `${selector} valC` } ]) },
+    ]);
+
+    const expectedContent = {
+      '[class|="top"] h1': [ 'h1 valA', 'h1 valB', '' ],
+      '[class|="top"] h2': [ 'h2 valA', '', 'h2 valC' ],
+      '[class|="top"] h3': [ '', 'h3 valB', 'h3 valC' ],
+    };
+
+    const { content } = extractHtmlContentPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any);
+    assert.deepEqual(content, expectedContent);
+  });
+
   it('extract html content - multiple selectors, different result length, cumulative apply', () => {
     extractHtmlContentPlugin = new ExtractHtmlContentPlugin({ selectors: 'h1\nh2\nh3' });
 
@@ -217,5 +238,35 @@ describe('Test Extract Html Content Plugin', () => {
 
     ({ content } = extractHtmlContentPlugin.apply(site, { url: 'http://sitea.com/index.html', depth: 1 } as any));
     assert.deepEqual(content, expectedContent);
+  });
+
+  it('extract valid selector base', () => {
+    extractHtmlContentPlugin = new ExtractHtmlContentPlugin();
+
+    assert.strictEqual(
+      extractHtmlContentPlugin.getSelectorBase([ 'div.row h1', 'div.row h2', 'div.row h3' ]),
+      'div.row',
+    );
+
+    assert.strictEqual(
+      extractHtmlContentPlugin.getSelectorBase([ 'div.row a.red h1', 'div.row a.red h2', 'div.row a.red h3' ]),
+      'div.row a.red',
+    );
+  });
+
+  it('extract null selector base', () => {
+    extractHtmlContentPlugin = new ExtractHtmlContentPlugin();
+
+    const cssBase = extractHtmlContentPlugin.getSelectorBase([ 'div.rowA h1', 'div.rowA h2', 'div.rowB h3' ]);
+    assert.isNull(cssBase);
+  });
+
+  it('trimSelector', () => {
+    extractHtmlContentPlugin = new ExtractHtmlContentPlugin();
+    assert.strictEqual(extractHtmlContentPlugin.trimSelector(' div.classA '), 'div.classA');
+    assert.strictEqual(extractHtmlContentPlugin.trimSelector(' div.classA div.classB '), 'div.classA div.classB');
+    assert.strictEqual(extractHtmlContentPlugin.trimSelector(' [class|= "top"] h1 '), '[class|="top"] h1');
+    assert.strictEqual(extractHtmlContentPlugin.trimSelector(' [class  |="top"] h1 '), '[class|="top"] h1');
+    assert.strictEqual(extractHtmlContentPlugin.trimSelector(' [class  |=  "top"] h1 '), '[class|="top"] h1');
   });
 });
