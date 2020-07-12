@@ -34,7 +34,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
         mediaType: 'text/html',
         content: {},
         meta: {},
-        parent: undefined,
+        parent: null,
       },
       { url: 'https://www.sitea.com/static/pageA.html',
         actions: [],
@@ -96,7 +96,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     },
     expectedResourceFields: [ 'url', 'actions', 'mediaType', 'meta', 'content', 'parent' ],
     expectedResources: [
-      { url: 'https://www.sitea.com/index.html', actions: [], mediaType: 'text/html', content: {}, meta: {}, parent: undefined },
+      { url: 'https://www.sitea.com/index.html', actions: [], mediaType: 'text/html', content: {}, meta: {}, parent: null },
       { url: 'https://www.sitea.com/static/pageA.html', actions: [], mediaType: 'text/html', content: {}, meta: {}, parent: { linkText: 'pageA' } },
       { url: 'https://www.sitea.com/static/pageB.html', actions: [], mediaType: 'text/html', content: {}, meta: {}, parent: { linkText: 'pageB' } },
       { url: 'https://www.sitea.com/pdf/pdfA-150.pdf', actions: [], mediaType: 'application/pdf', content: {}, meta: {}, parent: { linkText: 'pdf A' } },
@@ -133,7 +133,7 @@ const crawlDefinitions: ICrawlDefinition[] = [
     },
     expectedResourceFields: [ 'url', 'actions', 'mediaType', 'meta', 'content', 'parent' ],
     expectedResources: [
-      { url: 'https://www.sitea.com/index.html', actions: [], mediaType: 'text/html', content: {}, meta: {}, parent: undefined },
+      { url: 'https://www.sitea.com/index.html', actions: [], mediaType: 'text/html', content: {}, meta: {}, parent: null },
       { url: 'https://www.sitea.com/static/pageA.html', actions: [], mediaType: 'text/html', content: {}, meta: {}, parent: { linkText: 'pageA' } },
       { url: 'https://www.sitea.com/static/pageB.html', actions: [], mediaType: 'text/html', content: {}, meta: {}, parent: { linkText: 'pageB' } },
       { url: 'https://www.sitea.com/pdf/pdfA-150.pdf', actions: [], mediaType: 'application/pdf', content: {}, meta: {}, parent: { linkText: 'pdf A', title: 'PageA Heading Level 1' } },
