@@ -190,7 +190,7 @@ export default class IdbProject extends BaseEntity implements IProjectStorage {
           reject(err);
         }
       };
-      reqAddResource.onerror = () => reject(new Error(`could not add project: ${this.name}`));
+      reqAddResource.onerror = () => reject(new Error(`could not add project: ${this.name}, ${JSON.stringify(reqAddResource.error)}`));
     });
   }
 

@@ -324,4 +324,42 @@ describe('Project CRUD Pages', () => {
     const tableCount = await page.evaluate(() => document.querySelectorAll('table').length);
     assert.strictEqual(tableCount, 0);
   });
+
+  it('Test Create Project With Existing Name', async () => {
+    // create a new project
+    await page.evaluate(project => GsfClient.fetch('POST', 'project', project), expectedProject as any);
+
+    // reload project list
+    await browserHelper.goto('/projects');
+
+    // open a new project form
+    await page.waitFor('a#newproject');
+    await page.click('a#newproject');
+
+    // wait for the project detail page to load
+    await page.waitFor('input#name');
+
+    // fill in text input data for the new project
+    await page.evaluate(() => {
+      (document.getElementById('name') as HTMLInputElement).value = '';
+    });
+    await page.type('input#name', expectedProject.name);
+
+    await page.evaluate(() => {
+      (document.getElementById('url') as HTMLInputElement).value = '';
+    });
+    await page.type('input#url', expectedProject.url);
+
+    // fill in dropdown scenario
+    await page.select('select[id="scenarioPkg.name"]', expectedProject.scenario);
+
+    // wait for scenarioLink to be rendered, this means the plugin schemas are also rendered
+    await page.waitFor('[id="scenarioLink"]');
+
+    // save the project
+    await page.click('#save');
+
+    // wait for error modal to show up
+    await page.waitFor('div.modal-body p#error');
+  });
 });
