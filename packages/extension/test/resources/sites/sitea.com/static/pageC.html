@@ -28,7 +28,9 @@
   let loadNo = 0;
 
   window.onscroll = function (event) {
-    if (loadNo < loadMax && document.body.scrollHeight === window.pageYOffset + document.body.clientHeight) {
+    // window.pageYOffset varies, not integer, take this into account
+    const scrollToBottom = Math.abs(document.body.scrollHeight - (window.pageYOffset + document.body.clientHeight));
+    if (loadNo < loadMax && scrollToBottom < 1) {
       setTimeout(appendData, 1000);
     }
   };
