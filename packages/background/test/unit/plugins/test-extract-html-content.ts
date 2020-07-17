@@ -244,12 +244,20 @@ describe('Test Extract Html Content Plugin', () => {
     extractHtmlContentPlugin = new ExtractHtmlContentPlugin();
 
     assert.strictEqual(
-      extractHtmlContentPlugin.getSelectorBase([ 'div.row h1', 'div.row h2', 'div.row h3' ]),
+      extractHtmlContentPlugin.getSelectorBase([
+        { selector: 'div.row h1', prop: 'innerText' },
+        { selector: 'div.row h2', prop: 'innerText' },
+        { selector: 'div.row h3', prop: 'innerText' },
+      ]),
       'div.row',
     );
 
     assert.strictEqual(
-      extractHtmlContentPlugin.getSelectorBase([ 'div.row a.red h1', 'div.row a.red h2', 'div.row a.red h3' ]),
+      extractHtmlContentPlugin.getSelectorBase([
+        { selector: 'div.row a.red h1', prop: 'innerText' },
+        { selector: 'div.row a.red h2', prop: 'innerText' },
+        { selector: 'div.row a.red h3', prop: 'innerText' },
+      ]),
       'div.row a.red',
     );
   });
@@ -257,7 +265,11 @@ describe('Test Extract Html Content Plugin', () => {
   it('extract null selector base', () => {
     extractHtmlContentPlugin = new ExtractHtmlContentPlugin();
 
-    const cssBase = extractHtmlContentPlugin.getSelectorBase([ 'div.rowA h1', 'div.rowA h2', 'div.rowB h3' ]);
+    const cssBase = extractHtmlContentPlugin.getSelectorBase([
+      { selector: 'div.rowA h1', prop: 'innerText' },
+      { selector: 'div.rowA h2', prop: 'innerText' },
+      { selector: 'div.rowB h3', prop: 'innerText' },
+    ]);
     assert.isNull(cssBase);
   });
 

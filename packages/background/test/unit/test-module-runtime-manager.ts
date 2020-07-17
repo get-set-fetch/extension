@@ -67,7 +67,7 @@ describe('Test ModuleRuntimeManager', () => {
         name: 'ExtractHtmlContentPlugin',
         opts: {
           domRead: true,
-          selectors: 'h1\nh2',
+          selectors: 'h1 # headline innerText\nimg.main,alt # image alternate text',
         },
       },
 

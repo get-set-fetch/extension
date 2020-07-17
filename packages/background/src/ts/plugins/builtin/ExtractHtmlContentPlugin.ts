@@ -1,5 +1,10 @@
 import { ISite, IResource, IEnhancedJSONSchema, BasePlugin } from 'get-set-fetch-extension-commons';
 
+interface ISelectorPair {
+  selector: string;
+  prop: string;
+}
+
 export default class ExtractHtmlContentPlugin extends BasePlugin {
   getOptsSchema(): IEnhancedJSONSchema {
     return {
@@ -13,11 +18,11 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
         },
         selectors: {
           type: 'string',
-          default: 'h1\nh2',
+          default: 'h1 # headline innerText\nimg.main,alt # image alternate text',
           ui: {
             customField: 'LongTextField',
           },
-          description: 'One or multiple CSS selectors separated by new line. Each one will be a column when exporting resources under the csv format. Comments can be added via #.',
+          description: 'One or multiple CSS selectors separated by new line. Each one will be a column when exporting resources under the csv format. By default the innerText property will be scraped but you can define your own using a selector pair, ex: h1, title.  Comments can be added via #.',
         },
       },
       required: [ 'selectors' ],
@@ -43,42 +48,56 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
   }
 
   extractContent() {
-    const selectors: string[] = this.opts.selectors
+    const selectorPairs: ISelectorPair[] = this.opts.selectors
       .split('\n')
       .map((rawSelector: string) => {
-        let selector = this.trimSelector(rawSelector);
+        let selectorPair = this.trimSelector(rawSelector);
 
         // remove comments with last occurance of ' #', ex: a.class # comment becomes a.class
-        if (/\s#/.test(selector)) {
-          const selectorMatch = /(.+)(?=(\s#))/.exec(selector);
+        if (/\s#/.test(selectorPair)) {
+          const selectorMatch = /(.+)(?=(\s#))/.exec(selectorPair);
           // eslint-disable-next-line prefer-destructuring
-          selector = selectorMatch[1];
+          selectorPair = selectorMatch[1];
         }
 
-        return selector;
+        if (selectorPair.length > 0) {
+          const pair = selectorPair.split(',').map(elm => elm.trim());
+          return {
+            selector: pair[0],
+            prop: pair[1] ? pair[1] : 'innerText',
+          };
+        }
+
+        return null;
       })
-      .filter((selector: string) => selector.length > 0);
+      .filter((selectorPair: ISelectorPair) => selectorPair);
 
     let content;
 
-    // only makes sense for more than one selector
-    const selectorBase = selectors.length > 1 ? this.getSelectorBase(selectors) : null;
+    // only makes sense for more than one selector and only if selectorBase returns multiple elements
+    let selectorBase = null;
+    if (selectorPairs.length > 1) {
+      const potentialSelectorBase = this.getSelectorBase(selectorPairs);
+      if (potentialSelectorBase && Array.from(document.querySelectorAll(potentialSelectorBase)).length > 1) {
+        selectorBase = potentialSelectorBase;
+      }
+    }
 
     /*
     common base detected for all selectors, query selectors within base elements
     see https://github.com/get-set-fetch/extension/issues/44
     */
     if (selectorBase) {
-      const suffixSelectors = selectors.map(selector => selector.replace(selectorBase, '').trim());
+      const suffixSelectors = selectorPairs.map(selectorPair => selectorPair.selector.replace(selectorBase, '').trim());
       content = Array.from(document.querySelectorAll(selectorBase)).reduce(
         (result, baseElm) => {
           for (let i = 0; i < suffixSelectors.length; i += 1) {
-            const selector = selectors[i];
+            const { selector, prop } = selectorPairs[i];
             const suffixSelector = suffixSelectors[i];
             // eslint-disable-next-line no-param-reassign
             if (!result[selector]) result[selector] = [];
             result[selector].push(
-              Array.from(baseElm.querySelectorAll(suffixSelector)).map(elm => (elm as HTMLElement).innerText).join(','),
+              Array.from(baseElm.querySelectorAll(suffixSelector)).map(elm => this.getContent((elm as HTMLElement), prop)).join(','),
             );
           }
 
@@ -89,11 +108,13 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
     }
     // no common base detected
     else {
-      content = selectors.reduce(
-        (result, selector) => Object.assign(
+      content = selectorPairs.reduce(
+        (result, selectorPair) => Object.assign(
           result,
           {
-            [selector]: Array.from(document.querySelectorAll(selector)).map(elm => (elm as HTMLElement).innerText),
+            [selectorPair.selector]: Array.from(
+              document.querySelectorAll(selectorPair.selector),
+            ).map(elm => this.getContent(elm as HTMLElement, selectorPair.prop)),
           },
         ),
         {},
@@ -134,7 +155,9 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
     return content;
   }
 
-  getSelectorBase(selectors: string[]) {
+  getSelectorBase(selectorPairs: ISelectorPair[]) {
+    const selectors = selectorPairs.map(selectorPair => selectorPair.selector);
+
     const cssFragments = selectors[0].split(' ');
     let selectorBase = null;
     for (let i = 0; i < cssFragments.length; i += 1) {
@@ -176,5 +199,9 @@ export default class ExtractHtmlContentPlugin extends BasePlugin {
   trimSelector(rawSelector: string) {
     const selectorWithSingleSpaces = rawSelector.trim().replace(/ +/, ' ');
     return this.removeUnquotedBracketSpaces(selectorWithSingleSpaces);
+  }
+
+  getContent(elm: HTMLElement, prop: string) {
+    return elm[prop] || elm.getAttribute(prop) || '';
   }
 }
