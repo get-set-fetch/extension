@@ -6,6 +6,7 @@ import GsfClient from '../../components/GsfClient';
 import Site from './model/Site';
 import Resource from './model/Resource';
 import Page from '../../layout/Page';
+import Modal from '../../components/Modal';
 
 interface IState {
   header: IHeaderCol[];
@@ -64,7 +65,7 @@ export default class SiteList extends React.Component<{}, IState> {
       await GsfClient.fetch(HttpMethod.GET, `site/${site.id}/crawl`);
     }
     catch (err) {
-      console.error('error crawling site');
+      Modal.instance.show('Scrape Site', <p id="error">{err}</p>);
     }
   }
 
@@ -73,7 +74,7 @@ export default class SiteList extends React.Component<{}, IState> {
       await GsfClient.fetch(HttpMethod.DELETE, 'sites', { ids: [ site.id ] });
     }
     catch (err) {
-      console.error('error deleting site');
+      Modal.instance.show('Delete Site', <p id="error">{err}</p>);
     }
 
     this.loadSites();

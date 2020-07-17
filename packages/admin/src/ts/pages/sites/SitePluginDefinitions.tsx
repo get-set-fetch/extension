@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { IHeaderCol, IPluginDefinition } from 'get-set-fetch-extension-commons';
 import Table from '../../components/Table';
+import Modal from '../../components/Modal';
 
 interface IProps {
   siteId: string;
@@ -46,8 +47,13 @@ export default class SitePluginDefinitions extends React.Component<IProps, IStat
   }
 
   async componentDidMount() {
-    const availablePlugins = await window.GsfClient.fetch('GET', 'plugins');
-    this.setState({ availablePlugins });
+    try {
+      const availablePlugins = await window.GsfClient.fetch('GET', 'plugins');
+      this.setState({ availablePlugins });
+    }
+    catch (err) {
+      Modal.instance.show('Load Plugins', <p id="error">{err}</p>);
+    }
   }
 
 

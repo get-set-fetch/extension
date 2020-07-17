@@ -57,7 +57,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
       await GsfClient.fetch(HttpMethod.GET, `project/${project.id}/crawl`);
     }
     catch (err) {
-      console.error('error crawling project');
+      Modal.instance.show('Scrape Project', <p id="error">{err}</p>);
     }
   }
 
@@ -66,7 +66,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
       await GsfClient.fetch(HttpMethod.DELETE, 'projects', { ids: [ project.id ] });
     }
     catch (err) {
-      console.error('error deleting site');
+      Modal.instance.show('Delete Project', <p id="error">{err}</p>);
     }
 
     this.loadProjects();
@@ -100,7 +100,7 @@ export default class ProjectList extends React.Component<RouteComponentProps, IS
       this.setState({ selectedRows: [] });
     }
     catch (err) {
-      console.error('error deleting projects');
+      Modal.instance.show('Delete Project', <p id="error">{err}</p>);
     }
 
     this.loadProjects();

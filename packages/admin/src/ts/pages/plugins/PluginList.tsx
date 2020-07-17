@@ -4,6 +4,7 @@ import { HttpMethod, IPluginStorage } from 'get-set-fetch-extension-commons';
 import Table from '../../components/Table';
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
+import Modal from '../../components/Modal';
 
 interface IState {
   data: IPluginStorage[];
@@ -40,7 +41,7 @@ export default class PluginList extends React.Component<{}, IState> {
       this.setState({ selectedRows: [] });
     }
     catch (err) {
-      console.error('error deleting plugins');
+      Modal.instance.show('Delete Plugins', <p id="error">{err}</p>);
     }
 
     this.loadPlugins();

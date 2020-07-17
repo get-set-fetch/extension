@@ -3,6 +3,7 @@ import { HttpMethod, IHeaderCol, IScenarioStorage } from 'get-set-fetch-extensio
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
 import Table from '../../components/Table';
+import Modal from '../../components/Modal';
 
 enum ScenarioStatus {
   INSTALLED = 'Installed',
@@ -56,17 +57,27 @@ export default class ScenarioList extends React.Component<{}, IState> {
   }
 
   async installScenarioPkg(scenarioPkg: IScenarioStorage) {
+    try {
     // save scenario
-    await GsfClient.fetch(HttpMethod.POST, 'scenario', scenarioPkg);
-    // re-load scenario list
-    await this.loadScenarios();
+      await GsfClient.fetch(HttpMethod.POST, 'scenario', scenarioPkg);
+      // re-load scenario list
+      await this.loadScenarios();
+    }
+    catch (err) {
+      Modal.instance.show('Install Scenario', <p id="error">{err}</p>);
+    }
   }
 
   async uninstallScenarioPkg(scenarioPkg) {
-    // delete scenario
-    await GsfClient.fetch(HttpMethod.DELETE, 'scenarios', { ids: [ scenarioPkg.id ] });
-    // re-load scenario list
-    await this.loadScenarios();
+    try {
+      // delete scenario
+      await GsfClient.fetch(HttpMethod.DELETE, 'scenarios', { ids: [ scenarioPkg.id ] });
+      // re-load scenario list
+      await this.loadScenarios();
+    }
+    catch (err) {
+      Modal.instance.show('Delete Scenario', <p id="error">{err}</p>);
+    }
   }
 
   // eslint-disable-next-line class-methods-use-this

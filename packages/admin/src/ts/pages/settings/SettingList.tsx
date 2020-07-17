@@ -4,6 +4,7 @@ import { HttpMethod, ISetting } from 'get-set-fetch-extension-commons';
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
 import DatabaseOperations from './DatabaseOperations';
+import Modal from '../../components/Modal';
 
 interface IState {
   settings: ISetting[];
@@ -51,7 +52,7 @@ export default class SettingList extends React.Component<{}, IState> {
         await GsfClient.fetch(HttpMethod.PUT, 'setting', { key: entry.key, val: entry.val });
       }
       catch (err) {
-        console.error(`error saving setting ${entry.key}`);
+        Modal.instance.show('Save Settings', <p id="error">{err}</p>);
       }
     });
   }

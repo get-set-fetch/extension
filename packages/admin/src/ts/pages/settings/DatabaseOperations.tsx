@@ -81,18 +81,7 @@ export default class DatabaseOperations extends React.Component<{}, IState> {
       currentTarget.click();
     }
     catch (error) {
-      Modal.instance.show(
-        'Export Object Stores',
-        [
-          <p key="info">{error}</p>,
-        ],
-        [
-          {
-            title: 'Close',
-            value: 'close',
-          },
-        ],
-      );
+      Modal.instance.show('Export Object Stores', <p id="error">{error}</p>);
     }
   }
 
@@ -103,32 +92,10 @@ export default class DatabaseOperations extends React.Component<{}, IState> {
       const content = readEvt.target.result;
       try {
         await GsfClient.fetch(HttpMethod.GET, 'settings/stores/import', { stores: this.state.selectedStores, content });
-        Modal.instance.show(
-          'Import Object Stores',
-          [
-            <p id="success" key="info">Import successful.</p>,
-          ],
-          [
-            {
-              title: 'Close',
-              value: 'close',
-            },
-          ],
-        );
+        Modal.instance.show('Import Object Stores', <p id="success" key="success">Import successful.</p>);
       }
       catch (error) {
-        Modal.instance.show(
-          'Import Object Stores',
-          [
-            <p key="info">{error}</p>,
-          ],
-          [
-            {
-              title: 'Close',
-              value: 'close',
-            },
-          ],
-        );
+        Modal.instance.show('Import Object Stores', <p id="error">{error}</p>);
       }
     };
     reader.onerror = () => {

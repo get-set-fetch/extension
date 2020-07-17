@@ -83,19 +83,7 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
       currentTarget.click();
     }
     catch (error) {
-      Modal.instance.show(
-        'Export Project',
-        [
-          <p key="info">{error}</p>,
-        ],
-        [
-          {
-            title: 'Close',
-            value: 'close',
-          },
-        ],
-      );
-      console.error(error);
+      Modal.instance.show('Export Project', <p id="error">{error}</p>);
     }
   }
 

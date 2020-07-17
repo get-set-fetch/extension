@@ -3,6 +3,7 @@ import { HttpMethod, ILog, IExportResult, LogLevel } from 'get-set-fetch-extensi
 import Table from '../../components/Table';
 import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
+import Modal from '../../components/Modal';
 
 interface IState {
   data: ILog[];
@@ -33,7 +34,7 @@ export default class LogList extends React.Component<{}, IState> {
       await GsfClient.fetch(HttpMethod.DELETE, 'logs');
     }
     catch (err) {
-      console.error('error deleting logs');
+      Modal.instance.show('Delete Logs', <p id="error">{err}</p>);
     }
 
     this.loadLogs();
@@ -49,12 +50,17 @@ export default class LogList extends React.Component<{}, IState> {
     }
     evt.preventDefault();
 
-    const exportInfo: IExportResult = await GsfClient.fetch(HttpMethod.GET, 'logs/export');
+    try {
+      const exportInfo: IExportResult = await GsfClient.fetch(HttpMethod.GET, 'logs/export');
 
-    currentTarget.href = exportInfo.url;
-    currentTarget.download = 'get-set-fetch.logs.csv';
-    currentTarget.setAttribute('downloadready', 'true');
-    currentTarget.click();
+      currentTarget.href = exportInfo.url;
+      currentTarget.download = 'get-set-fetch.logs.csv';
+      currentTarget.setAttribute('downloadready', 'true');
+      currentTarget.click();
+    }
+    catch (err) {
+      Modal.instance.show('Export Logs', <p id="error">{err}</p>);
+    }
   }
 
   async delete(evt: React.MouseEvent<HTMLAnchorElement>) {
@@ -64,7 +70,7 @@ export default class LogList extends React.Component<{}, IState> {
       await GsfClient.fetch(HttpMethod.DELETE, 'logs');
     }
     catch (err) {
-      console.error('error deleting logs');
+      Modal.instance.show('Delete Logs', <p id="error">{err}</p>);
     }
 
     this.loadLogs();

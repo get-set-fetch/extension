@@ -7,6 +7,7 @@ import GsfClient from '../../components/GsfClient';
 import SiteDetailPlugins from './SiteDetailPlugins';
 import Site from './model/Site';
 import Page from '../../layout/Page';
+import Modal from '../../components/Modal';
 
 interface IState {
   site: Site;
@@ -41,7 +42,7 @@ export default class SiteDetail extends React.Component<RouteComponentProps<{sit
         site = new Site(data);
       }
       catch (err) {
-        console.error('error loading site');
+        Modal.instance.show('Load Site', <p id="error">{err}</p>);
       }
     }
     // new site
@@ -59,8 +60,13 @@ export default class SiteDetail extends React.Component<RouteComponentProps<{sit
 
     // default plugins for a new site
     if (!this.props.match.params.siteId) {
-      const defaultPluginDefinition = await GsfClient.fetch(HttpMethod.GET, 'plugindefs/default');
-      this.setState({ site: setIn(this.state.site, [ 'pluginDefinitions' ], defaultPluginDefinition) });
+      try {
+        const defaultPluginDefinition = await GsfClient.fetch(HttpMethod.GET, 'plugindefs/default');
+        this.setState({ site: setIn(this.state.site, [ 'pluginDefinitions' ], defaultPluginDefinition) });
+      }
+      catch (err) {
+        Modal.instance.show('Load Default Plugins', <p id="error">{err}</p>);
+      }
     }
   }
 
@@ -83,7 +89,7 @@ export default class SiteDetail extends React.Component<RouteComponentProps<{sit
       this.props.history.push('/sites');
     }
     catch (err) {
-      console.error('error saving site');
+      Modal.instance.show('Save Site', <p id="error">{err}</p>);
     }
   }
 

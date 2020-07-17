@@ -10,7 +10,7 @@ export interface IModalAction {
 
 interface IState {
   title: string;
-  content: JSX.Element[];
+  content: JSX.Element[] | JSX.Element;
   actions: IModalAction[];
   show: boolean;
   resolve: (val: string) => void;
@@ -38,7 +38,7 @@ export default class Modal extends React.Component<{}, IState> {
     this.actionHandler = this.actionHandler.bind(this);
   }
 
-  async show(title: string, content: JSX.Element[], actions: IModalAction[]): Promise<string> {
+  async show(title: string, content: JSX.Element[] | JSX.Element, actions: IModalAction[] = [ { title: 'Close', value: 'close' } ]): Promise<string> {
     this.modalContainer.style.display = 'block';
     return new Promise(resolve => Modal.instance.setState({ title, content, actions, resolve }));
   }

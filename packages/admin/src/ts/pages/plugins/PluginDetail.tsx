@@ -9,6 +9,7 @@ import GsfClient from '../../components/GsfClient';
 import GsfForm from '../../components/uniforms/GsfForm';
 import SchemaBridgeHelper from '../../components/uniforms/bridge/GsfBridgeHelper';
 import GsfBridge from '../../components/uniforms/bridge/GsfBridge';
+import Modal from '../../components/Modal';
 
 interface IState {
   bridge: GsfBridge;
@@ -68,7 +69,7 @@ export default class PluginDetail extends React.Component<RouteComponentProps<{p
       this.props.history.push('/plugins');
     }
     catch (err) {
-      console.error('error saving plugin');
+      Modal.instance.show('Save Plugin', <p id="error">{err}</p>);
     }
   }
 

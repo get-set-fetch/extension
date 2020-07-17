@@ -249,7 +249,7 @@ export default class ProjectDetail extends React.Component<RouteComponentProps<{
       this.props.history.push('/projects');
     }
     catch (err) {
-      console.error('error saving project');
+      Modal.instance.show('Save Project', <p id="error">{err}</p>);
     }
   }
 
