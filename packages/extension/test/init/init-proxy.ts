@@ -9,4 +9,5 @@ const serveStaticOpts: Map<string, serveStatic.ServeStaticOptions> = new Map([
 ProxyServer.create({
   rootDir: resolve(process.cwd(), 'test', 'resources', 'sites'),
   serveStaticOpts,
+  tlsDir: resolve(process.cwd(), 'test', 'resources', 'security'),
 });

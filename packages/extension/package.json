@@ -7,8 +7,9 @@
   ],
   "scripts": {
     "clean": "shx rm -rf dist",
-    "build": "npm run clean && npm run copy:resources && npm run build:tgz",
+    "build": "npm run clean && npm run copy:resources && npm run build:tgz && npm run build:keys",
     "build:tgz": "ts-node --files ./scripts/tgz-npm-pkg.ts",
+    "build:keys": "ts-node --files ./scripts/generate-keys.ts",
     "copy:resources": "npm run copy:local && npm run update:local && npm run copy:bkg && npm run copy:popup && npm run copy:admin && npm run copy:scenarios",
     "copy:local": "shx mkdir dist && shx cp -R src/resources/* dist/",
     "update:local": "node ./scripts/manifest-update.js",

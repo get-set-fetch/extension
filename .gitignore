@@ -77,3 +77,7 @@ todo*
 
 # generated files
 *.tar
+
+# cert and keys
+*.pem
+*.p12
