@@ -1,5 +1,5 @@
 import { stringify } from 'query-string';
-import BrowserHelper from './BrowserHelper';
+import BrowserHelper from './browser/BrowserHelper';
 
 export default class ScenarioHelper {
   static async installScenario(browserHelper: BrowserHelper, scenarioName: string) {

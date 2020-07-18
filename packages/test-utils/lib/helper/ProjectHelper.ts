@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import JSZip from 'jszip/dist/jszip';
 import { IProjectStorage, IPluginDefinition } from 'get-set-fetch-extension-commons';
-import BrowserHelper from './BrowserHelper';
+import BrowserHelper from './browser/BrowserHelper';
 
 declare const GsfClient;
 export default class ProjectHelper {

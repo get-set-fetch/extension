@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import { resolve } from 'path';
 import { Page } from 'puppeteer';
 import { IProjectStorage, IResource } from 'get-set-fetch-extension-commons';
-import BrowserHelper from '../helper/BrowserHelper';
+import BrowserHelper from '../helper/browser/BrowserHelper';
 import ScenarioHelper from '../helper/ScenarioHelper';
 import ProjectHelper from '../helper/ProjectHelper';
 import CrawlHelper from '../helper/CrawlHelper';

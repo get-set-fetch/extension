@@ -81,3 +81,6 @@ todo*
 # cert and keys
 *.pem
 *.p12
+
+# firefox profile
+**/firefox/*
