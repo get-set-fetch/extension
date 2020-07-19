@@ -4,10 +4,10 @@
   "version": "{GSF_VERSION}",
   "description": "Open source data scraper with csv, zip export capabilities. Provides scraping scenarios for fast, minimal configuration scraping.",
   "icons": {
-    "16": "icons/gsf_32x32.png",
+    "16": "icons/gsf_16x16.png",
     "32": "icons/gsf_32x32.png",
-    "48": "icons/gsf_32x32.png",
-    "128": "icons/gsf_32x32.png"
+    "48": "icons/gsf_48x48.png",
+    "128": "icons/gsf_128x128.png"
   },
   "background": {
     "page": "background/background.html"
