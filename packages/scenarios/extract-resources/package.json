@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-scenario-extract-resources",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Extract Resources scenario is used for extracting various resources from the corresponding sites.",
   "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/extract-resources",
   "main": "dist/ExtractResources.js",

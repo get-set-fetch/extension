@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-extension-admin",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "",
   "main": "dist/admin.js",
   "types": "dist/index.d.ts",
