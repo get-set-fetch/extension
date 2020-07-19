@@ -1,6 +1,5 @@
-import BrowserHelper, { clearQuerySelector, IBrowserProps } from './helper/browser/BrowserHelper';
+import { clearQuerySelector, IBrowserProps } from './helper/browser/BrowserHelper';
 import ChromeHelper from './helper/browser/ChromeHelper';
-import FirefoxHelper from './helper/browser/FirefoxHelper';
 
 import FileHelper from './helper/FileHelper';
 import ScenarioHelper from './helper/ScenarioHelper';
@@ -9,11 +8,7 @@ import TgzHelper from './helper/TgzHelper';
 
 import CertGenerator, { ITlsOptions } from './helper/CertGenerator';
 
-import crawlProjectBaseSuite, { ICrawlDefinition } from './test/crawl-project-base-suite';
-
-export function getBrowserHelper(props: IBrowserProps): BrowserHelper {
-  return process.env.browser === 'firefox' ? new FirefoxHelper(props) : new ChromeHelper(props);
-}
+import crawlProjectBaseSuite, { ICrawlDefinition, getBrowserHelper } from './test/crawl-project-base-suite';
 
 export {
   ChromeHelper as BrowserHelper,
@@ -25,4 +20,6 @@ export {
   ScenarioHelper,
   crawlProjectBaseSuite,
   ICrawlDefinition,
+  IBrowserProps,
+  getBrowserHelper,
 };

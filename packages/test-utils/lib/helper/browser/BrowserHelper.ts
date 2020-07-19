@@ -66,11 +66,11 @@ export default class BrowserHelper {
   }
 
   async getExtensionId(): Promise<string> {
-    throw new Error('not implemented');
+    throw new Error('getExtensionId not implemented');
   }
 
   getLaunchOptions(): LaunchOptions {
-    throw new Error('not implemented');
+    throw new Error('getLaunchOptions not implemented');
   }
 
   waitForPageCreation(): Promise<Page> {

@@ -2,11 +2,13 @@ import { assert } from 'chai';
 import { resolve } from 'path';
 import { Page } from 'puppeteer';
 import { IProjectStorage, IResource } from 'get-set-fetch-extension-commons';
-import BrowserHelper from '../helper/browser/BrowserHelper';
+import BrowserHelper, { IBrowserProps } from '../helper/browser/BrowserHelper';
 import ScenarioHelper from '../helper/ScenarioHelper';
 import ProjectHelper from '../helper/ProjectHelper';
 import CrawlHelper from '../helper/CrawlHelper';
 import FileHelper from '../helper/FileHelper';
+import FirefoxHelper from '../helper/browser/FirefoxHelper';
+import ChromeHelper from '../helper/browser/ChromeHelper';
 
 export interface ICrawlDefinition {
   title: string;
@@ -18,6 +20,10 @@ export interface ICrawlDefinition {
   expectedZipEntries?: string[];
 }
 
+export function getBrowserHelper(props: IBrowserProps): BrowserHelper {
+  return process.env.browser === 'firefox' ? new FirefoxHelper(props) : new ChromeHelper(props);
+}
+
 declare const GsfClient;
 
 const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => describe(`Project Crawl ${title}`, () => {
@@ -27,7 +33,7 @@ const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => descr
 
   before(async () => {
     const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
-    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    browserHelper = getBrowserHelper({ extension: { path: extensionPath } });
     await browserHelper.launch();
     ({ page } = browserHelper);
   });
