@@ -62,4 +62,4 @@ const crawlDefinitions: ICrawlDefinition[] = [
   },
 ];
 
-crawlProjectBaseSuite('Extract Static Content Using JS Links', crawlDefinitions);
+// crawlProjectBaseSuite('Extract Static Content Using JS Links', crawlDefinitions);
