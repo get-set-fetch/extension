@@ -124,7 +124,7 @@
       "except-parens"
     ],
     "no-lonely-if": "off",
-    "no-inferrable-types": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
     "@typescript-eslint/indent": [
       "error",
       2
