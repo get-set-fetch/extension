@@ -105,6 +105,14 @@ const webExtensions = [
       },
       {
         type: 2,
+        value: 'raw.githubusercontent.com',
+      },
+      {
+        type: 2,
+        value: 'registry.npmjs.org',
+      },
+      {
+        type: 2,
         value: 'localhost',
       },
       {
