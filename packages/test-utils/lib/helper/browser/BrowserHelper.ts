@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 import { launch, Page, NavigationOptions, Browser, Response, LaunchOptions } from 'puppeteer';
 
 declare const GsfClient;
@@ -44,12 +45,16 @@ export default class BrowserHelper {
     this.extension = extension;
   }
 
+  launchBrowser() {
+    return launch(this.getLaunchOptions());
+  }
+
   // launches a browser instance
   async launch() {
-    this.browser = await launch(this.getLaunchOptions());
+    this.browser = await this.launchBrowser();
 
     // wait for the extension to be installed and open the thank_you page
-    await this.waitForPageCreation();
+    await this.waitForExtensionPage();
 
     if (this.closeExtraPages) {
       await Promise.all(
@@ -73,13 +78,25 @@ export default class BrowserHelper {
     throw new Error('getLaunchOptions not implemented');
   }
 
-  waitForPageCreation(): Promise<Page> {
-    return new Promise(resolve => {
-      this.browser.once('targetcreated', async target => {
-        const page = await target.page();
-        resolve(page);
-      });
-    });
+  async waitForExtensionPage(): Promise<Page> {
+    // retry max 3 times
+    let tyPage: Page;
+    let retryNo = 0;
+    do {
+      const pages = await this.browser.pages();
+      tyPage = pages.find(page => page.url() === 'https://getsetfetch.org/thank-you-install.html');
+      if (tyPage) break;
+
+      retryNo += 1;
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    while (retryNo < 3);
+
+    if (!tyPage) {
+      throw new Error('ThankYou Page not opened');
+    }
+
+    return tyPage;
   }
 
   /*
@@ -112,7 +129,7 @@ export default class BrowserHelper {
   }
 
   goto(path: string): Promise<Response> {
-    throw new Error('not implemented');
+    throw new Error('goto not implemented');
   }
 
   waitFor(selector: string, timeout: number = 1 * 1000) {

@@ -52,7 +52,7 @@ xdescribe('Site Pages', () => {
     await popupPage.evaluate(anchorId => document.getElementById(anchorId).click(), 'newsite');
 
     // retrieve the newly created admin page
-    const adminPage = await browserHelper.waitForPageCreation();
+    const adminPage = await browserHelper.waitForExtensionPage();
 
     // wait for redirection to "new site" page
     await adminPage.waitFor('#save');

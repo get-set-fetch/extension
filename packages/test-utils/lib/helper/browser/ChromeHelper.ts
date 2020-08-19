@@ -7,11 +7,11 @@ export default class ChromeHelper extends BrowserHelper {
     await this.page.goto('chrome://extensions/', this.gotoOpts);
 
     // eslint-disable-next-line max-len
-    const devBtnHandle: any = await (this.page as any).evaluateHandle('document.querySelector("body > extensions-manager").shadowRoot.querySelector("extensions-toolbar").shadowRoot.querySelector("#devMode")');
+    const devBtnHandle: any = await this.page.evaluateHandle('document.querySelector("body > extensions-manager").shadowRoot.querySelector("extensions-toolbar").shadowRoot.querySelector("#devMode")');
     await devBtnHandle.click();
 
     // eslint-disable-next-line max-len
-    const extIdDivHandle: any = await (this.page as any).evaluateHandle('document.querySelector("body > extensions-manager").shadowRoot.querySelector("#items-list").shadowRoot.querySelector("extensions-item").shadowRoot.querySelector("#extension-id")');
+    const extIdDivHandle: any = await this.page.evaluateHandle('document.querySelector("body > extensions-manager").shadowRoot.querySelector("#items-list").shadowRoot.querySelector("extensions-item").shadowRoot.querySelector("#extension-id")');
     const rawExtId = await this.page.evaluate(div => div.textContent, extIdDivHandle);
     const extId = rawExtId.split(': ')[1];
     return extId;
