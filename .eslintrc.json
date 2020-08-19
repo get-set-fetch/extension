@@ -22,6 +22,7 @@
         "extensions": [
           ".js",
           ".ts",
+          ".tsx",
           ".d.ts"
         ]
       }
@@ -32,14 +33,16 @@
     "mocha": true
   },
   "globals": {
-    "chrome": true,
-    "GsfClient": true
+    "chrome": true
   },
   "rules": {
-    "max-len": [
+    "import/extensions": [
       "error",
+      "ignorePackages",
       {
-        "code": 170
+        "js": "never",
+        "ts": "never",
+        "tsx": "never"
       }
     ],
     "linebreak-style": [
@@ -61,11 +64,11 @@
         "exceptAfterSingleLine": true
       }
     ],
-    "max-line-length": [
-      true,
+    "max-len": [
+      "warn",
       180
     ],
-    "object-literal-sort-keys": false,
+    "object-literal-sort-keys": 0,
     "object-curly-newline": [
       "error",
       {
@@ -73,32 +76,25 @@
         "ExportDeclaration": "always"
       }
     ],
-    "trailing-comma": [
-      true,
-      {
-        "multiline": "never",
-        "singleline": "never"
-      }
+    "comma-dangle": [
+      "error",
+      "always-multiline"
     ],
     "arrow-parens": [
       "error",
       "as-needed"
-    ],
-    "member-access": [
-      true,
-      "no-public"
     ],
     "eol-last": [
       "error",
       "always"
     ],
     "whitespace": [
-      false,
+      0,
       "check-module"
     ],
-    "ordered-imports": false,
-    "quotemark": [
-      true,
+    "ordered-imports": 0,
+    "quotes": [
+      2,
       "single",
       "avoid-escape"
     ],
@@ -107,7 +103,7 @@
       "always"
     ],
     "one-line": [
-      false,
+      0,
       "check-catch",
       "check-finally",
       "check-else",
@@ -121,30 +117,42 @@
         "allowSingleLine": false
       }
     ],
-    "forin": false,
+    "forin": 0,
     "no-shadow": "off",
     "no-cond-assign": [
       "error",
       "except-parens"
     ],
-    "import/no-extraneous-dependencies": [
-      "off"
-    ],
+    "no-lonely-if": "off",
+    "no-inferrable-types": "off",
     "@typescript-eslint/indent": [
       "error",
       2
     ],
-    "@typescript-eslint/interface-name-prefix": [
-      "error",
-      "always"
-    ],
     "@typescript-eslint/no-angle-bracket-type-assertion": [
-      "error"
+      "off"
     ],
     "@typescript-eslint/explicit-member-accessibility": [
       "off"
     ],
     "@typescript-eslint/explicit-function-return-type": [
+      "off"
+    ],
+    "@typescript-eslint/no-object-literal-type-assertion": [
+      "off"
+    ],
+    "@typescript-eslint/naming-convention": [
+      "error",
+      {
+        "selector": "interface",
+        "format": ["PascalCase"],
+        "custom": {
+          "regex": "^I[A-Z]",
+          "match": true
+        }
+      }
+    ],
+    "@typescript-eslint/ban-types": [
       "off"
     ]
   }
