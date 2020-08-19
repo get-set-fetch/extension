@@ -12,7 +12,7 @@
     "lint": "eslint src/**/*.ts",
     "build": "npm run clean && npm run lint && npm run build:dist && npm run copy:resources",
     "build:dist": "rollup --config rollup.config.js",
-    "copy:resources": "shx cp -R src/html/*.html dist && shx cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js dist ",
+    "copy:resources": "shx cp node_modules/webextension-polyfill/dist/browser-polyfill.min.js dist ",
     "test": "nyc --reporter=lcov mocha \"./test/**/*.ts\"",
     "test:report": "cat ./coverage/lcov.info | ../../node_modules/coveralls/bin/coveralls.js",
     "test:single": "mocha \"./test/**/*.ts\" --grep \"Test JsonUrlHelper\""
