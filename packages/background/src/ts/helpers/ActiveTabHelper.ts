@@ -16,7 +16,7 @@ export default class ActiveTabHelper {
           */
           if (msg.resolved === undefined) return;
 
-          chrome.runtime.onMessage.removeListener(listener);
+          browser.runtime.onMessage.removeListener(listener);
           if (msg.resolved) {
             resolve(msg.result);
           }
@@ -24,7 +24,7 @@ export default class ActiveTabHelper {
             reject(msg.err);
           }
         };
-        chrome.runtime.onMessage.addListener(listener);
+        browser.runtime.onMessage.addListener(listener);
       });
 
       await ActiveTabHelper.executeScript(tabId, { code });
@@ -39,89 +39,103 @@ export default class ActiveTabHelper {
     return result;
   }
 
-  static executeScript<T = any>(tabId: number, details): Promise<T> {
-    return new Promise((resolve, reject) => {
-      chrome.tabs.executeScript(
-        tabId,
-        details,
-        result => {
-          if (result) {
-            resolve(result[0]);
-          }
-          else {
-            reject(chrome.runtime.lastError);
-          }
-        },
-      );
-    });
+  static async executeScript<T = any>(tabId: number, details): Promise<T> {
+    try {
+      const frameResults = await browser.tabs.executeScript(tabId, details);
+      return frameResults[0];
+    }
+    catch (err) {
+      throw new Error('could not execute script');
+    }
   }
 
-  static create(createProperties = {}, onRemoved: () => void = () => {}): Promise<chrome.tabs.Tab> {
-    return new Promise(resolve => {
-      chrome.tabs.create(
-        createProperties || {},
-        tab => {
-          Log.info(`scrape tab ${tab.id} created`);
-          // invalidate site.tabIds for all project sites, scrape will stop as there's no opened tab for it
-          const onRemovedListener = tabId => {
-            // only react to the opened scraping tab
-            if (tabId === tab.id) {
-              Log.info(`removing scrape tab ${tabId}`);
-              chrome.runtime.onMessage.removeListener(onRemovedListener);
-              onRemoved();
-            }
-          };
-          chrome.tabs.onRemoved.addListener(onRemovedListener);
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  static async create(createProperties = {}, onRemoved: () => void = () => {}): Promise<browser.tabs.Tab> {
+    const tab: browser.tabs.Tab = await browser.tabs.create(createProperties || {});
+    Log.info(`scrape tab ${tab.id} created`);
 
-          /*
-          make sure listners on targetcreated event with target.type() === 'page' are invoked before the page is further modified
-          delay returning the newly created tab
-          */
-          const resolveFnc = () => resolve(tab);
-          setTimeout(resolveFnc, 1000);
-        },
-      );
+    // invalidate site.tabIds for all project sites, scrape will stop as there's no opened tab for it
+    const onRemovedListener = tabId => {
+      // only react to the opened scraping tab
+      if (tabId === tab.id) {
+        Log.info(`removing scrape tab ${tabId}`);
+        browser.tabs.onRemoved.removeListener(onRemovedListener);
+        onRemoved();
+      }
+    };
+    browser.tabs.onRemoved.addListener(onRemovedListener);
+
+    // tab is fully loaded
+    if (tab.status === 'complete') {
+      return tab;
+    }
+
+    // tab is still loading, listen for its update
+    return new Promise(resolve => {
+      // wait for tab loading to complete
+      const onUpdatedListener = (tabId, changeInfo) => {
+        // only react to the opened scraping tab
+        if (tabId === tab.id && changeInfo.status === 'complete') {
+          browser.tabs.onUpdated.removeListener(onRemovedListener);
+          resolve(tab);
+        }
+      };
+
+      browser.tabs.onUpdated.addListener(onUpdatedListener);
     });
+
+
+    /*
+    make sure listners on targetcreated event with target.type() === 'page' are invoked before the page is further modified
+    delay returning the newly created tab
+    */
+
+    /*
+   await
+    const resolveFnc = () => resolve(tab);
+    setTimeout(resolveFnc, 1000);
+    */
   }
 
   static async close(tabId: number = null): Promise<void> {
     let activeTabId;
 
     if (!tabId) {
-      activeTabId = await new Promise(resolve => {
-        chrome.tabs.query({ active: true }, tabs => resolve(tabs[0].id));
-      });
+      const filteredTabs = await browser.tabs.query({ active: true });
+      activeTabId = filteredTabs[0].id;
     }
     else {
       activeTabId = tabId;
     }
 
-    await new Promise(resolve => {
-      chrome.tabs.remove(
-        activeTabId,
-        () => {
-          resolve();
-        },
-      );
-    });
+    await browser.tabs.remove(activeTabId);
   }
 
-  static update(tabId: number, updateProperties) {
-    return new Promise(resolve => {
-      chrome.tabs.update(
-        tabId,
-        updateProperties || {},
-        tab => {
-          // wait for the tab update to be completed, executeScript may throw errors otherwise
-          const updateHandler = (updatedTabId, changeInfo, updatedTab) => {
-            if (tabId === updatedTabId && changeInfo.status === 'complete') {
-              chrome.tabs.onUpdated.removeListener(updateHandler);
-              resolve(updatedTab);
-            }
-          };
-          chrome.tabs.onUpdated.addListener(updateHandler);
-        },
-      );
+  static update(tabId: number, updateProperties):Promise<browser.tabs.Tab> {
+    return new Promise(async (resolve, reject): Promise<void> => {
+      let tab;
+
+      try {
+        tab = await browser.tabs.update(tabId, updateProperties);
+      }
+      catch (err) {
+        reject(err);
+      }
+
+      // tab is fully loaded
+      if (tab.status === 'complete') {
+        resolve(tab);
+      }
+      else {
+        // wait for the tab update to be completed, executeScript may throw errors otherwise
+        const updateHandler = (updatedTabId, changeInfo, updatedTab) => {
+          if (tabId === updatedTabId && changeInfo.status === 'complete') {
+            browser.tabs.onUpdated.removeListener(updateHandler);
+            resolve(updatedTab);
+          }
+        };
+        browser.tabs.onUpdated.addListener(updateHandler);
+      }
     });
   }
 }

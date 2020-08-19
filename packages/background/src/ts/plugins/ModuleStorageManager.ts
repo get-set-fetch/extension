@@ -37,7 +37,7 @@ export default class ModuleStorageManager {
   }
 
   static async discoverLocalPlugins() {
-    const pluginDefinitions = await this.getModulesContent('background/plugins');
+    const pluginDefinitions = await this.getPluginsModules();
     const plugins = pluginDefinitions.map(moduleDef => new GsfProvider.Plugin(moduleDef));
     await ModuleStorageManager.persistModules(plugins);
   }
@@ -75,30 +75,46 @@ export default class ModuleStorageManager {
   }
 
   static async getLocalScenarios(): Promise<IScenarioStorage[]> {
-    const scenarioDirs = await ModuleStorageManager.getLocalDirs('scenarios');
-    const scenarioPkgs = Promise.all(
-      scenarioDirs.map(scenarioDir => ModuleStorageManager.getLocalScenarioDetails(scenarioDir)),
+    let scenarioNames: string[];
+    try {
+      scenarioNames = await (
+        await fetch(browser.extension.getURL('scenarios/scenario-list.json'))
+      ).json();
+    }
+    catch (err) {
+      throw new Error('could not fetch scenario-list.json');
+    }
+
+    const scenarioPkgs = Promise.all<IScenarioStorage>(
+      scenarioNames.map(async scenarioName => ModuleStorageManager.getLocalScenarioDetails(scenarioName)),
     );
+
     return scenarioPkgs;
   }
 
-  static async getLocalScenarioDetails(dir: DirectoryEntry): Promise<IScenarioStorage> {
-    // read local package.json
-    const pkgFileContent: string = await new Promise(resolve => {
-      dir.getFile('package.json', {}, async (pkgFileEntry: FileEntry) => {
-        const fileContent = await ModuleStorageManager.getFileContent(pkgFileEntry);
-        resolve(fileContent);
-      });
-    });
-    const pkgJson = JSON.parse(pkgFileContent);
+  static async getLocalScenarioDetails(scenarioName: string): Promise<IScenarioStorage> {
+    // fetch package.json
+    let pkgJson;
+    try {
+      pkgJson = await (
+        await fetch(browser.extension.getURL(`scenarios/${scenarioName}/package.json`))
+      ).json();
+    }
+    catch (err) {
+      throw new Error(`could not fetch scenarios/${scenarioName}/package.json`);
+    }
 
-    // read local main file
-    const code: string = await new Promise(resolve => {
-      dir.getFile(pkgJson.main, {}, async (mainFileEntry: FileEntry) => {
-        const fileContent = await ModuleStorageManager.getFileContent(mainFileEntry);
-        resolve(fileContent);
-      });
-    });
+    // fetch main file
+    let code: string;
+    try {
+      const scenarioMainFile = `scenarios/${scenarioName}/${pkgJson.main}`;
+      code = await (
+        await fetch(browser.extension.getURL(scenarioMainFile))
+      ).text();
+    }
+    catch (err) {
+      throw new Error(`could not fetch scenarios/${scenarioName}/${pkgJson.main}`);
+    }
 
     // pick relevant json npm props
     const extractProps = (
@@ -128,69 +144,34 @@ export default class ModuleStorageManager {
     );
   }
 
-  /* FILE UTILITIES */
+  static async getPluginsModules(): Promise<IModuleStorage[]> {
+    let pluginNames: string[];
+    try {
+      pluginNames = await (
+        await fetch(browser.extension.getURL('background/plugins/plugin-list.json'))
+      ).json();
+    }
+    catch (err) {
+      throw new Error(`could not fetch plugin-list.json: ${JSON.stringify(err)}`);
+    }
 
-  static getLocalDirs(relativeDir: string): Promise<DirectoryEntry[]> {
-    return new Promise((resolve, reject) => {
-      let dirs: DirectoryEntry[] = [];
+    const pluginModules = Promise.all<IModuleStorage>(
+      pluginNames.map(async pluginName => {
+        const pluginFile = `background/plugins/${pluginName}.js`;
+        try {
+          const code = await (
+            await fetch(browser.extension.getURL(pluginFile))
+          ).text();
 
-      chrome.runtime.getPackageDirectoryEntry(root => {
-        root.getDirectory(relativeDir, { create: false }, modulesDir => {
-          const reader = modulesDir.createReader();
-          // assume there are just a dozen plugins,
-          // otherwise a loop mechanism should be implemented in order to call readEntries multiple times
-          reader.readEntries(
-            async (entries: Entry[]) => {
-              dirs = entries.filter(entry => entry.isDirectory) as DirectoryEntry[];
-              resolve(dirs);
-            },
-            err => {
-              reject(err);
-            },
-          );
-        });
-      });
-    });
-  }
+          const moduleDef: IModuleStorage = { name: pluginName, code, builtin: true };
+          return moduleDef;
+        }
+        catch (err) {
+          throw new Error(`could not fetch plugin ${pluginFile}`);
+        }
+      }),
+    );
 
-  static getFileContent(fileEntry: FileEntry): Promise<string> {
-    return new Promise(resolve => {
-      fileEntry.file(pluginFile => {
-        const fileReader = new FileReader();
-        fileReader.onloadend = () => resolve(fileReader.result as string);
-        fileReader.readAsText(pluginFile);
-      });
-    });
-  }
-
-  static getModulesContent(relativeDir: string): Promise<IModuleStorage[]> {
-    return new Promise((resolve, reject) => {
-      let modules: IModuleStorage[] = [];
-
-      chrome.runtime.getPackageDirectoryEntry(root => {
-        root.getDirectory(relativeDir, { create: false }, modulesDir => {
-          const reader = modulesDir.createReader();
-          // assume there are just a dozen plugins,
-          // otherwise a loop mechanism should be implemented in order to call readEntries multiple times
-          reader.readEntries(
-            async (moduleFileEntries: FileEntry[]) => {
-              modules = await Promise.all(
-                moduleFileEntries.map(async moduleFileEntry => {
-                  const code = await ModuleStorageManager.getFileContent(moduleFileEntry);
-                  const name = moduleFileEntry.name.match(/^(\w+).js$/)[1];
-                  const moduleDef: IModuleStorage = { name, code, builtin: true };
-                  return moduleDef;
-                }),
-              );
-
-              resolve(modules);
-            },
-            err => {
-              reject(err);
-            },
-          );
-        });
-      });
-    });
+    return pluginModules;
   }
 }

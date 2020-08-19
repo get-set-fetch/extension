@@ -9,9 +9,9 @@ const Log = Logger.getLogger('background-main');
 (async () => {
   try {
     // handle toolbar click
-    chrome.browserAction.onClicked.addListener(() => {
+    browser.browserAction.onClicked.addListener(() => {
       const adminUrl = chrome.runtime.getURL('admin/admin.html');
-      chrome.tabs.create({ url: adminUrl });
+      browser.tabs.create({ url: adminUrl });
     });
 
     // handle install / uninstall events
