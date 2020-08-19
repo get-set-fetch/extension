@@ -44,23 +44,15 @@ export default class FetchPlugin extends BasePlugin {
     return this.fetch(resource);
   }
 
-  startDownload(url: string): Promise<number> {
-    return new Promise(resolve => chrome.downloads.download({ url }, (downloadId: number) => resolve(downloadId)));
-  }
-
   completeDownload(itemId: number): Promise<string> {
     return new Promise(resolve => {
-      chrome.downloads.onChanged.addListener(function onChanged(downloadDelta: chrome.downloads.DownloadDelta) {
-        if (downloadDelta.id === itemId && downloadDelta.state && downloadDelta.state.current !== 'in_progress') {
-          chrome.downloads.onChanged.removeListener(onChanged);
+      browser.downloads.onChanged.addListener(function onChanged(downloadDelta) {
+        if (downloadDelta.id === itemId && downloadDelta.state && downloadDelta.state.current === 'complete') {
+          browser.downloads.onChanged.removeListener(onChanged);
           resolve(downloadDelta.state.current);
         }
       });
     });
-  }
-
-  searchDownload(id: number): Promise<chrome.downloads.DownloadItem> {
-    return new Promise(resolve => chrome.downloads.search({ id }, (downloadItems: chrome.downloads.DownloadItem[]) => resolve(downloadItems[0])));
   }
 
   // fetch resource via builtin fetch
@@ -82,7 +74,7 @@ export default class FetchPlugin extends BasePlugin {
   // download resource via extension downloads API
   download(resource: IResource) {
     return new Promise(async (resolve, reject) => {
-      const downloadId: number = await this.startDownload(resource.url);
+      const downloadId: number = await browser.downloads.download({ url: resource.url });
 
       // download could not start
       if (!downloadId) {
@@ -100,56 +92,54 @@ export default class FetchPlugin extends BasePlugin {
       }
 
       // download succesfully completed
-      const downloadItem = await this.searchDownload(downloadId);
+      const downloadItems = await browser.downloads.search({ id: downloadId });
+      const downloadItem = downloadItems[0];
+
       const mediaType = downloadItem.mime;
       resolve({ mediaType });
     });
   }
 
-  openInTab(site: ISite, resource: IResource) {
-    return new Promise(async (resolve, reject) => {
-      let statusCode = null;
-      let redirectUrl = null;
+  async openInTab(site: ISite, resource: IResource) {
+    let completeHandler;
 
-      const reqHandler = request => {
-        ({ statusCode } = request);
-        chrome.webRequest.onErrorOccurred.removeListener(reqHandler);
-        chrome.webRequest.onCompleted.removeListener(reqHandler);
-      };
+    const reqPromise: Promise<{statusCode: number}> = new Promise((resolve, reject) => {
+      completeHandler = request => resolve(request.statusCode);
 
-      // https://developer.chrome.com/extensions/webRequest#event-onBeforeRedirect
-      const redirectHandler = details => {
-        ({ statusCode, redirectUrl } = details);
-        chrome.webRequest.onBeforeRedirect.removeListener(redirectHandler);
-      };
+      const resourceUrl:URL = new Url(resource.url);
 
-      // https://developer.chrome.com/extensions/match_patterns, path is required, make sure it at least '/'
-      const { pathname } = new Url(resource.url);
-      const urlFilters = pathname.length === 0 ? [ `${resource.url}/` ] : [ resource.url ];
-
-      // register request listers responsible for resolving or rejecting this plugin's apply fnc
-      chrome.webRequest.onErrorOccurred.addListener(reqHandler, { urls: urlFilters, tabId: site.tabId });
-      chrome.webRequest.onCompleted.addListener(reqHandler, { urls: urlFilters, tabId: site.tabId });
-      chrome.webRequest.onBeforeRedirect.addListener(redirectHandler, { urls: urlFilters, tabId: site.tabId });
-
-      // load the new resource
-      await ActiveTabHelper.update(site.tabId, { url: resource.url });
-
-      // url request succesfully completed with (3xx) or without (2xx) redirection
-      if (/^(2|3)\d{2}$/.test(statusCode)) {
-        const mediaType = await ActiveTabHelper.executeScript<string>(site.tabId, { code: 'document.contentType' });
-
-        if (/html/.test(mediaType) && this.opts.stabilityTimeout > 0) {
-          await this.waitForDomStabilityExecution(site.tabId, this.opts.stabilityTimeout);
-        }
-
-        resolve({ mediaType });
-      }
-      // url request error
-      else {
-        reject(new Error(`onErrorOccurred: ${statusCode}`));
-      }
+      // register request listeners responsible for resolving or rejecting this plugin's apply fnc
+      browser.webNavigation.onCompleted.addListener(
+        completeHandler,
+        {
+          url: [
+            {
+              hostEquals: resourceUrl.hostname,
+              pathEquals: resourceUrl.pathname,
+            },
+          ],
+        },
+      );
     });
+
+    // eslint-disable-next-line prefer-const
+    const [ tab ] = await Promise.all([
+      ActiveTabHelper.update(site.tabId, { url: resource.url }),
+      reqPromise,
+    ]);
+
+    // at some point, react to statusCode, redirectUrl ...
+
+    // remove the listners
+    browser.webNavigation.onCompleted.removeListener(completeHandler);
+
+    const mediaType = await ActiveTabHelper.executeScript<string>(site.tabId, { code: 'document.contentType' });
+
+    if (/html/.test(mediaType) && this.opts.stabilityTimeout > 0) {
+      await this.waitForDomStabilityExecution(site.tabId, this.opts.stabilityTimeout);
+    }
+
+    return { mediaType };
   }
 
   probableHtmlMimeType(urlStr: string) {
@@ -176,10 +166,10 @@ export default class FetchPlugin extends BasePlugin {
           await waitForDomStability(${timeout});
         
           // send the result back via messaging as the promise content will just be serialized to {}
-          chrome.runtime.sendMessage({resolved: true});
+          (browser || chrome).runtime.sendMessage({resolved: true});
         }
         catch(err) {
-          chrome.runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
+          (browser || chrome).runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
         }
       })();
     }
