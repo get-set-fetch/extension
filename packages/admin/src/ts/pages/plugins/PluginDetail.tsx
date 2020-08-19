@@ -88,6 +88,7 @@ export default class PluginDetail extends React.Component<RouteComponentProps<{p
           validate="onChangeAfterSubmit"
           showInlineError={true}
           validator={{ clean: true }}
+          // eslint-disable-next-line @typescript-eslint/no-empty-function
           onChangeModel={() => {}}
         >
           <div className="form-group">

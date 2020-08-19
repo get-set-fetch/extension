@@ -70,6 +70,7 @@ export default class SitePluginDefinitions extends React.Component<IProps, IStat
     const prop = evt.target.id;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   addPlugin(pluginId) {
   }
 
