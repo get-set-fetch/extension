@@ -84,3 +84,6 @@ todo*
 
 # firefox profile
 **/firefox/*
+
+# linked eslintrc files
+packages/**/.eslintrc.json
