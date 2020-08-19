@@ -10,7 +10,10 @@
     "128": "icons/gsf_128x128.png"
   },
   "background": {
-    "page": "background/background.html"
+	"scripts": [
+      "background/browser-polyfill.min.js",
+      "background/background-main.js"
+    ]
   },
   "browser_action": {
     "default_icon": "icons/gsf_32x32.png",
