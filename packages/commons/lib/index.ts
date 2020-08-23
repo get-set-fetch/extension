@@ -1,5 +1,10 @@
-export { SchemaHelper } from './schema/SchemaHelper';
-export { BasePlugin } from './plugin';
+import SchemaHelper from './schema/SchemaHelper';
+import { BasePlugin } from './plugin';
+
+export {
+  SchemaHelper,
+  BasePlugin,
+};
 
 export enum HttpMethod {
   GET = 'GET',

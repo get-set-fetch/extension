@@ -1,4 +1,4 @@
-export class SchemaHelper {
+export default class SchemaHelper {
   static instantiate(schema, data) {
     switch (schema.type) {
       case 'object':
@@ -20,7 +20,7 @@ export class SchemaHelper {
     const inst = {};
 
     if (schema.properties) {
-      Object.keys(schema.properties).forEach((propKey) => {
+      Object.keys(schema.properties).forEach(propKey => {
         inst[propKey] = this.instantiate(schema.properties[propKey], data[propKey]);
       });
     }

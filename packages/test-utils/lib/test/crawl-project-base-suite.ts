@@ -24,17 +24,17 @@ export function getBrowserHelper(customProps: IBrowserProps = {}): BrowserHelper
   const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
   const props = Object.assign(
     { extension: { path: extensionPath }, closeExtraPages: false },
-    customProps
+    customProps,
   );
   return process.env.browser === 'firefox' ? new FirefoxHelper(props) : new ChromeHelper(props);
 }
 
 declare const GsfClient;
 
-const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => describe(`Project Crawl ${title}`, () => {
+const crawlProjectBaseSuite = (title: string, crawlDefinitions: ICrawlDefinition[], cleanup = true) : Mocha.Suite => describe(`Project Crawl ${title}`, () => {
   let browserHelper: BrowserHelper;
   let page: Page;
-  const targetDir = resolve(process.cwd(), 'test', 'tmp');
+  const targetDir:string = resolve(process.cwd(), 'test', 'tmp');
 
   before(async () => {
     browserHelper = getBrowserHelper();

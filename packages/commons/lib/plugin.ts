@@ -1,7 +1,7 @@
 import { IResource } from './resource';
 import { ISite } from './site';
 import { IEnhancedJSONSchema } from './scenario';
-import { SchemaHelper } from './schema/SchemaHelper';
+import SchemaHelper from './schema/SchemaHelper';
 import { IModuleStorage } from './storage';
 
 export interface IPluginStorage extends IModuleStorage {
@@ -52,7 +52,7 @@ export abstract class BasePlugin {
     if (Object.keys(x).length !== Object.keys(y).length) return false;
 
     // different keys
-    for (var prop in x) {
+    for (const prop in x) {
       if (y.hasOwnProperty(prop)) {
         if (!this.deepEqual(x[prop], y[prop])) return false;
       }
@@ -66,7 +66,6 @@ export abstract class BasePlugin {
   }
 
   diffAndMergeResult(newResult: any, oldResult: any = this.result) {
-
     Object.keys(newResult).forEach(key => {
       const childContentType = this.getValType(newResult[key]);
       switch (childContentType) {
@@ -79,11 +78,9 @@ export abstract class BasePlugin {
           }
           else {
             // remove from the new array, already existing elms
-            newResult[key] = newResult[key].filter(newElm => {
-              return oldResult[key].find(oldElm => this.deepEqual(newElm, oldElm)) === undefined
-            })
+            newResult[key] = newResult[key].filter(newElm => oldResult[key].find(oldElm => this.deepEqual(newElm, oldElm)) === undefined);
             // add the new elms to the existing
-            oldResult[key].push(...newResult[key])
+            oldResult[key].push(...newResult[key]);
           }
           break;
         case 'object':
@@ -91,7 +88,7 @@ export abstract class BasePlugin {
             if (!oldResult[key]) {
               oldResult[key] = {};
             }
-            newResult[key] = this.diffAndMergeContent(newResult[key], oldResult[key])
+            newResult[key] = this.diffAndMergeContent(newResult[key], oldResult[key]);
           }
           else {
             this.diffAndMergeResult(newResult[key], oldResult[key]);
@@ -121,7 +118,7 @@ export abstract class BasePlugin {
   edge represents the boundary between previous and incoming new elements
   from the new content, everyting till the edge (included) is removed
   */
-  diffAndMergeContent(newContent: { [key: string]: string[] }, oldContent: { [key: string]: string[] }, ) {
+  diffAndMergeContent(newContent: { [key: string]: string[] }, oldContent: { [key: string]: string[] }) {
     const selectorKeys = Object.keys(newContent);
 
     // get old content edge
@@ -129,16 +126,16 @@ export abstract class BasePlugin {
       const edgeIdx = oldContent[selectorKey] && oldContent[selectorKey].length > 0 ? oldContent[selectorKey].length - 1 : null;
       return {
         edgeIdx,
-        edgeVal: edgeIdx !== null ? oldContent[selectorKey][edgeIdx] : null
-      }
+        edgeVal: edgeIdx !== null ? oldContent[selectorKey][edgeIdx] : null,
+      };
     });
 
-    let minEdgeIdx = Math.min(...edge.filter(({ edgeIdx }) => edgeIdx !== null).map(({ edgeIdx }) => edgeIdx))
+    const minEdgeIdx = Math.min(...edge.filter(({ edgeIdx }) => edgeIdx !== null).map(({ edgeIdx }) => edgeIdx));
 
     // make the edge idx relative
     edge.forEach(edgeEntry => {
       if (edgeEntry.edgeIdx !== null) {
-        edgeEntry.edgeIdx -= minEdgeIdx
+        edgeEntry.edgeIdx -= minEdgeIdx;
       }
     });
 
@@ -148,20 +145,20 @@ export abstract class BasePlugin {
     let startRowIdx = null;
 
     for (let rowIdx = 0; rowIdx < maxArrLength; rowIdx += 1) {
-      let edgeFound = selectorKeys.every((selectorKey, selectorIdx) => {
+      const edgeFound = selectorKeys.every((selectorKey, selectorIdx) => {
         const { edgeIdx, edgeVal } = edge[selectorIdx];
 
         // don't compare elements on an edge position with no value
         if (edgeVal === null) return true;
 
-        return newContent[selectorKey][rowIdx + edgeIdx] === edgeVal
-      })
+        return newContent[selectorKey][rowIdx + edgeIdx] === edgeVal;
+      });
 
       // edge found
       if (edgeFound) {
         startRowIdx = rowIdx;
         break;
-      };
+      }
     }
 
     selectorKeys.forEach(
@@ -172,8 +169,8 @@ export abstract class BasePlugin {
         }
         // add the new values to old content
         oldContent[selectorKey] = oldContent[selectorKey] || [];
-        oldContent[selectorKey].push(...newContent[selectorKey])
-      }
+        oldContent[selectorKey].push(...newContent[selectorKey]);
+      },
     );
 
     // make all array entries of same length, fill missing elements with last arr value

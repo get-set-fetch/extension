@@ -1,11 +1,11 @@
 import { assert } from 'chai';
-import { SchemaHelper } from '../lib/schema/SchemaHelper';
+import SchemaHelper from '../lib/schema/SchemaHelper';
 
 describe('Test Schema Helper', () => {
   it('parse normal string', async () => {
     const schemaWithDefault = {
       type: 'string',
-      default: 'valA'
+      default: 'valA',
     };
 
     let inst = SchemaHelper.instantiate(schemaWithDefault, undefined);
@@ -16,7 +16,7 @@ describe('Test Schema Helper', () => {
 
     const schemaWithConst = {
       type: 'string',
-      const: 'valA'
+      const: 'valA',
     };
 
     inst = SchemaHelper.instantiate(schemaWithConst, undefined);
@@ -30,7 +30,7 @@ describe('Test Schema Helper', () => {
     const schemaWithDefault = {
       type: 'string',
       format: 'regexp',
-      default: '/valA/i'
+      default: '/valA/i',
     };
 
     let inst = SchemaHelper.instantiate(schemaWithDefault, undefined);
@@ -41,7 +41,7 @@ describe('Test Schema Helper', () => {
 
     const schemaNoDefault = {
       type: 'string',
-      format: 'regexp'
+      format: 'regexp',
     };
 
     inst = SchemaHelper.instantiate(schemaNoDefault, undefined);
@@ -54,7 +54,7 @@ describe('Test Schema Helper', () => {
   it('parse integer', async () => {
     const schemaWithDefault = {
       type: 'integer',
-      default: '2'
+      default: '2',
     };
 
     let inst = SchemaHelper.instantiate(schemaWithDefault, undefined);
@@ -68,7 +68,7 @@ describe('Test Schema Helper', () => {
 
     const schemaWithConst = {
       type: 'integer',
-      const: '2'
+      const: '2',
     };
 
     inst = SchemaHelper.instantiate(schemaWithConst, undefined);
@@ -84,7 +84,7 @@ describe('Test Schema Helper', () => {
   it('parse number', async () => {
     const schemaWithDefault = {
       type: 'number',
-      default: '2.01'
+      default: '2.01',
     };
 
     let inst = SchemaHelper.instantiate(schemaWithDefault, undefined);
@@ -98,7 +98,7 @@ describe('Test Schema Helper', () => {
 
     const schemaWithConst = {
       type: 'number',
-      const: '2.01'
+      const: '2.01',
     };
 
     inst = SchemaHelper.instantiate(schemaWithConst, undefined);
@@ -114,7 +114,7 @@ describe('Test Schema Helper', () => {
   it('parse boolean', async () => {
     const schema = {
       type: 'boolean',
-      default: true
+      default: true,
     };
 
     let inst = SchemaHelper.instantiate(schema, undefined);
@@ -138,12 +138,12 @@ describe('Test Schema Helper', () => {
       type: 'object',
       properties: {
         propA: {
-          type: 'string'
+          type: 'string',
         },
         propB: {
-          type: 'string'
-        }
-      }
+          type: 'string',
+        },
+      },
     };
 
     const data = { propA: 'valA', propB: 'valB' };

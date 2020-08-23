@@ -83,18 +83,6 @@ export default class ActiveTabHelper {
 
       browser.tabs.onUpdated.addListener(onUpdatedListener);
     });
-
-
-    /*
-    make sure listners on targetcreated event with target.type() === 'page' are invoked before the page is further modified
-    delay returning the newly created tab
-    */
-
-    /*
-   await
-    const resolveFnc = () => resolve(tab);
-    setTimeout(resolveFnc, 1000);
-    */
   }
 
   static async close(tabId: number = null): Promise<void> {

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import connect from 'connect';
 import serveStatic from 'serve-static';
 import vhost from 'vhost';
@@ -22,7 +23,7 @@ export default class ProxyServer {
     serveStaticOpts = new Map<string, serveStatic.ServeStaticOptions>(),
     tlsDir,
   }:
-  IProxyServerProps) {
+  IProxyServerProps):void {
     const siteDirs = readdirSync(rootDir).filter(file => statSync(join(rootDir, file)).isDirectory());
 
     const mainApp = connect();

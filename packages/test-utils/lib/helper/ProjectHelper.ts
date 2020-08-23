@@ -2,11 +2,12 @@ import { readFileSync, unlinkSync } from 'fs';
 import { resolve } from 'path';
 import JSZip from 'jszip/dist/jszip';
 import { IProjectStorage, IPluginDefinition } from 'get-set-fetch-extension-commons';
+import { Page } from 'puppeteer';
 import BrowserHelper from './browser/BrowserHelper';
 
 declare const GsfClient;
 export default class ProjectHelper {
-  static async saveProject(browserHelper: BrowserHelper, project: IProjectStorage) {
+  static async saveProject(browserHelper: BrowserHelper, project: IProjectStorage):Promise<void> {
     const { page } = browserHelper;
 
     // go to project list
@@ -82,7 +83,7 @@ export default class ProjectHelper {
     await page.waitFor('table.table-main');
   }
 
-  static async downloadProjectCsv(page, project, targetDir, csvLineSeparator) {
+  static async downloadProjectCsv(page: Page, project:IProjectStorage, targetDir: string, csvLineSeparator: string) {
     // open export dropdown
     const downloadBtn = 'button#export';
     await page.waitFor(downloadBtn);
@@ -110,7 +111,7 @@ export default class ProjectHelper {
     };
   }
 
-  static async downloadProjectZip(page, project, targetDir) {
+  static async downloadProjectZip(page: Page, project:IProjectStorage, targetDir:string) {
     // open export dropdown
     const downloadBtn = 'button#export';
     await page.waitFor(downloadBtn);
@@ -124,7 +125,7 @@ export default class ProjectHelper {
     // wait a bit for file to be generated and saved
     await new Promise(res => setTimeout(res, 1000));
 
-     // read the file, delete it afterwards as firefox will not overwrite it on the next download
+    // read the file, delete it afterwards as firefox will not overwrite it on the next download
     const filePath = resolve(targetDir, `${project.name}.zip`);
     const generatedContent = readFileSync(resolve(targetDir, `${project.name}.zip`), 'binary');
     unlinkSync(filePath);

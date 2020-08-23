@@ -1,4 +1,5 @@
-import { launch, Page, NavigationOptions, Browser, Response, LaunchOptions } from 'puppeteer';
+/* eslint-disable no-await-in-loop */
+import { Page, NavigationOptions, Browser, Response, LaunchOptions } from 'puppeteer';
 
 declare const GsfClient;
 interface IExtension {
@@ -44,12 +45,12 @@ export default class BrowserHelper {
     this.extension = extension;
   }
 
-  launchBrowser() {
-    return launch(this.getLaunchOptions());
+  launchBrowser():Promise<Browser> {
+    throw new Error('launchBrowser not implemented');
   }
 
   // launches a browser instance
-  async launch() {
+  async launch():Promise<void> {
     this.browser = await this.launchBrowser();
 
     // wait for the extension to be installed and open the thank_you page
@@ -105,7 +106,7 @@ export default class BrowserHelper {
   once all scenarios are present it means all db initial operations are complete
   currently number of builtin installed scenarios: 1
   */
-  async waitForDBInitialization() {
+  async waitForDBInitialization():Promise<void> {
     // wait for the scenario page to load, have access to GsfClient
     await this.goto('/scenarios');
 
@@ -137,16 +138,16 @@ export default class BrowserHelper {
     return this.page.waitFor(selector, { timeout });
   }
 
-  close() {
+  close():Promise<void> {
     return this.browser.close();
   }
 
-  async setDownloadBehavior() {
+  async setDownloadBehavior():Promise<void> {
     throw new Error('setDownloadBehavior not implemented');
   }
 }
 
-const clearQuerySelector = async (page, selector) => {
+const clearQuerySelector = async (page:Page, selector) => {
   await page.evaluate(selector => {
     document.querySelector(selector).value = '';
   }, selector);

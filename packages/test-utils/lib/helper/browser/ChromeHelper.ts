@@ -1,6 +1,6 @@
 import { stringify } from 'query-string';
 import path from 'path';
-import { Response, LaunchOptions } from 'puppeteer';
+import { Response, LaunchOptions, launch, Browser } from 'puppeteer';
 import BrowserHelper from './BrowserHelper';
 
 export default class ChromeHelper extends BrowserHelper {
@@ -23,6 +23,10 @@ export default class ChromeHelper extends BrowserHelper {
     return this.page.goto(`chrome-extension://${this.extension.id}/admin/admin.html?${queryParams}`, this.gotoOpts);
   }
 
+  launchBrowser():Promise<Browser> {
+    return launch(this.getLaunchOptions());
+  }
+
   getLaunchOptions(): LaunchOptions {
     return {
       headless: false,
@@ -39,11 +43,11 @@ export default class ChromeHelper extends BrowserHelper {
   }
 
   // start a CDPSession in order to change download behavior via Chrome Devtools Protocol
-  async setDownloadBehavior() {
+  async setDownloadBehavior():Promise<void> {
     const client = await this.page.target().createCDPSession();
     await client.send('Page.setDownloadBehavior', {
       behavior: 'allow',
-      downloadPath: path.resolve(process.cwd(), 'test', 'tmp')
+      downloadPath: path.resolve(process.cwd(), 'test', 'tmp'),
     });
   }
 }

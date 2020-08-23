@@ -1,19 +1,19 @@
-/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable import/no-extraneous-dependencies */
+// eslint-disable-next-line camelcase
 import child_process from 'child_process';
 import pptr from 'puppeteer-core';
 import webExt from 'web-ext';
 
 import { stringify } from 'query-string';
-import { LaunchOptions } from 'puppeteer';
+import { LaunchOptions, Browser } from 'puppeteer';
 import { join } from 'path';
 import BrowserHelper from './BrowserHelper';
 
 export default class FirefoxHelper extends BrowserHelper {
-  client: any; // @cliqz-oss/firefox-client
+  client; // @cliqz-oss/firefox-client
   gotoInvoked: boolean = false;
-  
-  async launchBrowser() {
+
+  async launchBrowser():Promise<Browser> {
     const CDPPort = 51402;
     const args = [
       `--remote-debugger=localhost:${CDPPort}`,
@@ -32,10 +32,10 @@ export default class FirefoxHelper extends BrowserHelper {
             'network.socket.forcePort': '443=8443;80=8080',
 
             // download to last used folder
-            "browser.download.folderList": 2,
+            'browser.download.folderList': 2,
 
             // download folder, if path.sep === '\\' escape it again as it's parsed again upstream
-            "browser.download.dir": join(process.cwd(), 'test', 'tmp').replace(/\\/g, "\\\\"),
+            'browser.download.dir': join(process.cwd(), 'test', 'tmp').replace(/\\/g, '\\\\'),
 
             /*
             following flags appear not to be needed
@@ -45,20 +45,20 @@ export default class FirefoxHelper extends BrowserHelper {
             */
 
             // don't prompt for download
-            "browser.download.manager.showWhenStarting": false,
-            "browser.helperApps.alwaysAsk.force": false,
-            "browser.helperApps.neverAsk.saveToDisk": "application/zip,text/csv",
-            "browser.download.manager.focusWhenStarting": false,
-            "browser.download.manager.useWindow": false,
-            "browser.download.manager.showAlertOnComplete": false,
+            'browser.download.manager.showWhenStarting': false,
+            'browser.helperApps.alwaysAsk.force': false,
+            'browser.helperApps.neverAsk.saveToDisk': 'application/zip,text/csv',
+            'browser.download.manager.focusWhenStarting': false,
+            'browser.download.manager.useWindow': false,
+            'browser.download.manager.showAlertOnComplete': false,
 
             // disable updates
-            "app.update.enabled": false,
-            "app.update.checkInstallTime": false,
-            "app.update.disabledForTesting": true,
-            "app.update.auto": false,
-            "app.update.mode": 0,
-            "app.update.service.enabled": false,
+            'app.update.enabled': false,
+            'app.update.checkInstallTime': false,
+            'app.update.disabledForTesting': true,
+            'app.update.auto': false,
+            'app.update.mode': 0,
+            'app.update.service.enabled': false,
           },
         args,
       },
@@ -82,7 +82,7 @@ export default class FirefoxHelper extends BrowserHelper {
     const browserURL = `http://localhost:${CDPPort}`;
     const browser = await pptr.connect({
       browserURL,
-      product: 'firefox'
+      product: 'firefox',
     });
     return browser;
   }
@@ -113,11 +113,11 @@ export default class FirefoxHelper extends BrowserHelper {
 
   async goto(path: string) {
     const queryParams = stringify({ redirectPath: path });
-    
+
     /*
     loading resources via file://, about: , moz-extension:// is done in a sandbox
     a temporary browsing context is created first and immediately destroyed before the final one is created
-    
+
     see open issues:
     firefox : https://bugzilla.mozilla.org/show_bug.cgi?id=1634695
     puppeteer: https://github.com/puppeteer/puppeteer/issues/5504
@@ -137,13 +137,16 @@ export default class FirefoxHelper extends BrowserHelper {
       try {
         // switch to extension page, goto never receives any event for it
         await this.page.goto(
-          `moz-extension://${this.extension.id}/admin/admin.html?${queryParams}`, 
+          `moz-extension://${this.extension.id}/admin/admin.html?${queryParams}`,
           {
-            timeout: 100
-          }
+            timeout: 100,
+          },
         );
       }
-      catch (err) {};
+      catch (err) {
+        // eslint-disable-next-line no-console
+        console.log(`timeout on temporary browsing context, this is normal, ${JSON.stringify(err)}`);
+      }
 
       // make sure the extension page has loaded
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -152,10 +155,10 @@ export default class FirefoxHelper extends BrowserHelper {
       await this.browser.disconnect();
       this.browser = await pptr.connect({
         browserURL: `http://localhost:${51402}`,
-        product: 'firefox'
+        product: 'firefox',
       });
 
-      this.page = (await this.browser.pages())[0];
+      [ this.page ] = await this.browser.pages();
 
       return null;
     }
@@ -183,6 +186,7 @@ export default class FirefoxHelper extends BrowserHelper {
   downloads folder is set via preferences using web-ext when launching
   nothing to do
   */
-  async setDownloadBehavior() {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  async setDownloadBehavior():Promise<void> {
   }
 }
