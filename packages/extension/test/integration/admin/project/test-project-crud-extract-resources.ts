@@ -1,7 +1,6 @@
 import { assert } from 'chai';
-import { resolve } from 'path';
 import { Page } from 'puppeteer';
-import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
+import { BrowserHelper, getBrowserHelper } from 'get-set-fetch-extension-test-utils';
 import { IProjectStorage, IPluginDefinition } from 'get-set-fetch-extension-commons';
 import ProjectHelper from 'get-set-fetch-extension-test-utils/lib/helper/ProjectHelper';
 
@@ -114,8 +113,7 @@ describe('Project CRUD Pages', () => {
   const expectedConfigHash = 'eLtI4gnagystKMrPAjrUESM7wCQUkIVhWSSjpKTASl+/vLxcD5hYUhP1kvNz9TPzUlIr9DKAgYKag9JTS3SLgTgNlNx1YRJARlFiQaouMIGVZCbrIlIgRbmN4uyFI/WiJ1iU1JyckZiXnhqCnCbB6cm/ILUInEWL0XM+sck0MzedcEKlJGUa6pVkluSkKpGQ8EhLaACEAddQ';
 
   before(async () => {
-    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
-    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    browserHelper = getBrowserHelper();
     await browserHelper.launch();
     ({ page } = browserHelper as { page: Page });
   });
@@ -183,6 +181,7 @@ describe('Project CRUD Pages', () => {
 
     // check config hash
     await page.click(`#configHash-${savedProject.id}`);
+    await page.waitFor('#configHashArea');
     const actualConfigHash = await page.$eval('#configHashArea', el => (el as HTMLTextAreaElement).value);
     assert.strictEqual(actualConfigHash, expectedConfigHash);
   });

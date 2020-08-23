@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { launch, Page, NavigationOptions, Browser, Response, LaunchOptions } from 'puppeteer';
 
 declare const GsfClient;
@@ -10,7 +9,7 @@ interface IExtension {
 export interface IBrowserProps {
   httpPort?: number;
   httpsPort?: number;
-  extension: IExtension;
+  extension?: IExtension;
   gotoOpts?: NavigationOptions;
   closeExtraPages?: boolean;
 }
@@ -68,6 +67,8 @@ export default class BrowserHelper {
     this.extension.id = await this.getExtensionId();
     await this.waitForDBInitialization();
     await this.page.bringToFront();
+
+    await this.setDownloadBehavior();
   }
 
   async getExtensionId(): Promise<string> {
@@ -138,6 +139,10 @@ export default class BrowserHelper {
 
   close() {
     return this.browser.close();
+  }
+
+  async setDownloadBehavior() {
+    throw new Error('setDownloadBehavior not implemented');
   }
 }
 

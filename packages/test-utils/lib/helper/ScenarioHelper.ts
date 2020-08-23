@@ -5,8 +5,7 @@ export default class ScenarioHelper {
   static async installScenario(browserHelper: BrowserHelper, scenarioName: string) {
     const { page } = browserHelper;
     // load scenario list
-    const queryParams = stringify({ redirectPath: '/scenarios' });
-    await page.goto(`chrome-extension://${browserHelper.extension.id}/admin/admin.html?${queryParams}`, browserHelper.gotoOpts);
+    await browserHelper.goto('/scenarios');
 
     // wait for main table to render
     await page.waitFor('table.table-main');
@@ -20,8 +19,7 @@ export default class ScenarioHelper {
   static async uninstallScenario(browserHelper: BrowserHelper, scenarioName: string) {
     const { page } = browserHelper;
     // load scenario list
-    const queryParams = stringify({ redirectPath: '/scenarios' });
-    await page.goto(`chrome-extension://${browserHelper.extension.id}/admin/admin.html?${queryParams}`, browserHelper.gotoOpts);
+    await browserHelper.goto('/scenarios');
 
     // wait for main table to render
     await page.waitFor('table.table-main');

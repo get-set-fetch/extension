@@ -1,4 +1,5 @@
 import { stringify } from 'query-string';
+import path from 'path';
 import { Response, LaunchOptions } from 'puppeteer';
 import BrowserHelper from './BrowserHelper';
 
@@ -35,5 +36,14 @@ export default class ChromeHelper extends BrowserHelper {
         '--no-sandbox',
       ],
     };
+  }
+
+  // start a CDPSession in order to change download behavior via Chrome Devtools Protocol
+  async setDownloadBehavior() {
+    const client = await this.page.target().createCDPSession();
+    await client.send('Page.setDownloadBehavior', {
+      behavior: 'allow',
+      downloadPath: path.resolve(process.cwd(), 'test', 'tmp')
+    });
   }
 }

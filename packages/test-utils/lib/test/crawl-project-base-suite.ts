@@ -20,7 +20,12 @@ export interface ICrawlDefinition {
   expectedZipEntries?: string[];
 }
 
-export function getBrowserHelper(props: IBrowserProps): BrowserHelper {
+export function getBrowserHelper(customProps: IBrowserProps = {}): BrowserHelper {
+  const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
+  const props = Object.assign(
+    { extension: { path: extensionPath }, closeExtraPages: false },
+    customProps
+  );
   return process.env.browser === 'firefox' ? new FirefoxHelper(props) : new ChromeHelper(props);
 }
 
@@ -32,8 +37,7 @@ const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => descr
   const targetDir = resolve(process.cwd(), 'test', 'tmp');
 
   before(async () => {
-    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
-    browserHelper = getBrowserHelper({ extension: { path: extensionPath } });
+    browserHelper = getBrowserHelper();
     await browserHelper.launch();
     ({ page } = browserHelper);
   });
@@ -120,15 +124,6 @@ const crawlProjectBaseSuite = (title, crawlDefinitions, cleanup = true) => descr
       const resultsInputId = `input#results-${loadedProject.id}[type=button]`;
       await page.waitFor(resultsInputId);
       await page.click(resultsInputId);
-
-      // start a CDPSession in order to change download behavior via Chrome Devtools Protocol
-      const client = await page
-        .target()
-        .createCDPSession();
-      await client.send('Page.setDownloadBehavior', {
-        behavior: 'allow',
-        downloadPath: resolve(targetDir),
-      });
 
       // download and check csv
       if (crawlDefinition.expectedCsv && crawlDefinition.csvLineSeparator) {

@@ -1,7 +1,6 @@
 import { assert } from 'chai';
-import { resolve } from 'path';
 import { Page } from 'puppeteer';
-import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
+import { BrowserHelper, getBrowserHelper } from 'get-set-fetch-extension-test-utils';
 
 /* eslint-disable no-shadow, max-len */
 xdescribe('Site CRUD Pages', () => {
@@ -14,8 +13,7 @@ xdescribe('Site CRUD Pages', () => {
   };
 
   before(async () => {
-    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
-    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    browserHelper = getBrowserHelper();
     await browserHelper.launch();
     ({ page } = browserHelper as { page: Page });
   });

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
-import { join, resolve } from 'path';
+import { join } from 'path';
 import { Page } from 'puppeteer';
-import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
+import { BrowserHelper, getBrowserHelper } from 'get-set-fetch-extension-test-utils';
 
 
 /* eslint-disable no-shadow */
@@ -44,8 +44,7 @@ xdescribe('Site Crawl Extract Images', () => {
   };
 
   before(async () => {
-    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
-    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    browserHelper = getBrowserHelper();
     await browserHelper.launch();
     ({ page } = browserHelper as { page: Page });
   });
@@ -135,13 +134,6 @@ xdescribe('Site Crawl Extract Images', () => {
     // reload site list
     await browserHelper.goto('/sites');
     page.bringToFront();
-
-    // start a CDPSession in order to change download behavior via Chrome Devtools Protocol
-    const client = await page.target().createCDPSession();
-    await client.send('Page.setDownloadBehavior', {
-      behavior: 'allow',
-      downloadPath: resolve(targetDir),
-    });
 
     // implement: download zip
     /*

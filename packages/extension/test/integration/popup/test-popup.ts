@@ -1,16 +1,14 @@
 import { assert } from 'chai';
-import { resolve } from 'path';
 import { Page } from 'puppeteer';
-import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
+import { BrowserHelper, getBrowserHelper } from 'get-set-fetch-extension-test-utils';
 
 
-describe('Test Extension Popup', () => {
+xdescribe('Test Extension Popup', () => {
   let browserHelper: BrowserHelper;
   let page: Page;
 
   before(async () => {
-    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
-    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    browserHelper = getBrowserHelper();
     await browserHelper.launch();
     ({ page } = browserHelper as { page: Page });
   });

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { readFileSync } from 'fs';
 import { join, resolve } from 'path';
-import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
+import { BrowserHelper, getBrowserHelper } from 'get-set-fetch-extension-test-utils';
 import TestUtils from 'get-set-fetch/test/utils/TestUtils';
 import { Page } from 'puppeteer';
 
@@ -39,8 +39,7 @@ xdescribe('Site Crawl Extract HTML Headers', () => {
   };
 
   before(async () => {
-    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
-    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    browserHelper = getBrowserHelper();
     await browserHelper.launch();
     ({ page } = browserHelper as { page: Page });
   });
@@ -124,13 +123,6 @@ xdescribe('Site Crawl Extract HTML Headers', () => {
     // reload site list
     await browserHelper.goto('/sites');
     page.bringToFront();
-
-    // start a CDPSession in order to change download behavior via Chrome Devtools Protocol
-    const client = await page.target().createCDPSession();
-    await client.send('Page.setDownloadBehavior', {
-      behavior: 'allow',
-      downloadPath: resolve(targetDir),
-    });
 
     // download csv
     await page.click(`a#csv-${loadedSite.id}`);

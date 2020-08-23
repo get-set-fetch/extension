@@ -3,7 +3,7 @@ import { assert } from 'chai';
 import { Page } from 'puppeteer';
 import { resolve } from 'path';
 import { LogLevel, ILog, IProjectStorage, IPluginDefinition } from 'get-set-fetch-extension-commons';
-import { BrowserHelper, FileHelper } from 'get-set-fetch-extension-test-utils';
+import { BrowserHelper, FileHelper, getBrowserHelper } from 'get-set-fetch-extension-test-utils';
 
 describe('Storage', () => {
   let browserHelper: BrowserHelper;
@@ -11,20 +11,11 @@ describe('Storage', () => {
   const targetDir = resolve(process.cwd(), 'test', 'tmp');
 
   before(async () => {
-    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
-    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    browserHelper = getBrowserHelper();
     await browserHelper.launch();
+
     // cast related to https://github.com/Microsoft/TypeScript/issues/7576
     ({ page } = browserHelper as { page: Page });
-
-    // start a CDPSession in order to change download behavior via Chrome Devtools Protocol
-    const client = await page
-      .target()
-      .createCDPSession();
-    await client.send('Page.setDownloadBehavior', {
-      behavior: 'allow',
-      downloadPath: resolve(targetDir),
-    });
   });
 
   beforeEach(async () => {
@@ -41,7 +32,9 @@ describe('Storage', () => {
     await browserHelper.close();
   });
 
-  it('Populate > Export Logs > Clear > Import Logs > Clear', async () => {
+  it('Populate > Export Logs > Clear > Import Logs > Clear', async function() {
+    if (process.env.browser === 'firefox') return this.skip();
+
     // 1. Populate
     const logLevels = [ 3, 4 ];
     // eslint-disable-next-line no-restricted-syntax
@@ -94,7 +87,9 @@ describe('Storage', () => {
     await page.evaluate(() => GsfClient.fetch('DELETE', 'logs'));
   });
 
-  it('Export Plugins > Clear > Import Plugins', async () => {
+  it('Export Plugins > Clear > Import Plugins',  async function() {
+    if (process.env.browser === 'firefox') return this.skip();
+
     // 1. Export
     await browserHelper.goto('/settings');
 
@@ -138,7 +133,9 @@ describe('Storage', () => {
     assert.sameDeepMembers(importedPlugins, expectedPlugins);
   });
 
-  it('Populate > Export Project/Site/Resources > Clear > Import Export Project/Site/Resources > Clear', async () => {
+  it('Populate > Export Project/Site/Resources > Clear > Import Export Project/Site/Resources > Clear', async function() {
+    if (process.env.browser === 'firefox') return this.skip();
+
     // 1. Populate
     const plugins: IPluginDefinition[] = [ 'SelectResourcePlugin', 'ExtractUrlsPlugin', 'InsertResourcesPlugin', 'UpsertResourcePlugin' ].map(
       name => ({ name }),

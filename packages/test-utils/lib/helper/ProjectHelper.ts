@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { readFileSync, unlinkSync } from 'fs';
 import { resolve } from 'path';
 import JSZip from 'jszip/dist/jszip';
 import { IProjectStorage, IPluginDefinition } from 'get-set-fetch-extension-commons';
@@ -96,7 +96,10 @@ export default class ProjectHelper {
     // wait a bit for file to be generated and saved
     await new Promise(res => setTimeout(res, 1000));
 
+    // read the file, delete it afterwards as firefox will not overwrite it on the next download
+    const filePath = resolve(targetDir, `${project.name}.csv`);
     const generatedContent = readFileSync(resolve(targetDir, `${project.name}.csv`), 'utf8');
+    unlinkSync(filePath);
     const csvLines = generatedContent.split(csvLineSeparator);
 
     const header = csvLines[0];
@@ -121,7 +124,10 @@ export default class ProjectHelper {
     // wait a bit for file to be generated and saved
     await new Promise(res => setTimeout(res, 1000));
 
+     // read the file, delete it afterwards as firefox will not overwrite it on the next download
+    const filePath = resolve(targetDir, `${project.name}.zip`);
     const generatedContent = readFileSync(resolve(targetDir, `${project.name}.zip`), 'binary');
+    unlinkSync(filePath);
     const archive = await JSZip.loadAsync(generatedContent);
 
     return Object.keys(archive.files).map(name => archive.files[name].name);

@@ -1,8 +1,7 @@
 import { assert } from 'chai';
 import { Page } from 'puppeteer';
-import { resolve } from 'path';
 import { LogLevel } from 'get-set-fetch-extension-commons';
-import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
+import { BrowserHelper, getBrowserHelper } from 'get-set-fetch-extension-test-utils';
 
 
 describe('Logs Page', () => {
@@ -18,8 +17,7 @@ describe('Logs Page', () => {
   ];
 
   before(async () => {
-    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
-    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    browserHelper = getBrowserHelper();
     await browserHelper.launch();
     // cast related to https://github.com/Microsoft/TypeScript/issues/7576
     ({ page } = browserHelper as { page: Page });

@@ -1,18 +1,18 @@
+/* eslint-disable @typescript-eslint/camelcase */
 /* eslint-disable import/no-extraneous-dependencies */
-// eslint-disable-next-line camelcase
 import child_process from 'child_process';
-
 import pptr from 'puppeteer-core';
 import webExt from 'web-ext';
 
 import { stringify } from 'query-string';
-import { Response, LaunchOptions } from 'puppeteer';
+import { LaunchOptions } from 'puppeteer';
 import { join } from 'path';
 import BrowserHelper from './BrowserHelper';
 
 export default class FirefoxHelper extends BrowserHelper {
   client: any; // @cliqz-oss/firefox-client
-
+  gotoInvoked: boolean = false;
+  
   async launchBrowser() {
     const CDPPort = 51402;
     const args = [
@@ -22,15 +22,43 @@ export default class FirefoxHelper extends BrowserHelper {
     await webExt.cmd.run(
       {
         sourceDir: this.extension.path,
-        firefox: join(process.cwd(), './node_modules/puppeteer/.local-firefox/win64-80.0a1/firefox/firefox.exe'),
+        firefox: join(process.cwd(), './node_modules/puppeteer/.local-firefox/win64-81.0a1/firefox/firefox.exe'),
         firefoxProfile: join(process.cwd(), './test/resources/firefox/profile'),
         keepProfileChanges: true,
         pref:
           {
+            // proxy for all domains used in tests
             'network.dns.forceResolve': 'localhost',
             'network.socket.forcePort': '443=8443;80=8080',
-            'browser.tabs.remote.separateFileUriProcess': false,
-            'security.sandbox.content.level': 0,
+
+            // download to last used folder
+            "browser.download.folderList": 2,
+
+            // download folder, if path.sep === '\\' escape it again as it's parsed again upstream
+            "browser.download.dir": join(process.cwd(), 'test', 'tmp').replace(/\\/g, "\\\\"),
+
+            /*
+            following flags appear not to be needed
+            "browser.download.defaultFolder": join(process.cwd(), 'test', 'tmp'),
+            "browser.download.downloadDir": join(process.cwd(), 'test', 'tmp'),
+            "browser.download.lastDir": join(process.cwd(), 'test', 'tmp'),
+            */
+
+            // don't prompt for download
+            "browser.download.manager.showWhenStarting": false,
+            "browser.helperApps.alwaysAsk.force": false,
+            "browser.helperApps.neverAsk.saveToDisk": "application/zip,text/csv",
+            "browser.download.manager.focusWhenStarting": false,
+            "browser.download.manager.useWindow": false,
+            "browser.download.manager.showAlertOnComplete": false,
+
+            // disable updates
+            "app.update.enabled": false,
+            "app.update.checkInstallTime": false,
+            "app.update.disabledForTesting": true,
+            "app.update.auto": false,
+            "app.update.mode": 0,
+            "app.update.service.enabled": false,
           },
         args,
       },
@@ -47,16 +75,16 @@ export default class FirefoxHelper extends BrowserHelper {
         this.client = context.extensionRunners[0].remoteFirefox.client;
       });
 
-
     // Needed because `webExt.cmd.run` returns before the DevTools agent starts running.
     // Alternative would be to wrap the call to pptr.connect() with some custom retry logic
     child_process.execSync('sleep 5');
 
     const browserURL = `http://localhost:${CDPPort}`;
-    return pptr.connect({
+    const browser = await pptr.connect({
       browserURL,
-      product: 'firefox',
+      product: 'firefox'
     });
+    return browser;
   }
 
   async getExtensionId(): Promise<string> {
@@ -83,25 +111,56 @@ export default class FirefoxHelper extends BrowserHelper {
     return gsfId;
   }
 
-  async goto(path: string): Promise<Response> {
+  async goto(path: string) {
     const queryParams = stringify({ redirectPath: path });
-
+    
     /*
-    workaround for
-    https://github.com/puppeteer/puppeteer/issues/5504
-    https://bugzilla.mozilla.org/show_bug.cgi?id=1634690
+    loading resources via file://, about: , moz-extension:// is done in a sandbox
+    a temporary browsing context is created first and immediately destroyed before the final one is created
+    
+    see open issues:
+    firefox : https://bugzilla.mozilla.org/show_bug.cgi?id=1634695
+    puppeteer: https://github.com/puppeteer/puppeteer/issues/5504
 
-    Loading files via file:// is done in a sandbox, and as such causes a remoteness change.
-    This definitely changes the browsing context id (similar when loading about:) pages.
-    Note that a temporary browsing context is created first and immediately destroyed before the final one is created.
-    https://bugzilla.mozilla.org/show_bug.cgi?id=1634695
+    see related (not solving the problem) closed issues:
+    playwright: https://github.com/microsoft/playwright/issues/822
 
-    https://github.com/microsoft/playwright/pull/1110
-    https://github.com/microsoft/playwright/pull/1110/commits/95beeb429b7de99de895cda410c185972969b08c
+    the next goto navigation from _blank to moz-extension:// never completes looking like the remote agent
+    lost the connection
+
+    the workaround is to re-connect puppeteer when the browser tab has the moz-extension:// page opened
+    only needed to be done on the 1st time moz-extension:// loads
     */
-    this.page.goto(`moz-extension://${this.extension.id}/admin/admin.html?${queryParams}`, this.gotoOpts);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    return null;
+    if (!this.gotoInvoked) {
+      this.gotoInvoked = true;
+
+      try {
+        // switch to extension page, goto never receives any event for it
+        await this.page.goto(
+          `moz-extension://${this.extension.id}/admin/admin.html?${queryParams}`, 
+          {
+            timeout: 100
+          }
+        );
+      }
+      catch (err) {};
+
+      // make sure the extension page has loaded
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // re-connect puppeteer
+      await this.browser.disconnect();
+      this.browser = await pptr.connect({
+        browserURL: `http://localhost:${51402}`,
+        product: 'firefox'
+      });
+
+      this.page = (await this.browser.pages())[0];
+
+      return null;
+    }
+
+    return this.page.goto(`moz-extension://${this.extension.id}/admin/admin.html?${queryParams}`, this.gotoOpts);
   }
 
   getLaunchOptions(): LaunchOptions {
@@ -117,5 +176,13 @@ export default class FirefoxHelper extends BrowserHelper {
       ],
       userDataDir: join(process.cwd(), './test/resources/firefox/profile'),
     };
+  }
+
+  /*
+  puppeteer ff can't open CDPSession invoking Page.setDownloadBehavior
+  downloads folder is set via preferences using web-ext when launching
+  nothing to do
+  */
+  async setDownloadBehavior() {
   }
 }

@@ -1,7 +1,6 @@
 import { assert } from 'chai';
-import { resolve } from 'path';
 import { Page } from 'puppeteer';
-import { BrowserHelper } from 'get-set-fetch-extension-test-utils';
+import { BrowserHelper, getBrowserHelper } from 'get-set-fetch-extension-test-utils';
 import { IProjectStorage } from 'get-set-fetch-extension-commons';
 import ProjectHelper from 'get-set-fetch-extension-test-utils/lib/helper/ProjectHelper';
 import CrawlHelper from 'get-set-fetch-extension-test-utils/lib/helper/CrawlHelper';
@@ -43,8 +42,7 @@ describe('Resume Crawling', () => {
   };
 
   before(async () => {
-    const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
-    browserHelper = new BrowserHelper({ extension: { path: extensionPath } });
+    browserHelper = getBrowserHelper();
     await browserHelper.launch();
     ({ page } = browserHelper as { page: Page });
   });
@@ -66,7 +64,9 @@ describe('Resume Crawling', () => {
     await browserHelper.close();
   });
 
-  it('Test Pause/Resume', async () => {
+  it('Test Pause/Resume', async function() {
+    if (process.env.browser === 'firefox') return this.skip();
+    
     await browserHelper.goto('/projects');
 
     // open project detail page
