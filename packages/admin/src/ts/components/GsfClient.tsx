@@ -42,7 +42,7 @@ export default class GsfClient {
   static fetch<T = object>(method: HttpMethod, resource: string, body?: object): Promise<T> {
     return new Promise((resolve, reject) => {
       GsfClient.addFetchOp();
-      chrome.runtime.sendMessage({ method, resource, body }, response => {
+      (globalThis.browser || globalThis.chrome).runtime.sendMessage({ method, resource, body }, response => {
         if (response && response.error) {
           reject(response.error);
         }

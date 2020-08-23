@@ -142,10 +142,10 @@ export default class ModuleRuntimeManager {
             }
 
             // send the result back via messaging as the promise content will just be serialized to {}
-            chrome.runtime.sendMessage({resolved: true, result});
+            (globalThis.browser || globalThis.chrome).runtime.sendMessage({resolved: true, result});
           }
           catch(err) {
-            chrome.runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
+            (globalThis.browser || globalThis.chrome).runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
           }
         })();
       }

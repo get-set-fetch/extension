@@ -166,10 +166,10 @@ export default class FetchPlugin extends BasePlugin {
           await waitForDomStability(${timeout});
         
           // send the result back via messaging as the promise content will just be serialized to {}
-          (browser || chrome).runtime.sendMessage({resolved: true});
+          (globalThis.browser || globalThis.chrome).runtime.sendMessage({resolved: true});
         }
         catch(err) {
-          (browser || chrome).runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
+          (globalThis.browser || globalThis.chrome).runtime.sendMessage({resolved: false, err: JSON.stringify(err, Object.getOwnPropertyNames(err))});
         }
       })();
     }

@@ -41,7 +41,7 @@ export default class GsfProvider {
     GsfProvider.Setting = Setting;
 
     // wait for client requests
-    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
       let reqPromise = null;
 
       /*

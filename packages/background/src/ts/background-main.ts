@@ -10,15 +10,15 @@ const Log = Logger.getLogger('background-main');
   try {
     // handle toolbar click
     browser.browserAction.onClicked.addListener(() => {
-      const adminUrl = chrome.runtime.getURL('admin/admin.html');
+      const adminUrl = browser.runtime.getURL('admin/admin.html');
       browser.tabs.create({ url: adminUrl });
     });
 
     // handle install / uninstall events
-    chrome.runtime.onInstalled.addListener(() => {
-      chrome.tabs.create({ url: 'https://getsetfetch.org/thank-you-install.html' });
+    browser.runtime.onInstalled.addListener(() => {
+      browser.tabs.create({ url: 'https://getsetfetch.org/thank-you-install.html' });
     });
-    chrome.runtime.setUninstallURL('https://getsetfetch.org/thank-you-uninstall.html');
+    browser.runtime.setUninstallURL('https://getsetfetch.org/thank-you-uninstall.html');
 
     await GsfProvider.init();
 
