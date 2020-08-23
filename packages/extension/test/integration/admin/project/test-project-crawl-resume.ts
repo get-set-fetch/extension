@@ -21,7 +21,7 @@ describe('Resume Crawling', () => {
       {
         name: 'SelectResourcePlugin',
         opts: {
-          delay: 5000,
+          delay: 3000,
         },
       },
       {
@@ -64,9 +64,7 @@ describe('Resume Crawling', () => {
     await browserHelper.close();
   });
 
-  it('Test Pause/Resume', async function() {
-    if (process.env.browser === 'firefox') return this.skip();
-    
+  it('Test Pause/Resume', async () => {    
     await browserHelper.goto('/projects');
 
     // open project detail page
@@ -98,8 +96,8 @@ describe('Resume Crawling', () => {
     // pause scraping after 1st resource has been scraped
     await new Promise(resolve => {
       /*
-      with SelectResourcePlugin having a delay of 5s between fetching consecutive resources
-      a delay of 7s will ensure a single resource is crawled when the tab is closed
+      with SelectResourcePlugin having a delay of 3s between fetching consecutive resources
+      a delay of 5s will ensure a single resource is crawled when the tab is closed
       */
       setTimeout(
         () => {
@@ -107,12 +105,12 @@ describe('Resume Crawling', () => {
           page.evaluate(() => GsfClient.fetch('GET', 'utils/closeactivetab'));
           resolve();
         },
-        8000,
+        5000,
       );
     });
 
     // wait for 2nd resource to result in crawlInError flag
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 3000));
 
     let actualResources = await page.evaluate(siteId => GsfClient.fetch('GET', `resources/${siteId}`), savedSite.id);
 

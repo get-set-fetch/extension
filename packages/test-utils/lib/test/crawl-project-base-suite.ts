@@ -23,7 +23,7 @@ export interface ICrawlDefinition {
 export function getBrowserHelper(customProps: IBrowserProps = {}): BrowserHelper {
   const extensionPath = resolve(process.cwd(), 'node_modules', 'get-set-fetch-extension', 'dist');
   const props = Object.assign(
-    { extension: { path: extensionPath }, closeExtraPages: false },
+    { extension: { path: extensionPath } },
     customProps,
   );
   return process.env.browser === 'firefox' ? new FirefoxHelper(props) : new ChromeHelper(props);

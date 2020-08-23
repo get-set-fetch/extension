@@ -5,7 +5,7 @@ describe('Install', () => {
   let browserHelper: BrowserHelper;
 
   before(async () => {
-    browserHelper = getBrowserHelper();
+    browserHelper = getBrowserHelper({closeExtraPages: false});
     await browserHelper.launch();
   });
 
