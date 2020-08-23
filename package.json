@@ -107,7 +107,6 @@
     "get-set-fetch-extension-admin": "file:packages/admin",
     "get-set-fetch-extension-background": "file:packages/background",
     "get-set-fetch-extension-commons": "file:packages/commons",
-    "get-set-fetch-extension-popup": "file:packages/popup",
     "get-set-fetch-scenario-scrape-static-content": "file:packages/scenarios/scrape-static-content",
     "get-set-fetch-scenario-extract-resources": "file:packages/scenarios/extract-resources",
     "get-set-fetch-scenario-scrape-dynamic-content": "file:packages/scenarios/scrape-dynamic-content",

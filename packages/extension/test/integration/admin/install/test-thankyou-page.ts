@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { BrowserHelper, getBrowserHelper } from 'get-set-fetch-extension-test-utils';
 
-describe('Test ThankYou Pages', () => {
+describe('Install', () => {
   let browserHelper: BrowserHelper;
 
   before(async () => {
@@ -13,7 +13,7 @@ describe('Test ThankYou Pages', () => {
     await browserHelper.close();
   });
 
-  it('install page', async () => {
+  it('ThankYou Page', async () => {
     const tyPage = (await browserHelper.browser.pages()).find(page => /thank/.test(page.url()));
     assert.isDefined(tyPage);
     assert.equal(tyPage.url(), 'https://getsetfetch.org/thank-you-install.html');
