@@ -9,7 +9,7 @@ install:
   - npm install --global rollup
   - npm ci
 script:
-#  - npm run fetch:firefox
+  - npm run fetch:firefox
   - npm run build
   - npm run test  
 after_script:
