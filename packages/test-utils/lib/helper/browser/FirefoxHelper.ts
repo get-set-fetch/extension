@@ -8,6 +8,7 @@ import { stringify } from 'query-string';
 import { LaunchOptions, Browser } from 'puppeteer';
 import { join } from 'path';
 import BrowserHelper from './BrowserHelper';
+import { readFileSync } from 'fs';
 
 export default class FirefoxHelper extends BrowserHelper {
   client; // @cliqz-oss/firefox-client
@@ -19,10 +20,16 @@ export default class FirefoxHelper extends BrowserHelper {
       `--remote-debugger=localhost:${CDPPort}`,
     ];
 
+    const ffRevisionPath = join(process.cwd(), 'node_modules', 'puppeteer', 'firefox-revision.json');
+    const { executablePath } = JSON.parse(readFileSync(ffRevisionPath).toString());
+
+    // lots of verbose messages, capture them, don't show them in console
+    webExt.util.logger.consoleStream.startCapturing();
+
     await webExt.cmd.run(
       {
         sourceDir: this.extension.path,
-        firefox: join(process.cwd(), './node_modules/puppeteer/.local-firefox/win64-81.0a1/firefox/firefox.exe'),
+        firefox: executablePath,
         firefoxProfile: join(process.cwd(), './test/resources/firefox/profile'),
         keepProfileChanges: true,
         pref:

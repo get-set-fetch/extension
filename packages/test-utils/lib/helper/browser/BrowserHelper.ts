@@ -81,18 +81,18 @@ export default class BrowserHelper {
   }
 
   async waitForExtensionPage(): Promise<Page> {
-    // retry max 3 times
+    // wait longer for each retry
     let tyPage: Page;
     let retryNo = 0;
     do {
+      await new Promise(resolve => setTimeout(resolve, (retryNo + 1) * 500));
       const pages = await this.browser.pages();
       tyPage = pages.find(page => page.url() === 'https://getsetfetch.org/thank-you-install.html');
       if (tyPage) break;
 
       retryNo += 1;
-      await new Promise(resolve => setTimeout(resolve, 1000));
     }
-    while (retryNo < 3);
+    while (retryNo <= 3);
 
     if (!tyPage) {
       throw new Error('ThankYou Page not opened');

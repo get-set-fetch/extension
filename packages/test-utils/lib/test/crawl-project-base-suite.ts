@@ -26,6 +26,7 @@ export function getBrowserHelper(customProps: IBrowserProps = {}): BrowserHelper
     { extension: { path: extensionPath } },
     customProps,
   );
+
   return process.env.browser === 'firefox' ? new FirefoxHelper(props) : new ChromeHelper(props);
 }
 

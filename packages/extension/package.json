@@ -7,11 +7,11 @@
   ],
   "scripts": {
     "clean": "shx rm -rf dist",
-    "build": "npm run clean && npm run copy:resources && npm run build:file:list && npm run build:tgz && npm run build:keys && npm run build:firefox:profile",
-    "build:tgz": "ts-node --files ./scripts/tgz-npm-pkg.ts",
-    "build:keys": "ts-node --files ./scripts/generate-keys.ts",
-    "build:firefox:profile": "ts-node --files ./scripts/generate-firefox-profile.ts",
-    "build:file:list": "ts-node --files ./scripts/generate-file-list.ts",
+    "build": "npm run clean && npm run copy:resources && npm run generate:file:list && npm run generate:tgz && npm run generate:keys && npm run generate:firefox:policies",
+    "generate:tgz": "ts-node --files ./scripts/generate-tgz-npm-pkg.ts",
+    "generate:keys": "ts-node --files ./scripts/generate-keys.ts",
+    "generate:firefox:policies": "ts-node --files ./scripts/generate-firefox-policies.ts",
+    "generate:file:list": "ts-node --files ./scripts/generate-file-list.ts",
     "copy:resources": "npm run copy:local && npm run update:local && npm run copy:bkg && npm run copy:admin && npm run copy:scenarios",
     "copy:local": "shx mkdir dist && shx cp -R src/resources/* dist/",
     "update:local": "node ./scripts/manifest-update.js",
@@ -27,11 +27,11 @@
     "copy:scenario-scrape-dynamic-content-pkg": "shx cp -R ../../node_modules/get-set-fetch-scenario-scrape-dynamic-content/package.json dist/scenarios/get-set-fetch-scenario-scrape-dynamic-content",
     "copy:scenario-scrape-dynamic-content": "npm run copy:scenario-scrape-dynamic-content-dist && npm run copy:scenario-scrape-dynamic-content-pkg",
     "copy:scenarios": "npm run copy:scenario-scrape-static-content && npm run copy:scenario-scrape-dynamic-content",
-    "test": "mocha test \"./test/integration/**/*.ts\" --exit",
-    "test:single": "mocha test \"./test/integration/**/*.ts\" --grep \"Project Crawl Extract Html Headings\"",
-    "test:single:chrome": "browser=chrome mocha test \"./test/integration/**/*.ts\" --grep \"Test ThankYou Pages\"",
-    "test:single:firefox:wls": "browser=firefox mocha test \"./test/integration/**/*.ts\" --grep \"Test ThankYou Pages\"",
-    "test:single:firefox": "browser=firefox mocha test \"./test/integration/**/*.ts\" --grep \"Test ThankYou Pages\""
+    "test": "npm run test:chrome && npm run test:single:firefox",
+    "test:chrome": "mocha test \"./test/integration/**/*.ts\" --exit",
+    "test:firefox": "browser=firefox mocha test \"./test/integration/**/*.ts\" --exit",
+    "test:single:chrome": "mocha test \"./test/integration/**/*.ts\" --grep \"Project Crawl Extract Html Headings\"",
+    "test:single:firefox": "browser=firefox mocha test \"./test/integration/**/*.ts\" --grep \"ThankYou Page\""
   },
   "author": {
     "name": "Andrei Sabau"
