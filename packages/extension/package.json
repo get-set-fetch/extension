@@ -27,7 +27,7 @@
     "copy:scenario-scrape-dynamic-content-pkg": "shx cp -R ../../node_modules/get-set-fetch-scenario-scrape-dynamic-content/package.json dist/scenarios/get-set-fetch-scenario-scrape-dynamic-content",
     "copy:scenario-scrape-dynamic-content": "npm run copy:scenario-scrape-dynamic-content-dist && npm run copy:scenario-scrape-dynamic-content-pkg",
     "copy:scenarios": "npm run copy:scenario-scrape-static-content && npm run copy:scenario-scrape-dynamic-content",
-    "test": "npm run test:chrome && npm run test:single:firefox",
+    "test": "npm run test:chrome && npm run test:firefox",
     "test:chrome": "mocha test \"./test/integration/**/*.ts\" --exit",
     "test:firefox": "browser=firefox mocha test \"./test/integration/**/*.ts\" --exit",
     "test:single:chrome": "mocha test \"./test/integration/**/*.ts\" --grep \"Project Crawl Extract Html Headings\"",
