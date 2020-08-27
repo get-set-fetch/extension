@@ -1,10 +1,3 @@
-import 'jquery';
-
-import 'bootstrap/js/dist/util';
-import 'bootstrap/js/dist/dropdown';
-import 'bootstrap/js/dist/modal';
-import 'bootstrap/js/dist/collapse';
-
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import Admin from './pages/Admin';

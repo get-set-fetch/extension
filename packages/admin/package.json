@@ -34,8 +34,6 @@
     "get-set-fetch-extension-commons": "file:../commons",
     "immutable": "^4.0.0-rc.12",
     "is-my-json-valid": "^2.20.0",
-    "jquery": "^3.3.1",
-    "popper.js": "^1.14.3",
     "query-string": "^6.1.0",
     "react": "^16.4.0",
     "react-beautiful-dnd": "^10.0.4",

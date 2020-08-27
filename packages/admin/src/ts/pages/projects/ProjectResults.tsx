@@ -5,6 +5,7 @@ import GsfClient from '../../components/GsfClient';
 import Page from '../../layout/Page';
 import Modal from '../../components/Modal';
 import ScenarioHelper from '../scenarios/model/ScenarioHelper';
+import Dropdown from '../../components/Dropdown';
 
 interface IState {
   project: IProjectStorage;
@@ -146,17 +147,17 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
 
   renderExportButton() {
     return ([
-      <div key='export' className='dropdown btn btn-secondary mr-2 float-right'>
-        <button
-          id='export'
-          className='btn btn-secondary dropdown-toggle'
-          type='button'
-          data-toggle='dropdown'
-          aria-haspopup='true'
-          aria-expanded='false'>
-          Export
-        </button>
-        <div className='dropdown-menu' aria-labelledby='dropdownMenuButton'>
+      <Dropdown
+        className='dropdown btn btn-secondary mr-2 float-right'
+        anchor={
+          <button
+            id="export"
+            className={'btn btn-secondary dropdown-toggle'}
+          >
+            Export
+          </button>
+        }>
+        <div className='dropdown-menu show' aria-labelledby='dropdownMenuButton'>
           {
             this.state.scenario.getResultExportOpts().map(exportOpt => (
               <a
@@ -173,7 +174,7 @@ export default class ProjectResults extends React.Component<RouteComponentProps<
             ))
           }
         </div>
-      </div>,
+      </Dropdown>,
     ]);
   }
 
