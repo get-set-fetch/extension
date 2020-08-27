@@ -7,7 +7,9 @@
   ],
   "scripts": {
     "clean": "shx rm -rf dist",
+    "lint:addon": "web-ext lint --source-dir \"./dist\"",
     "build": "npm run clean && npm run copy:resources && npm run generate:file:list && npm run generate:tgz && npm run generate:keys && npm run generate:firefox:policies",
+    "fix:firefox:addons:linter": "ts-node --files ./scripts/fix-firefox-addons-linter.ts",
     "generate:tgz": "ts-node --files ./scripts/generate-tgz-npm-pkg.ts",
     "generate:keys": "ts-node --files ./scripts/generate-keys.ts",
     "generate:firefox:policies": "ts-node --files ./scripts/generate-firefox-policies.ts",
