@@ -1,6 +1,6 @@
 {
   "name": "get-set-fetch-scenario-scrape-dynamic-content",
-  "version": "0.3.0",
+  "version": "0.4.0-rc.1",
   "description": "extracts text and binary content from dynamic (javascript) pages based on CSS selectors",
   "homepage": "https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/scrape-dynamic-content",
   "main": "dist/ScrapeDynamicContent.js",
