@@ -43,11 +43,11 @@ You can find technical tidbits in each sub-package readme file.
 
 # Short-Term Roadmap
 
-## v.0.2.1
+## v.0.4
   - add column filter capability when exporting resources as csv
   - add import / export database capabilities
+  - add Firefox support
 
 # Medium-Term Roadmap
-  - add Firefox support
   - add additional scraping scenarios
 
