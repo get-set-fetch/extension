@@ -237,6 +237,62 @@ const crawlDefinitions: ICrawlDefinition[] = [
     ],
     csvLineSeparator: '\n',
   },
+
+  {
+    title: 'redirect maxDepth = -1, maxResources = -1',
+    project: {
+      name: 'projA',
+      description: 'descriptionA',
+      url: 'https://www.sitea.com/redirect/redirect-main.html',
+      scenario: 'get-set-fetch-scenario-scrape-static-content',
+      plugins: [
+        {
+          name: 'ExtractUrlsPlugin',
+          opts: {
+            maxDepth: -1,
+            maxResources: -1,
+            selectors: 'a[href$=".html"] # follow html links',
+          },
+        },
+        {
+          name: 'ExtractHtmlContentPlugin',
+          opts: {
+            selectors: 'h1\ni.classA # headlines',
+          },
+        },
+      ],
+    },
+    expectedResources: [
+      {
+        "url": "https://www.sitea.com/redirect/main.html",
+        "actions": [],
+        "mediaType": "text/html",
+        "meta": {},
+        "content": { "h1": ["Main Header 1"], "i.classA": ["italics main"] }
+      },
+      {
+        "url": "https://www.sitea.com/redirect/pageA.html",
+        "actions": [],
+        "mediaType": "text/html",
+        "meta": {},
+        "content": { "h1": ["PageA Heading Level 1"], "i.classA": ["italics A"] }
+      },
+      {
+        "url": "https://www.sitea.com/redirect/pageB.html",
+        "actions": [],
+        "mediaType": "text/html",
+        "meta": {},
+        "content": { "h1": ["PageB Heading Level 1"], "i.classA": ["italics B"] }
+      }
+    ],
+    expectedCsv: [
+      'url,content.h1,content.i.classA',
+      '"https://www.sitea.com/redirect/main.html","Main Header 1","italics main"',
+      '"https://www.sitea.com/redirect/pageA.html","PageA Heading Level 1","italics A"',
+      '"https://www.sitea.com/redirect/pageB.html","PageB Heading Level 1","italics B"',
+    ],
+    csvLineSeparator: '\n',
+  },
 ];
 
 crawlProjectBaseSuite('Extract Static Content', crawlDefinitions);

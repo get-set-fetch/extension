@@ -45,7 +45,9 @@ export default class InsertResourcesPlugin extends BasePlugin {
 
   async apply(site: ISite & IdbSite, resource: Partial<IResource>) {
     let resourcesAdded = false;
+    let resourceRedirect = false;
 
+    // initialize filter
     if (!this.bloomFilter) {
       this.bloomFilter = BloomFilter.create(this.opts.maxEntries, this.opts.probability, site.resourceFilter);
 
@@ -56,6 +58,7 @@ export default class InsertResourcesPlugin extends BasePlugin {
       }
     }
 
+    // handle new resources
     const { resourcesToAdd } = resource;
 
     if (resourcesToAdd && resourcesToAdd.length > 0) {
@@ -74,8 +77,17 @@ export default class InsertResourcesPlugin extends BasePlugin {
       }
     }
 
-    // if new resources have been added, update the site bloom filter with the latest one
-    if (resourcesAdded) {
+    /*
+    handle redirects
+    if the current resource.url is not present in the filter, means the url changed as a result of a redirect
+    */
+    if (this.bloomFilter.test(resource.url) === false) {
+      this.bloomFilter.add(resource.url);
+      resourceRedirect = true;
+    }
+
+    // if new resources have been added or redirect occurred, update the site bloom filter with the latest one
+    if (resourcesAdded || resourceRedirect) {
       // eslint-disable-next-line no-param-reassign
       site.resourceFilter = this.bloomFilter.bitset;
     }

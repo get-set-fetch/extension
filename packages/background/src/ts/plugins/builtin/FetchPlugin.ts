@@ -104,21 +104,19 @@ export default class FetchPlugin extends BasePlugin {
     let completeHandler;
 
     const reqPromise: Promise<{statusCode: number}> = new Promise((resolve, reject) => {
-      completeHandler = request => resolve(request.statusCode);
+      completeHandler = details => {
+        if (details.tabId === site.tabId) {
+          resolve();
+        }
+      };
 
-      const resourceUrl:URL = new Url(resource.url);
-
-      // register request listeners responsible for resolving or rejecting this plugin's apply fnc
+      /*
+      register request listeners responsible for resolving or rejecting this plugin's apply fnc
+      don't add EventUrlFilters (hostEquals, pathEquals) since in case of redirects they will no longer apply
+      and the listener will be filtered out, no longer invoked
+      */
       browser.webNavigation.onCompleted.addListener(
         completeHandler,
-        {
-          url: [
-            {
-              hostEquals: resourceUrl.hostname,
-              pathEquals: resourceUrl.pathname,
-            },
-          ],
-        },
       );
     });
 
@@ -127,8 +125,6 @@ export default class FetchPlugin extends BasePlugin {
       ActiveTabHelper.update(site.tabId, { url: resource.url }),
       reqPromise,
     ]);
-
-    // at some point, react to statusCode, redirectUrl ...
 
     // remove the listners
     browser.webNavigation.onCompleted.removeListener(completeHandler);
@@ -139,7 +135,10 @@ export default class FetchPlugin extends BasePlugin {
       await this.waitForDomStabilityExecution(site.tabId, this.opts.stabilityTimeout);
     }
 
-    return { mediaType };
+    // in case of redirects also return the updated resource url
+    return tab.url === resource.url
+      ? { mediaType }
+      : { mediaType, url: tab.url };
   }
 
   probableHtmlMimeType(urlStr: string) {

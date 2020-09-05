@@ -2,7 +2,7 @@
 import connect from 'connect';
 import serveStatic from 'serve-static';
 import vhost from 'vhost';
-import http from 'http';
+import http, { IncomingMessage, ServerResponse } from 'http';
 import https from 'https';
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
@@ -16,6 +16,19 @@ interface IProxyServerProps {
 }
 
 export default class ProxyServer {
+  /*
+  redirect all /dir/redirect-page.html req to /dir/page.html
+  some integration tests make use of this functionality to test the scraper redirect handling capabilities
+  */
+  static redirect(req: IncomingMessage, res: ServerResponse) {
+    if (/redirect-/.test(req.url)) {
+      const targetUrl = req.url.replace(/redirect-/, '');
+      res.statusCode = 301;
+      res.setHeader('Location', targetUrl);
+      res.end();
+    }
+  }
+
   static create({
     rootDir,
     httpPort = 8080,
@@ -30,6 +43,8 @@ export default class ProxyServer {
     siteDirs.forEach(siteDir => {
       const siteApp = connect();
       siteApp.use(serveStatic(join(rootDir, siteDir), serveStaticOpts.get(siteDir)));
+      siteApp.use(ProxyServer.redirect);
+
       mainApp.use(vhost(siteDir, siteApp));
       mainApp.use(vhost(`www.${siteDir}`, siteApp));
       console.log(`Serving ${siteDir} from ${join(rootDir, siteDir)}`);
