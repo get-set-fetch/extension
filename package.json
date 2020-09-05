@@ -6,7 +6,7 @@
     "clean": "lerna run clean",
     "postinstall": "patch-package && npm run symlink:delete && npm run symlink:create",
     "patch": "patch-package",
-    "fetch:firefox": "browser=firefox revision=81.0a1 node ./scripts/fetch-browser.js",
+    "fetch:firefox": "browser=firefox revision=82.0a1 node ./scripts/fetch-browser.js",
     "symlink:create": "node ./scripts/symlink.js create",
     "symlink:delete": "node ./scripts/symlink.js delete",
     "build": "lerna run build",
