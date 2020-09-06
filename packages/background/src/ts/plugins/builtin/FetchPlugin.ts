@@ -102,10 +102,12 @@ export default class FetchPlugin extends BasePlugin {
 
   async openInTab(site: ISite, resource: IResource) {
     let completeHandler;
+    let completeDetails;
 
     const reqPromise: Promise<{statusCode: number}> = new Promise((resolve, reject) => {
       completeHandler = details => {
         if (details.tabId === site.tabId) {
+          completeDetails = details;
           resolve();
         }
       };
@@ -120,8 +122,7 @@ export default class FetchPlugin extends BasePlugin {
       );
     });
 
-    // eslint-disable-next-line prefer-const
-    const [ tab ] = await Promise.all([
+    await Promise.all([
       ActiveTabHelper.update(site.tabId, { url: resource.url }),
       reqPromise,
     ]);
@@ -135,10 +136,18 @@ export default class FetchPlugin extends BasePlugin {
       await this.waitForDomStabilityExecution(site.tabId, this.opts.stabilityTimeout);
     }
 
-    // in case of redirects also return the updated resource url
-    return tab.url === resource.url
+    /*
+    in case of redirects also return the updated resource url
+
+    This property is only present if the extension's manifest includes the `"tabs"` permission.
+
+    ActiveTabHelper.update returns the newly updated tab 
+    but we can't get its url since the manifest doesn't have the tabs permissions
+    rely on completeHandler details instead
+    */
+    return completeDetails.url === resource.url
       ? { mediaType }
-      : { mediaType, url: tab.url };
+      : { mediaType, url: completeDetails.url };
   }
 
   probableHtmlMimeType(urlStr: string) {
