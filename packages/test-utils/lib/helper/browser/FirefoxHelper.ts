@@ -163,6 +163,7 @@ export default class FirefoxHelper extends BrowserHelper {
       this.browser = await pptr.connect({
         browserURL: `http://localhost:${51402}`,
         product: 'firefox',
+        slowMo: 150,
       });
 
       [ this.page ] = await this.browser.pages();
@@ -171,21 +172,6 @@ export default class FirefoxHelper extends BrowserHelper {
     }
 
     return this.page.goto(`moz-extension://${this.extension.id}/admin/admin.html?${queryParams}`, this.gotoOpts);
-  }
-
-  getLaunchOptions(): LaunchOptions {
-    return {
-      product: 'firefox',
-      executablePath: join(process.cwd(), './node_modules/puppeteer/.local-firefox/win64-80.0a1/firefox/firefox.exe'),
-
-      headless: false,
-      ignoreHTTPSErrors: true,
-      slowMo: 20,
-      args: [
-        '-wait-for-browser',
-      ],
-      userDataDir: join(process.cwd(), './test/resources/firefox/profile'),
-    };
   }
 
   /*
