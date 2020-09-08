@@ -8,6 +8,7 @@ export default class Navigation extends React.Component {
       <div key="logo" className='row'>
         <div className='col text-right mr-2'>
           <img src={gsfLogo} alt='get-set-fetch'/>
+          <p className="version">v{'{GSF_VERSION}'}</p>
         </div>
       </div>,
 
