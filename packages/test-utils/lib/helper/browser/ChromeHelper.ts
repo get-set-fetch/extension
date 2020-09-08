@@ -31,7 +31,7 @@ export default class ChromeHelper extends BrowserHelper {
     return {
       headless: false,
       ignoreHTTPSErrors: true,
-      slowMo: 150,
+      slowMo: 20,
       args: [
         `--host-rules=MAP *:80 127.0.0.1:${this.httpPort}, MAP *:443 127.0.0.1:${this.httpsPort}`,
         '--ignore-certificate-errors',

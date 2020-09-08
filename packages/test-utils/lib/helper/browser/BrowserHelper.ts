@@ -111,16 +111,16 @@ export default class BrowserHelper {
     await this.goto('/scenarios');
 
     const scenarioNo = 2;
-    let tryNo = 0;
+    let retryNo = 0;
     let scenarios = [];
-    while (tryNo < 10 && scenarios.length < scenarioNo) {
-      // eslint-disable-next-line
-      scenarios = await this.page.evaluate(() => GsfClient.fetch('GET', 'scenarios'));
-      tryNo += 1;
+    do {
+      await new Promise(resolve => setTimeout(resolve, (retryNo + 1) * 500));
 
       // eslint-disable-next-line
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      scenarios = await this.page.evaluate(() => GsfClient.fetch('GET', 'scenarios'));
+      retryNo += 1;
     }
+    while (retryNo < 10 && scenarios.length < scenarioNo) 
 
     if (scenarios.length !== scenarioNo) {
       throw new Error(`could not get all ${scenarioNo} scenarios`);

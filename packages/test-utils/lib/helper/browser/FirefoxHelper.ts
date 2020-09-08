@@ -163,7 +163,7 @@ export default class FirefoxHelper extends BrowserHelper {
       this.browser = await pptr.connect({
         browserURL: `http://localhost:${51402}`,
         product: 'firefox',
-        slowMo: 150,
+        slowMo: 20,
       });
 
       [ this.page ] = await this.browser.pages();
