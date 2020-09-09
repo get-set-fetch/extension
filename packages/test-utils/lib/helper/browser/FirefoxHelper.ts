@@ -5,10 +5,10 @@ import pptr from 'puppeteer-core';
 import webExt from 'web-ext';
 
 import { stringify } from 'query-string';
-import { LaunchOptions, Browser } from 'puppeteer';
+import { Browser } from 'puppeteer';
 import { join } from 'path';
-import BrowserHelper from './BrowserHelper';
 import { readFileSync } from 'fs';
+import BrowserHelper from './BrowserHelper';
 
 export default class FirefoxHelper extends BrowserHelper {
   client; // @cliqz-oss/firefox-client
@@ -84,7 +84,7 @@ export default class FirefoxHelper extends BrowserHelper {
 
     // Needed because `webExt.cmd.run` returns before the DevTools agent starts running.
     // Alternative would be to wrap the call to pptr.connect() with some custom retry logic
-    child_process.execSync('sleep 5');
+    child_process.execSync('sleep 10');
 
     const browserURL = `http://localhost:${CDPPort}`;
     const browser = await pptr.connect({
