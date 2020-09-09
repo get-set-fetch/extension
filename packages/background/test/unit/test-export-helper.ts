@@ -1,11 +1,61 @@
 /* eslint-disable no-useless-escape */
-import { assert } from 'chai';
+import { assert, expect } from 'chai';
 import { IResource, ExportType, ILog, LogLevel } from 'get-set-fetch-extension-commons';
 import ExportHelper from '../../src/ts/helpers/ExportHelper';
 
 describe('Test ExportHelper', () => {
   const lineSeparator = '\n';
   const fieldSeparator = ',';
+
+  it('no html resources to export', async () => {
+    const resources: Partial<IResource>[] = [
+      { url: 'urlC', mediaType: 'image/png', content: {} },
+    ];
+
+    let thrownErr;
+
+    try {
+      await ExportHelper.exportResourcesCSV(
+        resources as any,
+        {
+          type: ExportType.CSV,
+          cols: [ 'url', 'content' ],
+          fieldSeparator,
+          lineSeparator,
+        },
+      );
+    }
+    catch (err) {
+      thrownErr = err;
+    }
+
+    assert.strictEqual(thrownErr.message, 'No html content to export.');
+  });
+
+  it('no binary resources to export', async () => {
+    const resources: Partial<IResource>[] = [
+      { url: 'urlC', mediaType: 'image/png', content: {} },
+    ];
+
+    let thrownErr;
+
+    try {
+      await ExportHelper.exportResourcesZIP(
+        resources as any,
+        {
+          type: ExportType.CSV,
+          cols: [ 'blob' ],
+          fieldSeparator,
+          lineSeparator,
+        },
+      );
+    }
+    catch (err) {
+      thrownErr = err;
+    }
+
+    assert.strictEqual(thrownErr.message, 'No binary content to export.');
+  });
 
   it('export resources as csv, literal values', async () => {
     const resources: Partial<IResource>[] = [

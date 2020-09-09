@@ -207,8 +207,11 @@ export default class ExportHelper {
     if (resources.length === 0) throw new Error('Nothing to export. No resources found.');
     if (!opts.cols || opts.cols.length === 0) throw new Error('Expecting at least one column for csv content.');
 
+    const htmlResources: IResource[] = resources.filter(resource => /html/.test(resource.mediaType));
+    if (htmlResources.length === 0) throw new Error('No html content to export.');
+
     try {
-      const content = ExportHelper.exportCsvContent(resources, opts);
+      const content = ExportHelper.exportCsvContent(htmlResources, opts);
       const contentBlob = new Blob([ content ], { type: 'text/csv' });
       return { url: URL.createObjectURL(contentBlob) };
     }
