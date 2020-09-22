@@ -15,13 +15,20 @@ export default class FetchPlugin extends BasePlugin {
           title: 'Stability Timeout',
           description: 'Considers the page loaded and ready to be scraped when there are no more DOM changes within the specified amount of time (milliseconds). Only applies to html resources. Useful for bypassing preloader content.',
         },
+        maxStabilityWaitingTime: {
+          type: 'integer',
+          default: '0',
+          title: 'Max Stability Waiting Time',
+          description: 'Maximum waiting time (miliseconds) for achieving DOM stability in case of a continuously updated DOM (ex: timers, countdowns).',
+        },
       },
-      required: [ 'stabilityTimeout' ],
+      required: [ 'stabilityTimeout', 'maxStabilityWaitingTime' ],
     };
   }
 
   opts: {
     stabilityTimeout: number;
+    maxStabilityWaitingTime: number;
   };
 
   test(site: ISite, resource: IResource) {
@@ -133,7 +140,7 @@ export default class FetchPlugin extends BasePlugin {
     const mediaType = await ActiveTabHelper.executeScript<string>(site.tabId, { code: 'document.contentType' });
 
     if (/html/.test(mediaType) && this.opts.stabilityTimeout > 0) {
-      await this.waitForDomStabilityExecution(site.tabId, this.opts.stabilityTimeout);
+      await this.waitForDomStabilityExecution(site.tabId, this.opts.stabilityTimeout, this.opts.maxStabilityWaitingTime);
     }
 
     /*
@@ -141,7 +148,7 @@ export default class FetchPlugin extends BasePlugin {
 
     This property is only present if the extension's manifest includes the `"tabs"` permission.
 
-    ActiveTabHelper.update returns the newly updated tab 
+    ActiveTabHelper.update returns the newly updated tab
     but we can't get its url since the manifest doesn't have the tabs permissions
     rely on completeHandler details instead
     */
@@ -164,14 +171,14 @@ export default class FetchPlugin extends BasePlugin {
     return /htm|php/.test(ext);
   }
 
-  waitForDomStabilityExecution(tabId, timeout: number) {
+  waitForDomStabilityExecution(tabId, timeout: number, maxWaitingTime: number) {
     // use a block declaration in order not to polute the global namespace
     const code = `
     {
       (async function() {
         try {
           function ${this.waitForDomStability.toString()};
-          await waitForDomStability(${timeout});
+          await waitForDomStability(${timeout}, ${maxWaitingTime});
         
           // send the result back via messaging as the promise content will just be serialized to {}
           (globalThis.browser || globalThis.chrome).runtime.sendMessage({resolved: true});
@@ -186,8 +193,10 @@ export default class FetchPlugin extends BasePlugin {
     return ActiveTabHelper.executeAsyncScript(tabId, code);
   }
 
-  waitForDomStability(timeout: number) {
+  waitForDomStability(timeout: number, maxWaitingTime: number) {
     return new Promise(resolve => {
+      const startTime = Date.now();
+
       const waitResolve = observer => {
         observer.disconnect();
         resolve();
@@ -198,6 +207,14 @@ export default class FetchPlugin extends BasePlugin {
         for (let i = 0; i < mutationList.length; i += 1) {
           // we only care if new nodes have been added
           if (mutationList[i].type === 'childList') {
+            /*
+            we've waited for stability to be reached long enough,
+            don't reset the timer again and allow waitForDomStability to resolve
+            */
+            if (maxWaitingTime > 0 && Date.now() - startTime > maxWaitingTime) {
+              return;
+            }
+
             // restart the countdown timer
             window.clearTimeout(timeoutId);
             timeoutId = window.setTimeout(waitResolve, timeout, observer);

@@ -30,6 +30,7 @@ describe('Test ModuleRuntimeManager', () => {
         name: 'FetchPlugin',
         opts: {
           stabilityTimeout: 0,
+          maxStabilityWaitingTime: 0,
         },
       },
       {

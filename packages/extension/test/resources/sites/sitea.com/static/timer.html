@@ -1,0 +1,20 @@
+<html>
+
+<head>
+    <title>continuously updated timer</title>
+    <script>
+        function updateTime(entry) {
+            document.querySelector("#time").innerHTML = Date.now();
+        }
+
+        setInterval(updateTime, 100);
+    </script>
+
+</head>
+
+<body>
+  <h1 class="title">Timer Title</h1>
+  <p id="time"></p>  
+</body>
+
+</html>
