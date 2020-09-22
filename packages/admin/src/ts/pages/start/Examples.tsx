@@ -8,9 +8,9 @@ export default class GettingStarted extends React.Component {
     const projectHashes = {
       topLanguages: 'eLtI4gnarZS/boQwDMZfxep0DIGqfxaGPkHHjpVQOByILiRRYnri7evQgx5FHeh1QApO/MmOv1+Wo2/Og5G2HbimCPUI3vnBTMbaEHJpGygNDxpJElRwPUiI2rYcYrOQPkLH9wKeBfOFqY7Ix7Io0OZnfdIeGy1zF9oi/RWvOlLlVLUUUtVjZYe+xpDCllU/sIoe5Qn5Rld8tkgi8qcSTGLe4EWQHsVXReLb37ewfP/fLP+Cyk86VhWsrL8h5y8srFDY0n2D8SejTAOfVqXSIZJwStDoEagpLXXi2GnTHB4yfobm+b/bHZmPKXP2Bhx6bQzbNWa7RJ6SiEdumbNaBKfg7IJprnDYpfecwQvIy4kpdNUeKH7BzXi3g/Z9dH8CgGRfRw==',
       uefaTopScorers: 'eLtI4gnapZTBisMgFEV/5dG9sTDMprsuOv2BWQ4MNjFRWo3kmYb+fa8mTWmhDJkuBI0Pvb57T+6lu68tfbeB9i2sKBEHSH5GY3ovxeQaVSoqqrvWkSK2vsEnpCTakgwaQgGvo8FGQ9bX1sM14uwtSosZMhNj4I2UwzAUva5VUbZOpklplAu4lk9aNb2WxjLaeJGd8kecwDIgRxApmyT4N0uu5COzjY6CMeoEmLhtYNKpoMUoVtwz/w7f67eBfsHLjMhEwHjjR8Znjv9nXj7R8x8eHnH4g/CF8a/sucg9Z7SdBQLhhEhH4cczmvnjU83ktPC9O8Bg7GaLVwugWAbBFYIYEVs=',
-      amazonBabyCarSeats: 'eLtI4gnanVXfS8MwEP5XggPf0rmBTAURN/BJRNx8G4ysvc2wNil32er86/3S1WknIttDyd3lfuSS77vuXe8L8+GdGpr5Vo0MqzEZOB1yo2lYLSxLUKHyqmSfrWEp0YuoBftCNalSZJGYBVKgpedtsqfWWwil3HS7VVUlpnZPUl90UVjXhbvzO0u3r5OHq3PnM7rt9Qf9/vXgotdrk3JJQQu+RWSQ/tqAwKYkDcwGm+pvUJ9M4MsDeJ3E2D8IcciBFkFaAP/Fj1MQn9lNIhocKuqLMdYRKwOTSQEg0RnBluv4nhgIX8+bW7eaOtOB2T3Re3iEjm0HsX76Fo36/0yGI2kjpXGd5iATG/J4rhDXqUMzHbMhxglGawm+IH7B4KJKlE2MtugwooAREReZujqZSbntPol9dBQDL24pTV5ZzRYA45ppBl3FyCSlvLIZYAdv46QipkxhqkskSBNYsk1p516Lw9ynq3Fgu6LnqEfRLZEgtxLrqdrrMHYnzmPsDPe428CEXjPjwn7HhOxnNfwV0Mi+kuz0syPmynFz5BOX4Yaz',
-      goodReadsBookNominees: 'eLtI4gnanZTBToQwEIZfZaIXTSwIxoMcTHwAPZl48dKFQpuFlrSjzb690y4sAm7iciAp07/Taef/epLuhEPYGbN3YGrI77OnFRjDaeEkBW06pYVwUFvTAUoBtbI0id5AyVE0xioqagRKIvauSFPvfdIYU1m6VJeUpktLaVQpuOe2cmnIz2IpbKjjF4aNQOboqwMzbJyggeW9YORSVCWbbLwZ2YeFoTYxegaBpetnSMwsvSJii8cr9Z0M3TgUGiUrpWqrm+wWnoEXsWPH0B2ckeYrKb0VNRVl/LrjB2iV3rtPHZJx7bywH9ScXlhKQrGQaloefRQXzEjMlyA+/sn3v8nLrsNG7wrb8MzFTTH8xCrj3MsXShIDT3gcvdFGo/QYmbSvAjkdw/Vcz29p0FtyoW6uLqD4Mmp/AD/ITDw=',
-      dowJonesIndices: 'eLtI4gnanZSxUsMwDIZfRceMHFqOpRsrIxt3XXyx0hhc22crTXh75DSQS+jQdsidnN+RJeX/PNsp9PAWPGWw3tiSas3F1CzQUJODxjrZ21tuYf7UaNYKpCUqWTNoMVUaYwMcQEMn9WCTLHnjvqEJ6ahZ/QHXMse8q6ouqxynMlQdjtUUV8KPOLAyocfPciCK0GVOVjvUJ0oyzyW0B2LM8jSFMPwVJEg6Eoqn2dY4m/5uwF9W9ruW6Oenq5hZY7JgaMHAP4TugUIlyc9kcJo7Ouu/QO8amzJj3Vpn5K4QkQYo0l62nRQNMSRGnUMjPiDsZcaREuhJeYSyK8o/QrbsCNqNZBlcHnMsONyuMdxegvta7C4dey5+fLH3bFRM0igm4i55kcclnJejXrfaH8oNuYGPBK/eK3gf1fxwA6u3sfkDFY1FBQ==',
+      amazonBabyCarSeats: 'eLtI4gnanVXbbtswDP0VIQb65mQxMPQCBEVbYK8b1gx7qIuAsRlHiC0JpFwv/fpRcpImLoYufTBMSbyI5DnUQfWugVdr1D0st+oBSD0iiNKQG7uE1UoTe+U7qxzZspUdJ7mwWpFt1M5VIV44eBHJY2VpOz5Qa+2945vJpOu6MUT1cWGbiQROY+DJ8lbj7Nf829WFsSXOptllll1ffplOT0lZoU9ZvlVgULo/EIHAYSqY9bpI30D9aQJ/HcDrvxnbQ3q//xu016YKxwM2/4MsQ36ckKdYg6lwfkyBGO67Q4oTgXsO+Xcaxxz7DGtK/fJUggcpbeOskeKmfutwlo9Y2gEkvSDktvb56FmxA+ku1p0upV1qnSmQSbPHTa3NJjdtPYZUIKRNvLjsyroGwViiDP7p4XVC1eyD6XMmNcMlk92d5trXYRj68M+NJJvAi5S0woeWvW2QfspwxI5VuKUWeAWkkViEH+cmOoOCTtXnIY9EhdaYind+ebNYCeBbwoWsh7VKFBjukLBU8nJw7Glv6EgX2KtH8b62xebRk97gj7AOoqnEQa05xFNRa2jbi8tgu5A69gfyCrREUrD3Nr48jiYvjyRyiMT9enTG7DpvVv0FPj+poQ==',
+      goodReadsBookNominees: 'eLtI4gnanZQ7b8IwEMe/yqksMCQpVB3KUKnMfSxILCzGuSQWiR3Z16Z8+57zABKgAoYoiX0v+/6/25tu0BFsjNk6MAnMHqcvJ2C0p4W9KWhTKI3oILGmAMoQEmV5kyoDUhCmxiouqgMqIyrdPIqqqgpTY2LLl+pCaYpIZkZJFJWwsYt8/KAuJWjrOMIwRQocP4lnJug2+MOKEgNWKSkZHGR8N7JPA0FdzWgj4m59JRQpnfrtAb8X8BgS0cNFZkKnuDwWfZ3uq0RbzwDXUEMnFsdU3cNJrH7CtqO7uaYskJnK4/F0Aq8g5nXXmyUeIglnMlUrhc4JcqW3a30hzuyfOA65nfG5QEK7Cu2KO8/n5wC85sMcXGuRenvXw3w2pPz53Oy4murpyOdZKsr9CCX/rusbFUhCmtzXVZu8fVPGPiBCUX99cj72aH7GbtJ4ecsP9uSjuFLo/i2NwDdap2sdsvbkFmMINypdmN+FiXcQcl0FF/yuHPVuM8wxIfYuhNKQorb4cMOMuW2m/AHa94RS',
+      dowJonesIndices: 'eLtI4gnanZS9UsMwDMdfRceMbVq2PgILCyOLiJVExbV9tkrSt0cJhbaBoWXwne8ky/r4/3SSUxrgKUWqwNHzFGrJxbFYoLGhAC0H9R1Yejg99ShoQUuiKWoFVFGV+e5BEiDsNR/TFqbowwHaVHYo9ge4XiTXjXPDMNiau5DeMNgm7VzNfsuOojvm5hQklaLzaTDb6Wejhn2VwhgMflDRxrpLfDsSU/W0E2vm26CXgpmMqlu4MSf5/xv1x4UQr2V79XAVPUtgLmhqeowdvZwzMev5OWtHpinWL6jkl8c5dP/ByBbNQ8ib44BM4CqAm5ZLFdP0HLxuFzXSCIHj+2u0mtM8/9iQ6XQI/dx95EgF0NKYU5F76FeWo5SkxnwwwhKmNTWGOoe5gHe9ZHf910a4ltW7GxC8DblPUb02JQ==',
       imgurImages: 'eLtI4gnanZTfDoIgFIdf5ayr2kJyrS56iN7BAo1KYHC0evvAP4naVnrBhB3d+bnzfQRhssJAFcmOlGj+E0RVhqVUCKVgXNkVpEblEG/AcMYEUkPTQsoXaGXRflS6IGp7oFT4LtFZ5e179HHTe32VfdcyjsS6lXoxSFtwG5NoTlhNPulgnS3mboDNvyZuB9/9ljHkgIkykkl55E/snFuD9OcTytC+RtWvAcaszjHAh/HDItVw3Ygzl0m0HARuDNv177CpKsR1UxR49xdP9VxMwH4a5m9xNwS/',
     };
 
@@ -18,6 +18,8 @@ export default class GettingStarted extends React.Component {
     return (
       <Page title="Examples">
         <div className="p-4 examples">
+          <p className="notes">Note: The web is in constant motion :) . The CSS selectors used in the following examples (following robots.txt guidelines) may not be valid anymore.</p>
+
           <h5 className="inner">Single Static Page Scraping</h5>
           <hr/>
           <ul>
@@ -66,8 +68,8 @@ export default class GettingStarted extends React.Component {
               </NavLink>
             </li>
             <li>
-              <a href="https://www.goodreads.com/choiceawards/best-fiction-books-2019" target="_blank" rel="noopener noreferrer" className="inner-nav-link">
-              https://www.goodreads.com/choiceawards/best-fiction-books-2019
+              <a href="https://www.goodreads.com/choiceawards/best-books-2019" target="_blank" rel="noopener noreferrer" className="inner-nav-link">
+              https://www.goodreads.com/choiceawards/best-books-2019
               </a>
               <p>GoodReads.com best book nominees 2019.</p>
               <p>Extract best book nominees from the first two categories.</p>
@@ -77,12 +79,11 @@ export default class GettingStarted extends React.Component {
               </NavLink>
             </li>
             <li>
-              <a href="https://us.spindices.com/indices/equity/dow-jones-industrial-average" target="_blank" rel="noopener noreferrer" className="inner-nav-link">
-              https://us.spindices.com/indices/equity/dow-jones-industrial-average
+              <a href="https://www.spglobal.com/spdji/en/indices/equity/dow-jones-industrial-average/" target="_blank" rel="noopener noreferrer" className="inner-nav-link">
+              https://www.spglobal.com/spdji/en/indices/equity/dow-jones-industrial-average/
               </a>
               <p>Dow Jones indices.</p>
               <p>Extract excel files with Dow Jones data. Filenames are renamed to a user-friendly format based on a title selector.</p>
-              <p>Example of waiting for additional content to load in page (charts with export button) before scraping.</p>
               <NavLink to={`/project/${encodeURIComponent(projectHashes.dowJonesIndices)}`}>
                 <input type="button" className="btn-secondary mr-2" value="Create project" style={{ marginTop: '0.5rem' }} />
               </NavLink>
@@ -104,8 +105,6 @@ export default class GettingStarted extends React.Component {
               </NavLink>
             </li>
           </ul>
-
-          <p>Note: The examples above follow robots.txt guidelines.</p>
 
         </div>
       </Page>
