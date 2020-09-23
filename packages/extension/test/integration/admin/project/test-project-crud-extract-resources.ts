@@ -74,6 +74,7 @@ describe('Project CRUD Pages', () => {
         name: 'FetchPlugin',
         opts: {
           stabilityTimeout: 0,
+          maxStabilityWaitingTime: 0
         },
       },
       {
@@ -110,7 +111,7 @@ describe('Project CRUD Pages', () => {
     ],
   };
 
-  const expectedConfigHash = 'eLtI4gnagystKMrPAjrUESM7wCQUkIVhWSSjpKTASl+/vLxcD5hYUhP1kvNz9TPzUlIr9DKAgYKag9JTS3SLgTgNlNx1YRJARlFiQaouMIGVZCbrIlIgRbmN4uyFI/WiJ1iU1JyckZiXnhqCnCbB6cm/ILUInEWL0XM+sck0MzedcEKlJGUa6pVkluSkKpGQ8EhLaACEAddQ';
+  const expectedConfigHash = 'eLtI4gnagystKMrPAjrUESM7wCQUkIVhWSSjpKTASl+/vLxcD5hYUhP1kvNz9TPzUlIr9DKAgYKag9JTS3SLgTgNlNx1YRJARlFiQaouMIGVZCbrIlIgRbmNrOwFSX8w8fDEzJLMvHSQNFrWw5Gy0RMzSkpPzkjMS08NQU6vYOv8C1KLwNm3GL1UIDYJZ+amE07ElKRaQ72SzJKcVCUSEiVpiRAAWA7hhw==';
 
   before(async () => {
     browserHelper = getBrowserHelper();
@@ -269,6 +270,14 @@ describe('Project CRUD Pages', () => {
       maxOperations: -1,
       changeTimeout: 2000,
     };
+
+    const fetchPlugin: IPluginDefinition = projectToUpdate.plugins.find(plugin => plugin.name === 'FetchPlugin');
+    fetchPlugin.opts = Object.assign(
+      fetchPlugin.opts,
+      {
+        maxStabilityWaitingTime: 0
+      }
+    );
 
     assert.deepEqual(updatedProject, projectToUpdate);
 
