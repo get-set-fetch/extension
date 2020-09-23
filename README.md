@@ -10,7 +10,7 @@
 # Browser Extension
 get-set, Fetch! is a browser extension for scraping sites through out a series of parametrizable scraping scenarios.
 
-Currently supported browsers: [Chrome](https://chrome.google.com/webstore/detail/get-set-fetch-web-scraper/obanemoliijohdnhjjkdbekbhdjeolnk) .
+Currently supported browsers: [Chrome](https://chrome.google.com/webstore/detail/get-set-fetch-web-scraper/obanemoliijohdnhjjkdbekbhdjeolnk) , [Firefox](https://addons.mozilla.org/en-US/firefox/addon/get-set-fetch-web-scraper/) .
 
 The most common use cases are handled by builtin scenarios:
 - [Scrape Static Content](https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/scrape-static-content)
