@@ -48,7 +48,9 @@ export default class ExportHelper {
       nameParts.push(title);
       nameParts.push(linkText);
       nameParts.push(imgAlt);
-      return nameParts.filter(namePart => namePart).map(namePart => namePart.substr(0, 100)).join('-');
+
+      const uniqueNameParts = Array.from(new Set(nameParts.filter(namePart => namePart)));
+      return uniqueNameParts.map(namePart => namePart.substr(0, 100)).join('-');
     }
 
     // get resource name just from its url
