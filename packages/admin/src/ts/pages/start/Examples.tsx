@@ -11,7 +11,7 @@ export default class GettingStarted extends React.Component {
       amazonBabyCarSeats: 'eLtI4gnanVXbbtswDP0VIQb65mQxMPQCBEVbYK8b1gx7qIuAsRlHiC0JpFwv/fpRcpImLoYufTBMSbyI5DnUQfWugVdr1D0st+oBSD0iiNKQG7uE1UoTe+U7qxzZspUdJ7mwWpFt1M5VIV44eBHJY2VpOz5Qa+2945vJpOu6MUT1cWGbiQROY+DJ8lbj7Nf829WFsSXOptllll1ffplOT0lZoU9ZvlVgULo/EIHAYSqY9bpI30D9aQJ/HcDrvxnbQ3q//xu016YKxwM2/4MsQ36ckKdYg6lwfkyBGO67Q4oTgXsO+Xcaxxz7DGtK/fJUggcpbeOskeKmfutwlo9Y2gEkvSDktvb56FmxA+ku1p0upV1qnSmQSbPHTa3NJjdtPYZUIKRNvLjsyroGwViiDP7p4XVC1eyD6XMmNcMlk92d5trXYRj68M+NJJvAi5S0woeWvW2QfspwxI5VuKUWeAWkkViEH+cmOoOCTtXnIY9EhdaYind+ebNYCeBbwoWsh7VKFBjukLBU8nJw7Glv6EgX2KtH8b62xebRk97gj7AOoqnEQa05xFNRa2jbi8tgu5A69gfyCrREUrD3Nr48jiYvjyRyiMT9enTG7DpvVv0FPj+poQ==',
       goodReadsBookNominees: 'eLtI4gnanZQ7b8IwEMe/yqksMCQpVB3KUKnMfSxILCzGuSQWiR3Z16Z8+57zABKgAoYoiX0v+/6/25tu0BFsjNk6MAnMHqcvJ2C0p4W9KWhTKI3oILGmAMoQEmV5kyoDUhCmxiouqgMqIyrdPIqqqgpTY2LLl+pCaYpIZkZJFJWwsYt8/KAuJWjrOMIwRQocP4lnJug2+MOKEgNWKSkZHGR8N7JPA0FdzWgj4m59JRQpnfrtAb8X8BgS0cNFZkKnuDwWfZ3uq0RbzwDXUEMnFsdU3cNJrH7CtqO7uaYskJnK4/F0Aq8g5nXXmyUeIglnMlUrhc4JcqW3a30hzuyfOA65nfG5QEK7Cu2KO8/n5wC85sMcXGuRenvXw3w2pPz53Oy4murpyOdZKsr9CCX/rusbFUhCmtzXVZu8fVPGPiBCUX99cj72aH7GbtJ4ecsP9uSjuFLo/i2NwDdap2sdsvbkFmMINypdmN+FiXcQcl0FF/yuHPVuM8wxIfYuhNKQorb4cMOMuW2m/AHa94RS',
       dowJonesIndices: 'eLtI4gnanZS9UsMwDMdfRceMbVq2PgILCyOLiJVExbV9tkrSt0cJhbaBoWXwne8ky/r4/3SSUxrgKUWqwNHzFGrJxbFYoLGhAC0H9R1Yejg99ShoQUuiKWoFVFGV+e5BEiDsNR/TFqbowwHaVHYo9ge4XiTXjXPDMNiau5DeMNgm7VzNfsuOojvm5hQklaLzaTDb6Wejhn2VwhgMflDRxrpLfDsSU/W0E2vm26CXgpmMqlu4MSf5/xv1x4UQr2V79XAVPUtgLmhqeowdvZwzMev5OWtHpinWL6jkl8c5dP/ByBbNQ8ib44BM4CqAm5ZLFdP0HLxuFzXSCIHj+2u0mtM8/9iQ6XQI/dx95EgF0NKYU5F76FeWo5SkxnwwwhKmNTWGOoe5gHe9ZHf910a4ltW7GxC8DblPUb02JQ==',
-      imgurImages: 'eLtI4gnanZTfDoIgFIdf5ayr2kJyrS56iN7BAo1KYHC0evvAP4naVnrBhB3d+bnzfQRhssJAFcmOlGj+E0RVhqVUCKVgXNkVpEblEG/AcMYEUkPTQsoXaGXRflS6IGp7oFT4LtFZ5e179HHTe32VfdcyjsS6lXoxSFtwG5NoTlhNPulgnS3mboDNvyZuB9/9ljHkgIkykkl55E/snFuD9OcTytC+RtWvAcaszjHAh/HDItVw3Ygzl0m0HARuDNv177CpKsR1UxR49xdP9VxMwH4a5m9xNwS/',
+      imgurImages: 'eLtI4gnanZQ9D4IwEIb/ysXZWtDo4OrmYEwYXFzQFqiRlrQH0X8vtRChmCgMTT/u0nube592xKSlhqMydcgnonkmCCvYQCwZVIJxZSDRKocwAM0ZE0g1TUopn1A01ziOMsTCbCkVtsTiqvI2j2524W0fqT5oKUdi6pFYKkgbqBc6Ljhhzvbk49TJVK49z/yL4XIdOO9HbegUCxQytRnDa3+D2vUIE9VCxtWBP/DD4xyk3V9QdslsMB7oWwXBFzan0GHF2F6Sd+fr/qdzyEJ3hALv9stwpjhLL9dVHqY74/Sp88X2f8exkHkF3/NsBFDjAHoBBnokUg==',
     };
 
 
@@ -94,12 +94,12 @@ export default class GettingStarted extends React.Component {
           <hr/>
           <ul>
             <li>
-              <a href="https://imgur.com/r/funny/wkp6pjn" target="_blank" rel="noopener noreferrer" className="inner-nav-link">
+              <a href="https://imgur.com/r/funny/6C1jJSo" target="_blank" rel="noopener noreferrer" className="inner-nav-link">
               https://imgur.com/r/funny
               </a>
-              <p>Imgur images.</p>
-              <p>Extract images (not videos) from 10 reddit/r/funny posts.</p>
-              <p>Filenames are renamed based on img.alt attribute.</p>
+              <p>Imgur Posts.</p>
+              <p>Extract images and videos from 10 reddit/r/funny posts.</p>
+              <p>Filenames are renamed based on post title.</p>
               <NavLink to={`/project/${encodeURIComponent(projectHashes.imgurImages)}`}>
                 <input type="button" className="btn-secondary mr-2" value="Create project" style={{ marginTop: '0.5rem' }} />
               </NavLink>
