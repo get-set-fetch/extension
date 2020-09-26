@@ -56,6 +56,8 @@ export default class GettingStarted extends React.Component {
           <h5 className="inner">Multiple Static Page Scraping</h5>
           <hr/>
           <ul>
+            {
+              /*
             <li>
               <a href="https://www.amazon.com/Car-Seats/b?ie=UTF8&node=1272297011" target="_blank" rel="noopener noreferrer" className="inner-nav-link">
                 https://www.amazon.com/Car-Seats/
@@ -67,6 +69,8 @@ export default class GettingStarted extends React.Component {
                 <input type="button" className="btn-secondary mr-2" value="Create project" style={{ marginTop: '0.5rem' }} />
               </NavLink>
             </li>
+            */
+            }
             <li>
               <a href="https://www.goodreads.com/choiceawards/best-books-2019" target="_blank" rel="noopener noreferrer" className="inner-nav-link">
               https://www.goodreads.com/choiceawards/best-books-2019
