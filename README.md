@@ -10,7 +10,10 @@
 # Browser Extension
 get-set, Fetch! is a browser extension for scraping sites through out a series of parametrizable scraping scenarios.
 
-Currently supported browsers: [Chrome](https://chrome.google.com/webstore/detail/get-set-fetch-web-scraper/obanemoliijohdnhjjkdbekbhdjeolnk) , [Firefox](https://addons.mozilla.org/en-US/firefox/addon/get-set-fetch-web-scraper/) .
+Currently supported browsers: 
+[Chrome](https://chrome.google.com/webstore/detail/get-set-fetch-web-scraper/obanemoliijohdnhjjkdbekbhdjeolnk), 
+[Firefox](https://addons.mozilla.org/en-US/firefox/addon/get-set-fetch-web-scraper/),
+[Edge](https://microsoftedge.microsoft.com/addons/detail/getset-fetch-web-scrap/bpoeflbhbglemehjccjfockpkhddppoh).
 
 The most common use cases are handled by builtin scenarios:
 - [Scrape Static Content](https://github.com/get-set-fetch/extension/tree/master/packages/scenarios/scrape-static-content)
@@ -37,17 +40,8 @@ The extension is structured as a monorepo with the following sub-packages:
 - scrape-dynamic-content: builtin scenario
 - extension: builds the extension files and runs a comprehensive suite of integration tests
 
-In time, a more detailed documentation with lots of examples will be available at https://getsetfetch.org .
-
 You can find technical tidbits in each sub-package readme file.
 
-# Short-Term Roadmap
+A detailed documentation with a series of examples is available at [getsetfetch.org](https://getsetfetch.org/extension/getting-started.html).
 
-## v.0.4
-  - add column filter capability when exporting resources as csv
-  - add import / export database capabilities
-  - add Firefox support
-
-# Medium-Term Roadmap
-  - add additional scraping scenarios
 
