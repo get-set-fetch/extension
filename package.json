@@ -72,7 +72,7 @@
     "nock": "^10.0.4",
     "node-fetch": "^2.6.1",
     "node-forge": "^0.8.2",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "nyc": "^14.1.1",
     "patch-package": "^5.1.1",
     "puppeteer": "^5.2.0",
