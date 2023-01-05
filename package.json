@@ -112,7 +112,7 @@
     "get-set-fetch-scenario-scrape-dynamic-content": "file:packages/scenarios/scrape-dynamic-content",
     "immutable": "^4.0.0-rc.12",
     "is-my-json-valid": "^2.20.0",
-    "jszip": "^3.2.0",
+    "jszip": "^3.8.0",
     "pako": "^1.0.10",
     "popper.js": "^1.14.3",
     "query-string": "^6.1.0",
