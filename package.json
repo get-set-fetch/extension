@@ -122,8 +122,8 @@
     "react-router-dom": "^4.3.1",
     "webextension-polyfill": "^0.6.0",
     "uniforms": "^2.0.0-alpha.1",
-    "uniforms-bootstrap4": "^2.0.0-alpha.1",
-    "uniforms-bridge-json-schema": "^2.0.0-alpha.1",
+    "uniforms-bootstrap4": "^4.0.0",
+    "uniforms-bridge-json-schema": "^4.0.0",
     "untar.js": "^0.3.0",
     "url-parse": "^1.4.3",
     "util": "^0.12.1"
