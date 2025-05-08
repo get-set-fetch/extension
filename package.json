@@ -119,7 +119,7 @@
     "react": "^16.4.0",
     "react-beautiful-dnd": "^10.0.4",
     "react-dom": "^16.4.0",
-    "react-router-dom": "^4.3.1",
+    "react-router-dom": "^6.4.0",
     "webextension-polyfill": "^0.6.0",
     "uniforms": "^2.0.0-alpha.1",
     "uniforms-bootstrap4": "^2.0.0-alpha.1",
