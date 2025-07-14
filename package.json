@@ -117,7 +117,7 @@
     "popper.js": "^1.14.3",
     "query-string": "^6.1.0",
     "react": "^16.4.0",
-    "react-beautiful-dnd": "^10.0.4",
+    "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^16.4.0",
     "react-router-dom": "^4.3.1",
     "webextension-polyfill": "^0.6.0",
